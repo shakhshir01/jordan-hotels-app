@@ -1,12 +1,7 @@
 export default {
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {
-      colors: {
-        'jordan-blue': '#003580',
-        'petra-rose': '#d67d61',
-      }
-    },
+    extend: {},
   },
   plugins: [],
 }
