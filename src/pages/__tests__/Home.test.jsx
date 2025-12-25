@@ -1,0 +1,24 @@
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import Home from '../Home';
+
+vi.mock('../../services/api', () => ({
+  hotelAPI: {
+    getAllHotels: vi.fn(() => Promise.resolve([
+      { id: 'h1', name: 'Test Hotel', image: '', rating: 4.5, location: 'Amman', price: 100 },
+    ])),
+  },
+}));
+
+describe('Home page', () => {
+  test('renders hotel list from API', async () => {
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByText('Test Hotel')).toBeInTheDocument());
+  });
+});

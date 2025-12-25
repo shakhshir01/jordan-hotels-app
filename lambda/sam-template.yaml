@@ -1,0 +1,217 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless template to deploy `getHotelById` and an API stage for /hotels/{id}.
+
+Parameters:
+  CognitoUserPoolArn:
+    Type: String
+    Default: ''
+    Description: ARN of an existing Cognito User Pool to use for API Authorizer (optional)
+  StripeSecretArn:
+    Type: String
+    Default: ''
+    Description: (Optional) Secrets Manager ARN that contains Stripe secret key
+
+Resources:
+  HotelsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: stage
+      Cors:
+        AllowOrigins: "'*'"
+        AllowMethods: "'GET,POST,OPTIONS,ANY'"
+        AllowHeaders: "'Content-Type,Authorization'"
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !Ref CognitoUserPoolArn
+
+  GetHotelByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getHotelById
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: lambda/getHotelById/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        GetHotel:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HotelsApi
+            Path: /hotels/{id}
+            Method: ANY
+  GetHotelsListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getHotels
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: lambda/getHotels/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        ListHotels:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HotelsApi
+            Path: /hotels
+            Method: GET
+  CreateCheckoutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: createCheckoutSession
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: lambda/createCheckoutSession/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Ref StripeSecretArn
+      Environment:
+        Variables:
+          STRIPE_SECRET_ARN: !Ref StripeSecretArn
+      Events:
+        Checkout:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HotelsApi
+            Path: /payments/create-checkout-session
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+  GetSignedUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getSignedUrl
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: lambda/getSignedUrl/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        SignedUrl:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HotelsApi
+            Path: /uploads/signed-url
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+  BookingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: bookings
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: lambda/bookings/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        BookingsApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref HotelsApi
+            Path: /bookings
+            Method: ANY
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+Outputs:
+  ApiUrl:
+    Description: "Invoke URL for the API"
+    Value: !Sub "https://${HotelsApi}.execute-api.${AWS::Region}.amazonaws.com/${HotelsApi.StageName}"
+    Export:
+      Name: GetHotelsApiUrl
+  GetHotelsListFunction:
+    Description: "Path to list hotels"
+    Value: !Sub "https://${HotelsApi}.execute-api.${AWS::Region}.amazonaws.com/${HotelsApi.StageName}/hotels"
+  CreateCheckoutFunction:
+    Description: "Path to create checkout session"
+    Value: !Sub "https://${HotelsApi}.execute-api.${AWS::Region}.amazonaws.com/${HotelsApi.StageName}/payments/create-checkout-session"
+
+Resources:
+  # CloudWatch LogGroups and alarms for Lambdas
+  GetHotelByIdLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${GetHotelByIdFunction}"
+      RetentionInDays: 14
+
+  GetHotelsListLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${GetHotelsListFunction}"
+      RetentionInDays: 14
+
+  CreateCheckoutLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${CreateCheckoutFunction}"
+      RetentionInDays: 14
+
+  GetSignedUrlLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${GetSignedUrlFunction}"
+      RetentionInDays: 14
+
+  BookingsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${BookingsFunction}"
+      RetentionInDays: 14
+
+  # Metric filters and alarms: track ERROR occurrences in each function
+  GetHotelByIdErrorMetric:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref GetHotelByIdLogGroup
+      FilterPattern: '"ERROR"'
+      MetricTransformations:
+        - MetricValue: '1'
+          MetricNamespace: VisitJo/LambdaErrors
+          MetricName: GetHotelById_Errors
+
+  GetHotelByIdErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "GetHotelById-Error-Alarm-${AWS::StackName}"
+      Namespace: VisitJo/LambdaErrors
+      MetricName: GetHotelById_Errors
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      Threshold: 1
+      Period: 300
+      AlarmActions: []
+
+  # Similar metric filters/alarms for other functions
+  CreateCheckoutErrorMetric:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref CreateCheckoutLogGroup
+      FilterPattern: '"ERROR"'
+      MetricTransformations:
+        - MetricValue: '1'
+          MetricNamespace: VisitJo/LambdaErrors
+          MetricName: CreateCheckout_Errors
+
+  CreateCheckoutErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "CreateCheckout-Error-Alarm-${AWS::StackName}"
+      Namespace: VisitJo/LambdaErrors
+      MetricName: CreateCheckout_Errors
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      Threshold: 1
+      Period: 300
+      AlarmActions: []
+
