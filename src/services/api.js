@@ -279,4 +279,6 @@ export const hotelAPI = {
   },
 };
 
+export { apiClient };
+export const api = apiClient;
 export default apiClient;
