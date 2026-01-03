@@ -10,9 +10,9 @@ import AppLayout from './layouts/AppLayout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 // Pages
-import Home from './pages/home.jsx';
+import Home from './pages/Home.jsx';
 import HotelDetails from './pages/HotelDetails.jsx';
-import SignUp from './pages/signup.jsx';
+import SignUp from './pages/SignUp.jsx';
 import Verify from './pages/Verify';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
