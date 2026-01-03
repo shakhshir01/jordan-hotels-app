@@ -3,6 +3,8 @@
  * Manages environment variables and configuration across different environments
  */
 
+import React from 'react';
+
 /**
  * Environment Config Manager
  */

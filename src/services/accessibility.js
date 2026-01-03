@@ -3,6 +3,8 @@
  * WCAG 2.1 Level AA compliance
  */
 
+import React from 'react';
+
 /**
  * Keyboard Navigation Hook
  */

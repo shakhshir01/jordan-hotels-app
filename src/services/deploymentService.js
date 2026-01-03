@@ -3,6 +3,7 @@
  * Manages deployment and testing in staging environment
  */
 
+import React from 'react';
 import { logger } from './monitoringService';
 
 /**

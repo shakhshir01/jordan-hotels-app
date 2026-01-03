@@ -3,6 +3,7 @@
  * Suggests hotels based on user behavior and preferences
  */
 
+import React from 'react';
 import { api } from './api';
 
 /**

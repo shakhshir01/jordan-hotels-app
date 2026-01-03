@@ -3,6 +3,8 @@
  * Implements intelligent caching for API responses and computed values
  */
 
+import React from 'react';
+
 /**
  * Cache Entry
  */

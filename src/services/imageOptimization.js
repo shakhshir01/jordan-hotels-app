@@ -3,6 +3,8 @@
  * Handles lazy loading, compression, and responsive images
  */
 
+import React from 'react';
+
 /**
  * Lazy load images with Intersection Observer
  */

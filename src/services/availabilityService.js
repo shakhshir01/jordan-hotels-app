@@ -3,6 +3,8 @@
  * WebSocket-based availability updates
  */
 
+import React from 'react';
+
 /**
  * Real-time Availability Manager
  * Handles WebSocket connections for live availability updates

@@ -3,6 +3,7 @@
  * Handles automated backups, snapshots, and restoration
  */
 
+import React from 'react';
 import { api } from './api';
 import { logger } from './monitoringService';
 
