@@ -12,30 +12,56 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is already logged in on mount
   useEffect(() => {
-    const cognitoUser = UserPool.getCurrentUser();
-    if (cognitoUser) {
-      cognitoUser.getSession((err, session) => {
-        if (err) {
-          setError(err.message);
-        } else if (session.isValid()) {
-          setUser({ email: cognitoUser.getUsername() });
-          try {
-            const idToken = session.getIdToken().getJwtToken();
-            setAuthToken(idToken);
-          } catch (e) {
-            console.warn('Failed to set auth token from session', e);
-          }
-        }
+    try {
+      if (!UserPool) {
         setLoading(false);
-      });
-    } else {
+        return;
+      }
+      const cognitoUser = UserPool.getCurrentUser();
+      if (cognitoUser) {
+        cognitoUser.getSession((err, session) => {
+          if (err) {
+            setError(err.message);
+          } else if (session.isValid()) {
+            setUser({ email: cognitoUser.getUsername() });
+            try {
+              const idToken = session.getIdToken().getJwtToken();
+              setAuthToken(idToken);
+            } catch (e) {
+              console.warn('Failed to set auth token from session', e);
+            }
+          }
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error('Error checking session:', err);
       setLoading(false);
     }
   }, []);
 
-  const signUp = async (email, password) => {
+  const signUp = async (email, password, fullName) => {
     return new Promise((resolve, reject) => {
-      UserPool.signUp(email, password, [], null, (err, data) => {
+      if (!UserPool) {
+        reject(new Error('Authentication service not available'));
+        return;
+      }
+
+      // Create user attributes array with the required 'name' attribute for Cognito schema
+      const userAttributes = [
+        {
+          Name: 'email',
+          Value: email,
+        },
+        {
+          Name: 'name',
+          Value: fullName || email.split('@')[0],
+        }
+      ];
+
+      UserPool.signUp(email, password, userAttributes, null, (err, data) => {
         if (err) {
           setError(err.message);
           reject(err);
@@ -48,6 +74,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     return new Promise((resolve, reject) => {
+      if (!UserPool) {
+        reject(new Error('Authentication service not available'));
+        return;
+      }
       const cognitoUser = new CognitoUser({
         Username: email,
         Pool: UserPool,
@@ -79,9 +109,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    const cognitoUser = UserPool.getCurrentUser();
-    if (cognitoUser) {
-      cognitoUser.signOut();
+    if (UserPool) {
+      const cognitoUser = UserPool.getCurrentUser();
+      if (cognitoUser) {
+        cognitoUser.signOut();
+      }
     }
     setUser(null);
     setAuthToken(null);
@@ -90,6 +122,10 @@ export const AuthProvider = ({ children }) => {
 
   const verifyEmail = async (email, code) => {
     return new Promise((resolve, reject) => {
+      if (!UserPool) {
+        reject(new Error('Authentication service not available'));
+        return;
+      }
       const cognitoUser = new CognitoUser({
         Username: email,
         Pool: UserPool,
@@ -108,6 +144,10 @@ export const AuthProvider = ({ children }) => {
 
   const resendConfirmation = async (email) => {
     return new Promise((resolve, reject) => {
+      if (!UserPool) {
+        reject(new Error('Authentication service not available'));
+        return;
+      }
       const cognitoUser = new CognitoUser({ Username: email, Pool: UserPool });
       cognitoUser.resendConfirmationCode((err, result) => {
         if (err) {
@@ -122,6 +162,10 @@ export const AuthProvider = ({ children }) => {
 
   const forgotPassword = async (email) => {
     return new Promise((resolve, reject) => {
+      if (!UserPool) {
+        reject(new Error('Authentication service not available'));
+        return;
+      }
       const cognitoUser = new CognitoUser({ Username: email, Pool: UserPool });
       cognitoUser.forgotPassword({
         onSuccess: function (data) {
@@ -138,6 +182,10 @@ export const AuthProvider = ({ children }) => {
 
   const confirmNewPassword = async (email, code, newPassword) => {
     return new Promise((resolve, reject) => {
+      if (!UserPool) {
+        reject(new Error('Authentication service not available'));
+        return;
+      }
       const cognitoUser = new CognitoUser({ Username: email, Pool: UserPool });
       cognitoUser.confirmPassword(code, newPassword, {
         onSuccess: function (data) {

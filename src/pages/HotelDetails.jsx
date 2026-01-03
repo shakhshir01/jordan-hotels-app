@@ -3,6 +3,15 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } from 'lucide-react';
 import { hotelAPI } from '../services/api';
 
+const FALLBACK_IMG =
+  "data:image/svg+xml;charset=UTF-8," +
+  encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000">
+    <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#d67d61"/></linearGradient></defs>
+    <rect width="100%" height="100%" fill="url(#g)"/>
+    <text x="50%" y="50%" fill="rgba(255,255,255,.92)" font-family="Arial" font-size="56" text-anchor="middle" dominant-baseline="middle">VisitJo Hotel</text>
+  </svg>`);
+
 const HotelDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -89,66 +98,35 @@ const HotelDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="flex justify-between items-center p-6 max-w-7xl mx-auto">
-        <Link to="/" className="text-2xl font-black text-blue-900 hover:text-black transition">
-          Visit Jordan
-        </Link>
-        <Link to="/" className="text-blue-900 font-bold hover:underline">
-          ← Back to Hotels
-        </Link>
-      </nav>
-
+    <div className="bg-transparent">
       <div className="max-w-7xl mx-auto px-6 py-10">
         {/* Breadcrumbs */}
         <nav className="text-sm text-gray-500 mb-6">
-          <Link to="/" className="hover:text-blue-900 transition">Home</Link>
+          <Link to="/" className="hover:text-jordan-blue transition">Home</Link>
           {' / '}
           <span>{hotel.location}</span>
           {' / '}
           <span className="text-black font-semibold">{hotel.name}</span>
         </nav>
 
-        {/* Amazing Image Gallery Grid */}
-        <div className="grid grid-cols-4 grid-rows-2 gap-4 h-[500px] mb-10 overflow-hidden rounded-2xl">
-          <div className="col-span-2 row-span-2">
-            <img 
-              src={hotel.image} 
-              className="w-full h-full object-cover hover:scale-105 transition duration-700 cursor-pointer" 
-              alt="Main" 
+        {/* Replace flaky Unsplash gallery with one reliable hero image + placeholders */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 overflow-hidden rounded-2xl">
+          <div className="md:col-span-2">
+            <img
+              src={hotel.image || FALLBACK_IMG}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = FALLBACK_IMG;
+              }}
+              className="w-full h-[420px] object-cover rounded-2xl"
+              alt={hotel.name}
+              loading="lazy"
+              referrerPolicy="no-referrer"
             />
           </div>
-          <div className="col-span-1 row-span-1">
-            <img 
-              src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800" 
-              className="w-full h-full object-cover hover:scale-105 transition duration-700 cursor-pointer"
-              alt="Room"
-            />
-          </div>
-          <div className="col-span-1 row-span-1">
-            <img 
-              src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?q=80&w=800" 
-              className="w-full h-full object-cover hover:scale-105 transition duration-700 cursor-pointer"
-              alt="Amenities"
-            />
-          </div>
-          <div className="col-span-1 row-span-1">
-            <img 
-              src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800" 
-              className="w-full h-full object-cover hover:scale-105 transition duration-700 cursor-pointer"
-              alt="View"
-            />
-          </div>
-          <div className="col-span-1 row-span-1 bg-gray-900 relative">
-            <img 
-              src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=800" 
-              className="w-full h-full object-cover opacity-50"
-              alt="More photos"
-            />
-            <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-xl cursor-pointer hover:opacity-80 transition">
-              +12 Photos
-            </span>
+          <div className="grid gap-4">
+            <div className="h-[200px] rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-100" />
+            <div className="h-[200px] rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-100" />
           </div>
         </div>
 

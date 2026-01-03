@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -10,7 +10,8 @@ const Verify = () => {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [verified, setVerified] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
   const { verifyEmail, resendConfirmation } = useAuth();
 
   if (!email) {
@@ -44,7 +45,7 @@ const Verify = () => {
 
     try {
       await verifyEmail(email, code);
-      setSuccess(true);
+      setVerified(true);
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setError(err.message || 'Invalid verification code. Please try again.');
@@ -53,7 +54,7 @@ const Verify = () => {
     }
   };
 
-  if (success) {
+  if (verified) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
         <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
@@ -66,15 +67,11 @@ const Verify = () => {
     );
   }
 
-  // Resend cooldown state
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  // Start cooldown timer when value > 0
   useEffect(() => {
     if (!resendCooldown) return;
-    const t = setInterval(() => {
-      setResendCooldown(prev => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+    const t = setInterval(() => setResendCooldown(prev => (prev > 0 ? prev - 1 : 0)), 1000);
     return () => clearInterval(t);
   }, [resendCooldown]);
 
@@ -82,8 +79,9 @@ const Verify = () => {
     if (!email) return setError('Missing email address.');
     try {
       setError('');
+      setSuccessMsg('');
       await resendConfirmation(email);
-      setSuccess('Verification code resent. Check your email.');
+      setSuccessMsg('Verification code resent. Check your email.');
       setResendCooldown(60); // 60-second cooldown
     } catch (err) {
       setError(err.message || 'Failed to resend code.');
@@ -109,6 +107,13 @@ const Verify = () => {
           </div>
         )}
 
+        {/* Success Message */}
+        {successMsg && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-900 font-bold text-sm">{successMsg}</p>
+          </div>
+        )}
+
         {/* Code Input */}
         <div className="mb-6">
           <label className="block text-sm font-bold text-slate-700 mb-3">Verification Code</label>
@@ -118,7 +123,7 @@ const Verify = () => {
             value={code}
             onChange={e => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
             maxLength="6"
-            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-center text-3xl tracking-widest font-bold outline-none focus:border-blue-900 transition"
+            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-center text-3xl tracking-widest font-bold text-slate-900 placeholder-slate-400 outline-none focus:border-blue-900 transition"
           />
           <p className="text-xs text-slate-500 mt-2">Check your email for the code</p>
         </div>

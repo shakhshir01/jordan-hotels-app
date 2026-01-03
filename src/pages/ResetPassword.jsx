@@ -59,7 +59,7 @@ const ResetPassword = () => {
           placeholder="Verification code"
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="w-full p-3 mb-4 border rounded-lg outline-none text-center"
+          className="w-full p-3 mb-4 border border-slate-200 bg-slate-50 rounded-lg outline-none text-center text-slate-900 placeholder-slate-400 focus:border-blue-900 transition"
           required
         />
 
@@ -68,7 +68,7 @@ const ResetPassword = () => {
           placeholder="New password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full p-3 mb-4 border rounded-lg outline-none"
+          className="w-full p-3 mb-4 border border-slate-200 bg-slate-50 rounded-lg outline-none text-slate-900 placeholder-slate-400 focus:border-blue-900 transition"
           required
         />
 
@@ -77,7 +77,7 @@ const ResetPassword = () => {
           placeholder="Confirm password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full p-3 mb-6 border rounded-lg outline-none"
+          className="w-full p-3 mb-6 border border-slate-200 bg-slate-50 rounded-lg outline-none text-slate-900 placeholder-slate-400 focus:border-blue-900 transition"
           required
         />
 

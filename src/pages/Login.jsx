@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { validateLogin } from '../utils/validators';
@@ -59,7 +59,7 @@ const Login = () => {
             placeholder="you@example.com" 
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition ${
+            className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 ${
               errors.email ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
             }`}
           />
@@ -75,7 +75,7 @@ const Login = () => {
               placeholder="Enter your password" 
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition pr-10 ${
+              className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 pr-10 ${
                 errors.password ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
               }`}
             />
@@ -99,10 +99,15 @@ const Login = () => {
         </button>
 
         <p className="text-center text-slate-600 mt-6">
-          Don't have an account? <a href="/signup" className="text-blue-900 font-bold hover:underline">Sign up</a>
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-jordan-blue font-bold hover:underline">
+            Sign up
+          </Link>
         </p>
         <p className="text-center text-slate-600 mt-2">
-          <a href="/forgot-password" className="text-sm text-blue-900 hover:underline">Forgot password?</a>
+          <Link to="/forgot-password" className="text-sm text-jordan-blue hover:underline">
+            Forgot password?
+          </Link>
         </p>
       </form>
     </div>

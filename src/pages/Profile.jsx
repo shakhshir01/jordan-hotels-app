@@ -28,8 +28,8 @@ const Profile = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Your Profile</h1>
-      <div className="bg-white rounded-lg shadow p-6">
+      <h1 className="text-2xl font-black mb-4 text-jordan-blue">Your Profile</h1>
+      <div className="bg-white/90 backdrop-blur rounded-2xl shadow p-6 border border-slate-100">
         <p className="font-bold text-lg">{profile?.name || profile?.email}</p>
         <p className="text-sm text-slate-600">{profile?.email}</p>
         <div className="mt-4">

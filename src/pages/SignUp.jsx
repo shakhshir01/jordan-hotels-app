@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { validateSignUp, getPasswordErrors } from '../utils/validators';
 
 const SignUp = () => {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,6 +19,12 @@ const SignUp = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     
+    // Validate full name
+    if (!fullName.trim()) {
+      setErrors(prev => ({ ...prev, fullName: 'Full name is required' }));
+      return;
+    }
+
     const validationErrors = validateSignUp(email, password, confirmPassword);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -28,7 +35,7 @@ const SignUp = () => {
     setErrors({});
 
     try {
-      await signUp(email, password);
+      await signUp(email, password, fullName);
       navigate('/verify', { state: { email } });
     } catch (err) {
       setErrors({ submit: err.message || 'Failed to sign up. Please try again.' });
@@ -55,6 +62,21 @@ const SignUp = () => {
           </div>
         )}
 
+        {/* Full Name Input */}
+        <div className="mb-6">
+          <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+          <input 
+            type="text"
+            placeholder="John Doe" 
+            value={fullName}
+            onChange={e => setFullName(e.target.value)}
+            className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 ${
+              errors.fullName ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
+            }`}
+          />
+          {errors.fullName && <p className="text-red-600 text-sm mt-1">{errors.fullName}</p>}
+        </div>
+
         {/* Email Input */}
         <div className="mb-6">
           <label className="block text-sm font-bold text-slate-700 mb-2">Email</label>
@@ -63,7 +85,7 @@ const SignUp = () => {
             placeholder="you@example.com" 
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition ${
+            className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 ${
               errors.email ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
             }`}
           />
@@ -79,7 +101,7 @@ const SignUp = () => {
               placeholder="Min. 8 chars, 1 uppercase, 1 number" 
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition pr-10 ${
+              className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 pr-10 ${
                 errors.password ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
               }`}
             />
@@ -113,7 +135,7 @@ const SignUp = () => {
               placeholder="Re-enter password" 
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
-              className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition pr-10 ${
+              className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 pr-10 ${
                 errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
               }`}
             />
@@ -140,7 +162,10 @@ const SignUp = () => {
         </button>
 
         <p className="text-center text-slate-600 mt-6">
-          Already have an account? <a href="/login" className="text-blue-900 font-bold hover:underline">Sign in</a>
+          Already have an account?{' '}
+          <Link to="/login" className="text-jordan-blue font-bold hover:underline">
+            Sign in
+          </Link>
         </p>
       </form>
     </div>

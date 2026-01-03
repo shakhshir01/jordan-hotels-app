@@ -27,14 +27,14 @@ A modern React application for discovering and booking hotels across Jordan. Bui
 ```
 src/
 ├── components/        # Reusable components
-├── context/          # Auth context for state management
-├── pages/            # Page components (Home, Login, SignUp, etc.)
-├── services/         # API service layer
-├── utils/            # Utility functions (validators, helpers)
-├── App.jsx           # Main app component with routes
-├── authConfig.js     # AWS Cognito configuration
-├── index.css         # Global styles
-└── main.jsx          # Entry point
+├── context/           # Auth context for state management
+├── pages/             # Page components (home.jsx, signup.jsx, Login.jsx, etc.)
+├── services/          # API service layer
+├── utils/             # Utility functions (validators, helpers)
+├── App.jsx            # Main app component with routes
+├── authConfig.js      # AWS Cognito configuration
+├── index.css          # Global styles
+└── main.jsx           # Entry point
 ```
 
 ## Getting Started
