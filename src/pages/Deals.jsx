@@ -1,5 +1,5 @@
 import useFetch from "../hooks/useFetch.js";
-import { hotelAPI } from "../services/api.js";
+import realHotelsAPI from "../services/realHotelsData.js";
 import { Loader2 } from "lucide-react";
 
 const DEALS_DATA = [
@@ -10,7 +10,7 @@ const DEALS_DATA = [
 ];
 
 export default function Deals() {
-  const { data: deals, loading } = useFetch(() => hotelAPI.getDeals(), []);
+  const { data: deals, loading } = useFetch(() => realHotelsAPI.getFeaturedHotels(), []);
 
   return (
     <div className="min-h-screen">

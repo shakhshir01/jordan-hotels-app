@@ -1,11 +1,11 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
-import { hotelAPI } from "../services/api";
+import realHotelsAPI from "../services/realHotelsData";
 
 export default function DestinationDetails() {
   const { id } = useParams();
-  const { data: dest, loading, error } = useFetch(() => hotelAPI.getDestinationById(id), [id]);
+  const { data: dest, loading, error } = useFetch(() => realHotelsAPI.getHotelsByDestination(id), [id]);
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Search, Star, Loader2, AlertCircle } from "lucide-react";
-import { hotelAPI } from "../services/api";
+import realHotelsAPI from "../services/realHotelsData";
+import SmartRecommendations from "../components/SmartRecommendations";
 
 const FALLBACK_IMG =
   "data:image/svg+xml;charset=UTF-8," +
@@ -22,7 +23,7 @@ const Home = () => {
     setLoading(true);
     setError("");
     try {
-      const data = await hotelAPI.getAllHotels(location);
+      const data = await realHotelsAPI.getAllHotels(location);
       // Ensure data is an array
       const hotelsArray = Array.isArray(data) ? data : [];
       setHotels(hotelsArray);
@@ -173,6 +174,9 @@ const Home = () => {
           )}
         </div>
       </div>
+
+      {/* Smart Recommendations Section */}
+      <SmartRecommendations />
     </div>
   );
 };

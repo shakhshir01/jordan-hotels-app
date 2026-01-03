@@ -4,7 +4,7 @@ import { UserPool } from '../authConfig';
 import { setAuthToken } from '../services/api';
 import { showSuccess, showError } from '../services/toastService';
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -23,16 +23,29 @@ export const AuthProvider = ({ children }) => {
         cognitoUser.getSession((err, session) => {
           if (err) {
             setError(err.message);
+            setLoading(false);
           } else if (session.isValid()) {
-            setUser({ email: cognitoUser.getUsername() });
-            try {
-              const idToken = session.getIdToken().getJwtToken();
-              setAuthToken(idToken);
-            } catch (e) {
-              console.warn('Failed to set auth token from session', e);
-            }
+            // Get user attributes to retrieve the actual email
+            cognitoUser.getUserAttributes((err, attributes) => {
+              if (err) {
+                console.error('Error fetching user attributes:', err);
+                setUser({ email: cognitoUser.getUsername() });
+              } else {
+                const emailAttr = attributes?.find(attr => attr.Name === 'email');
+                const email = emailAttr?.Value || cognitoUser.getUsername();
+                setUser({ email });
+              }
+              try {
+                const idToken = session.getIdToken().getJwtToken();
+                setAuthToken(idToken);
+              } catch (e) {
+                console.warn('Failed to set auth token from session', e);
+              }
+              setLoading(false);
+            });
+          } else {
+            setLoading(false);
           }
-          setLoading(false);
         });
       } else {
         setLoading(false);

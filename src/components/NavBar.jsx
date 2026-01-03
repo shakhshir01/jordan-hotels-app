@@ -1,10 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle.jsx";
 import { getUseMocks, enableMocks } from "../services/api.js";
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const Navbar = () => {
   const [useMocks, setUseMocks] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setUseMocks(getUseMocks());
@@ -12,6 +15,11 @@ const Navbar = () => {
 
   const toggleMocks = () => {
     enableMocks(!useMocks);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -63,6 +71,31 @@ const Navbar = () => {
               Support
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
+
+            {/* New Nav Items */}
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" />
+            
+            <Link
+              to="/gallery"
+              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+            >
+              Gallery
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+            </Link>
+            <Link
+              to="/special-offers"
+              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+            >
+              Offers
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+            </Link>
+            <Link
+              to="/concierge"
+              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+            >
+              Concierge
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+            </Link>
           </div>
 
           {/* Actions */}
@@ -81,18 +114,44 @@ const Navbar = () => {
               {useMocks ? "DEMO" : "LIVE"}
             </button>
 
-            <Link
-              to="/login"
-              className="text-sm font-medium text-slate-700 hover:text-jordan-blue dark:text-slate-300 transition-colors duration-200"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/signup"
-              className="px-6 py-2.5 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-            >
-              Register
-            </Link>
+            {user ? (
+              <>
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {(() => {
+                    const email = user.email || '';
+                    const isUUID = email.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+                    return isUUID ? 'Account' : email.split('@')[0];
+                  })()}
+                </span>
+                <Link
+                  to="/profile"
+                  className="text-sm font-medium text-slate-700 hover:text-jordan-blue dark:text-slate-300 transition-colors duration-200"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-slate-700 hover:text-jordan-blue dark:text-slate-300 transition-colors duration-200"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="px-6 py-2.5 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+                >
+                  Register
+                </Link>
+              </>
+            )}
             <ThemeToggle />
           </div>
         </div>

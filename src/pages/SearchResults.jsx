@@ -1,12 +1,12 @@
 import React from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
-import { hotelAPI } from "../services/api";
+import realHotelsAPI from "../services/realHotelsData";
 
 export default function SearchResults() {
   const [params] = useSearchParams();
   const q = params.get("q") || "";
-  const { data, loading, error, run } = useFetch(() => hotelAPI.searchAll(q), [q]);
+  const { data, loading, error, run } = useFetch(() => realHotelsAPI.searchHotels({location: q}), [q]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } from 'lucide-react';
-import { hotelAPI } from '../services/api';
+import realHotelsAPI from '../services/realHotelsData';
+import WishlistButton from '../components/WishlistButton';
+import { useAuth } from '../context/AuthContext';
 
 const FALLBACK_IMG =
   "data:image/svg+xml;charset=UTF-8," +
@@ -27,7 +29,7 @@ const HotelDetails = () => {
       setLoading(true);
       setError('');
       try {
-        const data = await hotelAPI.getHotelById(id);
+        const data = await realHotelsAPI.getHotelById(id);
         setHotel(data);
       } catch (err) {
         setError(err.message || 'Failed to load hotel details.');
@@ -54,15 +56,8 @@ const HotelDetails = () => {
         numberOfGuests: parseInt(guests),
         totalPrice: hotel.price * parseInt(guests),
       };
-      // If payments are configured, create a checkout session and redirect
-      const paymentResponse = await hotelAPI.createCheckoutSession(id, bookingData);
-      if (paymentResponse?.sessionId) {
-        // Use client-side Checkout page to redirect via Stripe
-        navigate('/checkout', { state: { hotelId: id, bookingData } });
-        return;
-      }
-      const result = await hotelAPI.bookHotel(id, bookingData);
-      alert(`Booking successful! Reference: ${result.id}`);
+      // Navigate to checkout with hotel and booking data
+      navigate('/checkout', { state: { hotelId: id, bookingData, hotel } });
     } catch (err) {
       alert(err.message || 'Booking failed. Please try again.');
     } finally {
@@ -109,8 +104,41 @@ const HotelDetails = () => {
           <span className="text-black font-semibold">{hotel.name}</span>
         </nav>
 
+        {/* Gallery with all hotel images */}
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold mb-6">Gallery</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden rounded-2xl">
+            {hotel.images && hotel.images.length > 0 ? (
+              hotel.images.slice(0, 8).map((img, idx) => (
+                <div key={idx} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition group h-48 md:h-56">
+                  <img 
+                    src={img}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = FALLBACK_IMG;
+                    }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    alt={`${hotel.name} - Image ${idx + 1}`}
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="md:col-span-4 h-64 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                <p className="text-gray-500">No images available</p>
+              </div>
+            )}
+          </div>
+          {hotel.images && hotel.images.length > 8 && (
+            <p className="text-center text-gray-500 mt-4">
+              + {hotel.images.length - 8} more photos
+            </p>
+          )}
+        </div>
+
         {/* Replace flaky Unsplash gallery with one reliable hero image + placeholders */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 overflow-hidden rounded-2xl">
+        <div className="hidden grid-cols-1 md:grid-cols-3 gap-4 mb-10 overflow-hidden rounded-2xl">
           <div className="md:col-span-2">
             <img
               src={hotel.image || FALLBACK_IMG}
@@ -133,10 +161,15 @@ const HotelDetails = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Left Column: Info */}
           <div className="md:col-span-2">
-            <h1 className="text-4xl font-black text-blue-900 mb-2">{hotel.name}</h1>
-            <p className="flex items-center gap-1 text-gray-600 mb-4">
-              <MapPin className="w-5 h-5" /> {hotel.location}, Jordan
-            </p>
+            <div className="flex justify-between items-start gap-4 mb-4">
+              <div>
+                <h1 className="text-4xl font-black text-blue-900 mb-2">{hotel.name}</h1>
+                <p className="flex items-center gap-1 text-gray-600">
+                  <MapPin className="w-5 h-5" /> {hotel.location}, Jordan
+                </p>
+              </div>
+              <WishlistButton item={hotel} />
+            </div>
             <div className="flex items-center gap-2 mb-6">
               <div className="flex items-center text-orange-500 font-bold">
                 <Star size={20} fill="currentColor" /> {hotel.rating}

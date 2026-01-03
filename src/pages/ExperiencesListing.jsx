@@ -1,9 +1,9 @@
 import React from "react";
 import useFetch from "../hooks/useFetch";
-import { hotelAPI } from "../services/api";
+import realHotelsAPI from "../services/realHotelsData";
 
 export default function ExperiencesListing() {
-  const { data: items, loading, error } = useFetch(() => hotelAPI.getExperiences(), []);
+  const { data: items, loading, error } = useFetch(() => realHotelsAPI.getPopularHotels(), []);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">

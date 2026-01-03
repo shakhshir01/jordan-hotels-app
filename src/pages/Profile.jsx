@@ -3,8 +3,35 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, LogOut, Edit2, Check, X, Calendar, Users } from 'lucide-react';
 import { showSuccess, showError } from '../services/toastService';
-import { api } from '../services/api';
 import { InlineLoader } from '../components/LoadingSpinner';
+
+// Mock bookings data
+const MOCK_BOOKINGS = [
+  {
+    id: 'BK-001',
+    hotelName: 'Dead Sea Marriott Resort & Spa',
+    location: 'Dead Sea',
+    checkIn: '2026-02-15',
+    checkOut: '2026-02-18',
+    nights: 3,
+    guests: 2,
+    totalPrice: 339,
+    status: 'Confirmed',
+    image: 'https://cache.marriott.com/content/dam/marriott-digital/mc/emea/hws/q/qmdjv/en_us/photo/unlimited/assets/qmdjv-pool-0212.jpg',
+  },
+  {
+    id: 'BK-002',
+    hotelName: 'Mövenpick Resort Petra',
+    location: 'Petra',
+    checkIn: '2026-03-10',
+    checkOut: '2026-03-13',
+    nights: 3,
+    guests: 4,
+    totalPrice: 294,
+    status: 'Pending',
+    image: 'https://cf.bstatic.com/xdata/images/hotel/max1280x900/11384965.jpg',
+  },
+];
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -31,27 +58,26 @@ const Profile = () => {
   const loadUserProfile = async () => {
     try {
       setLoading(true);
-      // For now, use mock data as endpoint might not exist
+      // Extract proper email/username from user object
+      const userEmail = user?.email || 'User';
+      const isUUID = userEmail.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+      const displayName = isUUID ? 'Jordan Hotel User' : userEmail.split('@')[0];
+      
+      // Use mock data for profile
       setProfile({
-        firstName: user?.email?.split('@')[0] || 'User',
+        firstName: displayName,
         lastName: '',
-        email: user?.email || '',
+        email: isUUID ? 'user@visitjo.com' : userEmail,
         phone: '+962...',
       });
       
-      // Try to fetch real bookings from API
-      try {
-        const bookingsRes = await api.get('/bookings');
-        setBookings(bookingsRes.data?.bookings || []);
-      } catch (err) {
-        console.log('Bookings endpoint not ready, using empty list');
-        setBookings([]);
-      }
+      // Use mock bookings
+      setBookings(MOCK_BOOKINGS);
       
       setFormData({
-        firstName: user?.email?.split('@')[0] || '',
+        firstName: displayName,
         lastName: '',
-        email: user?.email || '',
+        email: isUUID ? 'user@visitjo.com' : userEmail,
         phone: '',
       });
     } catch (error) {
@@ -64,7 +90,7 @@ const Profile = () => {
 
   const handleUpdateProfile = async () => {
     try {
-      // API call would go here when backend is ready
+      // Update local state only (backend integration when ready)
       showSuccess('Profile updated successfully');
       setProfile(formData);
       setEditing(false);
