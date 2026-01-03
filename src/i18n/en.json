@@ -1,0 +1,113 @@
+{
+  "nav": {
+    "home": "Home",
+    "hotels": "Hotels",
+    "bookings": "Bookings",
+    "profile": "Profile",
+    "wishlist": "Wishlist",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout"
+  },
+  "hero": {
+    "title": "Discover Jordan's Best Hotels",
+    "subtitle": "Experience unforgettable stays in Jordan's most beautiful destinations",
+    "searchPlaceholder": "Where would you like to go?"
+  },
+  "search": {
+    "destination": "Destination or city",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "guests": "Guests",
+    "search": "Search",
+    "showFilters": "Show Advanced Filters",
+    "hideFilters": "Hide Filters",
+    "priceRange": "Price Range",
+    "minPrice": "Min",
+    "maxPrice": "Max",
+    "rating": "Minimum Rating",
+    "amenities": "Amenities",
+    "applyFilters": "Apply Filters",
+    "clearAll": "Clear All"
+  },
+  "hotels": {
+    "noResults": "No hotels found",
+    "perNight": "per night",
+    "addToWishlist": "Add to wishlist",
+    "removeFromWishlist": "Remove from wishlist",
+    "reviews": "reviews",
+    "rating": "Rating"
+  },
+  "booking": {
+    "selectDates": "Please select dates",
+    "selectGuests": "Please select number of guests",
+    "bookNow": "Book Now",
+    "confirmedEmail": "A confirmation email has been sent",
+    "bookingId": "Booking ID",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "nights": "nights",
+    "guests": "guests",
+    "totalPrice": "Total Price",
+    "guestDetails": "Guest Details",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "proceedPayment": "Proceed to Payment"
+  },
+  "payment": {
+    "cardDetails": "Card Details",
+    "nameOnCard": "Name on card",
+    "pay": "Pay",
+    "processing": "Processing...",
+    "paymentSecure": "Your payment is secure and encrypted",
+    "orderSummary": "Order Summary"
+  },
+  "auth": {
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signup": "Sign Up",
+    "login": "Login",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember me",
+    "dontHaveAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "sendCode": "Send Verification Code",
+    "verifyCode": "Verify Code",
+    "newPassword": "New Password",
+    "resetPassword": "Reset Password",
+    "verificationCodeSent": "Verification code sent to your email",
+    "checkEmail": "Check your email for the verification code"
+  },
+  "messages": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "loading": "Loading...",
+    "tryAgain": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close"
+  },
+  "profile": {
+    "myProfile": "My Profile",
+    "editProfile": "Edit Profile",
+    "myBookings": "My Bookings",
+    "noBookings": "No bookings yet",
+    "cancelBooking": "Cancel Booking",
+    "viewBooking": "View Booking",
+    "settings": "Settings"
+  },
+  "footer": {
+    "about": "About Us",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "copyright": "All rights reserved"
+  }
+}

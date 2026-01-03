@@ -1,0 +1,113 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "hotels": "الفنادق",
+    "bookings": "الحجوزات",
+    "profile": "الملف الشخصي",
+    "wishlist": "قائمتي المفضلة",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "logout": "تسجيل الخروج"
+  },
+  "hero": {
+    "title": "اكتشف أفضل فنادق الأردن",
+    "subtitle": "استمتع بإقامات لا تُنسى في أجمل وجهات الأردن",
+    "searchPlaceholder": "إلى أين تريد الذهاب؟"
+  },
+  "search": {
+    "destination": "الوجهة أو المدينة",
+    "checkIn": "تسجيل الدخول",
+    "checkOut": "تسجيل الخروج",
+    "guests": "الضيوف",
+    "search": "بحث",
+    "showFilters": "إظهار المزيد من الخيارات",
+    "hideFilters": "إخفاء الخيارات",
+    "priceRange": "نطاق السعر",
+    "minPrice": "الحد الأدنى",
+    "maxPrice": "الحد الأقصى",
+    "rating": "التقييم الأدنى",
+    "amenities": "المرافق",
+    "applyFilters": "تطبيق الفلاتر",
+    "clearAll": "مسح الكل"
+  },
+  "hotels": {
+    "noResults": "لم يتم العثور على فنادق",
+    "perNight": "لكل ليلة",
+    "addToWishlist": "إضافة للقائمة المفضلة",
+    "removeFromWishlist": "إزالة من المفضلة",
+    "reviews": "تقييمات",
+    "rating": "التقييم"
+  },
+  "booking": {
+    "selectDates": "يرجى اختيار التواريخ",
+    "selectGuests": "يرجى تحديد عدد الضيوف",
+    "bookNow": "احجز الآن",
+    "confirmedEmail": "تم إرسال بريد تأكيد",
+    "bookingId": "رقم الحجز",
+    "checkIn": "تسجيل الدخول",
+    "checkOut": "تسجيل الخروج",
+    "nights": "ليالي",
+    "guests": "ضيوف",
+    "totalPrice": "السعر الإجمالي",
+    "guestDetails": "بيانات الضيف",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "proceedPayment": "المتابعة للدفع"
+  },
+  "payment": {
+    "cardDetails": "بيانات البطاقة",
+    "nameOnCard": "الاسم على البطاقة",
+    "pay": "دفع",
+    "processing": "جاري المعالجة...",
+    "paymentSecure": "دفعتك آمنة ومشفرة",
+    "orderSummary": "ملخص الطلب"
+  },
+  "auth": {
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "signup": "إنشاء حساب",
+    "login": "تسجيل الدخول",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "rememberMe": "تذكرني",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "haveAccount": "هل لديك حساب بالفعل؟",
+    "sendCode": "إرسال رمز التحقق",
+    "verifyCode": "التحقق من الرمز",
+    "newPassword": "كلمة مرور جديدة",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "verificationCodeSent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
+    "checkEmail": "تحقق من بريدك الإلكتروني للحصول على رمز التحقق"
+  },
+  "messages": {
+    "success": "نجح",
+    "error": "خطأ",
+    "warning": "تحذير",
+    "loading": "جاري التحميل...",
+    "tryAgain": "حاول مجددا",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تحرير",
+    "close": "إغلاق"
+  },
+  "profile": {
+    "myProfile": "ملفي الشخصي",
+    "editProfile": "تحرير الملف الشخصي",
+    "myBookings": "حجوزاتي",
+    "noBookings": "لا توجد حجوزات",
+    "cancelBooking": "إلغاء الحجز",
+    "viewBooking": "عرض الحجز",
+    "settings": "الإعدادات"
+  },
+  "footer": {
+    "about": "عن الموقع",
+    "contact": "اتصل بنا",
+    "privacy": "سياسة الخصوصية",
+    "terms": "الشروط والأحكام",
+    "copyright": "جميع الحقوق محفوظة"
+  }
+}
