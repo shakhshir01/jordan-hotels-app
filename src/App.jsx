@@ -1,5 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
 
 // Shared layout
@@ -40,21 +42,7 @@ import DealsList from './pages/DealsList.jsx';
 import FlightsSearch from './pages/FlightsSearch.jsx';
 import CarsSearch from './pages/CarsSearch.jsx';
 import ExperiencesListing from './pages/ExperiencesListing.jsx';
-
-// Error Boundary
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
-  }
+import { ErrorBoundary } from './components/ErrorBoundary';
 
   render() {
     if (this.state.hasError) {
@@ -113,6 +101,18 @@ function App() {
           </Route>
         </Routes>
       </AuthProvider>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </ErrorBoundary>
   );
 }

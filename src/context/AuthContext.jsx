@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import { UserPool } from '../authConfig';
 import { setAuthToken } from '../services/api';
+import { showSuccess, showError } from '../services/toastService';
 
 const AuthContext = createContext();
 
@@ -98,10 +99,12 @@ export const AuthProvider = ({ children }) => {
               console.warn('Failed to set auth token on login', e);
             }
           setError(null);
+          showSuccess(`Welcome back, ${email}!`);
           resolve(session);
         },
         onFailure: (err) => {
           setError(err.message);
+          showError(err.message || 'Login failed');
           reject(err);
         },
       });
@@ -118,6 +121,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setAuthToken(null);
     setError(null);
+    showSuccess('Logged out successfully');
   };
 
   const verifyEmail = async (email, code) => {

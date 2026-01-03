@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { validateSignUp, getPasswordErrors } from '../utils/validators';
+import { showSuccess, showError } from '../services/toastService';
 
 const SignUp = () => {
   const [fullName, setFullName] = useState('');
@@ -36,9 +37,12 @@ const SignUp = () => {
 
     try {
       await signUp(email, password, fullName);
+      showSuccess('Account created! Check your email to verify.');
       navigate('/verify', { state: { email } });
     } catch (err) {
-      setErrors({ submit: err.message || 'Failed to sign up. Please try again.' });
+      const errorMsg = err.message || 'Failed to sign up. Please try again.';
+      showError(errorMsg);
+      setErrors({ submit: errorMsg });
     } finally {
       setLoading(false);
     }
