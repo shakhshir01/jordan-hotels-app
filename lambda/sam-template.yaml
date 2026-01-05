@@ -23,6 +23,10 @@ Resources:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'*'"
       EndpointConfiguration: REGIONAL
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
 
   HotelsTable:
     Type: AWS::DynamoDB::Table
@@ -38,6 +42,13 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       SSESpecification:
         SSEEnabled: true
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   DestinationsTable:
     Type: AWS::DynamoDB::Table
@@ -53,6 +64,13 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       SSESpecification:
         SSEEnabled: true
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   DealsTable:
     Type: AWS::DynamoDB::Table
@@ -68,6 +86,13 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       SSESpecification:
         SSEEnabled: true
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   ExperiencesTable:
     Type: AWS::DynamoDB::Table
@@ -83,6 +108,13 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       SSESpecification:
         SSEEnabled: true
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   BookingsTable:
     Type: AWS::DynamoDB::Table
@@ -107,6 +139,13 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       SSESpecification:
         SSEEnabled: true
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   UsersTable:
     Type: AWS::DynamoDB::Table
@@ -122,6 +161,13 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       SSESpecification:
         SSEEnabled: true
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   LogsBucket:
     Type: AWS::S3::Bucket
@@ -134,6 +180,13 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   UploadsBucket:
     Type: AWS::S3::Bucket
@@ -154,6 +207,13 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !Ref LogsBucket
         LogFilePrefix: access-logs/
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   StripeSecret:
     Type: AWS::SecretsManager::Secret
@@ -162,6 +222,13 @@ Resources:
     Properties:
       Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
       KmsKeyId: alias/aws/secretsmanager
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
 
   LambdaRolePolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -193,6 +260,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getHotels/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -211,6 +282,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getHotelById/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -229,6 +304,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: search/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -256,6 +335,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: destinations/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -280,6 +363,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: deals/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -304,6 +391,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: experiences/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -328,6 +419,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: bookings/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -346,6 +441,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: createCheckoutSession/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -364,6 +463,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getSignedUrl/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -382,6 +485,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: user/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy
@@ -425,6 +532,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: sendBookingEmail/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
       Policies:
         - AWSLambdaBasicExecutionRole
         - !Ref LambdaRolePolicy

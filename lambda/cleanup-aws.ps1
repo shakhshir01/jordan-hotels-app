@@ -179,13 +179,13 @@ Write-Host ("Keep stack: {0}" -f $StackName) -ForegroundColor Cyan
 Write-Host "Stacks to delete (will remove their Lambdas/APIs/Tables):" -ForegroundColor Yellow
 $stacksToDelete | Sort-Object | ForEach-Object { Write-Host "  - $_" }
 
-Write-Host "\nStandalone Lambdas to delete:" -ForegroundColor Yellow
+Write-Host "`nStandalone Lambdas to delete:" -ForegroundColor Yellow
 $lambdaToDelete | Sort-Object | ForEach-Object { Write-Host "  - $_" }
 
-Write-Host "\nStandalone REST APIs to delete:" -ForegroundColor Yellow
+Write-Host "`nStandalone REST APIs to delete:" -ForegroundColor Yellow
 $apisToDelete | ForEach-Object { Write-Host ("  - {0} ({1})" -f $_.name, $_.id) }
 
-Write-Host "\nStandalone DynamoDB tables to delete:" -ForegroundColor Yellow
+Write-Host "`nStandalone DynamoDB tables to delete:" -ForegroundColor Yellow
 $tablesToDelete | Sort-Object | ForEach-Object { Write-Host "  - $_" }
 
 if (-not $Force) {
@@ -210,7 +210,19 @@ foreach ($s in ($stacksToDelete | Sort-Object)) {
 # Delete standalone APIs
 foreach ($api in $apisToDelete) {
   Write-Host ("Deleting REST API: {0} ({1})" -f $api.name, $api.id) -ForegroundColor Red
-  aws apigateway delete-rest-api --rest-api-id $api.id --region $Region | Out-Null
+  $attempt = 0
+  while ($true) {
+    $attempt++
+    try {
+      aws apigateway delete-rest-api --rest-api-id $api.id --region $Region | Out-Null
+      break
+    } catch {
+      if ($attempt -ge 6) { throw }
+      $delay = [Math]::Min(30, 2 * $attempt)
+      Write-Host "API Gateway throttled; retrying in ${delay}s..." -ForegroundColor Yellow
+      Start-Sleep -Seconds $delay
+    }
+  }
 }
 
 # Delete standalone lambdas
