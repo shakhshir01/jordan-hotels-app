@@ -1,10 +1,11 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
 
 const BOOKINGS_TABLE = process.env.BOOKINGS_TABLE || 'Bookings';
+const USERS_TABLE = process.env.USERS_TABLE || 'Users';
 
 // Mock user profile for demo mode
 const mockUserProfile = {
@@ -51,14 +52,20 @@ exports.handler = async (event) => {
   try {
     const path = event.rawPath || event.path || '';
     const userId = event.requestContext?.authorizer?.claims?.sub || 'demo-user';
+    const method = event.requestContext?.http?.method || event.httpMethod || 'GET';
 
     // GET /user/profile
-    if (path === '/user/profile' && event.requestContext.http.method === 'GET') {
-      return await getUserProfile(userId);
+    if (path === '/user/profile' && method === 'GET') {
+      return await getUserProfile(userId, event);
+    }
+
+    // PUT /user/profile
+    if (path === '/user/profile' && method === 'PUT') {
+      return await updateUserProfile(userId, event);
     }
 
     // GET /user/bookings
-    if (path === '/user/bookings' && event.requestContext.http.method === 'GET') {
+    if (path === '/user/bookings' && method === 'GET') {
       return await getUserBookings(userId);
     }
 
@@ -76,29 +83,129 @@ exports.handler = async (event) => {
     };
   }
 };
-
-async function getUserProfile(userId) {
+async function getUserProfile(userId, event) {
   try {
-    // For demo, return mock profile
-    // In production, you would query Cognito or a users table
+    if (USERS_TABLE) {
+      const result = await docClient.send(
+        new GetCommand({
+          TableName: USERS_TABLE,
+          Key: { userId },
+        })
+      );
+
+      if (result && result.Item) {
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+          body: JSON.stringify(result.Item),
+        };
+      }
+    }
+
+    // Fallback: derive from Cognito claims or mock
+    const claims = event.requestContext?.authorizer?.claims || {};
+    const email = claims.email || mockUserProfile.email;
+    const name =
+      claims.name ||
+      [claims.given_name, claims.family_name].filter(Boolean).join(' ') ||
+      mockUserProfile.name;
+
+    const item = {
+      userId,
+      name,
+      email,
+      firstName: claims.given_name || name.split(' ')[0] || 'Guest',
+      lastName: claims.family_name || name.split(' ').slice(1).join(' '),
+      phone: claims.phone_number || mockUserProfile.phone,
+      location: mockUserProfile.location,
+      joinedDate: mockUserProfile.joinedDate,
+      membershipTier: mockUserProfile.membershipTier,
+    };
+
+    if (USERS_TABLE) {
+      try {
+        await docClient.send(
+          new PutCommand({
+            TableName: USERS_TABLE,
+            Item: item,
+          })
+        );
+      } catch (putErr) {
+        console.warn('Failed to seed user profile into Users table:', putErr.message || putErr);
+      }
+    }
+
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
       },
-      body: JSON.stringify(mockUserProfile)
+      body: JSON.stringify(item),
     };
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    // Return mock data on error (demo mode)
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
       },
-      body: JSON.stringify(mockUserProfile)
+      body: JSON.stringify(mockUserProfile),
+    };
+  }
+}
+
+async function updateUserProfile(userId, event) {
+  try {
+    const body = event.body ? JSON.parse(event.body) : {};
+
+    const firstName = body.firstName || body.given_name || body.name?.split(' ')[0] || 'Guest';
+    const lastName = body.lastName || body.family_name || body.name?.split(' ').slice(1).join(' ') || '';
+    const email = body.email || mockUserProfile.email;
+    const phone = body.phone || mockUserProfile.phone;
+
+    const item = {
+      userId,
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`.trim(),
+      email,
+      phone,
+      location: body.location || mockUserProfile.location,
+      joinedDate: body.joinedDate || mockUserProfile.joinedDate,
+      membershipTier: body.membershipTier || mockUserProfile.membershipTier,
+    };
+
+    if (USERS_TABLE) {
+      await docClient.send(
+        new PutCommand({
+          TableName: USERS_TABLE,
+          Item: item,
+        })
+      );
+    }
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: JSON.stringify(item),
+    };
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: JSON.stringify({ message: 'Failed to update profile' }),
     };
   }
 }

@@ -4,7 +4,7 @@ Description: VisitJo SAM template — API, Lambdas, DynamoDB, S3, Secrets Manage
 
 Globals:
   Function:
-    Runtime: nodejs18.x
+    Runtime: nodejs22.x
     Timeout: 10
     MemorySize: 512
     Environment:
@@ -19,12 +19,16 @@ Resources:
       Name: VisitJoApi
       StageName: prod
       Cors:
-        AllowOrigin: "'*'"
-        AllowMethods: "'GET,POST,OPTIONS,PUT,DELETE'"
+        # Restrict CORS to your Amplify app origin and allow methods/headers
+        AllowOrigin: "'https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization,X-Api-Key,X-Amz-Date,X-Amz-Security-Token'"
       EndpointConfiguration: REGIONAL
 
   HotelsTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub "${AWS::StackName}-Hotels"
       AttributeDefinitions:
@@ -34,9 +38,13 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
 
   DestinationsTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub "${AWS::StackName}-Destinations"
       AttributeDefinitions:
@@ -46,9 +54,13 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
 
   DealsTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub "${AWS::StackName}-Deals"
       AttributeDefinitions:
@@ -58,9 +70,13 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
 
   ExperiencesTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub "${AWS::StackName}-Experiences"
       AttributeDefinitions:
@@ -70,21 +86,67 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
 
   BookingsTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub "${AWS::StackName}-Bookings"
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
       KeySchema:
         - AttributeName: id
           KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: UserIdIndex
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub "${AWS::StackName}-Users"
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+
+  LogsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-logs-${AWS::Region}"
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
 
   UploadsBucket:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       BucketName: !Sub "${AWS::StackName}-uploads-${AWS::Region}"
       PublicAccessBlockConfiguration:
@@ -92,12 +154,24 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LogsBucket
+        LogFilePrefix: access-logs/
 
   StripeSecret:
     Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Name: !Sub "${AWS::StackName}/stripe"
       Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
+      KmsKeyId: alias/aws/secretsmanager
 
   LambdaRolePolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -315,6 +389,58 @@ Resources:
           Type: Api
           Properties:
             Path: /uploads/signed-url
+            Method: POST
+            RestApiId: !Ref Api
+
+  UserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-user"
+      Handler: user/index.handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - !Ref LambdaRolePolicy
+      Environment:
+        Variables:
+          BOOKINGS_TABLE: !Ref BookingsTable
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        ApiUserProfileGet:
+          Type: Api
+          Properties:
+            Path: /user/profile
+            Method: GET
+            RestApiId: !Ref Api
+        ApiUserProfilePut:
+          Type: Api
+          Properties:
+            Path: /user/profile
+            Method: PUT
+            RestApiId: !Ref Api
+        ApiUserBookings:
+          Type: Api
+          Properties:
+            Path: /user/bookings
+            Method: GET
+            RestApiId: !Ref Api
+
+  SendBookingEmailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-sendBookingEmail"
+      Handler: sendBookingEmail/index.handler
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - !Ref LambdaRolePolicy
+      Environment:
+        Variables:
+          SES_EMAIL_FROM: noreply@visitjo.com
+          FRONTEND_URL: https://main.d1ewsonl19kjj7.amplifyapp.com
+      Events:
+        ApiSendBookingEmail:
+          Type: Api
+          Properties:
+            Path: /send-booking-email
             Method: POST
             RestApiId: !Ref Api
 

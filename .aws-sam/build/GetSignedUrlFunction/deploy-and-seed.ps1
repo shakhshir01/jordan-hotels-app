@@ -2,9 +2,9 @@ Param()
 
 Write-Host "Running deploy-and-seed.ps1" -ForegroundColor Cyan
 
-# Ensure script runs from project root (lambda folder is sibling of script)
+# Ensure script runs from project root (jordan-hotels-app)
 Set-Location (Split-Path -Parent $MyInvocation.MyCommand.Path)
-Set-Location ..\..
+Set-Location ..
 
 Write-Host "1) Building SAM..." -ForegroundColor Green
 sam build --template-file lambda/sam-template.yaml

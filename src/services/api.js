@@ -8,7 +8,14 @@ import {
   mockSearchResult,
 } from "./mockData.js";
 
-const API_BASE_URL = (import.meta.env.VITE_API_GATEWAY_URL || "").replace(/\/$/, "");
+// Prefer env var, but force-switch away from the old ny5ohksmc3 API ID
+const FALLBACK_API_URL = "https://u5diymkrlb.execute-api.us-east-1.amazonaws.com/prod";
+const rawApiUrl = import.meta.env.VITE_API_GATEWAY_URL || "";
+const effectiveApiUrl =
+  !rawApiUrl || rawApiUrl.includes("ny5ohksmc3")
+    ? FALLBACK_API_URL
+    : rawApiUrl;
+const API_BASE_URL = effectiveApiUrl.replace(/\/$/, "");
 const API_KEY = import.meta.env.VITE_API_KEY || "";
 
 const apiClient = axios.create({
