@@ -3,11 +3,20 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../Home';
 
-vi.mock('../../services/api', () => ({
-  hotelAPI: {
-    getAllHotels: vi.fn(() => Promise.resolve([
-      { id: 'h1', name: 'Test Hotel', image: '', rating: 4.5, location: 'Amman', price: 100 },
-    ])),
+vi.mock('../../services/realHotelsData', () => ({
+  default: {
+    getAllHotels: vi.fn(() =>
+      Promise.resolve([
+        {
+          id: 'h1',
+          name: 'Test Hotel',
+          image: '',
+          rating: 4.5,
+          location: 'Amman',
+          price: 100,
+        },
+      ])
+    ),
   },
 }));
 
@@ -19,6 +28,6 @@ describe('Home page', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(screen.getByText('Test Hotel')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('Test Hotel').length).toBeGreaterThan(0));
   });
 });

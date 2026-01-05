@@ -1,8 +1,17 @@
 import { CognitoUserPool } from 'amazon-cognito-identity-js';
 
+const runtimeCfg =
+  typeof window !== 'undefined' ? window.__VISITJO_RUNTIME_CONFIG__ : undefined;
+
 const poolData = {
-  UserPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID || '',
-  ClientId: import.meta.env.VITE_COGNITO_CLIENT_ID || '',
+  UserPoolId:
+    runtimeCfg?.VITE_COGNITO_USER_POOL_ID ||
+    import.meta.env.VITE_COGNITO_USER_POOL_ID ||
+    '',
+  ClientId:
+    runtimeCfg?.VITE_COGNITO_CLIENT_ID ||
+    import.meta.env.VITE_COGNITO_CLIENT_ID ||
+    '',
 };
 
 let UserPool;

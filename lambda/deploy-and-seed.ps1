@@ -5,6 +5,72 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
+function Set-EnvVarInFile {
+	Param(
+		[Parameter(Mandatory = $true)][string]$Path,
+		[Parameter(Mandatory = $true)][string]$Key,
+		[Parameter(Mandatory = $true)][string]$Value
+	)
+
+	$line = "$Key=$Value"
+	if (Test-Path $Path) {
+		$lines = Get-Content $Path -ErrorAction SilentlyContinue
+		$found = $false
+		$newLines = foreach ($l in $lines) {
+			if ($l -match "^\s*$([regex]::Escape($Key))=") {
+				$found = $true
+				$line
+			} else {
+				$l
+			}
+		}
+		if (-not $found) { $newLines += $line }
+		$newLines | Out-File -FilePath $Path -Encoding utf8
+	} else {
+		$line | Out-File -FilePath $Path -Encoding utf8
+	}
+}
+
+function Update-RuntimeConfigFile {
+	Param(
+		[Parameter(Mandatory = $true)][string]$Path,
+		[Parameter(Mandatory = $true)][string]$ApiUrl
+	)
+
+	if (-not (Test-Path $Path)) {
+		@(
+			"// Auto-generated (or updated) by lambda/deploy-and-seed.ps1",
+			"// This file is safe to commit. It is loaded at runtime before the app boots.",
+			"window.__VISITJO_RUNTIME_CONFIG__ = {",
+			"  VITE_API_GATEWAY_URL: \"$ApiUrl\"",
+			"};",
+			""
+		) | Out-File -FilePath $Path -Encoding utf8
+		return
+	}
+
+	$content = Get-Content -Raw -Path $Path
+	$updated = $false
+	if ($content -match 'VITE_API_GATEWAY_URL\s*:\s*"[^"]*"') {
+		$content = [regex]::Replace(
+			$content,
+			'(VITE_API_GATEWAY_URL\s*:\s*")[^"]*(")',
+			"`$1$ApiUrl`$2"
+		)
+		$updated = $true
+	}
+
+	if (-not $updated) {
+		$content = [regex]::Replace(
+			$content,
+			'(window\.__VISITJO_RUNTIME_CONFIG__\s*=\s*\{)',
+			"`$1`n  VITE_API_GATEWAY_URL: \"$ApiUrl\",`n"
+		)
+	}
+
+	$content | Out-File -FilePath $Path -Encoding utf8
+}
+
 Write-Host "Running deploy-and-seed.ps1" -ForegroundColor Cyan
 
 # Ensure script runs from project root (jordan-hotels-app)
@@ -86,18 +152,11 @@ try {
 
 if ($apiUrl -and $apiUrl -ne "None") {
 	$envFile = Join-Path (Get-Location) ".env.local"
-	"VITE_API_GATEWAY_URL=$apiUrl" | Out-File -FilePath $envFile -Encoding utf8
+	Set-EnvVarInFile -Path $envFile -Key "VITE_API_GATEWAY_URL" -Value $apiUrl
 	Write-Host "Wrote $envFile with VITE_API_GATEWAY_URL" -ForegroundColor Cyan
 
 	$runtimeCfgFile = Join-Path (Get-Location) "public\runtime-config.js"
-	@(
-		"// Auto-generated (or updated) by lambda/deploy-and-seed.ps1",
-		"// This file is safe to commit. It is loaded at runtime before the app boots.",
-		"window.__VISITJO_RUNTIME_CONFIG__ = {",
-		"  VITE_API_GATEWAY_URL: \"$apiUrl\"",
-		"};",
-		""
-	) | Out-File -FilePath $runtimeCfgFile -Encoding utf8
+	Update-RuntimeConfigFile -Path $runtimeCfgFile -ApiUrl $apiUrl
 	Write-Host "Wrote $runtimeCfgFile with runtime API URL" -ForegroundColor Cyan
 
 	Write-Host "ApiUrl: $apiUrl" -ForegroundColor Cyan
