@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Home from '../Home';
+import Home from '../Home.jsx';
 
 vi.mock('../../services/realHotelsData', () => ({
   default: {
