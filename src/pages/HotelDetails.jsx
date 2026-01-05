@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } from 'lucide-react';
 import realHotelsAPI from '../services/realHotelsData';
+import { hotelAPI } from '../services/api';
 import WishlistButton from '../components/WishlistButton';
-import { useAuth } from '../context/AuthContext';
 
 const FALLBACK_IMG =
   "data:image/svg+xml;charset=UTF-8," +
@@ -13,6 +13,26 @@ const FALLBACK_IMG =
     <rect width="100%" height="100%" fill="url(#g)"/>
     <text x="50%" y="50%" fill="rgba(255,255,255,.92)" font-family="Arial" font-size="56" text-anchor="middle" dominant-baseline="middle">VisitJo Hotel</text>
   </svg>`);
+
+const normalizeHotel = (raw) => {
+  if (!raw) return null;
+  const location = raw.location || raw.destination || raw.city || 'Jordan';
+  const price = raw.price || raw.pricePerNight || raw.nightlyRate || raw.basePrice || 0;
+  const rating = raw.rating || raw.score || raw.stars || 0;
+  const images = Array.isArray(raw.images)
+    ? raw.images
+    : raw.image
+    ? [raw.image]
+    : [];
+
+  return {
+    ...raw,
+    location,
+    price,
+    rating,
+    images,
+  };
+};
 
 const HotelDetails = () => {
   const { id } = useParams();
@@ -29,8 +49,24 @@ const HotelDetails = () => {
       setLoading(true);
       setError('');
       try {
-        const data = await realHotelsAPI.getHotelById(id);
-        setHotel(data);
+        let data = null;
+
+        try {
+          data = await hotelAPI.getHotelById(id);
+        } catch (apiErr) {
+          console.warn('hotelAPI.getHotelById failed, falling back to realHotelsAPI:', apiErr.message || apiErr);
+        }
+
+        if (!data) {
+          data = await realHotelsAPI.getHotelById(id);
+        }
+
+        if (!data) {
+          setHotel(null);
+          setError('Hotel not found.');
+        } else {
+          setHotel(normalizeHotel(data));
+        }
       } catch (err) {
         setError(err.message || 'Failed to load hotel details.');
       } finally {

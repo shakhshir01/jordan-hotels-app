@@ -26,6 +26,8 @@ import Deals from './pages/Deals.jsx';
 import Flights from './pages/Flights.jsx';
 import Cars from './pages/Cars.jsx';
 import Experiences from './pages/Experiences.jsx';
+import Trends from './pages/Trends.jsx';
+import Insights from './pages/Insights.jsx';
 import TripPlanner from './pages/TripPlanner.jsx';
 import Wishlist from './pages/Wishlist.jsx';
 import Reviews from './pages/Reviews.jsx';
@@ -48,6 +50,7 @@ import InsureTrip from './pages/InsureTrip.jsx';
 import HotelsMap from './pages/HotelsMap.jsx';
 import FeaturedHotels from './pages/FeaturedHotels.jsx';
 import ContactConcierge from './pages/ContactConcierge.jsx';
+import SavedSearches from './pages/SavedSearches.jsx';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import ChatBot from './components/ChatBot.jsx';
 
@@ -76,6 +79,7 @@ function AppRoutes() {
         <Route path="/bookings" element={<ProtectedRoute><Bookings /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
         <Route path="/trip-planner" element={<ProtectedRoute><TripPlanner /></ProtectedRoute>} />
+        <Route path="/saved-searches" element={<ProtectedRoute><SavedSearches /></ProtectedRoute>} />
         <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
         <Route path="/admin/upload" element={<ProtectedRoute><AdminUpload /></ProtectedRoute>} />
 
@@ -84,6 +88,8 @@ function AppRoutes() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/destinations" element={<Destinations />} />
         <Route path="/destinations/:id" element={<DestinationDetails />} />
+        <Route path="/trends" element={<Trends />} />
+        <Route path="/insights" element={<Insights />} />
         <Route path="/experiences" element={<Experiences />} />
         <Route path="/deals" element={<DealsList />} />
         <Route path="/flights" element={<FlightsSearch />} />

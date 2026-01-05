@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, X, Minimize2, Maximize2, MessageCircle } from 'lucide-react';
-import { generateChatResponse } from '../services/chatbot';
-import realHotelsAPI from '../services/realHotelsData';
+import { Send, X, Minimize2, Maximize2, MessageCircle, Headphones } from 'lucide-react';
+import { generateChatResponse, HOTEL_DATA } from '../services/chatbot';
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +17,7 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState(['spa & wellness', 'beach vacation', 'adventure', 'luxury travel', 'city exploration']);
   const [viewedHotels, setViewedHotels] = useState([]);
+  const [awaitingHuman, setAwaitingHuman] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -41,30 +41,65 @@ export default function ChatBot() {
 
     // Get bot response
     setTimeout(() => {
-      const response = generateChatResponse(input, messages);
-      
-      let botText = response.text;
-      if (response.hotels && response.hotels.length > 0) {
-        botText += `\n\n✨ Recommended for you:\n${response.hotels.map(id => '• ' + (realHotelsAPI.getAllHotels().find(h => h.id === id)?.name || id)).join('\n')}`;
-        setViewedHotels(prev => [...new Set([...prev, ...response.hotels])]);
-      }
+      try {
+        const response = generateChatResponse(input, messages);
 
-      const botMessage = {
-        id: messages.length + 2,
-        text: botText,
-        sender: 'bot',
-        timestamp: new Date(),
-        suggestions: response.suggestions,
-        hotels: response.hotels
-      };
-      setMessages(prev => [...prev, botMessage]);
-      setSuggestions(response.suggestions || []);
-      setLoading(false);
+        let botText = response.text;
+        if (response.hotels && response.hotels.length > 0) {
+          const lines = response.hotels.map((id) => {
+            const meta = HOTEL_DATA[id];
+            const name = meta?.name || id;
+            const bestFor = Array.isArray(meta?.bestFor) ? meta.bestFor.slice(0, 2).join(', ') : '';
+            return bestFor ? `• ${name} — best for ${bestFor}` : `• ${name}`;
+          }).join('\n');
+
+          botText += `\n\n✨ Recommended for you:\n${lines}`;
+          setViewedHotels((prev) => [...new Set([...prev, ...response.hotels])]);
+        }
+
+        const botMessage = {
+          id: messages.length + 2,
+          text: botText,
+          sender: 'bot',
+          timestamp: new Date(),
+          suggestions: response.suggestions,
+          hotels: response.hotels,
+        };
+        setMessages((prev) => [...prev, botMessage]);
+        setSuggestions(response.suggestions || []);
+      } catch (err) {
+        console.error('ChatBot error:', err);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            text: "Sorry, something went wrong while generating a reply. Please try again.",
+            sender: 'bot',
+            timestamp: new Date(),
+          },
+        ]);
+      } finally {
+        setLoading(false);
+      }
     }, 600);
   };
 
   const handleSuggestion = (suggestion) => {
     setInput(suggestion);
+  };
+
+  const handleEscalateToHuman = () => {
+    setAwaitingHuman(true);
+    setMessages(prev => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        text:
+          "I’ve flagged this conversation for a human agent. In a live setup, this would create a support ticket with your last messages and contact details.",
+        sender: 'bot',
+        timestamp: new Date(),
+      },
+    ]);
   };
 
   if (!isOpen) {
@@ -153,7 +188,7 @@ export default function ChatBot() {
 
             {/* Input */}
             <div className="border-t p-4 bg-white">
-              <form onSubmit={handleSendMessage} className="flex gap-2">
+              <form onSubmit={handleSendMessage} className="flex gap-2 mb-2">
                 <input
                   type="text"
                   value={input}
@@ -169,6 +204,19 @@ export default function ChatBot() {
                   <Send size={18} />
                 </button>
               </form>
+              <div className="flex items-center justify-between text-[11px] text-gray-500">
+                <span>
+                  Tip: avoid sharing card numbers or sensitive data in chat.
+                </span>
+                <button
+                  type="button"
+                  onClick={handleEscalateToHuman}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-gray-300 text-[11px] hover:bg-gray-50"
+                >
+                  <Headphones size={12} />
+                  Ask for human
+                </button>
+              </div>
             </div>
           </>
         )}

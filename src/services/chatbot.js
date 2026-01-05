@@ -2,7 +2,7 @@
  * AI Chatbot Service - Smart travel recommendations and support
  */
 
-const HOTEL_DATA = {
+export const HOTEL_DATA = {
   'h-dead-sea-marriott': {
     name: 'Dead Sea Marriott Resort & Spa',
     bestFor: ['relaxation', 'spa', 'wellness', 'couples'],

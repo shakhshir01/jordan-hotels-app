@@ -1,21 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle.jsx";
-import { getUseMocks, enableMocks } from "../services/api.js";
-import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const Navbar = () => {
-  const [useMocks, setUseMocks] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setUseMocks(getUseMocks());
-  }, []);
-
-  const toggleMocks = () => {
-    enableMocks(!useMocks);
-  };
 
   const handleLogout = () => {
     logout();
@@ -44,6 +33,20 @@ const Navbar = () => {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
+              to="/trends"
+              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+            >
+              Trends
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+            </Link>
+            <Link
+              to="/insights"
+              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+            >
+              Insights
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+            </Link>
+            <Link
               to="/experiences"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
@@ -62,6 +65,13 @@ const Navbar = () => {
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
               Blog
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+            </Link>
+            <Link
+              to="/reviews"
+              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+            >
+              Reviews
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
@@ -100,20 +110,6 @@ const Navbar = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {/* Demo mode toggle */}
-            <button
-              type="button"
-              onClick={toggleMocks}
-              className={`px-3 py-2 text-xs font-bold rounded-lg transition-colors duration-200 ${
-                useMocks
-                  ? "bg-green-600 text-white"
-                  : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
-              }`}
-              title={useMocks ? "Using demo data" : "Click to use demo data"}
-            >
-              {useMocks ? "DEMO" : "LIVE"}
-            </button>
-
             {user ? (
               <>
                 <span className="text-sm font-medium text-slate-600 dark:text-slate-300">

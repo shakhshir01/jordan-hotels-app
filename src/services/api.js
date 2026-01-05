@@ -191,23 +191,88 @@ export const hotelAPI = {
   },
 
   getUserProfile: async () => {
-    if (getUseMocks()) return { name: "Demo User", email: "demo@visitjo.local", location: "Amman" };
+    if (getUseMocks()) {
+      // In mock mode, return an empty profile so the UI derives
+      // real-looking data from the signed-in user's info instead
+      // of showing hard-coded demo names.
+      return {
+        userId: "mock-user",
+      };
+    }
     try {
       const response = await apiClient.get("/user/profile");
       return response.data;
     } catch (error) {
-      if (lastAuthError) return { name: "Demo User", email: "demo@visitjo.local", location: "Amman" };
+      if (lastAuthError) {
+        // If the API auth fails, surface an empty profile so
+        // the frontend never shows fake "Demo User" data.
+        return {
+          userId: "fallback-user",
+        };
+      }
+      throw error;
+    }
+  },
+
+  updateUserProfile: async (profile) => {
+    if (getUseMocks()) return { ...profile, userId: profile.userId || "demo-user" };
+    try {
+      const response = await apiClient.put("/user/profile", profile);
+      return response.data;
+    } catch (error) {
+      if (lastAuthError) return { ...profile, userId: profile.userId || "demo-user" };
       throw error;
     }
   },
 
   getUserBookings: async () => {
-    if (getUseMocks()) return [{ id: "b1", hotelId: "h-movenpick-deadsea", nights: 2, total: 360 }];
+    if (getUseMocks()) {
+      return [
+        {
+          id: "booking-001",
+          hotelId: "hotel-dead-sea",
+          hotelName: "Movenpick Dead Sea",
+          checkIn: "2026-02-15",
+          checkOut: "2026-02-18",
+          guests: 2,
+          totalPrice: 450,
+          status: "confirmed",
+        },
+      ];
+    }
     try {
       const response = await apiClient.get("/user/bookings");
-      return response.data;
+      const data = response.data;
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.bookings)) return data.bookings;
+      return [];
     } catch (error) {
-      if (lastAuthError) return [{ id: "b1", hotelId: "h-movenpick-deadsea", nights: 2, total: 360 }];
+      if (lastAuthError)
+        return [
+          {
+            id: "booking-001",
+            hotelId: "hotel-dead-sea",
+            hotelName: "Movenpick Dead Sea",
+            checkIn: "2026-02-15",
+            checkOut: "2026-02-18",
+            guests: 2,
+            totalPrice: 450,
+            status: "confirmed",
+          },
+        ];
+      throw error;
+    }
+  },
+
+  cancelBooking: async (bookingId) => {
+    if (getUseMocks()) return { success: true, bookingId };
+    try {
+      const response = await apiClient.delete("/bookings", {
+        params: { id: bookingId },
+      });
+      return normalizeLambdaResponse(response.data) || { success: true };
+    } catch (error) {
+      if (lastAuthError) return { success: true, bookingId };
       throw error;
     }
   },
