@@ -8,14 +8,36 @@ import {
   mockSearchResult,
 } from "./mockData.js";
 
-// Prefer env var, but force-switch away from the old ny5ohksmc3 API ID
-const FALLBACK_API_URL = "https://u5diymkrlb.execute-api.us-east-1.amazonaws.com/prod";
-const rawApiUrl = import.meta.env.VITE_API_GATEWAY_URL || "";
+// Resolve API URL in this order:
+// 1) runtime config (public/runtime-config.js) - works in Amplify without env vars
+// 2) Vite env var (works locally)
+// Avoid old API IDs that are known to be stale.
+const STALE_API_IDS = ["ny5ohksmc3"];
+
+const normalizeBaseUrl = (value) => String(value || "").trim().replace(/\/$/, "");
+
+const isStaleApiUrl = (value) => {
+  const url = String(value || "");
+  return STALE_API_IDS.some((id) => url.includes(id));
+};
+
+const getRuntimeApiUrl = () => {
+  if (typeof window === "undefined") return "";
+  const cfg = window.__VISITJO_RUNTIME_CONFIG__;
+  return cfg && typeof cfg.VITE_API_GATEWAY_URL === "string" ? cfg.VITE_API_GATEWAY_URL : "";
+};
+
+const rawRuntimeApiUrl = getRuntimeApiUrl();
+const rawEnvApiUrl = import.meta.env.VITE_API_GATEWAY_URL || "";
+
 const effectiveApiUrl =
-  !rawApiUrl || rawApiUrl.includes("ny5ohksmc3")
-    ? FALLBACK_API_URL
-    : rawApiUrl;
-const API_BASE_URL = effectiveApiUrl.replace(/\/$/, "");
+  rawRuntimeApiUrl && !isStaleApiUrl(rawRuntimeApiUrl)
+    ? rawRuntimeApiUrl
+    : rawEnvApiUrl && !isStaleApiUrl(rawEnvApiUrl)
+      ? rawEnvApiUrl
+      : "";
+
+const API_BASE_URL = normalizeBaseUrl(effectiveApiUrl);
 const API_KEY = import.meta.env.VITE_API_KEY || "";
 
 const apiClient = axios.create({

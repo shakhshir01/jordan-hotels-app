@@ -6,7 +6,14 @@
  * Example: node wire-lambdas.js ny5ohksmc3 us-east-1
  */
 
-const { APIGatewayClient, GetResourcesCommand, PutMethodCommand, PutIntegrationCommand, PutMethodResponseCommand, PutIntegrationResponseCommand } = require('@aws-sdk/client-api-gateway');
+import {
+  APIGatewayClient,
+  GetResourcesCommand,
+  PutMethodCommand,
+  PutIntegrationCommand,
+  PutMethodResponseCommand,
+  PutIntegrationResponseCommand,
+} from "@aws-sdk/client-api-gateway";
 
 const apiId = process.argv[2];
 const region = process.argv[3] || 'us-east-1';

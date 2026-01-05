@@ -1,14 +1,18 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
+const stackName = process.env.STACK_NAME || "VisitJo";
+
 const TABLES = {
-  HOTELS: process.env.HOTELS_TABLE || "VisitJo-Hotels",
-  DESTINATIONS: process.env.DESTINATIONS_TABLE || "VisitJo-Destinations",
-  DEALS: process.env.DEALS_TABLE || "VisitJo-Deals",
-  EXPERIENCES: process.env.EXPERIENCES_TABLE || "VisitJo-Experiences",
-  BOOKINGS: process.env.BOOKINGS_TABLE || "VisitJo-Bookings",
+  HOTELS: process.env.HOTELS_TABLE || `${stackName}-Hotels`,
+  DESTINATIONS: process.env.DESTINATIONS_TABLE || `${stackName}-Destinations`,
+  DEALS: process.env.DEALS_TABLE || `${stackName}-Deals`,
+  EXPERIENCES: process.env.EXPERIENCES_TABLE || `${stackName}-Experiences`,
+  BOOKINGS: process.env.BOOKINGS_TABLE || `${stackName}-Bookings`,
 };
 
 const now = () => new Date().toISOString();
@@ -86,9 +90,16 @@ async function seed() {
   console.log("Seeding complete.");
 }
 
-if (require.main === module) {
+const isMain = (() => {
+  const thisFile = fileURLToPath(import.meta.url);
+  const invoked = process.argv[1] ? path.resolve(process.argv[1]) : "";
+  return invoked && path.resolve(thisFile) === invoked;
+})();
+
+if (isMain) {
   seed().catch((err) => {
     console.error("Seeding failed:", err);
     process.exit(1);
   });
 }
+

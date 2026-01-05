@@ -16,13 +16,12 @@ Resources:
   Api:
     Type: AWS::Serverless::Api
     Properties:
-      Name: VisitJoApi
       StageName: prod
       Cors:
         # Restrict CORS to your Amplify app origin and allow methods/headers
         AllowOrigin: "'https://main.d1ewsonl19kjj7.amplifyapp.com'"
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
-        AllowHeaders: "'Content-Type,Authorization,X-Api-Key,X-Amz-Date,X-Amz-Security-Token'"
+        AllowHeaders: "'*'"
       EndpointConfiguration: REGIONAL
 
   HotelsTable:
@@ -30,7 +29,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub "${AWS::StackName}-Hotels"
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -46,7 +44,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub "${AWS::StackName}-Destinations"
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -62,7 +59,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub "${AWS::StackName}-Deals"
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -78,7 +74,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub "${AWS::StackName}-Experiences"
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -94,7 +89,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub "${AWS::StackName}-Bookings"
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
@@ -119,7 +113,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      TableName: !Sub "${AWS::StackName}-Users"
       AttributeDefinitions:
         - AttributeName: userId
           AttributeType: S
@@ -135,7 +128,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !Sub "${AWS::StackName}-logs-${AWS::Region}"
       VersioningConfiguration:
         Status: Enabled
       BucketEncryption:
@@ -148,7 +140,6 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !Sub "${AWS::StackName}-uploads-${AWS::Region}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -169,14 +160,12 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      Name: !Sub "${AWS::StackName}/stripe"
       Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
       KmsKeyId: alias/aws/secretsmanager
 
   LambdaRolePolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: !Sub "${AWS::StackName}-managed-policy"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -203,7 +192,6 @@ Resources:
   GetHotelsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-getHotels"
       Handler: getHotels/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -222,7 +210,6 @@ Resources:
   GetHotelByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-getHotelById"
       Handler: getHotelById/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -241,7 +228,6 @@ Resources:
   SearchFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-search"
       Handler: search/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -259,11 +245,16 @@ Resources:
             Path: /search
             Method: GET
             RestApiId: !Ref Api
+        ApiSearchOptions:
+          Type: Api
+          Properties:
+            Path: /search
+            Method: OPTIONS
+            RestApiId: !Ref Api
 
   DestinationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-destinations"
       Handler: destinations/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -288,7 +279,6 @@ Resources:
   DealsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-deals"
       Handler: deals/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -313,7 +303,6 @@ Resources:
   ExperiencesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-experiences"
       Handler: experiences/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -338,7 +327,6 @@ Resources:
   BookingsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-bookings"
       Handler: bookings/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -357,7 +345,6 @@ Resources:
   CreateCheckoutSessionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-createCheckoutSession"
       Handler: createCheckoutSession/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -376,7 +363,6 @@ Resources:
   GetSignedUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-getSignedUrl"
       Handler: getSignedUrl/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -395,7 +381,6 @@ Resources:
   UserFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-user"
       Handler: user/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole
@@ -417,17 +402,28 @@ Resources:
             Path: /user/profile
             Method: PUT
             RestApiId: !Ref Api
+        ApiUserProfileOptions:
+          Type: Api
+          Properties:
+            Path: /user/profile
+            Method: OPTIONS
+            RestApiId: !Ref Api
         ApiUserBookings:
           Type: Api
           Properties:
             Path: /user/bookings
             Method: GET
             RestApiId: !Ref Api
+        ApiUserBookingsOptions:
+          Type: Api
+          Properties:
+            Path: /user/bookings
+            Method: OPTIONS
+            RestApiId: !Ref Api
 
   SendBookingEmailFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${AWS::StackName}-sendBookingEmail"
       Handler: sendBookingEmail/index.handler
       Policies:
         - AWSLambdaBasicExecutionRole

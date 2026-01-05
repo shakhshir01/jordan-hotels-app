@@ -1,10 +1,18 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
-const fs = require('fs');
-const path = require('path');
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({ region: 'us-east-1' }));
-const hotelsData = JSON.parse(fs.readFileSync(path.join(__dirname, 'hotels-data.json'), 'utf-8'));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const client = DynamoDBDocumentClient.from(
+  new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" })
+);
+const hotelsData = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "hotels-data.json"), "utf-8")
+);
 
 async function importHotels() {
   console.log(`Importing ${hotelsData.length} hotels to DynamoDB...`);

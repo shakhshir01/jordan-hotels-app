@@ -4,8 +4,29 @@
  * Uses: AWS SES to send transactional emails
  */
 
-const AWS = require('aws-sdk');
-const ses = new AWS.SES({ region: 'us-east-1' });
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+
+const ses = new SESClient({ region: process.env.AWS_REGION || "us-east-1" });
+
+const ALLOWED_ORIGINS = new Set([
+  "https://main.d1ewsonl19kjj7.amplifyapp.com",
+  "http://localhost:5173",
+  "http://localhost:5174",
+]);
+
+const getCorsHeaders = (event) => {
+  const origin = event?.headers?.origin || event?.headers?.Origin || "";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin)
+    ? origin
+    : "https://main.d1ewsonl19kjj7.amplifyapp.com";
+
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Methods": "POST,OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
+    "Vary": "Origin",
+  };
+};
 
 const bookingConfirmationTemplate = (data) => `
   <!DOCTYPE html>
@@ -76,7 +97,7 @@ const sendEmail = async (email, subject, htmlContent) => {
   };
 
   try {
-    const result = await ses.sendEmail(params).promise();
+    const result = await ses.send(new SendEmailCommand(params));
     return { success: true, messageId: result.MessageId };
   } catch (error) {
     console.error('SES Error:', error);
@@ -84,7 +105,21 @@ const sendEmail = async (email, subject, htmlContent) => {
   }
 };
 
-exports.handler = async (event) => {
+export async function handler(event) {
+  const method = event?.httpMethod || event?.requestContext?.http?.method || "POST";
+  const corsHeaders = getCorsHeaders(event);
+
+  if (method === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders,
+      },
+      body: "",
+    };
+  }
+
   try {
     const body = JSON.parse(event.body);
     const { email, hotelName, checkIn, checkOut, guests, totalPrice, bookingId, confirmationCode } = body;
@@ -114,14 +149,15 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
       body: JSON.stringify({ message: 'Email sent successfully', ...result }),
     };
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
       body: JSON.stringify({ message: 'Failed to send email' }),
     };
   }
-};
+}

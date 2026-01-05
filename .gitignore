@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# AWS SAM build artifacts
+.aws-sam/
+.sam/
+
 # Environment variables - NEVER commit .env files
 .env
 .env.local

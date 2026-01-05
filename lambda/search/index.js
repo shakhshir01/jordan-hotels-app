@@ -4,12 +4,46 @@ import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
 const ddb = new DynamoDBClient({});
 const client = DynamoDBDocumentClient.from(ddb);
 
+const ALLOWED_ORIGINS = new Set([
+  "https://main.d1ewsonl19kjj7.amplifyapp.com",
+  "http://localhost:5173",
+  "http://localhost:5174",
+]);
+
+const getCorsHeaders = (event) => {
+  const origin = event?.headers?.origin || event?.headers?.Origin || "";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin)
+    ? origin
+    : "https://main.d1ewsonl19kjj7.amplifyapp.com";
+
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Methods": "GET,OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
+    "Vary": "Origin",
+  };
+};
+
 const parseEventQuery = (event) => {
   const q = event?.queryStringParameters?.q || "";
   return q.trim();
 };
 
 export async function handler(event) {
+  const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
+  const corsHeaders = getCorsHeaders(event);
+
+  if (method === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders,
+      },
+      body: "",
+    };
+  }
+
   try {
     const q = parseEventQuery(event);
     const hotelsTable = process.env.HOTELS_TABLE;
@@ -38,14 +72,14 @@ export async function handler(event) {
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
       body: JSON.stringify({ hotels, destinations, deals, experiences }),
     };
   } catch (err) {
     console.error("search error", err);
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
       body: JSON.stringify({ message: "Internal error" }),
     };
   }

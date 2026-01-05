@@ -1,10 +1,10 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, GetCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" });
 const docClient = DynamoDBDocumentClient.from(client);
 
-const BLOG_TABLE = process.env.BLOG_TABLE || 'Blog';
+const BLOG_TABLE = process.env.BLOG_TABLE || "Blog";
 
 // Mock blog posts for demo mode
 const mockBlogPosts = [
@@ -62,7 +62,7 @@ const mockBlogPosts = [
   }
 ];
 
-exports.handler = async (event) => {
+export async function handler(event) {
   console.log('Event:', JSON.stringify(event, null, 2));
 
   try {
@@ -93,7 +93,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ message: 'Internal server error', error: error.message })
     };
   }
-};
+}
 
 async function listBlogPosts(event) {
   try {
