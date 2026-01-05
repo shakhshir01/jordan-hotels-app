@@ -2,9 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import { useTranslation } from 'react-i18next';
+import { getHotelDisplayName } from '../utils/hotelLocalization';
 
 export default function Wishlist() {
   const { wishlist, removeFromWishlist } = useWishlist();
+  const { t, i18n } = useTranslation();
 
   if (wishlist.length === 0) {
     return (
@@ -12,23 +15,23 @@ export default function Wishlist() {
         <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6 mt-8">
           <div className="absolute inset-0 bg-black/10" />
           <div className="relative px-6 py-20 text-center text-white">
-            <h1 className="text-5xl md:text-6xl font-black font-display mb-6">My Wishlist</h1>
-            <p className="text-lg opacity-95">Save your favorite hotels and experiences</p>
+            <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title')}</h1>
+            <p className="text-lg opacity-95">{t('pages.wishlist.subtitle')}</p>
           </div>
         </section>
 
         <div className="max-w-7xl mx-auto px-6 py-20 text-center">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12">
             <div className="text-6xl mb-4">💭</div>
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">No Saved Items Yet</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">{t('pages.wishlist.empty.title')}</h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-              Start exploring and save your favorite hotels, deals, and experiences to your wishlist.
+              {t('pages.wishlist.empty.body')}
             </p>
             <Link
               to="/destinations"
               className="inline-block px-8 py-3 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white font-bold rounded-full hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
             >
-              Explore Destinations
+              {t('pages.wishlist.empty.cta')}
             </Link>
           </div>
         </div>
@@ -41,8 +44,8 @@ export default function Wishlist() {
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6 mt-8">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-6 py-20 text-center text-white">
-          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">My Wishlist</h1>
-          <p className="text-lg opacity-95">{wishlist.length} item{wishlist.length !== 1 ? 's' : ''} saved</p>
+          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title')}</h1>
+          <p className="text-lg opacity-95">{t('pages.wishlist.itemsSaved', { count: wishlist.length })}</p>
         </div>
       </section>
 
@@ -53,14 +56,14 @@ export default function Wishlist() {
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={item.image}
-                  alt={item.name}
+                  alt={item.type === 'experience' ? (item.name || '') : getHotelDisplayName(item, i18n.language)}
                   onError={createHotelImageOnErrorHandler(item.id)}
                   className="w-full h-full object-cover hover:scale-110 transition"
                 />
                 <button
                   onClick={() => removeFromWishlist(item.id)}
                   className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition"
-                  title="Remove from wishlist"
+                  title={t('pages.wishlist.remove')}
                 >
                   ❌
                 </button>
@@ -71,18 +74,18 @@ export default function Wishlist() {
                 )}
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{item.name}</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{item.type === 'experience' ? item.name : getHotelDisplayName(item, i18n.language)}</h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm mb-2">{item.location || item.description}</p>
                 
                 <div className="mb-6 space-y-1">
                   {item.price && (
                     <p className="text-2xl font-bold text-jordan-blue">
-                      {item.price} JOD{item.type === 'experience' ? '' : '/night'}
+                      {item.price} JOD{item.type === 'experience' ? '' : ` ${t('hotels.perNight')}`}
                     </p>
                   )}
                   {item.addedAt && (
                     <p className="text-xs text-slate-500">
-                      Saved {new Date(item.addedAt).toLocaleDateString()}
+                      {t('pages.wishlist.savedOn', { date: new Date(item.addedAt).toLocaleDateString() })}
                     </p>
                   )}
                 </div>
@@ -91,7 +94,7 @@ export default function Wishlist() {
                   to={item.type === 'experience' ? '/experiences' : `/hotels/${item.id}`}
                   className="w-full block text-center bg-gradient-to-r from-jordan-blue to-jordan-teal text-white py-2 rounded-lg hover:shadow-lg transition font-bold"
                 >
-                  View Details
+                  {t('pages.wishlist.viewDetails')}
                 </Link>
               </div>
             </article>

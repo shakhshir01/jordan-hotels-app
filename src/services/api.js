@@ -7,6 +7,7 @@ import {
   mockBlogPosts,
   mockSearchResult,
 } from "./mockData.js";
+import { sanitizeHotelImageUrls } from "../utils/hotelImageFallback";
 
 // Resolve API URL in this order:
 // 1) runtime config (public/runtime-config.js) - works in Amplify without env vars
@@ -37,7 +38,15 @@ const effectiveApiUrl =
       ? rawEnvApiUrl
       : "";
 
-const API_BASE_URL = normalizeBaseUrl(effectiveApiUrl);
+const resolvedApiBaseUrl = normalizeBaseUrl(effectiveApiUrl);
+
+// Local dev: avoid CORS by routing through Vite's dev proxy (/api -> VITE_API_GATEWAY_URL)
+const shouldUseDevProxy =
+  import.meta.env.DEV &&
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+const API_BASE_URL = shouldUseDevProxy ? "/api" : resolvedApiBaseUrl;
 const API_KEY = import.meta.env.VITE_API_KEY || "";
 
 const apiClient = axios.create({
@@ -127,13 +136,18 @@ const normalizeLambdaResponse = (raw) => {
 const normalizeHotel = (rawHotel) => {
   if (!rawHotel || typeof rawHotel !== "object") return rawHotel;
 
-  const images = Array.isArray(rawHotel.images) ? rawHotel.images.filter(Boolean) : [];
-  const image = typeof rawHotel.image === "string" && rawHotel.image.trim() ? rawHotel.image.trim() : "";
+  const key = rawHotel.id || rawHotel.hotelId || rawHotel.name || "";
+  const rawImages = Array.isArray(rawHotel.images) ? rawHotel.images.filter(Boolean) : [];
+  const rawImage = typeof rawHotel.image === "string" && rawHotel.image.trim() ? rawHotel.image.trim() : "";
+
+  const sanitized = sanitizeHotelImageUrls([rawImage, ...rawImages], key);
+  const image = sanitized[0] || "";
+  const images = sanitized;
 
   return {
     ...rawHotel,
     images,
-    image: image || images[0] || "",
+    image,
   };
 };
 

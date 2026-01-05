@@ -16,6 +16,15 @@ export const GENERIC_HOTEL_FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1478860409698-8707f313ee8b?q=80&w=1200",
 ];
 
+const BLOCKED_HOTEL_IMAGE_HOSTS = ["cache.marriott.com"];
+
+export const isBlockedHotelImageUrl = (url) => {
+  if (typeof url !== "string") return false;
+  const u = url.trim().toLowerCase();
+  if (!u) return false;
+  return BLOCKED_HOTEL_IMAGE_HOSTS.some((host) => u.includes(host));
+};
+
 const hashString = (value) => {
   const str = String(value ?? "");
   let hash = 0;
@@ -29,6 +38,43 @@ export const getGenericHotelFallbackImage = (key = "") => {
   if (!GENERIC_HOTEL_FALLBACK_IMAGES.length) return "";
   const idx = hashString(key) % GENERIC_HOTEL_FALLBACK_IMAGES.length;
   return GENERIC_HOTEL_FALLBACK_IMAGES[idx];
+};
+
+export const getGenericHotelFallbackImages = (key = "", count = 4) => {
+  const pool = GENERIC_HOTEL_FALLBACK_IMAGES;
+  if (!pool.length) return [];
+
+  const out = [];
+  const seen = new Set();
+  const base = hashString(key);
+  const desired = Math.max(1, Math.min(Number(count) || 1, pool.length));
+
+  for (let i = 0; i < pool.length && out.length < desired; i += 1) {
+    const idx = (base + i) % pool.length;
+    const src = pool[idx];
+    if (!src || seen.has(src)) continue;
+    seen.add(src);
+    out.push(src);
+  }
+
+  return out;
+};
+
+export const sanitizeHotelImageUrls = (urls, key = "") => {
+  const out = [];
+  const seen = new Set();
+  for (const u of urls || []) {
+    if (typeof u !== "string") continue;
+    const s = u.trim();
+    if (!s) continue;
+    if (isBlockedHotelImageUrl(s)) continue;
+    if (seen.has(s)) continue;
+    seen.add(s);
+    out.push(s);
+  }
+
+  if (out.length) return out;
+  return getGenericHotelFallbackImages(key, 4);
 };
 
 /**

@@ -14,7 +14,7 @@ export default function DealsList() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -33,16 +33,16 @@ export default function DealsList() {
     navigate('/checkout', { state: { hotel, discount } });
   };
 
-  if (loading) return <div className="p-24 text-center">Loading deals...</div>;
+  if (loading) return <div className="p-24 text-center">{t('pages.dealsList.loading')}</div>;
 
   return (
     <div className="min-h-screen">
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-red-600 via-orange-600 to-yellow-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-6 py-20 text-center text-white">
-          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">Limited Time</div>
-          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">Deals & Offers</h1>
-          <p className="text-lg max-w-3xl mx-auto opacity-95">Incredible discounts on Jordan's finest hotels</p>
+          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.dealsList.hero.kicker')}</div>
+          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.dealsList.hero.title')}</h1>
+          <p className="text-lg max-w-3xl mx-auto opacity-95">{t('pages.dealsList.hero.subtitle')}</p>
         </div>
       </section>
 
@@ -76,16 +76,16 @@ export default function DealsList() {
                   <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">{hotel.location}</p>
                   
                   <div className="mb-6 space-y-1">
-                    <p className="text-slate-400 line-through text-sm">{originalPrice} JOD/night</p>
-                    <p className="text-3xl font-bold text-red-600">{discountedPrice} JOD/night</p>
-                    <p className="text-xs text-slate-500">Save {(originalPrice - discountedPrice).toFixed(2)} JOD</p>
+                    <p className="text-slate-400 line-through text-sm">{originalPrice} JOD {t('hotels.perNight')}</p>
+                    <p className="text-3xl font-bold text-red-600">{discountedPrice} JOD {t('hotels.perNight')}</p>
+                    <p className="text-xs text-slate-500">{t('pages.dealsList.save', { amount: (originalPrice - discountedPrice).toFixed(2) })}</p>
                   </div>
 
                   <button 
                     onClick={() => handleClaimDeal(hotel, discount)}
                     className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 rounded-lg hover:shadow-lg transition font-bold"
                   >
-                    Claim Deal
+                    {t('pages.dealsList.claimDeal')}
                   </button>
                 </div>
               </article>

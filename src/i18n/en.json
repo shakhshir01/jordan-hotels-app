@@ -92,7 +92,17 @@
     "newPassword": "New Password",
     "resetPassword": "Reset Password",
     "verificationCodeSent": "Verification code sent to your email",
-    "checkEmail": "Check your email for the verification code"
+    "checkEmail": "Check your email for the verification code",
+    "validation": {
+      "fullNameRequired": "Full name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordUppercase": "Password must contain an uppercase letter",
+      "passwordNumber": "Password must contain a number",
+      "passwordsDontMatch": "Passwords do not match"
+    }
   },
   "messages": {
     "success": "Success",
@@ -242,6 +252,271 @@
       "title": "Email support",
       "body": "For issues that are not urgent, send us an email including your booking ID, dates, and a short description of the problem.",
       "cta": "Open email draft"
+    }
+  }
+  ,
+  "pages": {
+    "destinations": {
+      "hero": {
+        "kicker": "Discover",
+        "title": "Destinations in Jordan",
+        "subtitle": "Explore iconic places and book the best stays."
+      },
+      "hotelsCount": "{{count}} hotel",
+      "hotelsCount_other": "{{count}} hotels",
+      "exploreHotels": "Explore Hotels"
+    },
+    "experiences": {
+      "hero": {
+        "kicker": "Do More",
+        "title": "Unforgettable Experiences",
+        "subtitle": "Curated tours, adventures, and activities across Jordan."
+      },
+      "learnMore": "Learn More",
+      "durationLabel": "Duration",
+      "groupSizeLabel": "Group size"
+    },
+    "dealsList": {
+      "loading": "Loading deals...",
+      "hero": {
+        "kicker": "Limited Time",
+        "title": "Deals & Offers",
+        "subtitle": "Save on top stays with exclusive discounts."
+      },
+      "save": "Save {{amount}} JOD",
+      "claimDeal": "Claim Deal"
+    },
+    "deals": {
+      "hero": {
+        "kicker": "Save More",
+        "title": "Featured Deals",
+        "subtitle": "Hand-picked offers for your next trip."
+      },
+      "seeOffers": "See offers"
+    },
+    "specialOffers": {
+      "title": "Special Offers",
+      "subtitle": "Exclusive discounts on selected hotels."
+    },
+    "blog": {
+      "hero": {
+        "kicker": "Read",
+        "title": "Blog",
+        "subtitle": "Travel tips, destinations, and stories from Jordan."
+      },
+      "read": "Read"
+    },
+    "reviews": {
+      "hero": {
+        "kicker": "Reviews",
+        "title": "Real Guest Reviews",
+        "subtitle": "Honest feedback to help you choose with confidence."
+      },
+      "features": {
+        "verified": {
+          "title": "Verified stays",
+          "meta": "Reviews from real bookings."
+        },
+        "context": {
+          "title": "Context & details",
+          "meta": "Guest notes that matter."
+        },
+        "signals": {
+          "title": "Trusted signals",
+          "meta": "Ratings that you can rely on."
+        }
+      }
+    },
+    "wishlist": {
+      "title": "Wishlist",
+      "subtitle": "Save your favorite hotels and experiences.",
+      "itemsSaved": "{{count}} item saved",
+      "itemsSaved_other": "{{count}} items saved",
+      "empty": {
+        "title": "Your wishlist is empty",
+        "body": "Start exploring destinations and save your favorites.",
+        "cta": "Explore Destinations"
+      },
+      "remove": "Remove from wishlist",
+      "savedOn": "Saved on {{date}}",
+      "viewDetails": "View details"
+    },
+    "tripPlanner": {
+      "hero": {
+        "kicker": "Plan",
+        "title": "Trip Planner",
+        "subtitle": "Draft a simple itinerary for your Jordan adventure."
+      },
+      "itinerary": "Itinerary",
+      "addDay": "Add day",
+      "dayNumber": "Day {{number}}",
+      "deleteDay": "Delete day",
+      "destinationPlaceholder": "Destination",
+      "notesPlaceholder": "Notes"
+    },
+    "privacy": {
+      "kicker": "PRIVACY",
+      "title": "Privacy Policy",
+      "intro": "Here’s how we collect, use, and protect your information.",
+      "sections": {
+        "1": {
+          "title": "Information we collect",
+          "body": "We collect information you provide (like name and email) and basic usage data to improve the service."
+        },
+        "2": {
+          "title": "How we use information",
+          "items": [
+            "To create and manage your account",
+            "To process bookings and provide support",
+            "To improve the website experience"
+          ]
+        },
+        "3": {
+          "title": "Sharing",
+          "body": "We only share data with service providers needed to run the app (payments, email, analytics), or when required by law."
+        },
+        "4": {
+          "title": "Cookies",
+          "body": "We use cookies and similar technologies for essential functionality and to understand usage patterns."
+        },
+        "5": {
+          "title": "Contact",
+          "body": "If you have questions about privacy, contact us via the Support page."
+        }
+      }
+    },
+    "terms": {
+      "kicker": "TERMS",
+      "title": "Terms & Conditions",
+      "intro": "By using VisitJo you agree to the following terms.",
+      "sections": {
+        "1": {
+          "title": "Using the service",
+          "body": "Use the website responsibly and provide accurate information when creating an account or booking."
+        },
+        "2": {
+          "title": "Bookings",
+          "items": [
+            "Availability and prices can change",
+            "Policies vary by property and rate",
+            "You are responsible for reviewing booking details"
+          ]
+        },
+        "3": {
+          "title": "Payments",
+          "body": "Payments are processed securely by third‑party providers."
+        },
+        "4": {
+          "title": "Cancellations",
+          "body": "Cancellation rules depend on the property and rate type shown during checkout."
+        },
+        "5": {
+          "title": "Limitation of liability",
+          "body": "VisitJo is provided as‑is; we’re not liable for indirect damages related to use of the service."
+        },
+        "6": {
+          "title": "Changes",
+          "body": "We may update these terms from time to time. Continued use means you accept the updated terms."
+        }
+      }
+    },
+    "about": {
+      "kicker": "ABOUT",
+      "title": "About VisitJo",
+      "intro": "Premium travel discovery and booking experiences for Jordan.",
+      "cards": {
+        "localFirst": {
+          "title": "Local‑first",
+          "body": "Built around Jordan’s destinations with practical details and authentic stays."
+        },
+        "curated": {
+          "title": "Curated picks",
+          "body": "A focused selection of hotels, experiences, and offers."
+        },
+        "planning": {
+          "title": "Simple planning",
+          "body": "Plan, save, and book faster with a clean workflow."
+        }
+      },
+      "focus": {
+        "title": "What we focus on",
+        "items": [
+          "Great stays in Jordan’s top spots",
+          "Helpful travel inspiration",
+          "Fast search and discovery",
+          "Transparent pricing",
+          "A smooth booking experience"
+        ]
+      },
+      "reviews": {
+        "title": "Built for real travelers",
+        "body1": "We aim to make it easy to compare options and book with confidence.",
+        "body2": "Have feedback? Use the Support page — we’re listening."
+      }
+    },
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your VisitJo account",
+      "passwordPlaceholder": "Enter your password",
+      "signingIn": "Signing in...",
+      "invalidCredentials": "Invalid email or password. Please try again."
+    },
+    "signup": {
+      "title": "Join VisitJo",
+      "subtitle": "Create your account to book amazing stays",
+      "passwordPlaceholder": "Min. 8 chars, 1 uppercase, 1 number",
+      "confirmPasswordPlaceholder": "Re-enter password",
+      "passwordsMatch": "Passwords match",
+      "creatingAccount": "Creating account...",
+      "accountCreatedToast": "Account created! Check your email to verify.",
+      "failed": "Failed to sign up. Please try again."
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email to receive a verification code.",
+      "sending": "Sending...",
+      "failed": "Failed to send verification code."
+    },
+    "resetPassword": {
+      "subtitle": "Enter the code sent to {{email}}",
+      "codePlaceholder": "Verification code",
+      "missingEmail": "Missing email. Please start from the Forgot Password flow.",
+      "codeRequired": "Please enter the verification code.",
+      "resetting": "Resetting...",
+      "failed": "Failed to reset password."
+    },
+    "verify": {
+      "title": "Verify Email",
+      "subtitle": "We sent a verification code to",
+      "verifyCta": "VERIFY EMAIL",
+      "verifying": "Verifying...",
+      "noCode": "Didn't receive a code?",
+      "resend": "Resend",
+      "resendIn": "Resend ({{seconds}}s)",
+      "invalidAccessTitle": "Invalid Access",
+      "invalidAccessBody": "Please complete the sign-up process first.",
+      "goToSignup": "Go to Sign Up",
+      "codeRequired": "Please enter the verification code",
+      "invalidCode": "Invalid verification code. Please try again.",
+      "verifiedTitle": "Email Verified!",
+      "verifiedBody": "Your account has been successfully verified.",
+      "redirecting": "Redirecting to login...",
+      "missingEmail": "Missing email address.",
+      "resent": "Verification code resent. Check your email.",
+      "resendFailed": "Failed to resend code."
+    },
+    "trends": {
+      "hero": {
+        "kicker": "TRAVEL INTELLIGENCE",
+        "title": "What’s trending",
+        "subtitle": "Search across hotels, experiences, deals, and destinations."
+      },
+      "searchPlaceholder": "Search Petra, Dead Sea, Amman...",
+      "explore": "Explore",
+      "destinationsMatching": "Destinations matching \"{{query}}\"",
+      "all": "All",
+      "fromPrice": "From {{price}}",
+      "noResults": "No results yet. Try a different search."
     }
   }
   ,

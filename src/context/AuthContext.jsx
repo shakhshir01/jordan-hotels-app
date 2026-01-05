@@ -3,13 +3,34 @@ import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import { UserPool } from '../authConfig';
 import { setAuthToken } from '../services/api';
 import { showSuccess, showError } from '../services/toastService';
+import { deriveNameFromEmail, loadSavedProfile, saveProfile } from '../utils/userProfile';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const setUserAndProfileFromEmail = (email) => {
+    const derived = deriveNameFromEmail(email);
+    const saved = loadSavedProfile(email);
+
+    const nextProfile = {
+      email: derived.email,
+      firstName: saved?.firstName || derived.firstName,
+      lastName: saved?.lastName || derived.lastName,
+      displayName:
+        (saved?.firstName || saved?.lastName)
+          ? [saved?.firstName, saved?.lastName].filter(Boolean).join(' ')
+          : derived.displayName,
+      hasCustomName: Boolean(saved?.hasCustomName),
+    };
+
+    setUser({ email: derived.email });
+    setUserProfile(nextProfile);
+  };
 
   // Check if user is already logged in on mount
   useEffect(() => {
@@ -33,7 +54,7 @@ export const AuthProvider = ({ children }) => {
               } else {
                 const emailAttr = attributes?.find(attr => attr.Name === 'email');
                 const email = emailAttr?.Value || cognitoUser.getUsername();
-                setUser({ email });
+                setUserAndProfileFromEmail(email);
               }
               try {
                 const idToken = session.getIdToken().getJwtToken();
@@ -104,7 +125,7 @@ export const AuthProvider = ({ children }) => {
 
       cognitoUser.authenticateUser(authDetails, {
         onSuccess: (session) => {
-            setUser({ email });
+            setUserAndProfileFromEmail(email);
             try {
               const idToken = session.getIdToken().getJwtToken();
               setAuthToken(idToken);
@@ -132,9 +153,31 @@ export const AuthProvider = ({ children }) => {
       }
     }
     setUser(null);
+    setUserProfile(null);
     setAuthToken(null);
     setError(null);
     showSuccess('Logged out successfully');
+  };
+
+  const updateUserProfileName = (patch) => {
+    const email = user?.email;
+    if (!email) return;
+
+    const safeFirst = String(patch?.firstName || '').trim();
+    const safeLast = String(patch?.lastName || '').trim();
+    const hasCustomName = Boolean(safeFirst || safeLast);
+
+    const derived = deriveNameFromEmail(email);
+    const next = {
+      email,
+      firstName: safeFirst || derived.firstName,
+      lastName: safeLast || derived.lastName,
+      displayName: hasCustomName ? [safeFirst, safeLast].filter(Boolean).join(' ') : derived.displayName,
+      hasCustomName,
+    };
+
+    setUserProfile(next);
+    saveProfile(email, next);
   };
 
   const verifyEmail = async (email, code) => {
@@ -218,6 +261,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    userProfile,
     loading,
     error,
     signUp,
@@ -227,6 +271,7 @@ export const AuthProvider = ({ children }) => {
     forgotPassword,
     confirmNewPassword,
     resendConfirmation,
+    updateUserProfileName,
     isAuthenticated: !!user,
   };
 

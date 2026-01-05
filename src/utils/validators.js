@@ -12,9 +12,9 @@ export const isValidPassword = (password) => {
 
 export const getPasswordErrors = (password) => {
   const errors = [];
-  if (password.length < 8) errors.push('Password must be at least 8 characters');
-  if (!/[A-Z]/.test(password)) errors.push('Password must contain an uppercase letter');
-  if (!/\d/.test(password)) errors.push('Password must contain a number');
+  if (password.length < 8) errors.push('auth.validation.passwordMinLength');
+  if (!/[A-Z]/.test(password)) errors.push('auth.validation.passwordUppercase');
+  if (!/\d/.test(password)) errors.push('auth.validation.passwordNumber');
   return errors;
 };
 
@@ -23,9 +23,9 @@ export const validateSignUp = (email, password, confirmPassword) => {
   const errors = {};
 
   if (!email.trim()) {
-    errors.email = 'Email is required';
+    errors.email = 'auth.validation.emailRequired';
   } else if (!isValidEmail(email)) {
-    errors.email = 'Please enter a valid email address';
+    errors.email = 'auth.validation.emailInvalid';
   }
 
   const passwordErrors = getPasswordErrors(password);
@@ -34,7 +34,7 @@ export const validateSignUp = (email, password, confirmPassword) => {
   }
 
   if (password !== confirmPassword) {
-    errors.confirmPassword = 'Passwords do not match';
+    errors.confirmPassword = 'auth.validation.passwordsDontMatch';
   }
 
   return errors;
@@ -44,13 +44,13 @@ export const validateLogin = (email, password) => {
   const errors = {};
 
   if (!email.trim()) {
-    errors.email = 'Email is required';
+    errors.email = 'auth.validation.emailRequired';
   } else if (!isValidEmail(email)) {
-    errors.email = 'Please enter a valid email address';
+    errors.email = 'auth.validation.emailInvalid';
   }
 
   if (!password.trim()) {
-    errors.password = 'Password is required';
+    errors.password = 'auth.validation.passwordRequired';
   }
 
   return errors;

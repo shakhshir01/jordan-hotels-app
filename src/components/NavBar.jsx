@@ -5,9 +5,17 @@ import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, userProfile, logout } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const displayName = user
+    ? (userProfile?.displayName || (() => {
+        const email = user.email || '';
+        const isUUID = email.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+        return isUUID ? t('nav.account') : email.split('@')[0];
+      })())
+    : '';
 
   const handleLogout = () => {
     logout();
@@ -109,6 +117,11 @@ const Navbar = () => {
               {t("nav.concierge")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
+            {user && (
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                {displayName}
+              </span>
+            )}
           </div>
 
           {/* Actions */}
@@ -116,11 +129,7 @@ const Navbar = () => {
             {user ? (
               <>
                 <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                  {(() => {
-                    const email = user.email || '';
-                    const isUUID = email.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
-                    return isUUID ? t('nav.account') : email.split('@')[0];
-                  })()}
+                  {displayName}
                 </span>
                 <Link
                   to="/profile"

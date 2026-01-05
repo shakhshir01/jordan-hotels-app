@@ -11,7 +11,7 @@ export default function SpecialOffers() {
   const [discounts] = useState([20, 15, 25, 10, 18, 30, 12, 22]);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -31,8 +31,8 @@ export default function SpecialOffers() {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-2">Special Offers</h1>
-      <p className="text-gray-600 mb-8">Limited time deals on Jordan's best hotels</p>
+      <h1 className="text-4xl font-bold mb-2">{t('pages.specialOffers.title')}</h1>
+      <p className="text-gray-600 mb-8">{t('pages.specialOffers.subtitle')}</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {hotels.map((hotel, idx) => (
@@ -64,7 +64,7 @@ export default function SpecialOffers() {
                 onClick={() => handleBookNow(hotel, discounts[idx])}
                 className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
               >
-                Book Now
+                {t('booking.bookNow')}
               </button>
             </div>
           </div>

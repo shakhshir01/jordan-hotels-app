@@ -6,6 +6,7 @@
 import {
   GENERIC_HOTEL_FALLBACK_IMAGES,
   getGenericHotelFallbackImage,
+  sanitizeHotelImageUrls,
 } from "../utils/hotelImageFallback";
 
 const REAL_HOTELS = [
@@ -19,23 +20,8 @@ const REAL_HOTELS = [
     currency: 'JOD',
     rating: 4.8,
     reviews: 5828,
-    image: 'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-exterior-0201-hor-clsc.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1336px:*',
-    images: [
-      'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-exterior-0201-hor-clsc.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1336px:*',
-      'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-lobby-0191-hor-clsc.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1336px:*',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-superior-room-king-11326:Classic-Hor?wid=1336&fit=constrain',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-guest-room-79483-39312:Classic-Hor?wid=1336&fit=constrain',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-pool-view-room-double-35037:Classic-Hor?wid=1336&fit=constrain',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-pool-terrace-king-26653:Classic-Hor?wid=1336&fit=constrain',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-views-37560:Classic-Hor?wid=1336&fit=constrain',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-bathroom-25411:Classic-Hor?wid=1336&fit=constrain',
-      'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-exterior-0201-hor-clsc.jpg?output-quality=75&interpolation=progressive-bilinear&downsize=1920px:*',
-      'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-entrance-7360-hor-clsc.jpg?output-quality=75&interpolation=progressive-bilinear&downsize=1920px:*',
-      'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-lobby-0191-hor-clsc.jpg?output-quality=75&interpolation=progressive-bilinear&downsize=1920px:*',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-pool-19562:Classic-Hor?wid=1336&fit=constrain',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-spa-15247:Classic-Hor?wid=1336&fit=constrain',
-      'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-restaurant-28901:Classic-Hor?wid=1336&fit=constrain',
-    ],
+    image: '',
+    images: [],
     description: 'Luxury 5-star resort on the shores of the Dead Sea with world-class spa, thermal pools, and award-winning dining.',
     address: 'Dead Sea Road, Swaimeh, Amman',
     phone: '+962 5 356 9555',
@@ -125,7 +111,6 @@ const REAL_HOTELS = [
       'https://lh3.googleusercontent.com/p/AF1QipMe4KUsUv_JAsCICtYDCNl_gD7uKMaJZpVH86FW=s296-w296-h168-n-k-no-v1',
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQwiF68u4gYe2ZCrWKIEhp7ud4tfQ0CzqE2A&s',
       'https://digital.ihg.com/is/image/ihg/holiday-inn-resort-dead-sea-4498958421-2x1?size=700,0',
-      'https://cache.marriott.com/content/dam/marriott-digital/mc/emea/hws/q/qmdjv/en_us/photo/unlimited/assets/qmdjv-pool-0212.jpg',
     ],
     description: 'Stunning resort near UNESCO World Heritage Petra site with traditional Nabatean architecture, modern luxury amenities, and guided access to the Rose City.',
     address: 'Wadi Musa, Petra, Jordan',
@@ -289,9 +274,10 @@ const normalizeHotelsForUi = (hotels) => {
 
   return (hotels || []).map((h) => {
     const rawImages = [h?.image, ...(Array.isArray(h?.images) ? h.images : [])];
+    const sanitizedInput = sanitizeHotelImageUrls(rawImages, h?.id || h?.name || "");
     const unique = [];
 
-    for (const url of toUniqueStrings(rawImages)) {
+    for (const url of toUniqueStrings(sanitizedInput)) {
       if (fallbackSet.has(url)) {
         unique.push(url);
         continue;

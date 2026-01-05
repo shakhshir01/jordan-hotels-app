@@ -3,15 +3,20 @@ import { hotelAPI } from "../services/api";
 import { Loader2, Search, MapPin, Star, Percent } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
+import { useTranslation } from "react-i18next";
+import { getHotelDisplayName } from "../utils/hotelLocalization";
 
 const defaultQueries = [
-  { id: "tr-petra", label: "Petra", q: "Petra" },
-  { id: "tr-dead-sea", label: "Dead Sea", q: "Dead Sea" },
-  { id: "tr-wadi-rum", label: "Wadi Rum", q: "Wadi Rum" },
-  { id: "tr-amman", label: "Amman", q: "Amman" },
+  { id: "tr-petra", label: "Petra", labelAr: "البتراء", q: "Petra" },
+  { id: "tr-dead-sea", label: "Dead Sea", labelAr: "البحر الميت", q: "Dead Sea" },
+  { id: "tr-wadi-rum", label: "Wadi Rum", labelAr: "وادي رم", q: "Wadi Rum" },
+  { id: "tr-amman", label: "Amman", labelAr: "عمّان", q: "Amman" },
 ];
 
 const Trends = () => {
+  const { t, i18n } = useTranslation();
+  const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
+
   const [query, setQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState(defaultQueries[0].q);
   const [results, setResults] = useState({ hotels: [], experiences: [], deals: [], destinations: [] });
@@ -56,21 +61,20 @@ const Trends = () => {
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
-            LIVE-STYLE DISCOVERY
+            {t('pages.trends.hero.kicker')}
           </p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-display tracking-tight mb-4">
-            See what Jordan is great for
+            {t('pages.trends.hero.title')}
           </h1>
           <p className="text-base md:text-lg opacity-95 leading-relaxed max-w-3xl mx-auto">
-            Explore where hotels, experiences, and deals naturally cluster by theme.
-            Try Petra at night, Red Sea escapes, or quick city breaks in Amman.
+            {t('pages.trends.hero.subtitle')}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 max-w-xl mx-auto flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 rounded-full px-3 py-2 shadow-2xl border border-white/30 dark:border-slate-700/60">
             <Search className="text-slate-400" size={18} />
             <input
               className="flex-1 bg-transparent outline-none text-sm md:text-base text-slate-900 dark:text-slate-50 placeholder-slate-400 dark:placeholder-slate-500"
-              placeholder="Search a vibe or place (e.g. spa, diving, city)"
+              placeholder={t('pages.trends.searchPlaceholder')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -78,7 +82,7 @@ const Trends = () => {
               type="submit"
               className="px-4 py-2 rounded-full bg-jordan-blue text-white text-xs md:text-sm font-semibold hover:bg-blue-700 transition-colors"
             >
-              Explore
+              {t('pages.trends.explore')}
             </button>
           </form>
 
@@ -94,7 +98,7 @@ const Trends = () => {
                     : "border-white/40 text-white/80 hover:bg-white/10"
                 }`}
               >
-                {q.label}
+                {isArabic ? q.labelAr : q.label}
               </button>
             ))}
           </div>
@@ -121,7 +125,7 @@ const Trends = () => {
               <section>
                 <h2 className="text-xl md:text-2xl font-bold mb-3 text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <MapPin size={18} className="text-emerald-500" />
-                  Destinations matching "{activeQuery || "All"}"
+                  {t('pages.trends.destinationsMatching', { query: activeQuery || t('pages.trends.all') })}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                   {results.destinations.map((d) => (
@@ -145,7 +149,7 @@ const Trends = () => {
               <section>
                 <h2 className="text-xl md:text-2xl font-bold mb-3 text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <Star size={18} className="text-amber-400" />
-                  Hotels
+                  {t('nav.hotels')}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {results.hotels.slice(0, 6).map((h) => (
@@ -154,7 +158,7 @@ const Trends = () => {
                         <div className="relative aspect-[4/3] overflow-hidden">
                           <img
                             src={h.image}
-                            alt={h.name}
+                            alt={getHotelDisplayName(h, i18n.language) || h.name}
                             loading="lazy"
                             referrerPolicy="no-referrer"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -164,7 +168,7 @@ const Trends = () => {
                       )}
                       <div className="p-4 flex flex-col gap-1 flex-1">
                         <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 line-clamp-1">
-                          {h.name}
+                          {getHotelDisplayName(h, i18n.language) || h.name}
                         </p>
                         {h.location && (
                           <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -179,7 +183,7 @@ const Trends = () => {
                           )}
                           {h.price && (
                             <span className="text-slate-700 dark:text-slate-200 font-semibold">
-                              {h.price} JOD <span className="text-[11px] text-slate-500">/ night</span>
+                              {h.price} JOD <span className="text-[11px] text-slate-500">{t('hotels.perNight')}</span>
                             </span>
                           )}
                         </div>
@@ -188,7 +192,7 @@ const Trends = () => {
                             to={`/hotels/${h.id}`}
                             className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-jordan-blue dark:hover:bg-jordan-blue transition-colors duration-200 inline-block"
                           >
-                            View details
+                            {t('common.view')}
                           </Link>
                         </div>
                       </div>
@@ -203,7 +207,7 @@ const Trends = () => {
               <section>
                 <h2 className="text-xl md:text-2xl font-bold mb-3 text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <Percent size={18} className="text-pink-500" />
-                  Experiences
+                  {t('nav.experiences')}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {results.experiences.slice(0, 6).map((e) => (
@@ -216,7 +220,7 @@ const Trends = () => {
                         <p className="text-xs text-slate-500 dark:text-slate-400">{e.meta}</p>
                       )}
                       {e.price && (
-                        <p className="text-xs text-slate-700 dark:text-slate-200 mt-1">From {e.price} JOD</p>
+                        <p className="text-xs text-slate-700 dark:text-slate-200 mt-1">{t('pages.trends.fromPrice', { price: e.price })}</p>
                       )}
                     </article>
                   ))}
@@ -229,7 +233,7 @@ const Trends = () => {
               <section>
                 <h2 className="text-xl md:text-2xl font-bold mb-3 text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <Percent size={18} className="text-emerald-500" />
-                  Deals
+                  {t('nav.deals')}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {results.deals.slice(0, 6).map((d) => (
@@ -255,7 +259,7 @@ const Trends = () => {
               results.deals.length === 0 &&
               results.destinations.length === 0 && (
                 <div className="text-center py-16 text-slate-500 dark:text-slate-400 text-sm">
-                  No results yet. Try a broader search or one of the suggested chips above.
+                  {t('pages.trends.noResults')}
                 </div>
               )}
           </>

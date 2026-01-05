@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const Verify = () => {
   const location = useLocation();
@@ -14,6 +15,7 @@ const Verify = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
   const { verifyEmail, resendConfirmation } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!resendCooldown) return;
@@ -26,13 +28,13 @@ const Verify = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
         <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
           <AlertCircle className="mx-auto text-red-600 mb-4" size={48} />
-          <h2 className="text-2xl font-black mb-4">Invalid Access</h2>
-          <p className="text-slate-600 mb-6">Please complete the sign-up process first.</p>
+          <h2 className="text-2xl font-black mb-4">{t('pages.verify.invalidAccessTitle')}</h2>
+          <p className="text-slate-600 mb-6">{t('pages.verify.invalidAccessBody')}</p>
           <button 
             onClick={() => navigate('/signup')}
             className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-blue-800 transition-all"
           >
-            Go to Sign Up
+            {t('pages.verify.goToSignup')}
           </button>
         </div>
       </div>
@@ -43,7 +45,7 @@ const Verify = () => {
     e.preventDefault();
 
     if (!code.trim()) {
-      setError('Please enter the verification code');
+      setError(t('pages.verify.codeRequired'));
       return;
     }
 
@@ -55,7 +57,7 @@ const Verify = () => {
       setVerified(true);
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      setError(err.message || 'Invalid verification code. Please try again.');
+      setError(err.message || t('pages.verify.invalidCode'));
     } finally {
       setLoading(false);
     }
@@ -66,33 +68,33 @@ const Verify = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
         <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
           <CheckCircle className="mx-auto text-green-600 mb-4" size={48} />
-          <h2 className="text-2xl font-black mb-2">Email Verified!</h2>
-          <p className="text-slate-600 mb-6">Your account has been successfully verified.</p>
-          <p className="text-sm text-slate-500">Redirecting to login...</p>
+          <h2 className="text-2xl font-black mb-2">{t('pages.verify.verifiedTitle')}</h2>
+          <p className="text-slate-600 mb-6">{t('pages.verify.verifiedBody')}</p>
+          <p className="text-sm text-slate-500">{t('pages.verify.redirecting')}</p>
         </div>
       </div>
     );
   }
 
   const handleResend = async () => {
-    if (!email) return setError('Missing email address.');
+    if (!email) return setError(t('pages.verify.missingEmail'));
     try {
       setError('');
       setSuccessMsg('');
       await resendConfirmation(email);
-      setSuccessMsg('Verification code resent. Check your email.');
+      setSuccessMsg(t('pages.verify.resent'));
       setResendCooldown(60); // 60-second cooldown
     } catch (err) {
-      setError(err.message || 'Failed to resend code.');
+      setError(err.message || t('pages.verify.resendFailed'));
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
       <form onSubmit={handleVerify} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 className="text-3xl font-black mb-2 text-center">Verify Email</h2>
+        <h2 className="text-3xl font-black mb-2 text-center">{t('pages.verify.title')}</h2>
         <p className="text-center text-slate-600 mb-8">
-          We sent a verification code to<br />
+          {t('pages.verify.subtitle')}<br />
           <span className="font-bold text-blue-900">{email}</span>
         </p>
 
@@ -115,7 +117,7 @@ const Verify = () => {
 
         {/* Code Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-3">Verification Code</label>
+          <label className="block text-sm font-bold text-slate-700 mb-3">{t('auth.verifyCode')}</label>
           <input 
             type="text"
             placeholder="000000" 
@@ -124,7 +126,7 @@ const Verify = () => {
             maxLength="6"
             className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-center text-3xl tracking-widest font-bold text-slate-900 placeholder-slate-400 outline-none focus:border-blue-900 transition"
           />
-          <p className="text-xs text-slate-500 mt-2">Check your email for the code</p>
+          <p className="text-xs text-slate-500 mt-2">{t('auth.checkEmail')}</p>
         </div>
 
         <button 
@@ -132,18 +134,20 @@ const Verify = () => {
           disabled={loading || code.length !== 6}
           className="w-full bg-green-600 text-white p-3 rounded-lg font-bold hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Verifying...' : 'VERIFY EMAIL'}
+          {loading ? t('pages.verify.verifying') : t('pages.verify.verifyCta')}
         </button>
 
         <p className="text-center text-slate-600 mt-6 text-sm">
-          Didn't receive a code? 
+          {t('pages.verify.noCode')}
           <button
             type="button"
             onClick={handleResend}
             disabled={resendCooldown > 0}
             className="text-blue-900 font-bold hover:underline disabled:opacity-50 ml-1"
           >
-            {resendCooldown > 0 ? `Resend (${resendCooldown}s)` : 'Resend'}
+            {resendCooldown > 0
+              ? t('pages.verify.resendIn', { seconds: resendCooldown })
+              : t('pages.verify.resend')}
           </button>
         </p>
       </form>

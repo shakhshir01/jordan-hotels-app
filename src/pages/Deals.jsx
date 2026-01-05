@@ -1,16 +1,19 @@
 import useFetch from "../hooks/useFetch.js";
 import realHotelsAPI from "../services/realHotelsData.js";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const DEALS_DATA = [
-  { title: "Weekend escape", meta: "City stays • Limited time" },
-  { title: "Family bundles", meta: "Kids-friendly • Breakfast" },
-  { title: "Desert + Petra combo", meta: "Curated itinerary • Best value" },
-  { title: "Last-minute", meta: "Tonight & tomorrow" },
+  { title: "Weekend escape", titleAr: "عطلة نهاية الأسبوع", meta: "City stays • Limited time", metaAr: "إقامات المدينة • لفترة محدودة" },
+  { title: "Family bundles", titleAr: "عروض العائلات", meta: "Kids-friendly • Breakfast", metaAr: "مناسب للعائلة • إفطار" },
+  { title: "Desert + Petra combo", titleAr: "باقة الصحراء + البتراء", meta: "Curated itinerary • Best value", metaAr: "مسار مقترح • أفضل قيمة" },
+  { title: "Last-minute", titleAr: "آخر لحظة", meta: "Tonight & tomorrow", metaAr: "الليلة وغداً" },
 ];
 
 export default function Deals() {
   const { data: deals, loading } = useFetch(() => realHotelsAPI.getFeaturedHotels(), []);
+  const { t, i18n } = useTranslation();
+  const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
 
   return (
     <div className="min-h-screen">
@@ -18,13 +21,13 @@ export default function Deals() {
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-6 py-20 text-center text-white">
           <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">
-            Save More
+            {t('pages.deals.hero.kicker')}
           </div>
           <h1 className="text-5xl md:text-6xl font-black font-display mb-6">
-            Deals & Offers
+            {t('pages.deals.hero.title')}
           </h1>
           <p className="text-lg max-w-3xl mx-auto opacity-95">
-            Exclusive offers and promo codes.
+            {t('pages.deals.hero.subtitle')}
           </p>
         </div>
       </section>
@@ -55,12 +58,12 @@ export default function Deals() {
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                      {d.title}
+                      {isArabic ? d.titleAr : d.title}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                      {d.meta}
+                      {isArabic ? d.metaAr : d.meta}
                     </p>
-                    <button className="btn-primary w-full">See offers</button>
+                    <button className="btn-primary w-full">{t('pages.deals.seeOffers')}</button>
                   </div>
                 </article>
               );

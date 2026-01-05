@@ -4,6 +4,7 @@ import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { validateSignUp, getPasswordErrors } from '../utils/validators';
 import { showSuccess, showError } from '../services/toastService';
+import { useTranslation } from 'react-i18next';
 
 const SignUp = () => {
   const [fullName, setFullName] = useState('');
@@ -16,13 +17,19 @@ const SignUp = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
+  const { t } = useTranslation();
+
+  const renderError = (value) => {
+    if (!value) return '';
+    return typeof value === 'string' && value.startsWith('auth.validation.') ? t(value) : value;
+  };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     
     // Validate full name
     if (!fullName.trim()) {
-      setErrors(prev => ({ ...prev, fullName: 'Full name is required' }));
+      setErrors(prev => ({ ...prev, fullName: 'auth.validation.fullNameRequired' }));
       return;
     }
 
@@ -37,10 +44,10 @@ const SignUp = () => {
 
     try {
       await signUp(email, password, fullName);
-      showSuccess('Account created! Check your email to verify.');
+      showSuccess(t('pages.signup.accountCreatedToast'));
       navigate('/verify', { state: { email } });
     } catch (err) {
-      const errorMsg = err.message || 'Failed to sign up. Please try again.';
+      const errorMsg = err.message || t('pages.signup.failed');
       showError(errorMsg);
       setErrors({ submit: errorMsg });
     } finally {
@@ -53,8 +60,8 @@ const SignUp = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
       <form onSubmit={handleSignUp} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 className="text-3xl font-black mb-2 text-center">Join VisitJo</h2>
-        <p className="text-center text-slate-600 mb-8">Create your account to book amazing stays</p>
+        <h2 className="text-3xl font-black mb-2 text-center">{t('pages.signup.title')}</h2>
+        <p className="text-center text-slate-600 mb-8">{t('pages.signup.subtitle')}</p>
 
         {/* Submit Error */}
         {errors.submit && (
@@ -68,7 +75,7 @@ const SignUp = () => {
 
         {/* Full Name Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+          <label className="block text-sm font-bold text-slate-700 mb-2">{t('auth.fullName')}</label>
           <input 
             type="text"
             placeholder="John Doe" 
@@ -78,12 +85,12 @@ const SignUp = () => {
               errors.fullName ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
             }`}
           />
-          {errors.fullName && <p className="text-red-600 text-sm mt-1">{errors.fullName}</p>}
+          {errors.fullName && <p className="text-red-600 text-sm mt-1">{renderError(errors.fullName)}</p>}
         </div>
 
         {/* Email Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-2">Email</label>
+          <label className="block text-sm font-bold text-slate-700 mb-2">{t('auth.email')}</label>
           <input 
             type="email"
             placeholder="you@example.com" 
@@ -93,16 +100,16 @@ const SignUp = () => {
               errors.email ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
             }`}
           />
-          {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="text-red-600 text-sm mt-1">{renderError(errors.email)}</p>}
         </div>
 
         {/* Password Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-2">Password</label>
+          <label className="block text-sm font-bold text-slate-700 mb-2">{t('auth.password')}</label>
           <div className="relative">
             <input 
               type={showPassword ? 'text' : 'password'}
-              placeholder="Min. 8 chars, 1 uppercase, 1 number" 
+              placeholder={t('pages.signup.passwordPlaceholder')}
               value={password}
               onChange={e => setPassword(e.target.value)}
               className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 pr-10 ${
@@ -117,13 +124,13 @@ const SignUp = () => {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
-          {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password}</p>}
+          {errors.password && <p className="text-red-600 text-sm mt-1">{renderError(errors.password)}</p>}
           {password && passwordErrors.length > 0 && (
             <div className="mt-2 text-sm text-slate-600">
               {passwordErrors.map((err, idx) => (
                 <p key={idx} className="flex items-center gap-2">
                   <span className={password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password) ? 'text-green-600' : 'text-slate-400'}>✓</span>
-                  {err}
+                  {t(err)}
                 </p>
               ))}
             </div>
@@ -132,11 +139,11 @@ const SignUp = () => {
 
         {/* Confirm Password Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-2">Confirm Password</label>
+          <label className="block text-sm font-bold text-slate-700 mb-2">{t('auth.confirmPassword')}</label>
           <div className="relative">
             <input 
               type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="Re-enter password" 
+              placeholder={t('pages.signup.confirmPasswordPlaceholder')}
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
               className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 pr-10 ${
@@ -151,9 +158,9 @@ const SignUp = () => {
               {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
-          {errors.confirmPassword && <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>}
+          {errors.confirmPassword && <p className="text-red-600 text-sm mt-1">{renderError(errors.confirmPassword)}</p>}
           {password && confirmPassword && password === confirmPassword && (
-            <p className="text-green-600 text-sm mt-1">✓ Passwords match</p>
+            <p className="text-green-600 text-sm mt-1">✓ {t('pages.signup.passwordsMatch')}</p>
           )}
         </div>
 
@@ -162,13 +169,13 @@ const SignUp = () => {
           disabled={loading}
           className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Creating Account...' : 'CREATE ACCOUNT'}
+          {loading ? t('pages.signup.creatingAccount') : t('auth.signup')}
         </button>
 
         <p className="text-center text-slate-600 mt-6">
-          Already have an account?{' '}
+          {t('auth.haveAccount')}{' '}
           <Link to="/login" className="text-jordan-blue font-bold hover:underline">
-            Sign in
+            {t('auth.login')}
           </Link>
         </p>
       </form>

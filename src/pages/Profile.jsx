@@ -69,7 +69,7 @@ const normalizeBooking = (booking, index = 0) => {
 };
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, userProfile, updateUserProfileName, logout } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -101,11 +101,18 @@ const Profile = () => {
       const fullName = apiProfile?.name || '';
       const [firstFromName, ...restName] = fullName.split(' ');
       const derivedFirstFromEmail = isUUID ? '' : (userEmail.split('@')[0] || '');
+      const localFirstName = userProfile?.hasCustomName ? userProfile?.firstName : '';
+      const localLastName = userProfile?.hasCustomName ? userProfile?.lastName : '';
+
       const firstName =
+        localFirstName ||
         apiProfile?.firstName ||
         firstFromName ||
         derivedFirstFromEmail;
-      const lastName = apiProfile?.lastName || restName.join(' ');
+      const lastName =
+        localLastName ||
+        apiProfile?.lastName ||
+        restName.join(' ');
       const email = apiProfile?.email || userEmail;
       const phone = apiProfile?.phone || '';
 
@@ -138,6 +145,9 @@ const Profile = () => {
 
   const handleUpdateProfile = async () => {
     try {
+      // Persist for navbar/profile display even if API update fails.
+      updateUserProfileName?.({ firstName: formData.firstName, lastName: formData.lastName });
+
       const updated = await hotelAPI.updateUserProfile(formData);
       setProfile({
         firstName: updated.firstName || formData.firstName,
@@ -161,7 +171,6 @@ const Profile = () => {
 
   const handleLogout = () => {
     logout();
-    showSuccess('Logged out successfully');
     navigate('/');
   };
 
