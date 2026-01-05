@@ -3,11 +3,22 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
 import realHotelsAPI from '../services/realHotelsData';
 import { validatePromoCode } from '../services/loyalty';
+import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import { hotelAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
+import { getHotelDisplayName } from '../utils/hotelLocalization';
 
 const Checkout = () => {
+  const { i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { hotelId, bookingData } = location.state || {};
+  const resolvedBookingData = bookingData || {
+    checkInDate: '',
+    checkOutDate: '',
+    nights: 1,
+    guests: 2,
+  };
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,11 +27,12 @@ const Checkout = () => {
   const [promoCode, setPromoCode] = useState('');
   const [promoResult, setPromoResult] = useState(null);
   const [appliedDiscount, setAppliedDiscount] = useState(0);
+  const [guestInfo, setGuestInfo] = useState({ fullName: '', email: '', phone: '' });
+  const [createdBookingId, setCreatedBookingId] = useState('');
 
   useEffect(() => {
     const loadHotel = async () => {
-      if (!hotelId || !bookingData) {
-        setError('Missing booking information');
+      if (!hotelId) {
         setLoading(false);
         return;
       }
@@ -41,11 +53,32 @@ const Checkout = () => {
     };
 
     loadHotel();
-  }, [hotelId, bookingData]);
+  }, [hotelId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const profile = await hotelAPI.getUserProfile();
+        if (cancelled) return;
+        const fullName = profile?.name || `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim();
+        setGuestInfo({
+          fullName: fullName || '',
+          email: profile?.email || '',
+          phone: profile?.phone || '',
+        });
+      } catch {
+        // If profile isn't available yet (auth/config), keep fields empty.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const calculateTotal = () => {
-    if (!hotel || !bookingData) return 0;
-    const nights = bookingData.nights || 1;
+    if (!hotel) return 0;
+    const nights = resolvedBookingData.nights || 1;
     return hotel.price * nights;
   };
 
@@ -68,20 +101,57 @@ const Checkout = () => {
 
   const handlePayment = async () => {
     setProcessing(true);
+    setError('');
     try {
+      if (!guestInfo.fullName.trim() || !guestInfo.email.trim() || !guestInfo.phone.trim()) {
+        throw new Error('Please fill in your name, email, and phone');
+      }
+
+      const [firstName, ...rest] = guestInfo.fullName.trim().split(' ');
+      const lastName = rest.join(' ');
+
+      // Persist name/phone/email to Users table
+      await hotelAPI.updateUserProfile({
+        firstName,
+        lastName,
+        email: guestInfo.email.trim(),
+        phone: guestInfo.phone.trim(),
+      });
+
+      // Create the booking record in DynamoDB
+      const subtotal = calculateTotal();
+      const total = Number(((subtotal - appliedDiscount) * 1.1).toFixed(2));
+      const bookingPayload = {
+        hotelId,
+        hotelName: hotel?.name,
+        location: hotel?.location,
+        checkInDate: resolvedBookingData.checkInDate || null,
+        checkOutDate: resolvedBookingData.checkOutDate || null,
+        nights: resolvedBookingData.nights || 1,
+        guests: resolvedBookingData.guests || 2,
+        totalPrice: total,
+        status: 'confirmed',
+        userName: guestInfo.fullName.trim(),
+        userEmail: guestInfo.email.trim(),
+        phone: guestInfo.phone.trim(),
+      };
+
+      const created = await hotelAPI.bookHotel(hotelId, bookingPayload);
+      const bookingId = created?.id || created?.bookingId || `BK-${Date.now()}`;
+      setCreatedBookingId(bookingId);
+
       // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       setOrderComplete(true);
-      
-      // Redirect to bookings after 3 seconds
+
       setTimeout(() => {
-        navigate('/bookings', { 
-          state: { 
-            bookingConfirmed: true, 
-            bookingId: `BK-${Date.now()}` 
-          } 
+        navigate('/bookings', {
+          state: {
+            bookingConfirmed: true,
+            bookingId,
+          },
         });
-      }, 3000);
+      }, 1800);
     } catch (err) {
       setError(err.message || 'Payment processing failed');
       setProcessing(false);
@@ -97,7 +167,27 @@ const Checkout = () => {
           <div className="text-6xl mb-4">✓</div>
           <h1 className="text-3xl font-bold text-green-600 mb-4">Payment Successful!</h1>
           <p className="text-gray-600 mb-6">Your booking has been confirmed.</p>
+          {createdBookingId && (
+            <p className="text-xs text-gray-500 mb-2">Booking ID: {createdBookingId}</p>
+          )}
           <p className="text-sm text-gray-500">Redirecting to your bookings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hotelId) {
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold mb-4">Checkout</h1>
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <p className="text-gray-700 mb-4">Choose a hotel to start booking.</p>
+          <button
+            onClick={() => navigate('/search')}
+            className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition"
+          >
+            Browse hotels
+          </button>
         </div>
       </div>
     );
@@ -118,35 +208,45 @@ const Checkout = () => {
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
 
             {hotel && (
+              (() => {
+                const hotelName = getHotelDisplayName(hotel, i18n.language);
+                return (
               <div className="mb-6 pb-6 border-b">
                 <div className="flex gap-4">
-                  <img src={hotel.image} alt={hotel.name} className="w-24 h-24 object-cover rounded-lg" />
+                  <img
+                    src={hotel.image}
+                    alt={hotelName}
+                    onError={createHotelImageOnErrorHandler(hotel.id)}
+                    className="w-24 h-24 object-cover rounded-lg"
+                  />
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg">{hotel.name}</h3>
+                    <h3 className="font-bold text-lg">{hotelName}</h3>
                     <p className="text-gray-600 text-sm">{hotel.location}</p>
                     <p className="text-blue-600 font-bold mt-2">{hotel.price} JOD/night</p>
                   </div>
                 </div>
               </div>
+                );
+              })()
             )}
 
-            {bookingData && (
+            {resolvedBookingData && (
               <div className="space-y-3 mb-6 pb-6 border-b">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Check-in</span>
-                  <span className="font-bold">{bookingData.checkInDate || 'N/A'}</span>
+                  <span className="font-bold">{resolvedBookingData.checkInDate || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Check-out</span>
-                  <span className="font-bold">{bookingData.checkOutDate || 'N/A'}</span>
+                  <span className="font-bold">{resolvedBookingData.checkOutDate || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Nights</span>
-                  <span className="font-bold">{bookingData.nights || 1}</span>
+                  <span className="font-bold">{resolvedBookingData.nights || 1}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Guests</span>
-                  <span className="font-bold">{bookingData.guests || 2}</span>
+                  <span className="font-bold">{resolvedBookingData.guests || 2}</span>
                 </div>
               </div>
             )}
@@ -212,17 +312,35 @@ const Checkout = () => {
           <div className="space-y-4">
             <div>
               <label className="block font-bold mb-2">Full Name *</label>
-              <input type="text" className="w-full border rounded-lg px-4 py-2" placeholder="John Doe" />
+              <input
+                type="text"
+                value={guestInfo.fullName}
+                onChange={(e) => setGuestInfo((p) => ({ ...p, fullName: e.target.value }))}
+                className="w-full border rounded-lg px-4 py-2"
+                placeholder="John Doe"
+              />
             </div>
 
             <div>
               <label className="block font-bold mb-2">Email *</label>
-              <input type="email" className="w-full border rounded-lg px-4 py-2" placeholder="john@example.com" />
+              <input
+                type="email"
+                value={guestInfo.email}
+                onChange={(e) => setGuestInfo((p) => ({ ...p, email: e.target.value }))}
+                className="w-full border rounded-lg px-4 py-2"
+                placeholder="john@example.com"
+              />
             </div>
 
             <div>
               <label className="block font-bold mb-2">Phone *</label>
-              <input type="tel" className="w-full border rounded-lg px-4 py-2" placeholder="+962" />
+              <input
+                type="tel"
+                value={guestInfo.phone}
+                onChange={(e) => setGuestInfo((p) => ({ ...p, phone: e.target.value }))}
+                className="w-full border rounded-lg px-4 py-2"
+                placeholder="+962"
+              />
             </div>
 
             <div className="border-t pt-4 mt-6">

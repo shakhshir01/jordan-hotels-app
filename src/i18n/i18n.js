@@ -17,4 +17,18 @@ i18n
     },
   });
 
+// Keep <html lang> and direction in sync
+const applyDocumentLangDir = (lng) => {
+  if (typeof document === 'undefined') return;
+  try {
+    document.documentElement.lang = lng;
+    document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
+  } catch {
+    // ignore
+  }
+};
+
+applyDocumentLangDir(i18n.language);
+i18n.on('languageChanged', applyDocumentLangDir);
+
 export default i18n;

@@ -32,44 +32,20 @@ const getCorsHeaders = (event) => {
   };
 };
 
-// Mock user profile for demo mode
-const mockUserProfile = {
-  userId: 'user123',
-  name: 'John Doe',
-  email: 'john@example.com',
-  phone: '+962779123456',
-  location: 'Amman, Jordan',
-  joinedDate: '2025-01-01',
-  membershipTier: 'Gold'
-};
-
-// Mock bookings
-const mockBookings = [
-  {
-    id: 'booking-001',
-    hotelId: 'hotel-dead-sea',
-    hotelName: 'Mövenpick Dead Sea',
-    checkInDate: '2026-02-15',
-    checkOutDate: '2026-02-18',
-    numberOfGuests: 2,
-    numberOfRooms: 1,
-    totalPrice: 450,
-    status: 'confirmed',
-    bookingDate: '2026-01-03'
-  },
-  {
-    id: 'booking-002',
-    hotelId: 'hotel-wadi-rum',
-    hotelName: 'Wadi Rum Bubble Camp',
-    checkInDate: '2026-03-10',
-    checkOutDate: '2026-03-12',
-    numberOfGuests: 4,
-    numberOfRooms: 2,
-    totalPrice: 320,
-    status: 'confirmed',
-    bookingDate: '2025-12-20'
+const parseJwtClaims = (event) => {
+  const auth = event?.headers?.authorization || event?.headers?.Authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length).trim() : '';
+  const parts = token.split('.');
+  if (parts.length < 2) return null;
+  try {
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = payload + '='.repeat((4 - (payload.length % 4)) % 4);
+    const json = Buffer.from(padded, 'base64').toString('utf8');
+    return JSON.parse(json);
+  } catch {
+    return null;
   }
-];
+};
 
 export async function handler(event) {
   console.log("Event:", JSON.stringify(event, null, 2));
@@ -89,7 +65,8 @@ export async function handler(event) {
 
   try {
     const path = event.rawPath || event.path || "";
-    const userId = event.requestContext?.authorizer?.claims?.sub || "demo-user";
+    const claims = event.requestContext?.authorizer?.claims || parseJwtClaims(event) || {};
+    const userId = claims.sub || "anonymous";
 
     // GET /user/profile
     if (path === '/user/profile' && method === 'GET') {
@@ -145,23 +122,23 @@ async function getUserProfile(userId, event) {
     }
 
     // Fallback: derive from Cognito claims or mock
-    const claims = event.requestContext?.authorizer?.claims || {};
-    const email = claims.email || mockUserProfile.email;
+    const claims = event.requestContext?.authorizer?.claims || parseJwtClaims(event) || {};
+    const email = claims.email || '';
     const name =
       claims.name ||
       [claims.given_name, claims.family_name].filter(Boolean).join(' ') ||
-      mockUserProfile.name;
+      '';
 
     const item = {
       userId,
       name,
       email,
-      firstName: claims.given_name || name.split(' ')[0] || 'Guest',
+      firstName: claims.given_name || name.split(' ')[0] || '',
       lastName: claims.family_name || name.split(' ').slice(1).join(' '),
-      phone: claims.phone_number || mockUserProfile.phone,
-      location: mockUserProfile.location,
-      joinedDate: mockUserProfile.joinedDate,
-      membershipTier: mockUserProfile.membershipTier,
+      phone: claims.phone_number || '',
+      location: '',
+      joinedDate: '',
+      membershipTier: '',
     };
 
     if (USERS_TABLE) {
@@ -188,12 +165,9 @@ async function getUserProfile(userId, event) {
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return {
-      statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-      body: JSON.stringify(mockUserProfile),
+      statusCode: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+      body: JSON.stringify({ message: 'Failed to fetch profile' }),
     };
   }
 }
@@ -205,8 +179,8 @@ async function updateUserProfile(userId, event) {
 
     const firstName = body.firstName || body.given_name || body.name?.split(' ')[0] || 'Guest';
     const lastName = body.lastName || body.family_name || body.name?.split(' ').slice(1).join(' ') || '';
-    const email = body.email || mockUserProfile.email;
-    const phone = body.phone || mockUserProfile.phone;
+    const email = body.email || '';
+    const phone = body.phone || '';
 
     const item = {
       userId,
@@ -215,9 +189,9 @@ async function updateUserProfile(userId, event) {
       name: `${firstName} ${lastName}`.trim(),
       email,
       phone,
-      location: body.location || mockUserProfile.location,
-      joinedDate: body.joinedDate || mockUserProfile.joinedDate,
-      membershipTier: body.membershipTier || mockUserProfile.membershipTier,
+      location: body.location || '',
+      joinedDate: body.joinedDate || '',
+      membershipTier: body.membershipTier || '',
     };
 
     if (USERS_TABLE) {
@@ -264,6 +238,8 @@ async function getUserBookings(userId, event) {
     };
 
     const result = await docClient.send(new QueryCommand(params));
+
+    const bookings = (result.Items || []).filter((b) => String(b?.status || '').toLowerCase() !== 'cancelled');
     
     return {
       statusCode: 200,
@@ -272,24 +248,17 @@ async function getUserBookings(userId, event) {
         ...corsHeaders,
       },
       body: JSON.stringify({
-        bookings: result.Items || [],
+        bookings,
         count: result.Count || 0
       })
     };
   } catch (error) {
     console.error("Error fetching user bookings:", error);
-    
-    // Return mock bookings on error (demo mode)
+
     return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-      body: JSON.stringify({
-        bookings: mockBookings,
-        count: mockBookings.length
-      })
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+      body: JSON.stringify({ bookings: [], count: 0 }),
     };
   }
 }

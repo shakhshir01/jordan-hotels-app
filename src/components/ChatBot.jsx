@@ -1,28 +1,83 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Send, X, Minimize2, Maximize2, MessageCircle, Headphones } from 'lucide-react';
 import { generateChatResponse, HOTEL_DATA } from '../services/chatbot';
+import realHotelsAPI from '../services/realHotelsData';
+import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import { useTranslation } from 'react-i18next';
 
 export default function ChatBot() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hello! 👋 Welcome to VisitJo! I'm your travel assistant. How can I help you find the perfect hotel today?",
+      text: t('chat.greeting.default'),
       sender: 'bot',
       timestamp: new Date()
     }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState(['spa & wellness', 'beach vacation', 'adventure', 'luxury travel', 'city exploration']);
+  const [suggestions, setSuggestions] = useState([
+    t('chat.suggestions.spa'),
+    t('chat.suggestions.beach'),
+    t('chat.suggestions.adventure'),
+    t('chat.suggestions.luxury'),
+    t('chat.suggestions.city'),
+  ]);
   const [viewedHotels, setViewedHotels] = useState([]);
   const [awaitingHuman, setAwaitingHuman] = useState(false);
+  const [hotelDetailsById, setHotelDetailsById] = useState({});
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    const ids = new Set();
+    for (const msg of messages) {
+      if (msg?.sender === 'bot' && Array.isArray(msg?.hotels)) {
+        for (const id of msg.hotels) ids.add(id);
+      }
+    }
+
+    const missing = [...ids].filter((id) => id && !hotelDetailsById[id]);
+    if (missing.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const results = await Promise.all(
+          missing.map(async (id) => {
+            try {
+              const hotel = await realHotelsAPI.getHotelById(id);
+              return [id, hotel];
+            } catch {
+              return [id, null];
+            }
+          })
+        );
+
+        if (cancelled) return;
+        setHotelDetailsById((prev) => {
+          const next = { ...prev };
+          for (const [id, hotel] of results) {
+            if (!next[id]) next[id] = hotel;
+          }
+          return next;
+        });
+      } catch {
+        // ignore
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [messages, hotelDetailsById]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -35,6 +90,7 @@ export default function ChatBot() {
       sender: 'user',
       timestamp: new Date()
     };
+    const nextHistory = [...messages, userMessage];
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
@@ -42,7 +98,7 @@ export default function ChatBot() {
     // Get bot response
     setTimeout(() => {
       try {
-        const response = generateChatResponse(input, messages);
+        const response = generateChatResponse(input, nextHistory);
 
         let botText = response.text;
         if (response.hotels && response.hotels.length > 0) {
@@ -50,10 +106,10 @@ export default function ChatBot() {
             const meta = HOTEL_DATA[id];
             const name = meta?.name || id;
             const bestFor = Array.isArray(meta?.bestFor) ? meta.bestFor.slice(0, 2).join(', ') : '';
-            return bestFor ? `• ${name} — best for ${bestFor}` : `• ${name}`;
+            return bestFor ? `• ${name} — ${t('chat.recommendations.bestFor')} ${bestFor}` : `• ${name}`;
           }).join('\n');
 
-          botText += `\n\n✨ Recommended for you:\n${lines}`;
+          botText += `\n\n${t('chat.recommendations.header')}\n${lines}`;
           setViewedHotels((prev) => [...new Set([...prev, ...response.hotels])]);
         }
 
@@ -64,6 +120,7 @@ export default function ChatBot() {
           timestamp: new Date(),
           suggestions: response.suggestions,
           hotels: response.hotels,
+          links: response.links,
         };
         setMessages((prev) => [...prev, botMessage]);
         setSuggestions(response.suggestions || []);
@@ -73,7 +130,7 @@ export default function ChatBot() {
           ...prev,
           {
             id: prev.length + 1,
-            text: "Sorry, something went wrong while generating a reply. Please try again.",
+            text: t('chat.ui.error'),
             sender: 'bot',
             timestamp: new Date(),
           },
@@ -95,7 +152,7 @@ export default function ChatBot() {
       {
         id: prev.length + 1,
         text:
-          "I’ve flagged this conversation for a human agent. In a live setup, this would create a support ticket with your last messages and contact details.",
+          t('chat.ui.escalate'),
         sender: 'bot',
         timestamp: new Date(),
       },
@@ -107,7 +164,7 @@ export default function ChatBot() {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all hover:scale-110 z-40"
-        aria-label="Open chat"
+        aria-label={t('chat.ui.open')}
       >
         <MessageCircle size={24} />
       </button>
@@ -121,7 +178,7 @@ export default function ChatBot() {
         <div className="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <MessageCircle size={20} />
-            <h3 className="font-bold">VisitJo Travel Assistant</h3>
+            <h3 className="font-bold">{t('chat.ui.title')}</h3>
           </div>
           <div className="flex gap-2">
             <button
@@ -156,6 +213,74 @@ export default function ChatBot() {
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+
+                    {Array.isArray(msg.links) && msg.links.length > 0 && msg.sender === 'bot' && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {msg.links.slice(0, 3).map((l, idx) => (
+                          <Link
+                            key={`${l.to}-${idx}`}
+                            to={l.to}
+                            onClick={() => setIsOpen(false)}
+                            className="text-xs bg-blue-700 text-white px-2 py-1 rounded hover:bg-blue-800 transition"
+                          >
+                            {l.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+
+                    {Array.isArray(msg.hotels) && msg.hotels.length > 0 && msg.sender === 'bot' && (
+                      <div className="mt-3 space-y-2">
+                        {msg.hotels.slice(0, 3).map((id) => {
+                          const d = hotelDetailsById[id];
+                          const name = d?.name || HOTEL_DATA[id]?.name || id;
+                          const location = d?.location || 'Jordan';
+                          const image = d?.image || (Array.isArray(d?.images) ? d.images[0] : '') || '';
+                          const price = d?.price;
+
+                          return (
+                            <div key={id} className="flex gap-3 bg-white/70 rounded-lg p-2 border border-gray-200">
+                              <img
+                                src={image}
+                                alt={name}
+                                onError={createHotelImageOnErrorHandler(`chat:${id}`)}
+                                className="w-16 h-16 rounded-md object-cover flex-shrink-0"
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="font-bold text-sm truncate">{name}</div>
+                                <div className="text-xs text-gray-600 truncate">{location}</div>
+                                {typeof price === 'number' && price > 0 && (
+                                  <div className="text-xs text-blue-900 font-bold">{price} JOD {t('hotels.perNight')}</div>
+                                )}
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  <Link
+                                    to={`/hotels/${id}`}
+                                    onClick={() => setIsOpen(false)}
+                                    className="text-xs bg-gray-200 text-gray-900 px-2 py-1 rounded hover:bg-gray-300 transition"
+                                  >
+                                    {t('common.view')}
+                                  </Link>
+                                  <Link
+                                    to="/checkout"
+                                    state={{
+                                      hotelId: id,
+                                      bookingData: { checkInDate: '', checkOutDate: '', nights: 1, guests: 2 },
+                                    }}
+                                    onClick={() => setIsOpen(false)}
+                                    className="text-xs bg-blue-700 text-white px-2 py-1 rounded hover:bg-blue-800 transition"
+                                  >
+                                    {t('common.book')}
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
                     {msg.suggestions && msg.suggestions.length > 0 && msg.sender === 'bot' && (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {msg.suggestions.slice(0, 3).map((sug, idx) => (
@@ -193,7 +318,7 @@ export default function ChatBot() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask me about hotels..."
+                  placeholder={t('chat.ui.placeholder')}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                 />
                 <button
@@ -206,7 +331,7 @@ export default function ChatBot() {
               </form>
               <div className="flex items-center justify-between text-[11px] text-gray-500">
                 <span>
-                  Tip: avoid sharing card numbers or sensitive data in chat.
+                  {t('chat.ui.tip')}
                 </span>
                 <button
                   type="button"
@@ -214,7 +339,7 @@ export default function ChatBot() {
                   className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-gray-300 text-[11px] hover:bg-gray-50"
                 >
                   <Headphones size={12} />
-                  Ask for human
+                  {t('chat.ui.askHuman')}
                 </button>
               </div>
             </div>

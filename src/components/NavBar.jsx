@@ -1,10 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import LanguageSwitcher from "./LanguageSwitcher.jsx";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
@@ -29,56 +32,56 @@ const Navbar = () => {
               to="/destinations"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Destinations
+              {t("nav.destinations")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/trends"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Trends
+              {t("nav.trends")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/insights"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Insights
+              {t("nav.insights")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/experiences"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Experiences
+              {t("nav.experiences")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/deals"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Deals
+              {t("nav.deals")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/blog"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Blog
+              {t("nav.blog")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/reviews"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Reviews
+              {t("nav.reviews")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/support"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Support
+              {t("nav.support")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
 
@@ -89,21 +92,21 @@ const Navbar = () => {
               to="/gallery"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Gallery
+              {t("nav.gallery")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/special-offers"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Offers
+              {t("nav.offers")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/concierge"
               className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
             >
-              Concierge
+              {t("nav.concierge")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
           </div>
@@ -116,20 +119,20 @@ const Navbar = () => {
                   {(() => {
                     const email = user.email || '';
                     const isUUID = email.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
-                    return isUUID ? 'Account' : email.split('@')[0];
+                    return isUUID ? t('nav.account') : email.split('@')[0];
                   })()}
                 </span>
                 <Link
                   to="/profile"
                   className="text-sm font-medium text-slate-700 hover:text-jordan-blue dark:text-slate-300 transition-colors duration-200"
                 >
-                  Profile
+                  {t("nav.profile")}
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                 >
-                  Logout
+                  {t("nav.logout")}
                 </button>
               </>
             ) : (
@@ -138,16 +141,17 @@ const Navbar = () => {
                   to="/login"
                   className="text-sm font-medium text-slate-700 hover:text-jordan-blue dark:text-slate-300 transition-colors duration-200"
                 >
-                  Sign In
+                  {t("nav.login")}
                 </Link>
                 <Link
                   to="/signup"
                   className="px-6 py-2.5 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                 >
-                  Register
+                  {t("nav.signup")}
                 </Link>
               </>
             )}
+            <LanguageSwitcher />
             <ThemeToggle />
           </div>
         </div>

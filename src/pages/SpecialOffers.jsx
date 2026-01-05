@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import realHotelsAPI from '../services/realHotelsData';
 import { useAuth } from '../context/AuthContext';
+import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import { useTranslation } from 'react-i18next';
+import { getHotelDisplayName } from '../utils/hotelLocalization';
 
 export default function SpecialOffers() {
   const [hotels, setHotels] = useState([]);
   const [discounts] = useState([20, 15, 25, 10, 18, 30, 12, 22]);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -32,15 +36,23 @@ export default function SpecialOffers() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {hotels.map((hotel, idx) => (
+          (() => {
+            const hotelName = getHotelDisplayName(hotel, i18n.language);
+            return (
           <div key={hotel.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
             <div className="relative">
-              <img src={hotel.image} alt={hotel.name} className="w-full h-48 object-cover" />
+              <img
+                src={hotel.image}
+                alt={hotelName}
+                onError={createHotelImageOnErrorHandler(hotel.id)}
+                className="w-full h-48 object-cover"
+              />
               <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full font-bold">
                 -{discounts[idx]}%
               </div>
             </div>
             <div className="p-4">
-              <h3 className="font-bold text-lg mb-2">{hotel.name}</h3>
+              <h3 className="font-bold text-lg mb-2">{hotelName}</h3>
               <p className="text-gray-600 text-sm mb-4">{hotel.location}</p>
               <div className="flex justify-between items-center mb-4">
                 <div>
@@ -56,6 +68,8 @@ export default function SpecialOffers() {
               </button>
             </div>
           </div>
+            );
+          })()
         ))}
       </div>
     </div>

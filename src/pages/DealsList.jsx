@@ -3,6 +3,9 @@ import realHotelsAPI from "../services/realHotelsData";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import WishlistButton from "../components/WishlistButton";
+import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
+import { useTranslation } from "react-i18next";
+import { getHotelDisplayName } from "../utils/hotelLocalization";
 
 const DISCOUNTS = [30, 25, 20, 35, 15, 22, 28, 18];
 
@@ -11,6 +14,7 @@ export default function DealsList() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -45,6 +49,7 @@ export default function DealsList() {
       <div className="max-w-7xl mx-auto px-6 pb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {hotels.map((hotel, idx) => {
+            const hotelName = getHotelDisplayName(hotel, i18n.language);
             const discount = DISCOUNTS[idx % DISCOUNTS.length];
             const originalPrice = hotel.price;
             const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2);
@@ -52,7 +57,12 @@ export default function DealsList() {
             return (
               <article key={hotel.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
                 <div className="relative h-48 overflow-hidden">
-                  <img src={hotel.image} alt={hotel.name} className="w-full h-full object-cover hover:scale-110 transition" />
+                  <img
+                    src={hotel.image}
+                    alt={hotelName}
+                    onError={createHotelImageOnErrorHandler(hotel.id)}
+                    className="w-full h-full object-cover hover:scale-110 transition"
+                  />
                   <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full font-bold text-lg">
                     -{discount}%
                   </div>
@@ -62,7 +72,7 @@ export default function DealsList() {
                   <WishlistButton item={hotel} className="absolute bottom-4 right-4" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{hotel.name}</h3>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{hotelName}</h3>
                   <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">{hotel.location}</p>
                   
                   <div className="mb-6 space-y-1">

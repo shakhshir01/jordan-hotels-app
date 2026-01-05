@@ -7,7 +7,19 @@
     "wishlist": "Wishlist",
     "login": "Login",
     "signup": "Sign Up",
-    "logout": "Logout"
+    "logout": "Logout",
+    "destinations": "Destinations",
+    "trends": "Trends",
+    "insights": "Insights",
+    "experiences": "Experiences",
+    "deals": "Deals",
+    "blog": "Blog",
+    "reviews": "Reviews",
+    "support": "Support",
+    "gallery": "Gallery",
+    "offers": "Offers",
+    "concierge": "Concierge",
+    "account": "Account"
   },
   "hero": {
     "title": "Discover Jordan's Best Hotels",
@@ -94,6 +106,20 @@
     "edit": "Edit",
     "close": "Close"
   },
+  "common": {
+    "view": "View",
+    "book": "Book"
+  },
+  "home": {
+    "hero": {
+      "kicker": "Discover Jordan",
+      "titleMain": "Jordan",
+      "titleAccent": "Infinite.",
+      "subtitle": "Uncover hidden treasures and iconic wonders across Jordan. From the rose-red city of Petra to the serene Dead Sea—your perfect adventure starts here.",
+      "searchPlaceholder": "Where in Jordan? (e.g. Petra, Dead Sea, Wadi Rum)",
+      "findStays": "FIND STAYS"
+    }
+  },
   "profile": {
     "myProfile": "My Profile",
     "editProfile": "Edit Profile",
@@ -108,6 +134,158 @@
     "contact": "Contact",
     "privacy": "Privacy Policy",
     "terms": "Terms & Conditions",
-    "copyright": "All rights reserved"
+    "copyright": "VisitJo. All rights reserved.",
+    "brandDescription": "Premium travel discovery and booking experiences for Jordan—connecting you with the best stays, experiences, and destinations.",
+    "explore": "Explore",
+    "plan": "Plan",
+    "company": "Company",
+    "dealsOffers": "Deals & Offers",
+    "travelBlog": "Travel Blog",
+    "tripPlanner": "Trip Planner",
+    "helpSupport": "Help & Support"
+  },
+  "chat": {
+    "ui": {
+      "open": "Open chat",
+      "title": "VisitJo Travel Assistant",
+      "placeholder": "Ask me about hotels...",
+      "tip": "Tip: avoid sharing card numbers or sensitive data in chat.",
+      "askHuman": "Ask for human",
+      "error": "Sorry, something went wrong while generating a reply. Please try again.",
+      "escalate": "I’ve flagged this conversation for a human agent. In a live setup, this would create a support ticket with your last messages and contact details."
+    },
+    "greeting": {
+      "default": "Hello! Welcome to VisitJo! I'm your travel assistant. How can I help you find the perfect hotel today?"
+    },
+    "smalltalk": {
+      "howAreYou": "I'm doing great — thanks for asking. Tell me where you want to stay (Petra, Amman, Aqaba, Dead Sea, Wadi Rum) and what vibe you want (luxury, budget, spa, adventure)."
+    },
+    "notFound": {
+      "default": "I didn't fully catch that — tell me the city (Petra, Amman, Aqaba, Dead Sea, Wadi Rum) and whether you prefer luxury, budget, spa, or adventure."
+    },
+    "followUp": {
+      "default": "Would you like more details about any specific hotel?"
+    },
+    "recommendations": {
+      "header": "Recommended for you:",
+      "bestFor": "best for",
+      "pickToBook": "Got it — pick a hotel to book:",
+      "openToSeeGallery": "Here are hotels that match — open one to see the full gallery:",
+      "deals": "Want discounts or special offers?",
+      "map": "Explore hotels by area on the map.",
+      "trends": "Here’s what’s trending right now.",
+      "wishlist": "Opening your wishlist.",
+      "destinations": "Want to browse by destination?",
+      "askVibe": "Tell me what vibe you want (spa, beach, adventure, city)."
+    },
+    "suggestions": {
+      "luxury": "luxury",
+      "budget": "budget-friendly",
+      "adventure": "adventure",
+      "relaxation": "relaxation",
+      "spa": "spa & wellness",
+      "beach": "beach vacation",
+      "city": "city exploration",
+      "deals": "deals",
+      "map": "map"
+    },
+    "links": {
+      "open": "Open",
+      "view": "View",
+      "checkout": "Checkout",
+      "deals": "Deals",
+      "specialOffers": "Special Offers",
+      "hotelsMap": "Hotels Map",
+      "wishlist": "Wishlist",
+      "destinations": "Destinations",
+      "trends": "Trends",
+      "searchHotels": "Search Hotels"
+    },
+    "misc": {
+      "amenitiesAsk": "I can help with amenities! What specific facilities are important to you?",
+      "bookingHelp": "I can help you book. Do you want to pick a hotel first, or do you already have one in mind?",
+      "pickHotelFirst": "pick a hotel first",
+      "alreadyPickedHotel": "I already picked a hotel"
+    }
+  }
+  ,
+  "support": {
+    "hero": {
+      "kicker": "HELP & SUPPORT",
+      "title": "We’re here if plans change",
+      "subtitle": "Start with our quick FAQ, then reach out using chat or email if you still need a human to look into a booking."
+    },
+    "faq": {
+      "cancellations": {
+        "q": "How do cancellations and changes work?",
+        "a": "Each booking clearly shows if it is flexible or non‑refundable. Flexible stays usually allow changes up to a certain time before check‑in."
+      },
+      "bookings": {
+        "q": "Where can I see my bookings?",
+        "a": "Open your Profile and go to the My Bookings section. From there you can review details and, where supported, request cancellation."
+      },
+      "currency": {
+        "q": "Do you support multi‑currency?",
+        "a": "Prices are shown in Jordanian Dinar (JOD) for now. Your bank or card provider may convert from your home currency."
+      },
+      "problem": {
+        "q": "Something is wrong with my stay—what should I do?",
+        "a": "First, speak to the property directly so they can resolve it quickly. If you still need help, contact VisitJo support with your booking ID."
+      }
+    },
+    "chat": {
+      "title": "Chat with an assistant",
+      "body": "Use the blue chat bubble in the bottom‑right corner to start a conversation with the VisitJo travel assistant. Ask about bookings, destinations, or how policies work.",
+      "note": "In a production setup, this can be connected to a live‑agent system so that complex issues are handed over to a human."
+    },
+    "email": {
+      "title": "Email support",
+      "body": "For issues that are not urgent, send us an email including your booking ID, dates, and a short description of the problem.",
+      "cta": "Open email draft"
+    }
+  }
+  ,
+  "hotelDetails": {
+    "location": {
+      "country": "Jordan"
+    },
+    "errors": {
+      "title": "Error Loading Hotel",
+      "notFound": "Hotel not found.",
+      "backToHotels": "Back to Hotels",
+      "selectCheckIn": "Please select a check-in date",
+      "bookingFailed": "Booking failed. Please try again."
+    },
+    "gallery": {
+      "title": "Gallery",
+      "imageAlt": "{{name}} - Image {{index}}",
+      "none": "No images available",
+      "morePhotos": "more photos"
+    },
+    "offers": {
+      "title": "What this place offers",
+      "wifi": { "title": "Free High Speed WiFi", "subtitle": "Available everywhere" },
+      "breakfast": { "title": "Breakfast Included", "subtitle": "Every morning" },
+      "parking": { "title": "Free Parking", "subtitle": "On premises" },
+      "frontDesk": { "title": "24/7 Front Desk", "subtitle": "Always available" }
+    },
+    "about": {
+      "title": "About this hotel",
+      "fallbackDescription": "Experience the true beauty of Jordan in this luxury stay. Located just minutes away from historical sites, this hotel offers world-class service, traditional Jordanian hospitality, and breathtaking views.",
+      "extra": "Whether you're visiting the ancient wonders of Petra, relaxing at the Dead Sea, or exploring the vast landscapes of Wadi Rum, this hotel is your perfect base for an unforgettable Jordanian adventure."
+    },
+    "booking": {
+      "averagePrice": "Average price based on availability",
+      "checkIn": "Check-in Date",
+      "guests": "Number of Guests",
+      "guestCount": "{{count}} Guest",
+      "guestCount_other": "{{count}} Guests",
+      "guestCountPlus": "5+ Guests",
+      "nights": "night",
+      "nights_other": "nights",
+      "reserveNow": "Reserve Now",
+      "bookingLoading": "Booking...",
+      "noChargeYet": "You won't be charged yet. Click to confirm booking."
+    }
   }
 }

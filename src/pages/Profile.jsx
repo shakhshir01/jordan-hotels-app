@@ -171,13 +171,7 @@ const Profile = () => {
     try {
       await hotelAPI.cancelBooking(bookingId);
       showSuccess('Booking cancelled successfully');
-      setBookings((prev) =>
-        prev.map((b) =>
-          b.id === bookingId || b.bookingId === bookingId
-            ? { ...b, status: 'cancelled' }
-            : b
-        )
-      );
+      setBookings((prev) => prev.filter((b) => (b.id || b.bookingId) !== bookingId));
     } catch (error) {
       showError('Failed to cancel booking');
       console.error('Cancel booking error:', error);

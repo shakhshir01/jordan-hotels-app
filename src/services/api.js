@@ -124,6 +124,19 @@ const normalizeLambdaResponse = (raw) => {
   return data;
 };
 
+const normalizeHotel = (rawHotel) => {
+  if (!rawHotel || typeof rawHotel !== "object") return rawHotel;
+
+  const images = Array.isArray(rawHotel.images) ? rawHotel.images.filter(Boolean) : [];
+  const image = typeof rawHotel.image === "string" && rawHotel.image.trim() ? rawHotel.image.trim() : "";
+
+  return {
+    ...rawHotel,
+    images,
+    image: image || images[0] || "",
+  };
+};
+
 export const hotelAPI = {
   getAllHotels: async (location = "") => {
     if (getUseMocks()) {
@@ -135,8 +148,8 @@ export const hotelAPI = {
       const url = location ? `/hotels?location=${encodeURIComponent(location)}` : "/hotels";
       const response = await apiClient.get(url);
       const data = normalizeLambdaResponse(response.data);
-      if (Array.isArray(data)) return data;
-      if (data?.hotels && Array.isArray(data.hotels)) return data.hotels;
+      if (Array.isArray(data)) return data.map(normalizeHotel);
+      if (data?.hotels && Array.isArray(data.hotels)) return data.hotels.map(normalizeHotel);
       return [];
     } catch (error) {
       // fallback to mocks on auth error
@@ -151,7 +164,7 @@ export const hotelAPI = {
     }
     try {
       const response = await apiClient.get(`/hotels/${id}`);
-      return normalizeLambdaResponse(response.data);
+      return normalizeHotel(normalizeLambdaResponse(response.data));
     } catch (error) {
       if (lastAuthError) return mockHotels.find((h) => h.id === id) || null;
       throw error;
@@ -163,10 +176,21 @@ export const hotelAPI = {
       return { id: `mock_${Date.now()}`, hotelId, ...bookingData };
     }
     try {
-      const response = await apiClient.post(`/hotels/${hotelId}/book`, bookingData);
+      const response = await apiClient.post(`/bookings`, { hotelId, ...bookingData });
       return normalizeLambdaResponse(response.data);
     } catch (error) {
       if (lastAuthError) return { id: `mock_${Date.now()}`, hotelId, ...bookingData };
+      throw error;
+    }
+  },
+
+  cancelBooking: async (bookingId) => {
+    if (getUseMocks()) return { success: true, deletedId: bookingId };
+    try {
+      const response = await apiClient.delete(`/bookings`, { params: { id: bookingId } });
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { success: true, deletedId: bookingId };
       throw error;
     }
   },
@@ -255,40 +279,15 @@ export const hotelAPI = {
   },
 
   getUserBookings: async () => {
-    if (getUseMocks()) {
-      return [
-        {
-          id: "booking-001",
-          hotelId: "hotel-dead-sea",
-          hotelName: "Movenpick Dead Sea",
-          checkIn: "2026-02-15",
-          checkOut: "2026-02-18",
-          guests: 2,
-          totalPrice: 450,
-          status: "confirmed",
-        },
-      ];
-    }
+    if (getUseMocks()) return [];
     try {
       const response = await apiClient.get("/user/bookings");
-      const data = response.data;
+      const data = normalizeLambdaResponse(response.data);
       if (Array.isArray(data)) return data;
       if (Array.isArray(data?.bookings)) return data.bookings;
       return [];
     } catch (error) {
-      if (lastAuthError)
-        return [
-          {
-            id: "booking-001",
-            hotelId: "hotel-dead-sea",
-            hotelName: "Movenpick Dead Sea",
-            checkIn: "2026-02-15",
-            checkOut: "2026-02-18",
-            guests: 2,
-            totalPrice: 450,
-            status: "confirmed",
-          },
-        ];
+      if (lastAuthError) return [];
       throw error;
     }
   },

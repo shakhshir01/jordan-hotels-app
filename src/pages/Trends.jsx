@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { hotelAPI } from "../services/api";
 import { Loader2, Search, MapPin, Star, Percent } from "lucide-react";
 import { Link } from "react-router-dom";
+import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 
 const defaultQueries = [
   { id: "tr-petra", label: "Petra", q: "Petra" },
@@ -157,6 +158,7 @@ const Trends = () => {
                             loading="lazy"
                             referrerPolicy="no-referrer"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={createHotelImageOnErrorHandler(h.id)}
                           />
                         </div>
                       )}

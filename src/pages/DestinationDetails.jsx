@@ -2,10 +2,13 @@ import React from "react";
 import { useParams, Link } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import { hotelAPI } from "../services/api";
+import { useTranslation } from "react-i18next";
+import { getHotelDisplayName } from "../utils/hotelLocalization";
 
 export default function DestinationDetails() {
   const { id } = useParams();
   const { data: dest, loading, error } = useFetch(() => hotelAPI.getDestinationById(id), [id]);
+  const { i18n } = useTranslation();
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
@@ -38,18 +41,21 @@ export default function DestinationDetails() {
             <h2 className="text-2xl font-semibold mb-4">Hotels in {dest.name}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {(dest.hotels || []).map((h) => (
+                (() => {
+                  const hotelName = getHotelDisplayName(h, i18n.language);
+                  return (
                 <div key={h.id} className="hotel-card overflow-hidden">
                   {h.image && (
                     <img
                       src={h.image}
-                      alt={h.name}
+                      alt={hotelName}
                       className="w-full h-40 object-cover"
                       loading="lazy"
                       referrerPolicy="no-referrer"
                     />
                   )}
                   <div className="p-4 flex flex-col gap-1">
-                    <h3 className="font-bold text-slate-900 dark:text-slate-100">{h.name}</h3>
+                    <h3 className="font-bold text-slate-900 dark:text-slate-100">{hotelName}</h3>
                     {h.location && (
                       <p className="text-xs text-slate-500 dark:text-slate-400">{h.location}</p>
                     )}
@@ -66,6 +72,8 @@ export default function DestinationDetails() {
                     </div>
                   </div>
                 </div>
+                  );
+                })()
               ))}
             </div>
           </section>

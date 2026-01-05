@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import realHotelsAPI from '../services/realHotelsData';
+import { useTranslation } from 'react-i18next';
+import { getHotelDisplayName } from '../utils/hotelLocalization';
 
 export default function Gallery() {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -46,10 +49,13 @@ export default function Gallery() {
         ) : (
           <div className="space-y-20">
             {hotels.map((hotel) => (
+              (() => {
+                const hotelName = getHotelDisplayName(hotel, i18n.language);
+                return (
               <div key={hotel.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
                 {/* Hotel Header */}
                 <div className="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-8">
-                  <h2 className="text-3xl font-bold mb-2">{hotel.name}</h2>
+                  <h2 className="text-3xl font-bold mb-2">{hotelName}</h2>
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex gap-6">
                       <span className="text-blue-100">📍 {hotel.location}</span>
@@ -75,7 +81,7 @@ export default function Gallery() {
                           <div className="relative h-56 bg-slate-200 overflow-hidden">
                             <img 
                               src={img} 
-                              alt={`${hotel.name} - Image ${idx + 1}`}
+                              alt={`${hotelName} - Image ${idx + 1}`}
                               className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
                               onError={(e) => {
                                 e.currentTarget.src = FALLBACK_IMG;
@@ -98,6 +104,8 @@ export default function Gallery() {
                   )}
                 </div>
               </div>
+                );
+              })()
             ))}
           </div>
         )}

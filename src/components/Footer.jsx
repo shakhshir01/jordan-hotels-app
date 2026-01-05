@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="mt-24 border-t border-slate-200 bg-gradient-to-b from-transparent to-slate-50 dark:border-slate-800 dark:to-slate-900">
       <div className="max-w-7xl mx-auto px-6 py-20">
@@ -11,30 +13,30 @@ export default function Footer() {
               VISITJO
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6 max-w-xs">
-              Premium travel discovery and booking experiences for Jordan—connecting you with the best stays, experiences, and destinations.
+              {t("footer.brandDescription")}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-500">
-              © {new Date().getFullYear()} VisitJo. All rights reserved.
+              © {new Date().getFullYear()} {t("footer.copyright")}
             </p>
           </div>
 
           {/* Explore */}
           <div>
             <div className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 mb-4">
-              Explore
+              {t("footer.explore")}
             </div>
             <div className="space-y-3">
               <Link to="/destinations" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Destinations
+                {t("nav.destinations")}
               </Link>
               <Link to="/experiences" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Experiences
+                {t("nav.experiences")}
               </Link>
               <Link to="/deals" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Deals & Offers
+                {t("footer.dealsOffers")}
               </Link>
               <Link to="/blog" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Travel Blog
+                {t("footer.travelBlog")}
               </Link>
             </div>
           </div>
@@ -42,20 +44,20 @@ export default function Footer() {
           {/* Plan */}
           <div>
             <div className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 mb-4">
-              Plan
+              {t("footer.plan")}
             </div>
             <div className="space-y-3">
               <Link to="/trip-planner" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Trip Planner
+                {t("footer.tripPlanner")}
               </Link>
               <Link to="/wishlist" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Wishlist
+                {t("nav.wishlist")}
               </Link>
               <Link to="/reviews" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Reviews
+                {t("nav.reviews")}
               </Link>
               <Link to="/support" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Help & Support
+                {t("footer.helpSupport")}
               </Link>
             </div>
           </div>
@@ -63,17 +65,17 @@ export default function Footer() {
           {/* Company */}
           <div>
             <div className="text-sm font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100 mb-4">
-              Company
+              {t("footer.company")}
             </div>
             <div className="space-y-3">
               <Link to="/about" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                About Us
+                {t("footer.about")}
               </Link>
               <Link to="/terms" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Terms of Service
+                {t("footer.terms")}
               </Link>
               <Link to="/privacy" className="block text-sm text-slate-600 hover:text-jordan-blue dark:text-slate-400 dark:hover:text-blue-400 transition-colors duration-200">
-                Privacy Policy
+                {t("footer.privacy")}
               </Link>
             </div>
           </div>

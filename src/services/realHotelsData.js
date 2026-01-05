@@ -3,10 +3,16 @@
  * Uses real hotel data from Google Hotels with verified pricing and multiple images
  */
 
+import {
+  GENERIC_HOTEL_FALLBACK_IMAGES,
+  getGenericHotelFallbackImage,
+} from "../utils/hotelImageFallback";
+
 const REAL_HOTELS = [
   {
     id: 'h-dead-sea-marriott',
     name: 'Dead Sea Marriott Resort & Spa',
+    nameAr: 'منتجع وسبا ماريوت البحر الميت',
     location: 'Dead Sea',
     destination: 'Dead Sea',
     price: 113,
@@ -16,7 +22,6 @@ const REAL_HOTELS = [
     image: 'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-exterior-0201-hor-clsc.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1336px:*',
     images: [
       'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-exterior-0201-hor-clsc.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1336px:*',
-      'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-entrance-7360-hor-clsc.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1336px:*',
       'https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-lobby-0191-hor-clsc.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1336px:*',
       'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-superior-room-king-11326:Classic-Hor?wid=1336&fit=constrain',
       'https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-guest-room-79483-39312:Classic-Hor?wid=1336&fit=constrain',
@@ -44,6 +49,7 @@ const REAL_HOTELS = [
   {
     id: 'h-movenpick-deadsea',
     name: 'Mövenpick Resort Dead Sea',
+    nameAr: 'منتجع موفنبيك البحر الميت',
     location: 'Dead Sea',
     destination: 'Dead Sea',
     price: 110,
@@ -81,6 +87,7 @@ const REAL_HOTELS = [
   {
     id: 'h-amman-grand-hyatt',
     name: 'Grand Hyatt Amman',
+    nameAr: 'فندق جراند حياة عمّان',
     location: 'Amman',
     destination: 'Amman',
     price: 95,
@@ -105,6 +112,7 @@ const REAL_HOTELS = [
   {
     id: 'h-petra-movenpick',
     name: 'Mövenpick Resort Petra',
+    nameAr: 'منتجع موفنبيك البتراء',
     location: 'Petra',
     destination: 'Petra',
     price: 98,
@@ -132,6 +140,7 @@ const REAL_HOTELS = [
   {
     id: 'h-aqaba-hilton',
     name: 'Hilton Aqaba',
+    nameAr: 'هيلتون العقبة',
     location: 'Aqaba',
     destination: 'Aqaba',
     price: 85,
@@ -157,6 +166,7 @@ const REAL_HOTELS = [
   {
     id: 'h-amman-kempinski',
     name: 'Amman Kempinski Hotel',
+    nameAr: 'فندق كمبينسكي عمّان',
     location: 'Amman',
     destination: 'Amman',
     price: 128,
@@ -184,6 +194,7 @@ const REAL_HOTELS = [
   {
     id: 'h-wadi-rum-luxury',
     name: 'Wadi Rum Luxury Camp',
+    nameAr: 'مخيم وادي رم الفاخر',
     location: 'Wadi Rum',
     destination: 'Wadi Rum',
     price: 145,
@@ -214,6 +225,7 @@ const REAL_HOTELS = [
   {
     id: 'h-amman-intercontinental',
     name: 'Intercontinental Amman',
+    nameAr: 'فندق إنتركونتيننتال عمّان',
     location: 'Amman',
     destination: 'Amman',
     price: 92,
@@ -240,24 +252,94 @@ const REAL_HOTELS = [
   },
 ];
 
+const toUniqueStrings = (values) => {
+  const out = [];
+  const seen = new Set();
+  for (const v of values || []) {
+    if (typeof v !== "string") continue;
+    const s = v.trim();
+    if (!s) continue;
+    if (seen.has(s)) continue;
+    seen.add(s);
+    out.push(s);
+  }
+  return out;
+};
+
+const normalizeDestinationInput = (value) => {
+  const v = String(value || '').trim();
+  if (!v) return '';
+  const compact = v.replace(/\s+/g, ' ');
+
+  // Arabic -> canonical English destination strings used in REAL_HOTELS
+  if (/^عمّ?ان$/.test(compact)) return 'Amman';
+  if (/^(ال)?بترا$/.test(compact) || /^البتراء$/.test(compact)) return 'Petra';
+  if (/^البحر الميت$/.test(compact)) return 'Dead Sea';
+  if (/^العقبة$/.test(compact)) return 'Aqaba';
+  if (/^وادي رم$/.test(compact)) return 'Wadi Rum';
+
+  return compact;
+};
+
+// Enforce: no duplicate non-fallback image URLs across the realHotels dataset.
+// Fallback images (#49–#62) are allowed to repeat.
+const normalizeHotelsForUi = (hotels) => {
+  const fallbackSet = new Set(GENERIC_HOTEL_FALLBACK_IMAGES);
+  const usedNonFallback = new Set();
+
+  return (hotels || []).map((h) => {
+    const rawImages = [h?.image, ...(Array.isArray(h?.images) ? h.images : [])];
+    const unique = [];
+
+    for (const url of toUniqueStrings(rawImages)) {
+      if (fallbackSet.has(url)) {
+        unique.push(url);
+        continue;
+      }
+      if (usedNonFallback.has(url)) continue;
+      usedNonFallback.add(url);
+      unique.push(url);
+    }
+
+    const fallback = getGenericHotelFallbackImage(h?.id || h?.name || "");
+    const primary = unique[0] || fallback || "";
+    const images = unique.length ? unique : (primary ? [primary] : []);
+
+    return {
+      ...h,
+      image: primary,
+      images,
+    };
+  });
+};
+
+let NORMALIZED_CACHE = null;
+const getNormalizedHotels = () => {
+  if (!NORMALIZED_CACHE) {
+    NORMALIZED_CACHE = normalizeHotelsForUi(REAL_HOTELS);
+  }
+  return NORMALIZED_CACHE;
+};
+
 export const realHotelsAPI = {
   getAllHotels: async (location = '') => {
     try {
-      if (location) {
-        return REAL_HOTELS.filter((h) =>
-          h.location.toLowerCase().includes(location.toLowerCase())
+      const normalizedLocation = normalizeDestinationInput(location);
+      if (normalizedLocation) {
+        return getNormalizedHotels().filter((h) =>
+          h.location.toLowerCase().includes(normalizedLocation.toLowerCase())
         );
       }
-      return REAL_HOTELS;
+      return getNormalizedHotels();
     } catch (error) {
       console.error('Error fetching hotels:', error);
-      return REAL_HOTELS;
+      return getNormalizedHotels();
     }
   },
 
   getHotelById: async (id) => {
     try {
-      return REAL_HOTELS.find((h) => h.id === id) || null;
+      return getNormalizedHotels().find((h) => h.id === id) || null;
     } catch (error) {
       console.error('Error fetching hotel:', error);
       return null;
@@ -266,22 +348,24 @@ export const realHotelsAPI = {
 
   getHotelsByDestination: async (destination) => {
     try {
-      return REAL_HOTELS.filter((h) =>
-        h.destination.toLowerCase() === destination.toLowerCase()
+      const normalizedDestination = normalizeDestinationInput(destination);
+      return getNormalizedHotels().filter((h) =>
+        h.destination.toLowerCase() === normalizedDestination.toLowerCase()
       );
     } catch (error) {
       console.error('Error fetching hotels by destination:', error);
-      return REAL_HOTELS;
+      return getNormalizedHotels();
     }
   },
 
   searchHotels: async (filters) => {
     try {
-      let results = REAL_HOTELS;
+      let results = getNormalizedHotels();
 
       if (filters.location) {
+        const normalizedLocation = normalizeDestinationInput(filters.location);
         results = results.filter((h) =>
-          h.location.toLowerCase().includes(filters.location.toLowerCase())
+          h.location.toLowerCase().includes(normalizedLocation.toLowerCase())
         );
       }
 
@@ -306,16 +390,16 @@ export const realHotelsAPI = {
       return results;
     } catch (error) {
       console.error('Error searching hotels:', error);
-      return REAL_HOTELS;
+      return getNormalizedHotels();
     }
   },
 
   getPopularHotels: async () => {
-    return REAL_HOTELS.sort((a, b) => b.rating - a.rating).slice(0, 6);
+    return [...getNormalizedHotels()].sort((a, b) => b.rating - a.rating).slice(0, 6);
   },
 
   getFeaturedHotels: async () => {
-    return REAL_HOTELS.filter((h) => h.rating >= 4.7);
+    return getNormalizedHotels().filter((h) => h.rating >= 4.7);
   },
 };
 

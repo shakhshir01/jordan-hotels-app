@@ -6,13 +6,20 @@ import { useAuth } from '../context/AuthContext';
 const Verify = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [email] = useState(location.state?.email || '');
+  const email = location.state?.email || '';
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [verified, setVerified] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
   const { verifyEmail, resendConfirmation } = useAuth();
+
+  useEffect(() => {
+    if (!resendCooldown) return;
+    const t = setInterval(() => setResendCooldown(prev => (prev > 0 ? prev - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
 
   if (!email) {
     return (
@@ -23,7 +30,7 @@ const Verify = () => {
           <p className="text-slate-600 mb-6">Please complete the sign-up process first.</p>
           <button 
             onClick={() => navigate('/signup')}
-            className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-black transition-all"
+            className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-blue-800 transition-all"
           >
             Go to Sign Up
           </button>
@@ -66,14 +73,6 @@ const Verify = () => {
       </div>
     );
   }
-
-  const [resendCooldown, setResendCooldown] = useState(0);
-
-  useEffect(() => {
-    if (!resendCooldown) return;
-    const t = setInterval(() => setResendCooldown(prev => (prev > 0 ? prev - 1 : 0)), 1000);
-    return () => clearInterval(t);
-  }, [resendCooldown]);
 
   const handleResend = async () => {
     if (!email) return setError('Missing email address.');

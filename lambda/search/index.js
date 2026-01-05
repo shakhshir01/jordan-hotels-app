@@ -29,6 +29,56 @@ const parseEventQuery = (event) => {
   return q.trim();
 };
 
+const normalizeQueryToTokens = (q) => {
+  const raw = String(q || '').trim();
+  if (!raw) return [];
+
+  // Normalize whitespace
+  let s = raw.replace(/\s+/g, ' ').trim();
+
+  // Map Arabic multi-word phrases first
+  const phraseMap = [
+    { from: /\bالبحر\s+الميت\b/g, to: 'dead sea' },
+    { from: /\bوادي\s+رم\b/g, to: 'wadi rum' },
+  ];
+  for (const p of phraseMap) s = s.replace(p.from, p.to);
+
+  // Then map common single-word Arabic destinations
+  const wordMap = new Map([
+    ['عمان', 'amman'],
+    ['عمّان', 'amman'],
+    ['البترا', 'petra'],
+    ['بترا', 'petra'],
+    ['البتراء', 'petra'],
+    ['العقبة', 'aqaba'],
+    ['عقبة', 'aqaba'],
+    ['رم', 'rum'],
+  ]);
+
+  const parts = s.split(' ').filter(Boolean);
+  const tokens = [];
+  for (const part of parts) {
+    const mapped = wordMap.get(part) || part;
+    tokens.push(mapped);
+  }
+
+  // Also keep the full normalized string for phrase matching
+  tokens.push(s);
+
+  // Lowercase + dedupe
+  const out = [];
+  const seen = new Set();
+  for (const t of tokens) {
+    const tl = String(t || '').toLowerCase().trim();
+    if (!tl) continue;
+    if (seen.has(tl)) continue;
+    seen.add(tl);
+    out.push(tl);
+  }
+
+  return out;
+};
+
 export async function handler(event) {
   const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
   const corsHeaders = getCorsHeaders(event);
@@ -46,6 +96,7 @@ export async function handler(event) {
 
   try {
     const q = parseEventQuery(event);
+    const qTokens = normalizeQueryToTokens(q);
     const hotelsTable = process.env.HOTELS_TABLE;
     const destinationsTable = process.env.DESTINATIONS_TABLE;
     const dealsTable = process.env.DEALS_TABLE;
@@ -57,9 +108,10 @@ export async function handler(event) {
       const res = await client.send(new ScanCommand({ TableName }));
       const items = (res && res.Items) || [];
       if (!q) return items;
-      const ql = q.toLowerCase();
+
       return items.filter((it) => {
-        return fields.some((f) => (String(it[f] || "").toLowerCase().includes(ql)));
+        const haystacks = fields.map((f) => String(it[f] || '').toLowerCase());
+        return qTokens.some((token) => haystacks.some((h) => h.includes(token)));
       });
     };
 

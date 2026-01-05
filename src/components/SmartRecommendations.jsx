@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 import { Star, MapPin, Sparkles, ArrowRight } from 'lucide-react';
 import realHotelsAPI from '../services/realHotelsData';
 import { getSmartSuggestions } from '../services/chatbot';
+import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import { useTranslation } from 'react-i18next';
+import { getHotelDisplayName } from '../utils/hotelLocalization';
 
 export default function SmartRecommendations() {
+  const { i18n } = useTranslation();
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,6 +84,9 @@ export default function SmartRecommendations() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {recommendations.map(hotel => (
+            (() => {
+              const hotelName = getHotelDisplayName(hotel, i18n.language);
+              return (
             <Link
               key={hotel.id}
               to={`/hotels/${hotel.id}`}
@@ -89,16 +96,18 @@ export default function SmartRecommendations() {
               <div className="relative h-48 overflow-hidden bg-gray-200">
                 <img
                   src={hotel.image}
-                  alt={hotel.name}
+                  alt={hotelName}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-                      `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
-                        <rect width="100%" height="100%" fill="#e5e7eb"/>
-                        <text x="50%" y="50%" fill="#6b7280" font-family="Arial" font-size="20" text-anchor="middle" dominant-baseline="middle">${hotel.name}</text>
-                      </svg>`
-                    );
-                  }}
+                  onError={createHotelImageOnErrorHandler(
+                    hotel.id,
+                    'data:image/svg+xml;charset=UTF-8,' +
+                      encodeURIComponent(
+                        `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
+                          <rect width="100%" height="100%" fill="#e5e7eb"/>
+                          <text x="50%" y="50%" fill="#6b7280" font-family="Arial" font-size="20" text-anchor="middle" dominant-baseline="middle">${hotelName}</text>
+                        </svg>`
+                      )
+                  )}
                 />
                 <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1 shadow flex items-center gap-1">
                   <Star size={16} className="text-yellow-500 fill-yellow-500" />
@@ -109,7 +118,7 @@ export default function SmartRecommendations() {
               {/* Hotel Info */}
               <div className="p-4">
                 <h3 className="font-bold text-lg text-gray-900 mb-1 line-clamp-2">
-                  {hotel.name}
+                  {hotelName}
                 </h3>
                 <div className="flex items-center gap-1 text-gray-600 text-sm mb-3">
                   <MapPin size={16} />
@@ -125,6 +134,8 @@ export default function SmartRecommendations() {
                 </div>
               </div>
             </Link>
+              );
+            })()
           ))}
         </div>
 

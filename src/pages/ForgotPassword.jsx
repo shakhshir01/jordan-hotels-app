@@ -59,7 +59,7 @@ const ForgotPassword = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-black transition-all disabled:opacity-50"
+          className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-blue-800 transition-all disabled:opacity-50"
         >
           {loading ? 'Sending...' : 'Send Verification Code'}
         </button>

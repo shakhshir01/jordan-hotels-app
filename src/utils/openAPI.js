@@ -12,7 +12,7 @@ export const openAPISpec = {
     contact: {
       name: 'VisitJo Support',
       url: 'https://visitjo.com',
-      email: 'support@visitjo.com',
+      email: 'khaledshakhshir2133@gmail.com',
     },
     license: {
       name: 'MIT',

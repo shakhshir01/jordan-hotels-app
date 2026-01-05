@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import { hotelAPI } from "../services/api";
 import { MapPin, Star, Search } from "lucide-react";
+import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 
 const STORAGE_KEY = "visitjo.savedSearches";
 
@@ -58,17 +59,17 @@ export default function SearchResults() {
   const results = data || {};
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
       <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 mb-1">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">
             Search results
           </h1>
           <p className="text-sm text-slate-600">
             Showing matches for <span className="font-semibold">“{term || "All"}”</span>
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             type="button"
             onClick={handleSaveSearch}
@@ -135,6 +136,7 @@ export default function SearchResults() {
                           loading="lazy"
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={createHotelImageOnErrorHandler(h.id)}
                         />
                       </div>
                     )}

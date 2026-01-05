@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import realHotelsAPI from '../services/realHotelsData';
+import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import { useTranslation } from 'react-i18next';
+import { getHotelDisplayName } from '../utils/hotelLocalization';
 
 export default function FeaturedHotels() {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -23,16 +27,24 @@ export default function FeaturedHotels() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {hotels.map((hotel) => (
+          (() => {
+            const hotelName = getHotelDisplayName(hotel, i18n.language);
+            return (
           <div key={hotel.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition">
             <div className="relative h-64 overflow-hidden">
-              <img src={hotel.image} alt={hotel.name} className="w-full h-full object-cover hover:scale-110 transition" />
+              <img
+                src={hotel.image}
+                alt={hotelName}
+                onError={createHotelImageOnErrorHandler(hotel.id)}
+                className="w-full h-full object-cover hover:scale-110 transition"
+              />
               <div className="absolute top-4 left-4 bg-yellow-400 px-3 py-1 rounded-full">
                 ★ {hotel.rating}
               </div>
             </div>
 
             <div className="p-6">
-              <h3 className="text-xl font-bold mb-2">{hotel.name}</h3>
+              <h3 className="text-xl font-bold mb-2">{hotelName}</h3>
               <p className="text-gray-600 text-sm mb-3">{hotel.location}</p>
               <p className="text-gray-700 text-sm mb-4 line-clamp-2">{hotel.description}</p>
 
@@ -74,6 +86,8 @@ export default function FeaturedHotels() {
               </div>
             </div>
           </div>
+            );
+          })()
         ))}
       </div>
     </div>

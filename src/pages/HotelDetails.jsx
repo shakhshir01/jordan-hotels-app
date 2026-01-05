@@ -4,6 +4,9 @@ import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } fr
 import realHotelsAPI from '../services/realHotelsData';
 import { hotelAPI } from '../services/api';
 import WishlistButton from '../components/WishlistButton';
+import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import { useTranslation } from 'react-i18next';
+import { getHotelDisplayName } from '../utils/hotelLocalization';
 
 const FALLBACK_IMG =
   "data:image/svg+xml;charset=UTF-8," +
@@ -35,6 +38,7 @@ const normalizeHotel = (raw) => {
 };
 
 const HotelDetails = () => {
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [hotel, setHotel] = useState(null);
@@ -81,7 +85,7 @@ const HotelDetails = () => {
     e.preventDefault();
     
     if (!checkInDate) {
-      alert('Please select a check-in date');
+      alert(t('hotelDetails.errors.selectCheckIn'));
       return;
     }
 
@@ -95,7 +99,7 @@ const HotelDetails = () => {
       // Navigate to checkout with hotel and booking data
       navigate('/checkout', { state: { hotelId: id, bookingData, hotel } });
     } catch (err) {
-      alert(err.message || 'Booking failed. Please try again.');
+      alert(err.message || t('hotelDetails.errors.bookingFailed'));
     } finally {
       setBookingLoading(false);
     }
@@ -116,10 +120,10 @@ const HotelDetails = () => {
           <div className="flex items-start gap-3">
             <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={24} />
             <div>
-              <h3 className="font-bold text-red-900 mb-2">Error Loading Hotel</h3>
-              <p className="text-red-700">{error || 'Hotel not found.'}</p>
+              <h3 className="font-bold text-red-900 mb-2">{t('hotelDetails.errors.title')}</h3>
+              <p className="text-red-700">{error || t('hotelDetails.errors.notFound')}</p>
               <Link to="/" className="text-red-900 font-bold hover:underline mt-4 inline-block">
-                ← Back to Hotels
+                ← {t('hotelDetails.errors.backToHotels')}
               </Link>
             </div>
           </div>
@@ -128,33 +132,32 @@ const HotelDetails = () => {
     );
   }
 
+  const hotelName = getHotelDisplayName(hotel, i18n.language);
+
   return (
     <div className="bg-transparent">
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {/* Breadcrumbs */}
         <nav className="text-sm text-gray-500 mb-6">
-          <Link to="/" className="hover:text-jordan-blue transition">Home</Link>
+          <Link to="/" className="hover:text-jordan-blue transition">{t('nav.home')}</Link>
           {' / '}
           <span>{hotel.location}</span>
           {' / '}
-          <span className="text-black font-semibold">{hotel.name}</span>
+          <span className="text-black font-semibold">{hotelName}</span>
         </nav>
 
         {/* Gallery with all hotel images */}
         <div className="mb-10">
-          <h2 className="text-2xl font-bold mb-6">Gallery</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('hotelDetails.gallery.title')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden rounded-2xl">
             {hotel.images && hotel.images.length > 0 ? (
               hotel.images.slice(0, 8).map((img, idx) => (
                 <div key={idx} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition group h-48 md:h-56">
                   <img 
                     src={img}
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = FALLBACK_IMG;
-                    }}
+                    onError={createHotelImageOnErrorHandler(`${hotel.id}:${idx}`, FALLBACK_IMG)}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    alt={`${hotel.name} - Image ${idx + 1}`}
+                    alt={t('hotelDetails.gallery.imageAlt', { name: hotelName, index: idx + 1 })}
                     loading="lazy"
                     referrerPolicy="no-referrer"
                   />
@@ -162,13 +165,13 @@ const HotelDetails = () => {
               ))
             ) : (
               <div className="md:col-span-4 h-64 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                <p className="text-gray-500">No images available</p>
+                <p className="text-gray-500">{t('hotelDetails.gallery.none')}</p>
               </div>
             )}
           </div>
           {hotel.images && hotel.images.length > 8 && (
             <p className="text-center text-gray-500 mt-4">
-              + {hotel.images.length - 8} more photos
+              + {hotel.images.length - 8} {t('hotelDetails.gallery.morePhotos')}
             </p>
           )}
         </div>
@@ -178,12 +181,9 @@ const HotelDetails = () => {
           <div className="md:col-span-2">
             <img
               src={hotel.image || FALLBACK_IMG}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = FALLBACK_IMG;
-              }}
+              onError={createHotelImageOnErrorHandler(hotel.id, FALLBACK_IMG)}
               className="w-full h-[420px] object-cover rounded-2xl"
-              alt={hotel.name}
+              alt={hotelName}
               loading="lazy"
               referrerPolicy="no-referrer"
             />
@@ -194,14 +194,14 @@ const HotelDetails = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
           {/* Left Column: Info */}
           <div className="md:col-span-2">
             <div className="flex justify-between items-start gap-4 mb-4">
               <div>
-                <h1 className="text-4xl font-black text-blue-900 mb-2">{hotel.name}</h1>
+                <h1 className="text-4xl font-black text-blue-900 mb-2">{hotelName}</h1>
                 <p className="flex items-center gap-1 text-gray-600">
-                  <MapPin className="w-5 h-5" /> {hotel.location}, Jordan
+                  <MapPin className="w-5 h-5" /> {hotel.location}, {t('hotelDetails.location.country')}
                 </p>
               </div>
               <WishlistButton item={hotel} />
@@ -210,19 +210,19 @@ const HotelDetails = () => {
               <div className="flex items-center text-orange-500 font-bold">
                 <Star size={20} fill="currentColor" /> {hotel.rating}
               </div>
-              <span className="text-gray-500">(124 reviews)</span>
+              <span className="text-gray-500">(124 {t('hotels.reviews')})</span>
             </div>
             
             <div className="border-t border-b py-8 mb-8">
-              <h3 className="text-2xl font-bold mb-6">What this place offers</h3>
-              <div className="grid grid-cols-2 gap-6">
+              <h3 className="text-2xl font-bold mb-6">{t('hotelDetails.offers.title')}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-50 p-3 rounded-lg">
                     <Wifi className="text-blue-900" size={24} />
                   </div>
                   <div>
-                    <p className="font-bold">Free High Speed WiFi</p>
-                    <p className="text-sm text-gray-500">Available everywhere</p>
+                    <p className="font-bold">{t('hotelDetails.offers.wifi.title')}</p>
+                    <p className="text-sm text-gray-500">{t('hotelDetails.offers.wifi.subtitle')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -230,8 +230,8 @@ const HotelDetails = () => {
                     <Coffee className="text-blue-900" size={24} />
                   </div>
                   <div>
-                    <p className="font-bold">Breakfast Included</p>
-                    <p className="text-sm text-gray-500">Every morning</p>
+                    <p className="font-bold">{t('hotelDetails.offers.breakfast.title')}</p>
+                    <p className="text-sm text-gray-500">{t('hotelDetails.offers.breakfast.subtitle')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -239,8 +239,8 @@ const HotelDetails = () => {
                     <Car className="text-blue-900" size={24} />
                   </div>
                   <div>
-                    <p className="font-bold">Free Parking</p>
-                    <p className="text-sm text-gray-500">On premises</p>
+                    <p className="font-bold">{t('hotelDetails.offers.parking.title')}</p>
+                    <p className="text-sm text-gray-500">{t('hotelDetails.offers.parking.subtitle')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -248,38 +248,38 @@ const HotelDetails = () => {
                     <CheckCircle className="text-blue-900" size={24} />
                   </div>
                   <div>
-                    <p className="font-bold">24/7 Front Desk</p>
-                    <p className="text-sm text-gray-500">Always available</p>
+                    <p className="font-bold">{t('hotelDetails.offers.frontDesk.title')}</p>
+                    <p className="text-sm text-gray-500">{t('hotelDetails.offers.frontDesk.subtitle')}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold mb-4">About this hotel</h3>
+              <h3 className="text-2xl font-bold mb-4">{t('hotelDetails.about.title')}</h3>
               <p className="text-gray-700 leading-relaxed text-lg mb-4">
-                {hotel.description || 'Experience the true beauty of Jordan in this luxury stay. Located just minutes away from historical sites, this hotel offers world-class service, traditional Jordanian hospitality, and breathtaking views.'}
+                {hotel.description || t('hotelDetails.about.fallbackDescription')}
               </p>
               <p className="text-gray-700 leading-relaxed text-lg">
-                Whether you're visiting the ancient wonders of Petra, relaxing at the Dead Sea, or exploring the vast landscapes of Wadi Rum, this hotel is your perfect base for an unforgettable Jordanian adventure.
+                {t('hotelDetails.about.extra')}
               </p>
             </div>
           </div>
 
           {/* Right Column: Booking Sidebar */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 sticky top-24 h-fit">
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8 md:sticky md:top-24 h-fit">
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-3xl font-black text-blue-900">{hotel.price} JOD</span>
-                <span className="text-sm font-medium text-gray-500">/night</span>
+                <span className="text-sm font-medium text-gray-500">/{t('hotels.perNight')}</span>
               </div>
-              <p className="text-sm text-gray-600">Average price based on availability</p>
+              <p className="text-sm text-gray-600">{t('hotelDetails.booking.averagePrice')}</p>
             </div>
             
             <form onSubmit={handleBooking} className="space-y-6">
               {/* Check-in Date */}
               <div>
-                <label className="block text-xs uppercase font-bold text-gray-500 mb-2">Check-in Date</label>
+                <label className="block text-xs uppercase font-bold text-gray-500 mb-2">{t('hotelDetails.booking.checkIn')}</label>
                 <input 
                   type="date" 
                   value={checkInDate}
@@ -292,17 +292,17 @@ const HotelDetails = () => {
 
               {/* Number of Guests */}
               <div>
-                <label className="block text-xs uppercase font-bold text-gray-500 mb-2">Number of Guests</label>
+                <label className="block text-xs uppercase font-bold text-gray-500 mb-2">{t('hotelDetails.booking.guests')}</label>
                 <select 
                   value={guests}
                   onChange={(e) => setGuests(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:border-blue-900 transition bg-white"
                 >
-                  <option value="1">1 Guest</option>
-                  <option value="2">2 Guests</option>
-                  <option value="3">3 Guests</option>
-                  <option value="4">4 Guests</option>
-                  <option value="5">5+ Guests</option>
+                  <option value="1">{t('hotelDetails.booking.guestCount', { count: 1 })}</option>
+                  <option value="2">{t('hotelDetails.booking.guestCount', { count: 2 })}</option>
+                  <option value="3">{t('hotelDetails.booking.guestCount', { count: 3 })}</option>
+                  <option value="4">{t('hotelDetails.booking.guestCount', { count: 4 })}</option>
+                  <option value="5">{t('hotelDetails.booking.guestCountPlus')}</option>
                 </select>
               </div>
 
@@ -310,7 +310,7 @@ const HotelDetails = () => {
               <div className="border-t pt-6">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-gray-700">
-                    {hotel.price} JOD × {guests} night{guests > 1 ? 's' : ''}
+                    {hotel.price} JOD × {guests} {t('hotelDetails.booking.nights', { count: Number(guests) })}
                   </span>
                   <span className="font-bold text-lg">
                     {(hotel.price * parseInt(guests)).toLocaleString()} JOD
@@ -323,11 +323,11 @@ const HotelDetails = () => {
                 disabled={bookingLoading || !checkInDate}
                 className="w-full bg-orange-500 text-white py-4 rounded-lg font-bold text-lg hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {bookingLoading ? 'Booking...' : 'Reserve Now'}
+                {bookingLoading ? t('hotelDetails.booking.bookingLoading') : t('hotelDetails.booking.reserveNow')}
               </button>
 
               <p className="text-center text-gray-500 text-xs">
-                You won't be charged yet. Click to confirm booking.
+                {t('hotelDetails.booking.noChargeYet')}
               </p>
             </form>
           </div>

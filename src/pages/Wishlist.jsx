@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
+import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 
 export default function Wishlist() {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -50,7 +51,12 @@ export default function Wishlist() {
           {wishlist.map((item) => (
             <article key={item.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
               <div className="relative h-48 overflow-hidden">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover hover:scale-110 transition" />
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  onError={createHotelImageOnErrorHandler(item.id)}
+                  className="w-full h-full object-cover hover:scale-110 transition"
+                />
                 <button
                   onClick={() => removeFromWishlist(item.id)}
                   className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition"

@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { MapPin, Search, Star, Loader2, AlertCircle } from "lucide-react";
 import realHotelsAPI from "../services/realHotelsData";
 import SmartRecommendations from "../components/SmartRecommendations";
+import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
+import { useTranslation } from "react-i18next";
+import { getHotelDisplayName } from "../utils/hotelLocalization";
 
 const FALLBACK_IMG =
   "data:image/svg+xml;charset=UTF-8," +
@@ -14,6 +17,7 @@ const FALLBACK_IMG =
   </svg>`);
 
 const Home = () => {
+  const { t, i18n } = useTranslation();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,11 +32,11 @@ const Home = () => {
       const hotelsArray = Array.isArray(data) ? data : [];
       setHotels(hotelsArray);
       if (hotelsArray.length === 0) {
-        setError("No hotels found. Try a different search");
+        setError(t("hotels.noResults"));
       }
     } catch (err) {
       console.error("Fetch error:", err);
-      setError(err.message || "Failed to load hotels. Please try again.");
+      setError(err.message || t("messages.tryAgain"));
       setHotels([]);
     } finally {
       setLoading(false);
@@ -58,23 +62,21 @@ const Home = () => {
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-6 py-24 md:py-32 text-center text-white">
           <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4 animate-fade-in">
-            Discover Jordan
+            {t("home.hero.kicker")}
           </div>
           <h1 className="text-5xl md:text-7xl font-black font-display mb-6 tracking-tight leading-tight animate-slide-up">
-            Jordan{" "}
-            <span className="text-yellow-300">Infinite.</span>
+            {t("home.hero.titleMain")}{" "}
+            <span className="text-yellow-300">{t("home.hero.titleAccent")}</span>
           </h1>
           <p className="text-lg md:text-xl max-w-3xl mx-auto opacity-95 mb-12 leading-relaxed animate-fade-in">
-            Uncover hidden treasures and iconic wonders across Jordan. From the
-            rose-red city of Petra to the serene Dead Sea—your perfect adventure
-            starts here.
+            {t("home.hero.subtitle")}
           </p>
 
           {/* Premium Search Bar */}
           <div className="search-bar max-w-3xl mx-auto animate-slide-up">
             <input
               className="flex-1 px-6 py-4 bg-transparent text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 outline-none text-base rounded-full"
-              placeholder="Where in Jordan? (e.g. Petra, Dead Sea, Wadi Rum)"
+              placeholder={t("home.hero.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -84,7 +86,7 @@ const Home = () => {
               className="px-8 py-4 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
             >
               <Search size={20} />
-              <span className="hidden sm:inline">FIND STAYS</span>
+              <span className="hidden sm:inline">{t("home.hero.findStays")}</span>
             </button>
           </div>
         </div>
@@ -119,20 +121,20 @@ const Home = () => {
           ) : hotels.length === 0 ? (
             <div className="col-span-full text-center py-20">
               <p className="text-slate-500 dark:text-slate-400 text-lg">
-                No hotels found. Try a different search.
+                {t("hotels.noResults")}
               </p>
             </div>
           ) : (
             hotels.map((hotel) => (
+              (() => {
+                const hotelName = getHotelDisplayName(hotel, i18n.language);
+                return (
               <article key={hotel.id} className="hotel-card group">
                 <div className="cover">
                   <img
                     src={hotel.image || FALLBACK_IMG}
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = FALLBACK_IMG;
-                    }}
-                    alt={hotel.name}
+                    onError={createHotelImageOnErrorHandler(hotel.id, FALLBACK_IMG)}
+                    alt={hotelName}
                     loading="lazy"
                     referrerPolicy="no-referrer"
                   />
@@ -146,13 +148,12 @@ const Home = () => {
                 {/* Content */}
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 leading-snug">
-                    {hotel.name}
+                    {hotelName}
                   </h3>
                   <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 mb-6">
                     <MapPin size={14} />
                     {hotel.location}
                   </div>
-
                   {/* Footer */}
                   <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
                     <div>
@@ -165,11 +166,13 @@ const Home = () => {
                       to={`/hotels/${hotel.id}`}
                       className="px-6 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-semibold text-sm rounded-xl hover:bg-jordan-blue hover:text-white dark:hover:bg-jordan-blue transition-all duration-300"
                     >
-                      View
+                      {t("common.view")}
                     </Link>
                   </div>
                 </div>
               </article>
+                );
+              })()
             ))
           )}
         </div>
