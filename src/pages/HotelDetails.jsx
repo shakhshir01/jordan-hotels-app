@@ -4,7 +4,10 @@ import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } fr
 import realHotelsAPI from '../services/realHotelsData';
 import { hotelAPI } from '../services/api';
 import WishlistButton from '../components/WishlistButton';
-import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import {
+  createHotelImageOnErrorHandler,
+  GENERIC_HOTEL_FALLBACK_IMAGES,
+} from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
 
@@ -54,6 +57,13 @@ const HotelDetails = () => {
       setError('');
       try {
         let data = null;
+        let seed = null;
+
+        try {
+          seed = await realHotelsAPI.getHotelById(id);
+        } catch {
+          seed = null;
+        }
 
         try {
           data = await hotelAPI.getHotelById(id);
@@ -62,14 +72,43 @@ const HotelDetails = () => {
         }
 
         if (!data) {
-          data = await realHotelsAPI.getHotelById(id);
+          data = seed || (await realHotelsAPI.getHotelById(id));
         }
 
         if (!data) {
           setHotel(null);
           setError('Hotel not found.');
         } else {
-          setHotel(normalizeHotel(data));
+          const normalized = normalizeHotel(data);
+
+          // If the API returns no real photos (or only our generic fallbacks),
+          // prefer the curated dataset photos (e.g., Marriott/Mövenpick URLs).
+          const fallbackSet = new Set(GENERIC_HOTEL_FALLBACK_IMAGES);
+          const apiImages = Array.isArray(normalized?.images) ? normalized.images : [];
+          const apiHasRealImage = apiImages.some((u) => typeof u === 'string' && u.trim() && !fallbackSet.has(u.trim()));
+
+          if (seed && (!apiImages.length || !apiHasRealImage)) {
+            const seedNormalized = normalizeHotel(seed);
+            const seedImages = Array.isArray(seedNormalized?.images) ? seedNormalized.images : [];
+            const mergedImages = [...apiImages];
+
+            for (const u of seedImages) {
+              if (typeof u !== 'string') continue;
+              const s = u.trim();
+              if (!s) continue;
+              if (mergedImages.includes(s)) continue;
+              mergedImages.push(s);
+            }
+
+            const next = {
+              ...normalized,
+              images: mergedImages.length ? mergedImages : seedImages,
+            };
+            next.image = next.images?.[0] || normalized.image || seedNormalized.image || '';
+            setHotel(next);
+          } else {
+            setHotel(normalized);
+          }
         }
       } catch (err) {
         setError(err.message || 'Failed to load hotel details.');

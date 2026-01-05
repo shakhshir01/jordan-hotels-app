@@ -16,7 +16,9 @@ export const GENERIC_HOTEL_FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1478860409698-8707f313ee8b?q=80&w=1200",
 ];
 
-const BLOCKED_HOTEL_IMAGE_HOSTS = ["cache.marriott.com"];
+// Previously we blocked some hotlinked CDN hosts.
+// User now explicitly wants Marriott images to render in hotel details.
+const BLOCKED_HOTEL_IMAGE_HOSTS = [];
 
 export const isBlockedHotelImageUrl = (url) => {
   if (typeof url !== "string") return false;
