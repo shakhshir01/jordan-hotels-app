@@ -117,11 +117,6 @@ const Navbar = () => {
               {t("nav.concierge")}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
-            {user && (
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                {displayName}
-              </span>
-            )}
           </div>
 
           {/* Actions */}

@@ -130,6 +130,14 @@ const Profile = () => {
         phone,
       });
 
+      // If backend profile provides an explicit name, sync it to the auth profile
+      // so the navbar shows "FirstName LastName". If the backend provides no name,
+      // keep the email-derived fallback behavior.
+      const apiHasName = Boolean(apiProfile?.firstName || apiProfile?.lastName || apiProfile?.name);
+      if (apiHasName && !(userProfile?.hasCustomName)) {
+        updateUserProfileName?.({ firstName, lastName });
+      }
+
       const userBookings = await hotelAPI.getUserBookings();
       const normalized = Array.isArray(userBookings)
         ? userBookings.map((b, index) => normalizeBooking(b, index)).filter(Boolean)
