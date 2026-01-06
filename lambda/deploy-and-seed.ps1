@@ -1,0 +1,167 @@
+Param(
+	[string]$StackName = $(if ($env:VISITJO_STACK_NAME) { $env:VISITJO_STACK_NAME } else { "VisitJo" }),
+	[string]$Region = $(if ($env:AWS_REGION) { $env:AWS_REGION } elseif ($env:AWS_DEFAULT_REGION) { $env:AWS_DEFAULT_REGION } else { "us-east-1" })
+)
+
+$ErrorActionPreference = "Stop"
+
+function Set-EnvVarInFile {
+	Param(
+		[Parameter(Mandatory = $true)][string]$Path,
+		[Parameter(Mandatory = $true)][string]$Key,
+		[Parameter(Mandatory = $true)][string]$Value
+	)
+
+	$line = "$Key=$Value"
+	if (Test-Path $Path) {
+		$lines = Get-Content $Path -ErrorAction SilentlyContinue
+		$found = $false
+		$newLines = foreach ($l in $lines) {
+			if ($l -match "^\s*$([regex]::Escape($Key))=") {
+				$found = $true
+				$line
+			} else {
+				$l
+			}
+		}
+		if (-not $found) { $newLines += $line }
+		$newLines | Out-File -FilePath $Path -Encoding utf8
+	} else {
+		$line | Out-File -FilePath $Path -Encoding utf8
+	}
+}
+
+function Update-RuntimeConfigFile {
+	Param(
+		[Parameter(Mandatory = $true)][string]$Path,
+		[Parameter(Mandatory = $true)][string]$ApiUrl
+	)
+
+	if (-not (Test-Path $Path)) {
+		@(
+			"// Auto-generated (or updated) by lambda/deploy-and-seed.ps1",
+			"// This file is safe to commit. It is loaded at runtime before the app boots.",
+			"window.__VISITJO_RUNTIME_CONFIG__ = {",
+			"  VITE_API_GATEWAY_URL: \"$ApiUrl\"",
+			"};",
+			""
+		) | Out-File -FilePath $Path -Encoding utf8
+		return
+	}
+
+	$content = Get-Content -Raw -Path $Path
+	$updated = $false
+	if ($content -match 'VITE_API_GATEWAY_URL\s*:\s*"[^"]*"') {
+		$content = [regex]::Replace(
+			$content,
+			'(VITE_API_GATEWAY_URL\s*:\s*")[^"]*(")',
+			"`$1$ApiUrl`$2"
+		)
+		$updated = $true
+	}
+
+	if (-not $updated) {
+		$content = [regex]::Replace(
+			$content,
+			'(window\.__VISITJO_RUNTIME_CONFIG__\s*=\s*\{)',
+			"`$1`n  VITE_API_GATEWAY_URL: \"$ApiUrl\",`n"
+		)
+	}
+
+	$content | Out-File -FilePath $Path -Encoding utf8
+}
+
+Write-Host "Running deploy-and-seed.ps1" -ForegroundColor Cyan
+
+# Ensure script runs from project root (jordan-hotels-app)
+Set-Location (Split-Path -Parent $MyInvocation.MyCommand.Path)
+Set-Location ..
+
+Write-Host "Using stack: $StackName (region: $Region)" -ForegroundColor Cyan
+
+Write-Host "Checking CloudFormation stack state..." -ForegroundColor Green
+try {
+	$aws = Get-Command aws -ErrorAction Stop
+	$status = aws cloudformation describe-stacks --stack-name $StackName --region $Region --query "Stacks[0].StackStatus" --output text 2>$null
+	if ($status -eq "ROLLBACK_COMPLETE") {
+		Write-Host "Stack is ROLLBACK_COMPLETE; deleting it so deploy can proceed..." -ForegroundColor Yellow
+		aws cloudformation delete-stack --stack-name $StackName --region $Region | Out-Null
+		aws cloudformation wait stack-delete-complete --stack-name $StackName --region $Region
+		Write-Host "Stack deleted." -ForegroundColor Green
+	}
+} catch {
+	# AWS CLI not available or stack doesn't exist; proceed
+}
+
+Write-Host "0) Installing lambda seed dependencies..." -ForegroundColor Green
+Push-Location "lambda"
+try {
+	if (-not (Test-Path "node_modules")) {
+		npm install
+	}
+} finally {
+	Pop-Location
+}
+
+Write-Host "1) Building SAM..." -ForegroundColor Green
+sam build --template-file lambda/sam-template.yaml
+if ($LASTEXITCODE -ne 0) { throw "sam build failed (exit $LASTEXITCODE)" }
+
+Write-Host "2) Deploying SAM (non-interactive)..." -ForegroundColor Green
+sam deploy `
+	--template-file .aws-sam/build/template.yaml `
+	--stack-name $StackName `
+	--region $Region `
+	--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM `
+	--resolve-s3 `
+	--no-confirm-changeset `
+	--no-fail-on-empty-changeset
+if ($LASTEXITCODE -ne 0) { throw "sam deploy failed (exit $LASTEXITCODE)" }
+
+Write-Host "3) Seeding DynamoDB..." -ForegroundColor Green
+$env:STACK_NAME = $StackName
+$tables = @{}
+try {
+	$aws = Get-Command aws -ErrorAction Stop
+	$tables.HOTELS = aws cloudformation describe-stack-resources --stack-name $StackName --region $Region --query "StackResources[?LogicalResourceId=='HotelsTable'].PhysicalResourceId" --output text
+	$tables.DESTINATIONS = aws cloudformation describe-stack-resources --stack-name $StackName --region $Region --query "StackResources[?LogicalResourceId=='DestinationsTable'].PhysicalResourceId" --output text
+	$tables.DEALS = aws cloudformation describe-stack-resources --stack-name $StackName --region $Region --query "StackResources[?LogicalResourceId=='DealsTable'].PhysicalResourceId" --output text
+	$tables.EXPERIENCES = aws cloudformation describe-stack-resources --stack-name $StackName --region $Region --query "StackResources[?LogicalResourceId=='ExperiencesTable'].PhysicalResourceId" --output text
+	$tables.BOOKINGS = aws cloudformation describe-stack-resources --stack-name $StackName --region $Region --query "StackResources[?LogicalResourceId=='BookingsTable'].PhysicalResourceId" --output text
+} catch {
+	# ignore
+}
+
+if ($tables.HOTELS -and $tables.HOTELS -ne "None") { $env:HOTELS_TABLE = $tables.HOTELS }
+if ($tables.DESTINATIONS -and $tables.DESTINATIONS -ne "None") { $env:DESTINATIONS_TABLE = $tables.DESTINATIONS }
+if ($tables.DEALS -and $tables.DEALS -ne "None") { $env:DEALS_TABLE = $tables.DEALS }
+if ($tables.EXPERIENCES -and $tables.EXPERIENCES -ne "None") { $env:EXPERIENCES_TABLE = $tables.EXPERIENCES }
+if ($tables.BOOKINGS -and $tables.BOOKINGS -ne "None") { $env:BOOKINGS_TABLE = $tables.BOOKINGS }
+
+node lambda/seed/seed.js
+if ($LASTEXITCODE -ne 0) { throw "seed failed (exit $LASTEXITCODE)" }
+
+Write-Host "4) Fetching ApiUrl output (if AWS CLI is available)..." -ForegroundColor Green
+$apiUrl = $null
+try {
+	$aws = Get-Command aws -ErrorAction Stop
+	$apiUrl = aws cloudformation describe-stacks --stack-name $StackName --region $Region --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" --output text
+} catch {
+	# ignore
+}
+
+if ($apiUrl -and $apiUrl -ne "None") {
+	$envFile = Join-Path (Get-Location) ".env.local"
+	Set-EnvVarInFile -Path $envFile -Key "VITE_API_GATEWAY_URL" -Value $apiUrl
+	Write-Host "Wrote $envFile with VITE_API_GATEWAY_URL" -ForegroundColor Cyan
+
+	$runtimeCfgFile = Join-Path (Get-Location) "public\runtime-config.js"
+	Update-RuntimeConfigFile -Path $runtimeCfgFile -ApiUrl $apiUrl
+	Write-Host "Wrote $runtimeCfgFile with runtime API URL" -ForegroundColor Cyan
+
+	Write-Host "ApiUrl: $apiUrl" -ForegroundColor Cyan
+} else {
+	Write-Host "Deployed. ApiUrl is in SAM outputs (could not auto-fetch)." -ForegroundColor Cyan
+}
+
+Write-Host "Done." -ForegroundColor Cyan
