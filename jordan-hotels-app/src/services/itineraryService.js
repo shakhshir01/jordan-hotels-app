@@ -1,5 +1,5 @@
 // Itinerary Service
-export const generatePersonalizedItinerary = (destination, nights, interests = []) => {
+export const generatePersonalizedItinerary = (destination, _nights, _interests = []) => {
   const baseItineraries = {
     Amman: {
       activities: [
@@ -37,11 +37,12 @@ export const generatePersonalizedItinerary = (destination, nights, interests = [
   return baseItineraries[destination] || {};
 };
 
-export const calculateOptimalRoute = (destinations) => {
+export const calculateOptimalRoute = (destinations = []) => {
   const routes = {
     'Amman-Petra-Dead Sea': ['Amman', 'Petra', 'Dead Sea'],
     'Amman-Wadi Rum-Aqaba': ['Amman', 'Wadi Rum', 'Aqaba'],
     'All Jordan': ['Amman', 'Petra', 'Wadi Rum', 'Dead Sea', 'Aqaba'],
   };
+  if (Array.isArray(destinations) && destinations.length > 0) return destinations;
   return routes['All Jordan'];
 };

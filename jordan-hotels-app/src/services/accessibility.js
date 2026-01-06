@@ -11,7 +11,7 @@ import React from 'react';
 export const useKeyboardNavigation = (items, onSelect) => {
   const [focusedIndex, setFocusedIndex] = React.useState(0);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = React.useCallback((e) => {
     switch (e.key) {
       case 'ArrowUp':
         e.preventDefault();
@@ -29,12 +29,12 @@ export const useKeyboardNavigation = (items, onSelect) => {
       default:
         break;
     }
-  };
+  }, [focusedIndex, items, onSelect]);
 
   React.useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [focusedIndex, items]);
+  }, [handleKeyDown]);
 
   return { focusedIndex, setFocusedIndex };
 };
@@ -195,9 +195,6 @@ export const getContrastRatio = (color1, color2) => {
   const l2 = getLuminance(color2);
   return Math.max(l1, l2) / Math.min(l1, l2);
 };
-
-import React from 'react';
-
 export default {
   useKeyboardNavigation,
   ScreenReaderOnly,

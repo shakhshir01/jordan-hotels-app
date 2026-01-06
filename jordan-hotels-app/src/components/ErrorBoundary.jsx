@@ -7,7 +7,7 @@ export class ErrorBoundary extends React.Component {
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true };
   }
 
@@ -28,7 +28,7 @@ export class ErrorBoundary extends React.Component {
             <h2 className="text-2xl font-black mb-2 text-slate-900">Oops! Something went wrong</h2>
             <p className="text-slate-600 mb-6">We encountered an unexpected error. Our team has been notified.</p>
             
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
                 <p className="text-sm font-mono text-red-800 break-words">
                   {this.state.error.toString()}
@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component {
   }
 }
 
-export const ComponentErrorBoundary = ({ children, fallback = null }) => {
+export const ComponentErrorBoundary = ({ children }) => {
   return (
     <ErrorBoundary>
       {children}

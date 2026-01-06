@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { MapPin, Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -34,34 +34,32 @@ const defaultDays = [
 export default function TripPlanner() {
   const { t, i18n } = useTranslation();
   const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
-  const [days, setDays] = useState(
-    defaultDays.map((d) => ({
-      id: d.id,
-      title: isArabic ? d.titleAr : d.title,
-      destination: d.destination,
-      notes: isArabic ? d.notesAr : d.notes,
-    }))
-  );
-
-  useEffect(() => {
+  const [days, setDays] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length) {
-          setDays(parsed);
-        }
+        if (Array.isArray(parsed) && parsed.length) return parsed;
       }
     } catch {
-      // ignore
+      // ignore (storage unavailable / invalid JSON)
     }
-  }, []);
+
+    return defaultDays.map((d) => ({
+      id: d.id,
+      title: isArabic ? d.titleAr : d.title,
+      destination: d.destination,
+      notes: isArabic ? d.notesAr : d.notes,
+    }));
+  });
 
   const persist = (next) => {
     setDays(next);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {}
+    } catch {
+      // ignore (storage unavailable)
+    }
   };
 
   const handleAddDay = () => {

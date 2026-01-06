@@ -3,7 +3,17 @@ import { Heart, Share2, MessageCircle, MapPin } from 'lucide-react';
 
 export default function SocialSharing({ hotelName, destination, roomPrice }) {
   const [showShare, setShowShare] = useState(false);
-  const [likes, setLikes] = useState(Math.floor(Math.random() * 500) + 50);
+  const hashStringToUint32 = (value) => {
+    let hash = 2166136261;
+    for (let i = 0; i < value.length; i++) {
+      hash ^= value.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  };
+
+  const initialLikes = 50 + (hashStringToUint32(`${hotelName || ''}|${destination || ''}|${roomPrice || 0}`) % 500);
+  const [likes, setLikes] = useState(initialLikes);
   const [isLiked, setIsLiked] = useState(false);
 
   const shareText = `Just found an amazing deal at ${hotelName} in ${destination} for $${roomPrice}/night on VisitJo! 🏨✨`;

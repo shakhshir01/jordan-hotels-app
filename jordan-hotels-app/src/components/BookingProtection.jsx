@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Shield, CheckCircle } from 'lucide-react';
 
-export default function BookingProtection({ bookingAmount, status = 'confirmed' }) {
+export default function BookingProtection({ bookingAmount }) {
   const [expanded, setExpanded] = useState(false);
 
   return (

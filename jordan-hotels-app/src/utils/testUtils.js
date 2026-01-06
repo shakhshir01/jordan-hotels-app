@@ -6,24 +6,14 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HashRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { expect, vi } from 'vitest';
 
 /**
  * Custom render function with providers
  */
 export const renderWithProviders = (ui, options = {}) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
   const Wrapper = ({ children }) => (
-    <QueryClientProvider client={queryClient}>
-      <HashRouter>{children}</HashRouter>
-    </QueryClientProvider>
+    <HashRouter>{children}</HashRouter>
   );
 
   return render(ui, { wrapper: Wrapper, ...options });
@@ -43,7 +33,7 @@ export const mockApiResponse = (status = 200, data = {}) => ({
  * Setup API mocks
  */
 export const setupApiMocks = () => {
-  global.fetch = vi.fn();
+  globalThis.fetch = vi.fn();
 };
 
 /**
@@ -113,7 +103,7 @@ export const waitFor = async (callback, options = {}) => {
     try {
       callback();
       return;
-    } catch (error) {
+    } catch (_error) {
       await new Promise((resolve) => setTimeout(resolve, interval));
     }
   }

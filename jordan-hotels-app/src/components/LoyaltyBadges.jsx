@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Trophy, Star } from 'lucide-react';
 import { getUserBadge, getAchievements, ACHIEVEMENTS } from '../services/gamificationService';
 

@@ -4,11 +4,33 @@ import { Eye, Download, Shield } from 'lucide-react';
 export default function PriceComparison({ hotelName, basePrice, nights }) {
   const [showComparison, setShowComparison] = useState(false);
 
+  const hashStringToUint32 = (value) => {
+    let hash = 2166136261;
+    for (let i = 0; i < value.length; i++) {
+      hash ^= value.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  };
+
+  const mulberry32 = (seed) => {
+    let t = seed >>> 0;
+    return () => {
+      t += 0x6D2B79F5;
+      let x = t;
+      x = Math.imul(x ^ (x >>> 15), x | 1);
+      x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+      return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    };
+  };
+
+  const rng = mulberry32(hashStringToUint32(`${hotelName || ''}|${basePrice}|${nights}`));
+
   const competitors = [
     { name: 'VisitJo', price: basePrice, link: '#' },
-    { name: 'Booking.com', price: Math.round(basePrice * (0.95 + Math.random() * 0.2)), link: '#' },
-    { name: 'Expedia', price: Math.round(basePrice * (0.92 + Math.random() * 0.25)), link: '#' },
-    { name: 'Hotels.com', price: Math.round(basePrice * (0.95 + Math.random() * 0.2)), link: '#' },
+    { name: 'Booking.com', price: Math.round(basePrice * (0.95 + rng() * 0.2)), link: '#' },
+    { name: 'Expedia', price: Math.round(basePrice * (0.92 + rng() * 0.25)), link: '#' },
+    { name: 'Hotels.com', price: Math.round(basePrice * (0.95 + rng() * 0.2)), link: '#' },
   ];
 
   const cheapest = Math.min(...competitors.map(c => c.price));
@@ -16,7 +38,7 @@ export default function PriceComparison({ hotelName, basePrice, nights }) {
 
   return (
     <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-6">
-      <h3 className="text-lg font-bold text-gray-800 mb-4">🔍 Price Comparison</h3>
+      <h3 className="text-lg font-bold text-gray-800 mb-4">🔍 Price Comparison{hotelName ? ` — ${hotelName}` : ''}</h3>
 
       <button
         onClick={() => setShowComparison(!showComparison)}

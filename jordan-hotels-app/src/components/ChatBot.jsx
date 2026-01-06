@@ -20,15 +20,15 @@ export default function ChatBot() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState([
+  const [, setSuggestions] = useState([
     t('chat.suggestions.spa'),
     t('chat.suggestions.beach'),
     t('chat.suggestions.adventure'),
     t('chat.suggestions.luxury'),
     t('chat.suggestions.city'),
   ]);
-  const [viewedHotels, setViewedHotels] = useState([]);
-  const [awaitingHuman, setAwaitingHuman] = useState(false);
+  const [, setViewedHotels] = useState([]);
+  const [, setAwaitingHuman] = useState(false);
   const [hotelDetailsById, setHotelDetailsById] = useState({});
   const messagesEndRef = useRef(null);
 

@@ -1,18 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import NavBar from "../components/NavBar.jsx";
 import Footer from "../components/Footer.jsx";
 import { getLastAuthError, enableMocks, getUseMocks } from "../services/api.js";
 
 export default function AppLayout() {
-  const [authError, setAuthError] = useState(null);
+  const [authError] = useState(() => getLastAuthError());
   const [dismissed, setDismissed] = useState(false);
   const [useMocks, setUseMocks] = useState(getUseMocks());
-
-  useEffect(() => {
-    const error = getLastAuthError();
-    setAuthError(error);
-  }, []);
 
   const showBanner = authError && !dismissed && !useMocks;
 

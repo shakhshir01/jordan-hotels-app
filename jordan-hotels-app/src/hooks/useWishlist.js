@@ -3,21 +3,16 @@ import { useState, useEffect, useCallback } from 'react';
 const WISHLIST_KEY = 'visitjo_wishlist';
 
 export const useWishlist = () => {
-  const [wishlist, setWishlist] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Initialize wishlist from localStorage
-  useEffect(() => {
-    const savedWishlist = localStorage.getItem(WISHLIST_KEY);
-    if (savedWishlist) {
-      try {
-        setWishlist(JSON.parse(savedWishlist));
-      } catch (error) {
-        console.error('Error parsing wishlist:', error);
-      }
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const savedWishlist = localStorage.getItem(WISHLIST_KEY);
+      return savedWishlist ? JSON.parse(savedWishlist) : [];
+    } catch (error) {
+      console.error('Error parsing wishlist:', error);
+      return [];
     }
-    setLoading(false);
-  }, []);
+  });
+  const [loading] = useState(false);
 
   // Save to localStorage whenever wishlist changes
   useEffect(() => {

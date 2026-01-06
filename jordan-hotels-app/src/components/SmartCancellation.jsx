@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { CANCELLATION_POLICIES, processInstantRefund, getCancellationDeadline } from '../services/cancellationService';
 
-export default function SmartCancellation({ bookingId, checkInDate, bookingAmount, policyType = 'free' }) {
+export default function SmartCancellation({ checkInDate, bookingAmount, policyType = 'free' }) {
   const [showDetails, setShowDetails] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
 

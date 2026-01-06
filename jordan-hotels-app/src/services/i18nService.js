@@ -21,7 +21,6 @@ export const translations = {
     weather: 'Weather',
     packingTips: 'Packing Tips',
     accessibility: 'Accessibility',
-    reviews: 'Guest Reviews',
   },
   ar: {
     header: 'مرحبا بك في VisitJo',
@@ -44,7 +43,6 @@ export const translations = {
     weather: 'الطقس',
     packingTips: 'نصائح التعبئة',
     accessibility: 'إمكانية الوصول',
-    reviews: 'تقييمات الضيوف',
   }
 };
 

@@ -82,15 +82,7 @@ const Profile = () => {
     phone: '',
   });
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    loadUserProfile();
-  }, [user, navigate]);
-
-  const loadUserProfile = async () => {
+  const loadUserProfile = React.useCallback(async () => {
     try {
       setLoading(true);
       const userEmail = user?.email || user?.attributes?.email || 'User';
@@ -149,7 +141,15 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [updateUserProfileName, user, userProfile?.hasCustomName, userProfile?.firstName, userProfile?.lastName]);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    loadUserProfile();
+  }, [user, navigate, loadUserProfile]);
 
   const handleUpdateProfile = async () => {
     try {

@@ -146,7 +146,7 @@ export class CacheManager {
     let totalHits = 0;
     let validEntries = 0;
 
-    for (const [key, entry] of this.cache) {
+    for (const [, entry] of this.cache) {
       if (entry.isValid()) {
         validEntries++;
         totalHits += entry.hits;
@@ -270,7 +270,7 @@ export const useCachedFetch = (url, options = {}) => {
     };
 
     fetchData();
-  }, [url, JSON.stringify(options)]);
+  }, [url, options]);
 
   return { data, loading, error };
 };

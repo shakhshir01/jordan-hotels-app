@@ -19,7 +19,7 @@ export class ConfigManager {
    * Detect current environment
    */
   detectEnvironment() {
-    const nodeEnv = process.env.NODE_ENV;
+    const nodeEnv = import.meta.env.MODE;
     const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 
     if (nodeEnv === 'production' || hostname.includes('visitjo.com')) {
@@ -47,7 +47,7 @@ export class ConfigManager {
       development: {
         api: 'http://localhost:3000/api',
         wsUrl: 'ws://localhost:3000',
-        stripePublicKey: process.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_....',
+        stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_....',
         logLevel: 'debug',
         enableDevTools: true,
         corsEnabled: true,
@@ -55,7 +55,7 @@ export class ConfigManager {
       staging: {
         api: 'https://staging-api.visitjo.com',
         wsUrl: 'wss://staging-api.visitjo.com',
-        stripePublicKey: process.env.VITE_STRIPE_PUBLIC_KEY,
+        stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
         logLevel: 'info',
         enableDevTools: false,
         corsEnabled: false,
@@ -63,7 +63,7 @@ export class ConfigManager {
       production: {
         api: 'https://api.visitjo.com',
         wsUrl: 'wss://api.visitjo.com',
-        stripePublicKey: process.env.VITE_STRIPE_PUBLIC_KEY,
+        stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
         logLevel: 'warn',
         enableDevTools: false,
         corsEnabled: false,

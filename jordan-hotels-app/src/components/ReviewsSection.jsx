@@ -26,7 +26,7 @@ export const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
       showSuccess('Review submitted successfully');
       setComment('');
       setRating(5);
-    } catch (error) {
+    } catch (_error) {
       showError('Failed to submit review');
     } finally {
       setSubmitting(false);

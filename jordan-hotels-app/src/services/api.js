@@ -108,7 +108,9 @@ export const getUseMocks = () => {
 export const enableMocks = (enable = true) => {
   try {
     localStorage.setItem("visitjo.useMocks", enable ? "1" : "0");
-  } catch {}
+  } catch {
+    // ignore (storage unavailable)
+  }
   // reload so components re-run hooks and pick up mock data
   if (typeof window !== "undefined") {
     setTimeout(() => window.location.reload(), 100);
@@ -123,12 +125,16 @@ const normalizeLambdaResponse = (raw) => {
   if (typeof data === "string") {
     try {
       data = JSON.parse(data);
-    } catch {}
+    } catch {
+      // ignore (not JSON)
+    }
   }
   if (data && typeof data.body === "string") {
     try {
       data = JSON.parse(data.body);
-    } catch {}
+    } catch {
+      // ignore (not JSON)
+    }
   }
   return data;
 };
@@ -237,13 +243,13 @@ export const hotelAPI = {
 
   uploadFileToSignedUrl: async (signedUrl, file) => {
     if (getUseMocks()) return true;
-    try {
-      const res = await fetch(signedUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
-      if (!res.ok) throw new Error("Upload to S3 failed");
-      return true;
-    } catch (error) {
-      throw error;
-    }
+    const res = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": file.type },
+      body: file,
+    });
+    if (!res.ok) throw new Error("Upload to S3 failed");
+    return true;
   },
 
   registerHotelImage: async (hotelId, imageKey) => {
@@ -302,19 +308,6 @@ export const hotelAPI = {
       return [];
     } catch (error) {
       if (lastAuthError) return [];
-      throw error;
-    }
-  },
-
-  cancelBooking: async (bookingId) => {
-    if (getUseMocks()) return { success: true, bookingId };
-    try {
-      const response = await apiClient.delete("/bookings", {
-        params: { id: bookingId },
-      });
-      return normalizeLambdaResponse(response.data) || { success: true };
-    } catch (error) {
-      if (lastAuthError) return { success: true, bookingId };
       throw error;
     }
   },

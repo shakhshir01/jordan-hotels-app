@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Trash2 } from "lucide-react";
 
 const STORAGE_KEY = "visitjo.savedSearches";
 
 const SavedSearches = () => {
-  const [saved, setSaved] = useState([]);
-
-  useEffect(() => {
+  const [saved, setSaved] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setSaved(JSON.parse(raw));
+      return raw ? JSON.parse(raw) : [];
     } catch {
-      setSaved([]);
+      return [];
     }
-  }, []);
+  });
 
   const handleDelete = (id) => {
     const next = saved.filter((s) => s.id !== id);
     setSaved(next);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {}
+    } catch {
+      // ignore (storage unavailable)
+    }
   };
 
   return (

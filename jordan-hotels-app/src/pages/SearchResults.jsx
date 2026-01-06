@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import { hotelAPI } from "../services/api";
@@ -14,22 +14,22 @@ export default function SearchResults() {
   const term = destination || q;
 
   const { data, loading, error } = useFetch(() => hotelAPI.searchAll(term), [term]);
-  const [savedSearches, setSavedSearches] = useState([]);
-
-  useEffect(() => {
+  const [savedSearches, setSavedSearches] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setSavedSearches(JSON.parse(raw));
+      return raw ? JSON.parse(raw) : [];
     } catch {
-      setSavedSearches([]);
+      return [];
     }
-  }, []);
+  });
 
   const persistSaved = (items) => {
     setSavedSearches(items);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {}
+    } catch {
+      // ignore (storage unavailable)
+    }
   };
 
   const handleSaveSearch = () => {

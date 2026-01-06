@@ -142,14 +142,13 @@ export const LazyImage = ({ src, alt, className = '', ...props }) => {
       { rootMargin: '50px' }
     );
 
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
+    const imgEl = imgRef.current;
+    if (imgEl) {
+      observer.observe(imgEl);
     }
 
     return () => {
-      if (imgRef.current) {
-        observer.unobserve(imgRef.current);
-      }
+      if (imgEl) observer.unobserve(imgEl);
     };
   }, [src]);
 
@@ -164,9 +163,6 @@ export const LazyImage = ({ src, alt, className = '', ...props }) => {
     />
   );
 };
-
-import React from 'react';
-
 export default {
   useLazyImage,
   getOptimizedImageUrl,

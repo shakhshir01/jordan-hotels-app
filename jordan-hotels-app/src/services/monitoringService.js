@@ -123,8 +123,10 @@ class Logger {
   async sendLogsToServer() {
     if (!this.logToServer || this.logs.length === 0) return;
 
+    let logsToSend = [];
+
     try {
-      const logsToSend = [...this.logs];
+      logsToSend = [...this.logs];
       this.logs = [];
 
       await fetch(this.serverUrl, {

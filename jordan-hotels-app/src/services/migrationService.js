@@ -112,7 +112,7 @@ export class MigrationRunner {
       migrations.forEach((m) => {
         this.applied.add(m.name);
       });
-    } catch (error) {
+    } catch (_error) {
       console.log('Migrations table not found, will be created');
     }
   }

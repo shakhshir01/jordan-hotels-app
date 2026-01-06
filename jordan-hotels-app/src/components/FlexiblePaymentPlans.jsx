@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CreditCard, Calendar } from 'lucide-react';
 
-export default function FlexiblePaymentPlans({ totalPrice, nights }) {
+export default function FlexiblePaymentPlans({ totalPrice }) {
   const [selectedPlan, setSelectedPlan] = useState('full');
 
   const plans = {

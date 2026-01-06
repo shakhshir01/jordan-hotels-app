@@ -14,10 +14,18 @@ export const LanguageSwitcher = () => {
   const handleLanguageChange = (languageCode) => {
     i18n.changeLanguage(languageCode);
     localStorage.setItem('language', languageCode);
-    document.documentElement.lang = languageCode;
-    document.documentElement.dir = languageCode === 'ar' ? 'rtl' : 'ltr';
     setIsOpen(false);
   };
+
+  React.useEffect(() => {
+    try {
+      const languageCode = i18n.language;
+      document.documentElement.lang = languageCode;
+      document.documentElement.dir = languageCode === 'ar' ? 'rtl' : 'ltr';
+    } catch {
+      // ignore (non-browser env)
+    }
+  }, [i18n.language]);
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language);
 

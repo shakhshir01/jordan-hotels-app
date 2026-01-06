@@ -1,8 +1,17 @@
 import { useState } from 'react';
-import { Zap, TrendingUp, Award } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
 export default function RecentBookings() {
   const [showActivity, setShowActivity] = useState(false);
+
+  const hashStringToUint32 = (value) => {
+    let hash = 2166136261;
+    for (let i = 0; i < value.length; i++) {
+      hash ^= value.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  };
 
   const recentActivity = [
     { name: 'Sarah M.', action: 'booked', hotel: 'Dead Sea Marriott', time: '2 hours ago', quantity: 2 },
@@ -11,6 +20,8 @@ export default function RecentBookings() {
     { name: 'Hassan R.', action: 'booked', hotel: 'Amman Kempinski', time: '1 hour ago', quantity: 2 },
     { name: 'Lisa W.', action: 'viewing', hotel: 'Wadi Rum Luxury Camp', time: '3 hours ago', quantity: 4 },
   ];
+
+  const roomsLeft = 1 + (hashStringToUint32(recentActivity.map((r) => r.hotel).join('|')) % 5);
 
   return (
     <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-lg p-4">
@@ -44,7 +55,7 @@ export default function RecentBookings() {
             </div>
           ))}
           <div className="bg-teal-100 rounded p-2 text-center text-sm text-teal-800 font-bold mt-2">
-            ✨ Only {Math.floor(Math.random() * 5) + 1} rooms left at this price!
+            ✨ Only {roomsLeft} rooms left at this price!
           </div>
         </div>
       )}

@@ -5,7 +5,7 @@ import { api } from './api';
  * Handles payment processing and checkout flow
  */
 
-const STRIPE_PUBLIC_KEY = process.env.REACT_APP_STRIPE_PUBLIC_KEY;
+const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
 if (!STRIPE_PUBLIC_KEY) {
   console.warn('STRIPE_PUBLIC_KEY not configured');
@@ -56,7 +56,7 @@ export const getPaymentStatus = async (paymentIntentId) => {
   try {
     const response = await api.get(`/payments/${paymentIntentId}`);
     return response.data;
-  } catch (error) {
+  } catch (_error) {
     throw new Error('Failed to retrieve payment status');
   }
 };
@@ -68,7 +68,7 @@ export const cancelPayment = async (paymentIntentId) => {
   try {
     const response = await api.post(`/payments/${paymentIntentId}/cancel`);
     return response.data;
-  } catch (error) {
+  } catch (_error) {
     throw new Error('Failed to cancel payment');
   }
 };
@@ -80,7 +80,7 @@ export const getPaymentMethods = async (email) => {
   try {
     const response = await api.get(`/payments/methods/${email}`);
     return response.data;
-  } catch (error) {
+  } catch (_error) {
     throw new Error('Failed to retrieve payment methods');
   }
 };

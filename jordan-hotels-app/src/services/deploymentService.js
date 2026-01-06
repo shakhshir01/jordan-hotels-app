@@ -124,13 +124,7 @@ export class DeploymentPipeline {
   async runTests() {
     logger.info('Running test suite');
 
-    const tests = {
-      unit: 'npm run test:unit',
-      integration: 'npm run test:integration',
-      e2e: 'npm run test:e2e',
-    };
-
-    // Implementation would execute these commands
+    // Placeholder: implementation would execute test commands
     return { passed: true, testCount: 150, duration: 45000 };
   }
 
@@ -275,9 +269,9 @@ export class DeploymentPipeline {
     return {
       environment: env,
       url: this.environments[env].url,
-      version: process.env.VITE_APP_VERSION || 'unknown',
-      buildTime: process.env.VITE_BUILD_TIME || 'unknown',
-      commitHash: process.env.VITE_COMMIT_HASH || 'unknown',
+      version: import.meta.env.VITE_APP_VERSION || 'unknown',
+      buildTime: import.meta.env.VITE_BUILD_TIME || 'unknown',
+      commitHash: import.meta.env.VITE_COMMIT_HASH || 'unknown',
     };
   }
 
@@ -298,19 +292,19 @@ export class DeploymentPipeline {
     return { passed: true };
   }
 
-  async healthCheck(env) {
+  async healthCheck(_env) {
     return { passed: true };
   }
 
-  async checkDatabase(env) {
+  async checkDatabase(_env) {
     return { passed: true };
   }
 
-  async checkExternalServices(env) {
+  async checkExternalServices(_env) {
     return { passed: true };
   }
 
-  async checkPerformance(env) {
+  async checkPerformance(_env) {
     return { passed: true };
   }
 
@@ -318,19 +312,19 @@ export class DeploymentPipeline {
     return { success: true, duration: 120000 };
   }
 
-  async uploadArtifacts(deployment) {
+  async uploadArtifacts(_deployment) {
     return { success: true, artifacts: 142 };
   }
 
-  async updateRouting(deployment) {
+  async updateRouting(_deployment) {
     return { success: true };
   }
 
-  async backupCurrent(env) {
+  async backupCurrent(_env) {
     return { success: true, backupId: `backup-${Date.now()}` };
   }
 
-  async restorePreviousVersion(env) {
+  async restorePreviousVersion(_env) {
     return { success: true };
   }
 
@@ -354,12 +348,12 @@ export class DeploymentPipeline {
     return { success: true, percentage, version };
   }
 
-  async monitorMetrics(version, duration) {
+  async monitorMetrics(version, _duration) {
     return { errorRate: 0.1, latency: 150, version };
   }
 
   async rollbackCanary(version) {
-    return { success: true };
+    return { success: true, version };
   }
 }
 
@@ -402,7 +396,7 @@ export const useDeploymentPipeline = () => {
 
   React.useEffect(() => {
     setDeployments(pipeline.getDeploymentHistory());
-  }, []);
+  }, [pipeline]);
 
   return {
     deployments,

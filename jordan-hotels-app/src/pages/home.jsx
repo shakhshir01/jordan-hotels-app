@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Search, Star, Loader2, AlertCircle } from "lucide-react";
 import realHotelsAPI from "../services/realHotelsData";
@@ -23,7 +23,7 @@ const Home = () => {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchHotels = async (location = "") => {
+  const fetchHotels = useCallback(async (location = "") => {
     setLoading(true);
     setError("");
     try {
@@ -41,11 +41,11 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     fetchHotels();
-  }, []);
+  }, [fetchHotels]);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {

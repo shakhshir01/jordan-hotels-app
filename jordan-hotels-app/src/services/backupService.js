@@ -242,7 +242,6 @@ export const backupRetentionPolicy = {
 
     // Keep daily backups for a week
     if (diffDays <= 7) {
-      const backupDay = backupDate.getDate();
       const lastBackupOfDay = backup.isLastOfDay;
       return lastBackupOfDay;
     }
@@ -255,12 +254,10 @@ export const backupRetentionPolicy = {
 
     // Keep monthly backups for a year
     if (diffDays <= 365) {
-      const backupMonth = backupDate.getMonth();
       return backup.isLastOfMonth;
     }
 
     // Keep yearly backups
-    const backupYear = backupDate.getFullYear();
     return backup.isLastOfYear;
   },
 

@@ -19,7 +19,7 @@ export default function PriceTracker({ hotelName, initialPrice }) {
     <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-gray-800 flex items-center gap-2">
-          <Zap size={18} className="text-yellow-600" /> Price Tracker
+          <Zap size={18} className="text-yellow-600" /> Price Tracker{hotelName ? ` — ${hotelName}` : ''}
         </h3>
         <button
           onClick={() => setIsTracking(!isTracking)}

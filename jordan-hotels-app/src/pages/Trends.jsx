@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { hotelAPI } from "../services/api";
 import { Loader2, Search, MapPin, Star, Percent } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -23,7 +23,7 @@ const Trends = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const runSearch = async (q) => {
+  const runSearch = useCallback(async (q) => {
     setLoading(true);
     setError("");
     try {
@@ -42,12 +42,11 @@ const Trends = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     runSearch(defaultQueries[0].q);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [runSearch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

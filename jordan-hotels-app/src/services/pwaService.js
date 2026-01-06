@@ -127,10 +127,9 @@ export const cacheManager = {
   /**
    * Clear cache older than specified days
    */
-  clearOldCaches: async (maxDays = 7) => {
+  clearOldCaches: async (_maxDays = 7) => {
     try {
       const cacheNames = await caches.keys();
-      const cutoffDate = Date.now() - maxDays * 24 * 60 * 60 * 1000;
 
       for (const cacheName of cacheNames) {
         // Simple strategy: delete cache if its name contains old date

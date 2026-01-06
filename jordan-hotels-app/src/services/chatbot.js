@@ -147,7 +147,7 @@ export const generateChatResponse = (userMessage, conversationHistory = []) => {
     const t = (text || '').toLowerCase();
     if (!t) return [];
     return Object.entries(HOTEL_DATA)
-      .filter(([id, meta]) => {
+      .filter(([, meta]) => {
         const name = (meta?.name || '').toLowerCase();
         const kws = Array.isArray(meta?.keywords) ? meta.keywords.join(' ').toLowerCase() : '';
         return name.includes(t) || t.includes(name) || kws.includes(t) || t.split(/\s+/).some((w) => w && (name.includes(w) || kws.includes(w)));
@@ -311,8 +311,6 @@ export const generateChatResponse = (userMessage, conversationHistory = []) => {
   // Simple follow-up
   if (message === 'yes' || message === 'yeah' || message === 'yep' || message === 'ok') {
     if (lastHotels.length > 0) {
-      const first = lastHotels[0];
-      const name = HOTEL_DATA[first]?.name || first;
       return {
         text: `${i18n.t('chat.followUp.default')}`,
         hotels: lastHotels,
@@ -430,9 +428,8 @@ export const generateChatResponse = (userMessage, conversationHistory = []) => {
   };
 };
 
-export const getSmartSuggestions = (viewedHotels = [], preferences = {}) => {
+export const getSmartSuggestions = (viewedHotels = [], _preferences = {}) => {
   // Based on viewing history, suggest similar hotels
-  const viewedHotelData = viewedHotels.map(id => HOTEL_DATA[id]).filter(Boolean);
   const allHotels = Object.keys(HOTEL_DATA);
   
   if (viewedHotels.length === 0) {
@@ -440,7 +437,7 @@ export const getSmartSuggestions = (viewedHotels = [], preferences = {}) => {
   }
 
   // Find similar hotels
-  const suggestions = allHotels.filter(hotelId => !viewedHotels.includes(hotelId));
+  const suggestions = allHotels.filter((hotelId) => !viewedHotels.includes(hotelId));
   return suggestions.slice(0, 3);
 };
 

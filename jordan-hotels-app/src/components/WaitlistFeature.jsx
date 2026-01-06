@@ -10,6 +10,12 @@ export default function WaitlistFeature({ hotelName, roomType }) {
         <Users size={18} /> Waitlist & Price Drop Alert
       </h3>
 
+      {(hotelName || roomType) && (
+        <p className="text-xs text-gray-600 mb-2">
+          {hotelName ? hotelName : 'This hotel'}{roomType ? ` · ${roomType}` : ''}
+        </p>
+      )}
+
       {!isWaitlisted ? (
         <div className="space-y-3">
           <p className="text-sm text-gray-700">

@@ -12,7 +12,7 @@ export const trackEvent = (eventName, eventData = {}) => {
     }
 
     // Console logging for development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log(`📊 Event: ${eventName}`, eventData);
     }
 
@@ -101,7 +101,7 @@ export const trackError = (errorMessage, errorCode) => {
 };
 
 // Custom analytics logging (for future integration)
-const logToCustomAnalytics = (eventName, eventData) => {
+const logToCustomAnalytics = (_eventName, _eventData) => {
   // This would connect to your custom analytics backend
   // Example: API call to /analytics endpoint
 };
