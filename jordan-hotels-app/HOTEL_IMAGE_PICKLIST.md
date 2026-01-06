@@ -20,7 +20,7 @@ How to use:
 8. https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-views-37560:Classic-Hor?wid=1336&fit=constrain marriot dead sea
 9. https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-bathroom-25411:Classic-Hor?wid=1336&fit=constrain marriot dead sea
 10. https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-exterior-0201-hor-clsc.jpg?output-quality=75&interpolation=progressive-bilinear&downsize=1920px:*marriot dead sea
-11. https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-entrance-7360-hor-clsc.jpg?output-quality=75&interpolation=progressive-bilinear&downsize=1920px:* marriot dead sea
+11. https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-entrance-7360-hor-clsc.jpg?output-quality=75&interpolation=progressive-bilinear&downsize=1920px:* bad url , dont add it
 12. https://cache.marriott.com/content/dam/marriott-renditions/QMDJV/qmdjv-lobby-0191-hor-clsc.jpg?output-quality=75&interpolation=progressive-bilinear&downsize=1920px:* marriot dead sea
 13. https://cache.marriott.com/is/image/marriotts7prod/mc-qmdjv-pool-19562:Classic-Hor?wid=1336&fit=constrain marriot dead sea
 

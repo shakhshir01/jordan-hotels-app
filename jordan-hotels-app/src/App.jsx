@@ -1,56 +1,57 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { InlineLoader } from './components/LoadingSpinner';
 
 // Shared layout
 import AppLayout from './layouts/AppLayout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 // Pages
-import Home from './pages/home.jsx';
-import HotelDetails from './pages/HotelDetails.jsx';
-import SignUp from './pages/SignUp.jsx';
-import Verify from './pages/Verify';
-import Login from './pages/Login';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Profile from './pages/Profile';
-import Bookings from './pages/Bookings';
-import Checkout from './pages/Checkout';
-import AdminUpload from './pages/AdminUpload';
-import Destinations from './pages/Destinations.jsx';
-import Deals from './pages/Deals.jsx';
-import Flights from './pages/Flights.jsx';
-import Cars from './pages/Cars.jsx';
-import Experiences from './pages/Experiences.jsx';
-import Trends from './pages/Trends.jsx';
-import Insights from './pages/Insights.jsx';
-import TripPlanner from './pages/TripPlanner.jsx';
-import Wishlist from './pages/Wishlist.jsx';
-import Reviews from './pages/Reviews.jsx';
-import Support from './pages/Support.jsx';
-import About from './pages/About.jsx';
-import Blog from './pages/Blog.jsx';
-import BlogPost from './pages/BlogPost.jsx';
-import Terms from './pages/Terms.jsx';
-import Privacy from './pages/Privacy.jsx';
-import NotFound from './pages/NotFound.jsx';
-import SearchResults from './pages/SearchResults.jsx';
-import DestinationDetails from './pages/DestinationDetails.jsx';
-import DealsList from './pages/DealsList.jsx';
-import FlightsSearch from './pages/FlightsSearch.jsx';
-import CarsSearch from './pages/CarsSearch.jsx';
-import ExperiencesListing from './pages/ExperiencesListing.jsx';
-import Gallery from './pages/Gallery.jsx';
-import SpecialOffers from './pages/SpecialOffers.jsx';
-import InsureTrip from './pages/InsureTrip.jsx';
-import HotelsMap from './pages/HotelsMap.jsx';
-import FeaturedHotels from './pages/FeaturedHotels.jsx';
-import ContactConcierge from './pages/ContactConcierge.jsx';
-import SavedSearches from './pages/SavedSearches.jsx';
+const Home = React.lazy(() => import('./pages/home.jsx'));
+const HotelDetails = React.lazy(() => import('./pages/HotelDetails.jsx'));
+const SignUp = React.lazy(() => import('./pages/SignUp.jsx'));
+const Verify = React.lazy(() => import('./pages/Verify'));
+const Login = React.lazy(() => import('./pages/Login'));
+const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const Bookings = React.lazy(() => import('./pages/Bookings'));
+const Checkout = React.lazy(() => import('./pages/Checkout'));
+const AdminUpload = React.lazy(() => import('./pages/AdminUpload'));
+const Destinations = React.lazy(() => import('./pages/Destinations.jsx'));
+const Deals = React.lazy(() => import('./pages/Deals.jsx'));
+const Flights = React.lazy(() => import('./pages/Flights.jsx'));
+const Cars = React.lazy(() => import('./pages/Cars.jsx'));
+const Experiences = React.lazy(() => import('./pages/Experiences.jsx'));
+const Trends = React.lazy(() => import('./pages/Trends.jsx'));
+const Insights = React.lazy(() => import('./pages/Insights.jsx'));
+const TripPlanner = React.lazy(() => import('./pages/TripPlanner.jsx'));
+const Wishlist = React.lazy(() => import('./pages/Wishlist.jsx'));
+const Reviews = React.lazy(() => import('./pages/Reviews.jsx'));
+const Support = React.lazy(() => import('./pages/Support.jsx'));
+const About = React.lazy(() => import('./pages/About.jsx'));
+const Blog = React.lazy(() => import('./pages/Blog.jsx'));
+const BlogPost = React.lazy(() => import('./pages/BlogPost.jsx'));
+const Terms = React.lazy(() => import('./pages/Terms.jsx'));
+const Privacy = React.lazy(() => import('./pages/Privacy.jsx'));
+const NotFound = React.lazy(() => import('./pages/NotFound.jsx'));
+const SearchResults = React.lazy(() => import('./pages/SearchResults.jsx'));
+const DestinationDetails = React.lazy(() => import('./pages/DestinationDetails.jsx'));
+const DealsList = React.lazy(() => import('./pages/DealsList.jsx'));
+const FlightsSearch = React.lazy(() => import('./pages/FlightsSearch.jsx'));
+const CarsSearch = React.lazy(() => import('./pages/CarsSearch.jsx'));
+const ExperiencesListing = React.lazy(() => import('./pages/ExperiencesListing.jsx'));
+const Gallery = React.lazy(() => import('./pages/Gallery.jsx'));
+const SpecialOffers = React.lazy(() => import('./pages/SpecialOffers.jsx'));
+const InsureTrip = React.lazy(() => import('./pages/InsureTrip.jsx'));
+const HotelsMap = React.lazy(() => import('./pages/HotelsMap.jsx'));
+const FeaturedHotels = React.lazy(() => import('./pages/FeaturedHotels.jsx'));
+const ContactConcierge = React.lazy(() => import('./pages/ContactConcierge.jsx'));
+const SavedSearches = React.lazy(() => import('./pages/SavedSearches.jsx'));
 import { ErrorBoundary } from './components/ErrorBoundary';
 import ChatBot from './components/ChatBot.jsx';
 
@@ -115,7 +116,15 @@ function App() {
       <AuthProvider>
         <WishlistProvider>
           <ChatBot />
-          <AppRoutes />
+          <Suspense
+            fallback={
+              <div className="flex justify-center py-10">
+                <InlineLoader />
+              </div>
+            }
+          >
+            <AppRoutes />
+          </Suspense>
           <ToastContainer
             position="top-right"
             autoClose={3000}

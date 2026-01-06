@@ -5,7 +5,7 @@
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { HashRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { expect, vi } from 'vitest';
 
 /**
@@ -13,7 +13,7 @@ import { expect, vi } from 'vitest';
  */
 export const renderWithProviders = (ui, options = {}) => {
   const Wrapper = ({ children }) => (
-    <HashRouter>{children}</HashRouter>
+    <MemoryRouter>{children}</MemoryRouter>
   );
 
   return render(ui, { wrapper: Wrapper, ...options });

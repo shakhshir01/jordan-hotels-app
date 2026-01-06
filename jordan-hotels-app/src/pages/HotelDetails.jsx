@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } from 'lucide-react';
 import realHotelsAPI from '../services/realHotelsData';
 import { hotelAPI } from '../services/api';
 import WishlistButton from '../components/WishlistButton';
+import Seo from '../components/Seo.jsx';
 import {
   createHotelImageOnErrorHandler,
   GENERIC_HOTEL_FALLBACK_IMAGES,
@@ -44,6 +45,7 @@ const HotelDetails = () => {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -197,8 +199,66 @@ const HotelDetails = () => {
 
   const hotelName = getHotelDisplayName(hotel, i18n.language);
 
+  const canonicalUrl = `${window.location.origin}${location.pathname}`;
+  const descriptionText = (() => {
+    const raw = String(hotel?.description || hotel?.summary || '').trim();
+    if (raw) return raw.length > 160 ? `${raw.slice(0, 157)}...` : raw;
+    const price = hotel?.price ? `${hotel.price} JOD` : 'great rates';
+    return `Book ${hotelName} in ${hotel.location}. Starting from ${price} per night.`;
+  })();
+
+  const jsonLdGraph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `${window.location.origin}/`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: hotelName,
+            item: canonicalUrl,
+          },
+        ],
+      },
+      {
+        '@type': 'Hotel',
+        name: hotelName,
+        url: canonicalUrl,
+        image: Array.isArray(hotel?.images) ? hotel.images.slice(0, 8) : undefined,
+        description: descriptionText,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: hotel.location,
+          addressCountry: 'JO',
+        },
+        priceRange: hotel?.price ? `${hotel.price} JOD` : undefined,
+        aggregateRating:
+          typeof hotel?.rating === 'number' && hotel.rating > 0
+            ? {
+                '@type': 'AggregateRating',
+                ratingValue: hotel.rating,
+                bestRating: 5,
+              }
+            : undefined,
+      },
+    ],
+  };
+
   return (
     <div className="bg-transparent">
+      <Seo
+        title={`${hotelName} | VisitJo`}
+        description={descriptionText}
+        canonicalUrl={canonicalUrl}
+        jsonLd={jsonLdGraph}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {/* Breadcrumbs */}
         <nav className="text-sm text-gray-500 mb-6">
