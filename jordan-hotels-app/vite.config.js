@@ -24,22 +24,25 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const apiTarget = normalizeBaseUrl(env.VITE_API_GATEWAY_URL) || getRuntimeApiTarget();
 
+  const normalizeId = (id) => String(id || '').replace(/\\/g, '/')
+
   return {
     plugins: [react()],
     build: {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (!id.includes('node_modules')) return;
+            const normalizedId = normalizeId(id)
 
-            if (id.includes('react-router')) return 'vendor-router';
-            if (id.includes('react-toastify')) return 'vendor-toast';
-            if (id.includes('leaflet') || id.includes('react-leaflet')) return 'vendor-maps';
-            if (id.includes('@stripe') || id.includes('stripe')) return 'vendor-stripe';
-            if (id.includes('amazon-cognito-identity-js')) return 'vendor-auth';
-            if (id.includes('i18next') || id.includes('react-i18next')) return 'vendor-i18n';
-            if (id.includes('lucide-react')) return 'vendor-icons';
-            if (id.includes('react')) return 'vendor-react';
+            if (!normalizedId.includes('node_modules')) return;
+
+            if (normalizedId.includes('react-router')) return 'vendor-router';
+            if (normalizedId.includes('react-toastify')) return 'vendor-toast';
+            if (normalizedId.includes('leaflet') || normalizedId.includes('react-leaflet')) return 'vendor-maps';
+            if (normalizedId.includes('@stripe') || normalizedId.includes('stripe')) return 'vendor-stripe';
+            if (normalizedId.includes('amazon-cognito-identity-js')) return 'vendor-auth';
+            if (normalizedId.includes('i18next') || normalizedId.includes('react-i18next')) return 'vendor-i18n';
+            if (normalizedId.includes('lucide-react')) return 'vendor-icons';
 
             return 'vendor';
           },
