@@ -1,17 +1,18 @@
 version: 1
-frontend:
-  appRoot: jordan-hotels-app
-  phases:
-    preBuild:
-      commands:
-        - npm ci --include=dev
-    build:
-      commands:
-        - npm run build
-  artifacts:
-    baseDirectory: dist
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
+applications:
+  - appRoot: jordan-hotels-app
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci --include=dev
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
