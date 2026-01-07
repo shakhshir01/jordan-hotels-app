@@ -3,9 +3,9 @@
  * Handles caching, offline support, and background sync
  */
 
-const CACHE_NAME = 'visitjo-v2';
-const RUNTIME_CACHE = 'visitjo-runtime-v2';
-const API_CACHE = 'visitjo-api-v2';
+const CACHE_NAME = 'visitjo-v3';
+const RUNTIME_CACHE = 'visitjo-runtime-v3';
+const API_CACHE = 'visitjo-api-v3';
 
 const ASSETS_TO_CACHE = [
   '/',
@@ -81,6 +81,12 @@ self.addEventListener('fetch', (event) => {
 
   // HTML pages - network first
   if (request.headers.get('accept').includes('text/html')) {
+    event.respondWith(networkFirstStrategy(request));
+    return;
+  }
+
+  // JS/CSS bundles - network first (avoid mixed cached chunks after deploy)
+  if (request.destination === 'script' || request.destination === 'style') {
     event.respondWith(networkFirstStrategy(request));
     return;
   }
