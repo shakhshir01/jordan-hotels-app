@@ -5,6 +5,8 @@ applications:
       phases:
         preBuild:
           commands:
+            - 'if [ -s "$NVM_DIR/nvm.sh" ]; then . "$NVM_DIR/nvm.sh"; nvm install 18; nvm use 18; fi'
+            - node -v
             - npm ci --include=dev
         build:
           commands:

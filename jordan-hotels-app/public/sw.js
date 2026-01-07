@@ -3,9 +3,9 @@
  * Handles caching, offline support, and background sync
  */
 
-const CACHE_NAME = 'visitjo-v1';
-const RUNTIME_CACHE = 'visitjo-runtime-v1';
-const API_CACHE = 'visitjo-api-v1';
+const CACHE_NAME = 'visitjo-v2';
+const RUNTIME_CACHE = 'visitjo-runtime-v2';
+const API_CACHE = 'visitjo-api-v2';
 
 const ASSETS_TO_CACHE = [
   '/',
