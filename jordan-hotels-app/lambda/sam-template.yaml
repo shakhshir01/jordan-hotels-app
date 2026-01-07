@@ -18,8 +18,9 @@ Resources:
     Properties:
       StageName: prod
       Cors:
-        # Restrict CORS to your Amplify app origin and allow methods/headers
-        AllowOrigin: "'https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        # Allow all origins so localhost dev and Amplify both work.
+        # If you want to lock this down later, change to your Amplify domain.
+        AllowOrigin: "'*'"
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'*'"
       EndpointConfiguration: REGIONAL

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import useFetch from "../hooks/useFetch";
 import { hotelAPI } from "../services/api";
 import { MapPin, Star, Search } from "lucide-react";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
@@ -13,7 +12,14 @@ export default function SearchResults() {
   const destination = params.get("destination") || "";
   const term = destination || q;
 
-  const { data, loading, error } = useFetch(() => hotelAPI.searchAll(term), [term]);
+  const [hotels, setHotels] = useState([]);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(null);
+  const sentinelRef = useRef(null);
+  const requestIdRef = useRef(0);
+  const abortRef = useRef(null);
   const [savedSearches, setSavedSearches] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -56,7 +62,93 @@ export default function SearchResults() {
     persistSaved(next);
   };
 
-  const results = data || {};
+  const resetAndLoad = useCallback(async () => {
+    const rid = requestIdRef.current + 1;
+    requestIdRef.current = rid;
+
+    if (abortRef.current) abortRef.current.abort();
+    const ac = new AbortController();
+    abortRef.current = ac;
+
+    setLoading(true);
+    setLoadingMore(false);
+    setError(null);
+    setHotels([]);
+    setNextCursor(null);
+
+    try {
+      const first = await hotelAPI.searchHotelsPage({ q: term, limit: 30, signal: ac.signal });
+      if (requestIdRef.current !== rid) return;
+      const items = Array.isArray(first?.hotels) ? first.hotels : [];
+      setHotels(items);
+      setNextCursor(first?.nextCursor || null);
+    } catch (e) {
+      if (requestIdRef.current !== rid) return;
+      if (String(e?.message || "").toLowerCase().includes("aborted")) return;
+      setError(e);
+      setHotels([]);
+      setNextCursor(null);
+    } finally {
+      if (requestIdRef.current === rid) setLoading(false);
+    }
+  }, [term]);
+
+  const loadMore = useCallback(async () => {
+    if (loading || loadingMore) return;
+    if (!nextCursor) return;
+
+    setLoadingMore(true);
+    setError(null);
+    const rid = requestIdRef.current;
+
+    try {
+      const page = await hotelAPI.searchHotelsPage({ q: term, cursor: nextCursor, limit: 30 });
+      if (requestIdRef.current !== rid) return;
+      const items = Array.isArray(page?.hotels) ? page.hotels : [];
+      setHotels((prev) => {
+        const seen = new Set(prev.map((h) => h?.id).filter(Boolean));
+        const merged = [...prev];
+        for (const it of items) {
+          const id = it?.id;
+          if (!id || seen.has(id)) continue;
+          seen.add(id);
+          merged.push(it);
+        }
+        return merged;
+      });
+      setNextCursor(page?.nextCursor || null);
+    } catch (e) {
+      if (requestIdRef.current !== rid) return;
+      setError(e);
+    } finally {
+      if (requestIdRef.current === rid) setLoadingMore(false);
+    }
+  }, [loading, loadingMore, nextCursor, term]);
+
+  useEffect(() => {
+    resetAndLoad();
+    return () => {
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, [resetAndLoad]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    if (!nextCursor) return;
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        loadMore();
+      },
+      { root: null, rootMargin: "400px", threshold: 0 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [loadMore, nextCursor]);
+
+  const hasHotels = useMemo(() => Array.isArray(hotels) && hotels.length > 0, [hotels]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
@@ -116,17 +208,40 @@ export default function SearchResults() {
         </section>
       )}
 
-      {loading && <p className="text-slate-500">Loading...</p>}
-      {error && <p className="text-red-600">{error.message}</p>}
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-xl shadow animate-pulse h-64" />
+          ))}
+        </div>
+      )}
 
-      {!loading && !error && (
+      {!loading && error && !hasHotels && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800">
+          <div className="text-sm font-semibold">{error.message || "Search failed"}</div>
+          <button
+            type="button"
+            onClick={resetAndLoad}
+            className="mt-3 px-4 py-2 rounded-full border border-red-200 bg-white text-sm font-semibold text-red-800 hover:bg-red-50"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {!loading && (hasHotels || !error) && (
         <div className="space-y-10">
           {/* Hotels */}
-          {Array.isArray(results.hotels) && results.hotels.length > 0 && (
+          {hasHotels && (
             <section>
               <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">Hotels</h2>
+              {error && (
+                <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 text-sm">
+                  {error.message || "Some results failed to load."}
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {results.hotels.map((h) => (
+                {hotels.map((h) => (
                   <article key={h.id} className="hotel-card group overflow-hidden flex flex-col">
                     {h.image && (
                       <div className="relative aspect-[4/3] overflow-hidden">
@@ -134,6 +249,7 @@ export default function SearchResults() {
                           src={h.image}
                           alt={h.name}
                           loading="lazy"
+                          decoding="async"
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={createHotelImageOnErrorHandler(h.id)}
@@ -173,76 +289,46 @@ export default function SearchResults() {
                   </article>
                 ))}
               </div>
-            </section>
-          )}
 
-          {/* Experiences */}
-          {Array.isArray(results.experiences) && results.experiences.length > 0 && (
-            <section>
-              <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">Experiences</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {results.experiences.map((x) => (
-                  <article key={x.id} className="glass-card rounded-2xl p-4 flex flex-col gap-1">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{x.title}</p>
-                    {x.meta && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{x.meta}</p>
-                    )}
-                    {x.price && (
-                      <p className="text-xs text-slate-700 dark:text-slate-200 mt-1">From {x.price} JOD</p>
-                    )}
-                  </article>
-                ))}
+              <div className="mt-6">
+                {!loading && error && nextCursor && (
+                  <div className="mb-3 text-center">
+                    <button
+                      type="button"
+                      onClick={loadMore}
+                      className="px-4 py-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                    >
+                      Retry loading more
+                    </button>
+                  </div>
+                )}
+                {nextCursor && (
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      className="px-4 py-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                    >
+                      {loadingMore ? "Loading more..." : "Load more"}
+                    </button>
+                  </div>
+                )}
+                {loadingMore && (
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="bg-white rounded-xl shadow animate-pulse h-64" />
+                    ))}
+                  </div>
+                )}
+                <div ref={sentinelRef} className="h-1" />
               </div>
             </section>
           )}
 
-          {/* Deals */}
-          {Array.isArray(results.deals) && results.deals.length > 0 && (
-            <section>
-              <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">Deals</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {results.deals.map((d) => (
-                  <article key={d.id} className="glass-card rounded-2xl p-4 flex flex-col gap-1">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{d.title}</p>
-                    {d.meta && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{d.meta}</p>
-                    )}
-                    {d.price && (
-                      <p className="text-xs text-slate-700 dark:text-slate-200 mt-1">{d.price}</p>
-                    )}
-                  </article>
-                ))}
-              </div>
-            </section>
+          {!hasHotels && (
+            <p className="text-sm text-slate-500">No hotels found. Try another search term.</p>
           )}
-
-          {/* Destinations */}
-          {Array.isArray(results.destinations) && results.destinations.length > 0 && (
-            <section>
-              <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">Destinations</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                {results.destinations.map((d) => (
-                  <Link
-                    key={d.id}
-                    to={d.id ? `/destinations/${d.id}` : "/destinations"}
-                    className="glass-card rounded-2xl p-4 flex flex-col gap-1 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
-                  >
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{d.name}</p>
-                    {d.description && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{d.description}</p>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {(!Array.isArray(results.hotels) || results.hotels.length === 0) &&
-            (!Array.isArray(results.experiences) || results.experiences.length === 0) &&
-            (!Array.isArray(results.deals) || results.deals.length === 0) &&
-            (!Array.isArray(results.destinations) || results.destinations.length === 0) && (
-              <p className="text-sm text-slate-500">No results found. Try another search term.</p>
-            )}
         </div>
       )}
     </div>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import realHotelsAPI from '../services/realHotelsData';
+import hotelsService from '../services/hotelsService';
+import { hotelAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
+import { InlineLoader } from '../components/LoadingSpinner';
 
 export default function Gallery() {
   const [hotels, setHotels] = useState([]);
@@ -11,14 +13,20 @@ export default function Gallery() {
 
   useEffect(() => {
     const loadHotels = async () => {
-      const data = await realHotelsAPI.getAllHotels();
-      setHotels(data);
-      setLoading(false);
+      // Gallery can be huge; fetch a capped page for fast render.
+      try {
+        const page = await hotelAPI.getHotelsPage({ limit: 60 });
+        const data = Array.isArray(page?.hotels) ? page.hotels : [];
+        setHotels(data);
+      } catch {
+        const data = await hotelsService.getHotelsSample({ limit: 60 });
+        setHotels(Array.isArray(data) ? data.slice(0, 60) : []);
+      } finally {
+        setLoading(false);
+      }
     };
     loadHotels();
   }, []);
-
-  if (loading) return <div className="text-center py-12">Loading gallery...</div>;
 
   const FALLBACK_IMG =
     "data:image/svg+xml;charset=UTF-8," +
@@ -42,10 +50,7 @@ export default function Gallery() {
       {/* Gallery */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-block animate-spin">⏳</div>
-            <p className="mt-4 text-gray-600">Loading gallery...</p>
-          </div>
+          <InlineLoader message="Loading gallery…" />
         ) : (
           <div className="space-y-20">
             {hotels.map((hotel) => (
@@ -87,6 +92,7 @@ export default function Gallery() {
                                 e.currentTarget.src = FALLBACK_IMG;
                               }}
                               loading="lazy"
+                              decoding="async"
                               referrerPolicy="no-referrer"
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition"></div>

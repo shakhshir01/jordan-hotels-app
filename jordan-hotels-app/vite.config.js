@@ -1,10 +1,28 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const normalizeBaseUrl = (value) => String(value || '').trim().replace(/\/$/, '')
+
+const getRuntimeApiTarget = () => {
+  try {
+    const runtimePath = path.resolve(process.cwd(), 'public', 'runtime-config.js')
+    if (!fs.existsSync(runtimePath)) return ''
+    const content = fs.readFileSync(runtimePath, 'utf8')
+
+    // Matches: VITE_API_GATEWAY_URL: "https://..."
+    const match = content.match(/VITE_API_GATEWAY_URL\s*:\s*['\"]([^'\"]+)['\"]/)
+    return match ? normalizeBaseUrl(match[1]) : ''
+  } catch {
+    return ''
+  }
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiTarget = String(env.VITE_API_GATEWAY_URL || '').trim().replace(/\/$/, '');
+  const apiTarget = normalizeBaseUrl(env.VITE_API_GATEWAY_URL) || getRuntimeApiTarget();
 
   return {
     plugins: [react()],
@@ -30,7 +48,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5175,
-      strictPort: true,
+      strictPort: false,
       proxy: apiTarget
         ? {
             '/api': {

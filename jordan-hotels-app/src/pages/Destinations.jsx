@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import realHotelsAPI from "../services/realHotelsData";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { hotelAPI } from "../services/api";
 
 const DESTINATION_INFO = {
   'Dead Sea': {
@@ -39,30 +39,48 @@ const DESTINATION_INFO = {
 
 export default function Destinations() {
   const navigate = useNavigate();
-  const [hotels, setHotels] = useState([]);
+  const [apiDestinations, setApiDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const { t, i18n } = useTranslation();
   const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
 
   useEffect(() => {
     const loadHotels = async () => {
-      const data = await realHotelsAPI.getAllHotels();
-      setHotels(data);
-      setLoading(false);
+      try {
+        setError("");
+        const destinations = await hotelAPI.getDestinations();
+        setApiDestinations(Array.isArray(destinations) ? destinations : []);
+      } catch (e) {
+        setApiDestinations([]);
+        setError(e?.message || "Failed to load destinations");
+      } finally {
+        setLoading(false);
+      }
     };
     loadHotels();
   }, []);
 
   // Get unique destinations
-  const destinations = Array.from(new Set(hotels.map(h => h.destination)))
-    .map(dest => ({
-      id: `dest-${dest.toLowerCase()}`,
-      query: dest,
-      name: isArabic ? (DESTINATION_INFO[dest]?.nameAr || dest) : dest,
-      count: hotels.filter(h => h.destination === dest).length,
-      emoji: DESTINATION_INFO[dest]?.emoji,
-      desc: isArabic ? (DESTINATION_INFO[dest]?.descAr || DESTINATION_INFO[dest]?.desc) : DESTINATION_INFO[dest]?.desc,
-    }));
+  const destinations = (Array.isArray(apiDestinations) ? apiDestinations : [])
+    .map((d) => {
+      const rawName = d?.name || d?.title || d?.destination || '';
+      const name = String(rawName).trim() || 'Jordan';
+      const countFromApi = typeof d?.count === 'number' ? d.count : null;
+      const countFromIds = Array.isArray(d?.hotels) ? d.hotels.length : null;
+
+      return {
+        id: d?.id || `dest-${name.toLowerCase().replace(/\s+/g, '-')}`,
+        query: name,
+        name: isArabic ? (DESTINATION_INFO[name]?.nameAr || name) : name,
+        count: typeof countFromApi === 'number' ? countFromApi : typeof countFromIds === 'number' ? countFromIds : 0,
+        emoji: DESTINATION_INFO[name]?.emoji,
+        desc: isArabic
+          ? (DESTINATION_INFO[name]?.descAr || d?.description || DESTINATION_INFO[name]?.desc)
+          : (d?.description || DESTINATION_INFO[name]?.desc),
+      };
+    })
+    .filter((d) => d && d.query);
 
   return (
     <div className="min-h-screen">
@@ -81,6 +99,11 @@ export default function Destinations() {
         {loading && (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-jordan-blue" size={48} />
+          </div>
+        )}
+        {!loading && error && (
+          <div className="bg-red-50 text-red-700 border border-red-200 rounded-lg px-4 py-3 mb-6">
+            {error}
           </div>
         )}
         {!loading && (

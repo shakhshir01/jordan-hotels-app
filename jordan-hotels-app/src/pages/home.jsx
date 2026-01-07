@@ -1,11 +1,89 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { MapPin, Search, Star, Loader2, AlertCircle } from "lucide-react";
-import realHotelsAPI from "../services/realHotelsData";
-import SmartRecommendations from "../components/SmartRecommendations";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { MapPin, Search, Star, AlertCircle, Loader2 } from "lucide-react";
+import { hotelAPI } from "../services/api";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import hotelsService from "../services/hotelsService";
+import { haversineKm } from "../utils/geo";
+
+const JORDAN_PLACES = [
+  { name: "Amman", lat: 31.9539, lon: 35.9106 },
+  { name: "Aqaba", lat: 29.5319, lon: 35.0061 },
+  { name: "Petra", lat: 30.3285, lon: 35.4444 },
+  { name: "Wadi Rum", lat: 29.5764, lon: 35.4195 },
+  { name: "Dead Sea", lat: 31.7191, lon: 35.5744 },
+  { name: "Jerash", lat: 32.2769, lon: 35.896 },
+  { name: "Madaba", lat: 31.715, lon: 35.7939 },
+];
+
+const getNearestJordanPlace = ({ lat, lon }) => {
+  let best = JORDAN_PLACES[0];
+  let bestDist = Number.POSITIVE_INFINITY;
+  for (const p of JORDAN_PLACES) {
+    const d = haversineKm(lat, lon, p.lat, p.lon);
+    if (d < bestDist) {
+      bestDist = d;
+      best = p;
+    }
+  }
+  return best;
+};
+
+const getUserRecommendedHotels = async () => {
+  // Prefer truly-close hotels when geo is available; fall back to a small first page.
+  const geo = await new Promise((resolve) => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        resolve({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+        }),
+      () => resolve(null),
+      { enableHighAccuracy: false, timeout: 2500, maximumAge: 5 * 60 * 1000 }
+    );
+  });
+
+  if (geo) {
+    const nearby = await hotelsService.getNearbyHotelsByGeo({
+      lat: geo.lat,
+      lon: geo.lon,
+      limit: 6,
+      targetKm: 20,
+      pageLimit: 200,
+      maxPages: 6,
+    });
+
+    if (Array.isArray(nearby) && nearby.length > 0) return nearby;
+
+    // Fallback if geo exists but we couldn't compute distances (missing geo on hotels).
+    const place = getNearestJordanPlace(geo);
+    const page = await hotelAPI.getHotelsPage({ limit: 60 });
+    const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
+    const sorted = [...hotels].sort((a, b) => {
+      const aLoc = String(a?.location || a?.destination || "").toLowerCase();
+      const bLoc = String(b?.location || b?.destination || "").toLowerCase();
+      const aBoost = aLoc.includes(place.name.toLowerCase()) ? 1 : 0;
+      const bBoost = bLoc.includes(place.name.toLowerCase()) ? 1 : 0;
+      if (bBoost !== aBoost) return bBoost - aBoost;
+      return (b?.rating || 0) - (a?.rating || 0);
+    });
+    return sorted.slice(0, 6);
+  }
+
+  const page = await hotelAPI.getHotelsPage({ limit: 6 });
+  const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
+  return hotels.slice(0, 6);
+};
 
 const FALLBACK_IMG =
   "data:image/svg+xml;charset=UTF-8," +
@@ -16,48 +94,214 @@ const FALLBACK_IMG =
     <text x="50%" y="50%" fill="rgba(255,255,255,.9)" font-family="Arial" font-size="32" text-anchor="middle" dominant-baseline="middle">VisitJo Hotel</text>
   </svg>`);
 
+const getColumnsForWidth = (width) => {
+  if (typeof width !== "number") return 1;
+  if (width >= 1024) return 3;
+  if (width >= 768) return 2;
+  return 1;
+};
+
+const useResponsiveColumns = () => {
+  const [columns, setColumns] = useState(() => {
+    if (typeof window === "undefined") return 1;
+    return getColumnsForWidth(window.innerWidth);
+  });
+
+  useEffect(() => {
+    const onResize = () => setColumns(getColumnsForWidth(window.innerWidth));
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return columns;
+};
+
+const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel }) {
+  const hotelName = useMemo(
+    () => getHotelDisplayName(hotel, i18nLanguage),
+    [hotel, i18nLanguage]
+  );
+
+  const onImgError = useMemo(
+    () => createHotelImageOnErrorHandler(hotel.id, FALLBACK_IMG),
+    [hotel.id]
+  );
+
+  return (
+    <article className="hotel-card group">
+      <div className="cover">
+        <img
+          src={hotel.image || FALLBACK_IMG}
+          onError={onImgError}
+          alt={hotelName}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute top-4 right-4 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg flex items-center gap-1.5">
+          <Star size={14} className="text-amber-500" fill="currentColor" />
+          <span className="text-sm font-bold text-slate-900">{hotel.rating}</span>
+        </div>
+      </div>
+
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 leading-snug">
+          {hotelName}
+        </h3>
+        <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 mb-6">
+          <MapPin size={14} />
+          {hotel.location}
+        </div>
+
+        <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+          <div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              {hotel.price} {hotel.currency || "JOD"}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">/night</div>
+          </div>
+          <Link
+            to={`/hotels/${hotel.id}`}
+            className="px-6 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-semibold text-sm rounded-xl hover:bg-jordan-blue hover:text-white dark:hover:bg-jordan-blue transition-all duration-300"
+          >
+            {viewLabel}
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+});
+
+const HotelsVirtualizedGrid = React.memo(function HotelsVirtualizedGrid({
+  hotels,
+  viewLabel,
+  i18nLanguage,
+}) {
+  const columns = useResponsiveColumns();
+  const [scrollMargin, setScrollMargin] = useState(0);
+
+  const parentRef = useRef(null);
+  const parentRefCallback = useCallback((node) => {
+    parentRef.current = node;
+    if (node) setScrollMargin(node.offsetTop ?? 0);
+  }, []);
+
+  const rows = Math.ceil(hotels.length / columns);
+
+  const rowVirtualizer = useWindowVirtualizer({
+    count: rows,
+    estimateSize: () => 560,
+    overscan: 4,
+    scrollMargin,
+  });
+
+  const items = rowVirtualizer.getVirtualItems();
+
+  return (
+    <div ref={parentRefCallback}>
+      <div className="relative" style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
+        {items.map((virtualRow) => {
+          const rowIndex = virtualRow.index;
+          const startIndex = rowIndex * columns;
+          const rowHotels = hotels.slice(startIndex, startIndex + columns);
+
+          return (
+            <div
+              key={virtualRow.key}
+              data-index={rowIndex}
+              ref={rowVirtualizer.measureElement}
+              className="absolute left-0 top-0 w-full"
+              style={{
+                transform: `translateY(${virtualRow.start - scrollMargin}px)`,
+              }}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {rowHotels.map((hotel) => (
+                  <HotelCard
+                    key={hotel.id}
+                    hotel={hotel}
+                    i18nLanguage={i18nLanguage}
+                    viewLabel={viewLabel}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
 const Home = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchHotels = useCallback(async (location = "") => {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await realHotelsAPI.getAllHotels(location);
-      // Ensure data is an array
-      const hotelsArray = Array.isArray(data) ? data : [];
-      setHotels(hotelsArray);
-      if (hotelsArray.length === 0) {
-        setError(t("hotels.noResults"));
+  const viewLabel = useMemo(() => t("common.view"), [t]);
+  const noResultsLabel = useMemo(() => t("hotels.noResults"), [t]);
+
+  const fetchHotels = useCallback(
+    async (location = "") => {
+      setLoading(true);
+      setError("");
+      try {
+        // Home should not load the entire Jordan dataset by default.
+        // If user is searching, use /search (hotelAPI.getAllHotels(location) routes to search).
+        const data = location && String(location).trim()
+          ? await hotelAPI.getAllHotels(location)
+          : await getUserRecommendedHotels();
+        const hotelsArray = Array.isArray(data) ? data : [];
+        setHotels(hotelsArray);
+        if (hotelsArray.length === 0) {
+          setError(noResultsLabel);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError(err.message || t("messages.tryAgain"));
+        setHotels([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setError(err.message || t("messages.tryAgain"));
-      setHotels([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
+    },
+    [noResultsLabel, t]
+  );
 
   useEffect(() => {
-    fetchHotels();
+    // Defer fetch until after first paint to help LCP.
+    const id = setTimeout(() => fetchHotels(), 0);
+    return () => clearTimeout(id);
   }, [fetchHotels]);
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      fetchHotels(searchQuery);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const prefetch = () => {
+      import("./SearchResults.jsx").catch(() => {
+        // ignore (prefetch best-effort)
+      });
+    };
+
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(prefetch);
     } else {
-      fetchHotels();
+      setTimeout(prefetch, 800);
     }
+  }, []);
+
+  const handleSearch = () => {
+    const q = String(searchQuery || "").trim();
+    if (q) {
+      navigate(`/search?q=${encodeURIComponent(q)}`);
+      return;
+    }
+    fetchHotels();
   };
 
   return (
     <div className="min-h-screen">
-      {/* Premium Hero Section */}
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-6 py-24 md:py-32 text-center text-white">
@@ -72,7 +316,6 @@ const Home = () => {
             {t("home.hero.subtitle")}
           </p>
 
-          {/* Premium Search Bar */}
           <div className="search-bar max-w-3xl mx-auto animate-slide-up">
             <input
               className="flex-1 px-6 py-4 bg-transparent text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 outline-none text-base rounded-full"
@@ -92,7 +335,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Error Message */}
       {error && (
         <div className="max-w-7xl mx-auto px-6 mb-8">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
@@ -105,81 +347,20 @@ const Home = () => {
         </div>
       )}
 
-      {/* Hotels Grid */}
       <div className="max-w-7xl mx-auto px-6 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="hotel-card">
-                <div className="shimmer aspect-[4/3]" />
-                <div className="p-6">
-                  <div className="shimmer h-6 rounded mb-3" />
-                  <div className="shimmer h-4 w-2/3 rounded" />
-                </div>
-              </div>
-            ))
-          ) : hotels.length === 0 ? (
-            <div className="col-span-full text-center py-20">
-              <p className="text-slate-500 dark:text-slate-400 text-lg">
-                {t("hotels.noResults")}
-              </p>
-            </div>
-          ) : (
-            hotels.map((hotel) => (
-              (() => {
-                const hotelName = getHotelDisplayName(hotel, i18n.language);
-                return (
-              <article key={hotel.id} className="hotel-card group">
-                <div className="cover">
-                  <img
-                    src={hotel.image || FALLBACK_IMG}
-                    onError={createHotelImageOnErrorHandler(hotel.id, FALLBACK_IMG)}
-                    alt={hotelName}
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                  {/* Rating Badge */}
-                  <div className="absolute top-4 right-4 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg flex items-center gap-1.5">
-                    <Star size={14} className="text-amber-500" fill="currentColor" />
-                    <span className="text-sm font-bold text-slate-900">{hotel.rating}</span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 leading-snug">
-                    {hotelName}
-                  </h3>
-                  <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 mb-6">
-                    <MapPin size={14} />
-                    {hotel.location}
-                  </div>
-                  {/* Footer */}
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
-                    <div>
-                      <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                        {hotel.price} JOD
-                      </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400">/night</div>
-                    </div>
-                    <Link
-                      to={`/hotels/${hotel.id}`}
-                      className="px-6 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-semibold text-sm rounded-xl hover:bg-jordan-blue hover:text-white dark:hover:bg-jordan-blue transition-all duration-300"
-                    >
-                      {t("common.view")}
-                    </Link>
-                  </div>
-                </div>
-              </article>
-                );
-              })()
-            ))
-          )}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="animate-spin text-jordan-blue" size={48} />
+          </div>
+        ) : (
+          <HotelsVirtualizedGrid
+            hotels={hotels}
+            viewLabel={viewLabel}
+            i18nLanguage={i18n.language}
+          />
+        )}
       </div>
 
-      {/* Smart Recommendations Section */}
-      <SmartRecommendations />
     </div>
   );
 };

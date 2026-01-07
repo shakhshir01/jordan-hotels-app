@@ -1,7 +1,9 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, BatchWriteCommand } from "@aws-sdk/lib-dynamodb";
 import path from "path";
 import { fileURLToPath } from "url";
+
+import { fetchXoteloHotels } from "../providers/xotelo.js";
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -16,6 +18,47 @@ const TABLES = {
 };
 
 const now = () => new Date().toISOString();
+
+const parseBool = (v) => {
+  const s = String(v || "").trim().toLowerCase();
+  return s === "1" || s === "true" || s === "yes";
+};
+
+const slugify = (s) =>
+  String(s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const chunk = (arr, size) => {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+};
+
+async function batchWriteItems(table, items) {
+  if (!items.length) return;
+  const batches = chunk(items, 25);
+
+  for (const batch of batches) {
+    let req = {
+      RequestItems: {
+        [table]: batch.map((Item) => ({ PutRequest: { Item } })),
+      },
+    };
+
+    // Retry unprocessed items a few times (basic exponential backoff)
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const res = await client.send(new BatchWriteCommand(req));
+      const unprocessed = res?.UnprocessedItems?.[table] || [];
+      if (!unprocessed.length) break;
+      const backoff = 100 * Math.pow(2, attempt);
+      await new Promise((r) => setTimeout(r, backoff));
+      req = { RequestItems: { [table]: unprocessed } };
+    }
+  }
+}
 
 const sampleHotels = [
   {
@@ -78,8 +121,51 @@ async function putItem(table, item) {
 
 async function seed() {
   console.log("Seeding DynamoDB tables:", TABLES);
-  for (const h of sampleHotels) await putItem(TABLES.HOTELS, h);
-  for (const d of sampleDestinations) await putItem(TABLES.DESTINATIONS, d);
+
+  const seedFromXotelo = parseBool(process.env.SEED_FROM_XOTELO);
+  if (seedFromXotelo) {
+    const locationKey = process.env.XOTELO_LOCATION_KEY || "g293985";
+    const maxHotelsRaw = process.env.XOTELO_MAX_HOTELS;
+    const maxHotels = maxHotelsRaw == null || maxHotelsRaw === "" ? 2500 : Number(maxHotelsRaw);
+    const pageLimit = Number(process.env.XOTELO_PAGE_LIMIT || 100);
+    const sleepMs = Number(process.env.XOTELO_SLEEP_MS || 140);
+
+    console.log(`Fetching hotels from Xotelo (/api/list) location_key=${locationKey}...`);
+    const hotels = await fetchXoteloHotels({
+      locationKey,
+      limit: pageLimit,
+      maxHotels: Number.isFinite(maxHotels) ? maxHotels : 2500,
+      sleepMs,
+    });
+
+    console.log(`Writing ${hotels.length} hotels -> ${TABLES.HOTELS} (batch write)...`);
+    await batchWriteItems(TABLES.HOTELS, hotels);
+
+    // Seed destinations derived from hotels without storing full hotel ID arrays (can exceed DynamoDB item size).
+    const counts = new Map();
+    for (const h of hotels) {
+      const dest = String(h?.destination || h?.location || "Jordan").trim() || "Jordan";
+      counts.set(dest, (counts.get(dest) || 0) + 1);
+    }
+    const destinations = Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({
+        id: `d-${slugify(name) || "jordan"}`,
+        name,
+        description: "",
+        hotels: [],
+        count,
+        createdAt: now(),
+        source: "xotelo",
+      }));
+
+    console.log(`Writing ${destinations.length} destinations -> ${TABLES.DESTINATIONS}...`);
+    await batchWriteItems(TABLES.DESTINATIONS, destinations);
+  } else {
+    for (const h of sampleHotels) await putItem(TABLES.HOTELS, h);
+    for (const d of sampleDestinations) await putItem(TABLES.DESTINATIONS, d);
+  }
+
   for (const dl of sampleDeals) await putItem(TABLES.DEALS, dl);
   for (const ex of sampleExperiences) await putItem(TABLES.EXPERIENCES, ex);
 

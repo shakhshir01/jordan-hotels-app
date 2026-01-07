@@ -40,11 +40,18 @@ const effectiveApiUrl =
 
 const resolvedApiBaseUrl = normalizeBaseUrl(effectiveApiUrl);
 
-// Local dev: avoid CORS by routing through Vite's dev proxy (/api -> VITE_API_GATEWAY_URL)
-const shouldUseDevProxy =
+// Local dev: optionally avoid CORS by routing through Vite's dev proxy (/api -> VITE_API_GATEWAY_URL).
+// Important: the Vite proxy is only configured from VITE_API_GATEWAY_URL (not runtime-config),
+// so don't force /api unless that env var is present.
+const isLocalDevHost =
   import.meta.env.DEV &&
   typeof window !== "undefined" &&
   (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+const hasRuntimeApiUrl = Boolean(rawRuntimeApiUrl && !isStaleApiUrl(rawRuntimeApiUrl));
+const hasEnvApiUrl = Boolean(rawEnvApiUrl && !isStaleApiUrl(rawEnvApiUrl));
+
+const shouldUseDevProxy = isLocalDevHost && (hasRuntimeApiUrl || hasEnvApiUrl);
 
 const API_BASE_URL = shouldUseDevProxy ? "/api" : resolvedApiBaseUrl;
 const API_KEY = import.meta.env.VITE_API_KEY || "";
@@ -158,6 +165,31 @@ const normalizeHotel = (rawHotel) => {
 };
 
 export const hotelAPI = {
+  getHotelsPage: async ({ cursor = "", limit = 100 } = {}) => {
+    if (getUseMocks()) {
+      return {
+        hotels: Array.isArray(mockHotels) ? mockHotels : [],
+        nextCursor: null,
+      };
+    }
+    try {
+      const params = new URLSearchParams();
+      if (limit) params.set("limit", String(limit));
+      if (cursor) params.set("cursor", String(cursor));
+      const url = params.toString() ? `/hotels?${params.toString()}` : "/hotels";
+      const response = await apiClient.get(url);
+      const data = normalizeLambdaResponse(response.data);
+      const hotels = Array.isArray(data?.hotels) ? data.hotels.map(normalizeHotel) : Array.isArray(data) ? data.map(normalizeHotel) : [];
+      const nextCursor = data?.nextCursor ? String(data.nextCursor) : null;
+      return { hotels, nextCursor };
+    } catch (error) {
+      if (lastAuthError) {
+        return { hotels: mockHotels, nextCursor: null };
+      }
+      throw error;
+    }
+  },
+
   getAllHotels: async (location = "") => {
     if (getUseMocks()) {
       return mockHotels.filter(
@@ -165,12 +197,33 @@ export const hotelAPI = {
       );
     }
     try {
-      const url = location ? `/hotels?location=${encodeURIComponent(location)}` : "/hotels";
-      const response = await apiClient.get(url);
-      const data = normalizeLambdaResponse(response.data);
-      if (Array.isArray(data)) return data.map(normalizeHotel);
-      if (data?.hotels && Array.isArray(data.hotels)) return data.hotels.map(normalizeHotel);
-      return [];
+      // When a filter is requested, use /search (it already supports multi-table search)
+      // instead of scanning the full hotels table.
+      if (location && String(location).trim()) {
+        const search = await hotelAPI.searchAll(location);
+        const hotels = Array.isArray(search?.hotels) ? search.hotels : [];
+        return hotels.map(normalizeHotel);
+      }
+
+      // Cursor-paginated scan of all hotels.
+      const maxHotels = 6000;
+      const limit = 200;
+      const out = [];
+      let cursor = "";
+      let guard = 0;
+
+      while (guard < 50 && out.length < maxHotels) {
+        const page = await hotelAPI.getHotelsPage({ cursor, limit });
+        const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
+        out.push(...hotels);
+
+        const next = page?.nextCursor ? String(page.nextCursor) : "";
+        if (!next || next === cursor || hotels.length === 0) break;
+        cursor = next;
+        guard += 1;
+      }
+
+      return out;
     } catch (error) {
       // fallback to mocks on auth error
       if (lastAuthError) return mockHotels;
@@ -313,6 +366,44 @@ export const hotelAPI = {
   },
 
   // new dynamic endpoints: search / destinations / deals / experiences / blog
+  searchHotelsPage: async ({ q = "", cursor = "", limit = 30, signal } = {}) => {
+    if (getUseMocks()) {
+      const term = String(q || "").toLowerCase().trim();
+      const filtered = Array.isArray(mockHotels)
+        ? mockHotels.filter((h) => {
+            if (!term) return true;
+            const name = String(h?.name || "").toLowerCase();
+            const loc = String(h?.location || "").toLowerCase();
+            return name.includes(term) || loc.includes(term);
+          })
+        : [];
+      return { hotels: filtered.slice(0, Math.max(1, Number(limit) || 30)).map(normalizeHotel), nextCursor: null };
+    }
+
+    try {
+      const params = new URLSearchParams();
+      params.set("scope", "hotels");
+      if (q && String(q).trim()) params.set("q", String(q));
+      if (limit) params.set("limit", String(limit));
+      if (cursor) params.set("cursor", String(cursor));
+      const url = `/search?${params.toString()}`;
+      const response = await apiClient.get(url, signal ? { signal } : undefined);
+      const data = normalizeLambdaResponse(response.data);
+      const hotels = Array.isArray(data?.hotels)
+        ? data.hotels.map(normalizeHotel)
+        : Array.isArray(data)
+          ? data.map(normalizeHotel)
+          : [];
+      const nextCursor = data?.nextCursor ? String(data.nextCursor) : null;
+      return { hotels, nextCursor };
+    } catch (error) {
+      if (lastAuthError) {
+        return { hotels: Array.isArray(mockHotels) ? mockHotels.map(normalizeHotel) : [], nextCursor: null };
+      }
+      throw error;
+    }
+  },
+
   searchAll: async (q = "") => {
     if (getUseMocks()) return mockSearchResult({ q });
     try {

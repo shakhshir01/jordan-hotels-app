@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import realHotelsAPI from '../services/realHotelsData';
+import hotelsService from '../services/hotelsService';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
@@ -11,7 +11,7 @@ export default function FeaturedHotels() {
 
   useEffect(() => {
     const loadHotels = async () => {
-      const data = await realHotelsAPI.getFeaturedHotels();
+      const data = await hotelsService.getFeaturedHotels();
       setHotels(data);
       setLoading(false);
     };
@@ -63,13 +63,19 @@ export default function FeaturedHotels() {
               <div className="mb-4">
                 <p className="text-sm font-bold text-gray-700 mb-2">Amenities:</p>
                 <div className="flex flex-wrap gap-2">
-                  {hotel.amenities.slice(0, 3).map((amenity) => (
-                    <span key={amenity} className="bg-gray-100 px-2 py-1 rounded text-xs">
-                      {amenity}
-                    </span>
-                  ))}
-                  {hotel.amenities.length > 3 && (
-                    <span className="bg-gray-100 px-2 py-1 rounded text-xs">+{hotel.amenities.length - 3}</span>
+                  {Array.isArray(hotel.amenities) && hotel.amenities.length > 0 ? (
+                    <>
+                      {hotel.amenities.slice(0, 3).map((amenity) => (
+                        <span key={amenity} className="bg-gray-100 px-2 py-1 rounded text-xs">
+                          {amenity}
+                        </span>
+                      ))}
+                      {hotel.amenities.length > 3 && (
+                        <span className="bg-gray-100 px-2 py-1 rounded text-xs">+{hotel.amenities.length - 3}</span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="bg-gray-100 px-2 py-1 rounded text-xs">—</span>
                   )}
                 </div>
               </div>

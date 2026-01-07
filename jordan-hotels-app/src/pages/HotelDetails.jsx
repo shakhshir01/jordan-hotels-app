@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } from 'lucide-react';
-import realHotelsAPI from '../services/realHotelsData';
-import { hotelAPI } from '../services/api';
+import hotelsService from '../services/hotelsService';
 import WishlistButton from '../components/WishlistButton';
 import Seo from '../components/Seo.jsx';
 import {
   createHotelImageOnErrorHandler,
-  GENERIC_HOTEL_FALLBACK_IMAGES,
 } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
@@ -58,83 +56,13 @@ const HotelDetails = () => {
       setLoading(true);
       setError('');
       try {
-        let data = null;
-        let seed = null;
-        let apiData = null;
-
-        try {
-          seed = await realHotelsAPI.getHotelById(id);
-        } catch {
-          seed = null;
-        }
-
-        try {
-          apiData = await hotelAPI.getHotelById(id);
-        } catch (apiErr) {
-          console.warn('hotelAPI.getHotelById failed, falling back to realHotelsAPI:', apiErr.message || apiErr);
-        }
-
-        // Prefer the curated dataset when available so routing always shows the correct hotel.
-        data = seed || apiData;
-
-        if (!data) {
-          data = seed || (await realHotelsAPI.getHotelById(id));
-        }
+        const data = await hotelsService.getHotelById(id);
 
         if (!data) {
           setHotel(null);
           setError('Hotel not found.');
         } else {
-          const normalized = normalizeHotel(data);
-          const seedNormalized = seed ? normalizeHotel(seed) : null;
-          const apiNormalized = apiData ? normalizeHotel(apiData) : null;
-
-          // If the API returns no real photos (or only our generic fallbacks),
-          // prefer the curated dataset photos (e.g., Marriott/Mövenpick URLs).
-          const fallbackSet = new Set(GENERIC_HOTEL_FALLBACK_IMAGES);
-          const apiImages = Array.isArray(normalized?.images) ? normalized.images : [];
-          const apiHasRealImage = apiImages.some((u) => typeof u === 'string' && u.trim() && !fallbackSet.has(u.trim()));
-
-          if (seedNormalized && apiNormalized) {
-            // If we're showing the API hotel but it lacks real imagery, merge in curated images.
-            // If we're showing the curated hotel, still merge any additional non-generic API images.
-            const seedImages = Array.isArray(seedNormalized?.images) ? seedNormalized.images : [];
-            const apiImages2 = Array.isArray(apiNormalized?.images) ? apiNormalized.images : [];
-
-            const merged = [];
-            const addUnique = (arr) => {
-              for (const u of arr) {
-                if (typeof u !== 'string') continue;
-                const s = u.trim();
-                if (!s) continue;
-                if (merged.includes(s)) continue;
-                merged.push(s);
-              }
-            };
-
-            // Start from whichever object we're currently using
-            const base = normalized;
-
-            // Always include current images first
-            addUnique(Array.isArray(base?.images) ? base.images : []);
-
-            // If base is API and it's missing real images, add seed images.
-            if (!apiHasRealImage) addUnique(seedImages);
-
-            // If base is seed, add any API images that are not generic fallbacks.
-            const fallbackSet2 = new Set(GENERIC_HOTEL_FALLBACK_IMAGES);
-            const apiRealOnly = apiImages2.filter((u) => typeof u === 'string' && u.trim() && !fallbackSet2.has(u.trim()));
-            addUnique(apiRealOnly);
-
-            const next = {
-              ...base,
-              images: merged.length ? merged : (base.images || []),
-            };
-            next.image = next.images?.[0] || base.image || seedNormalized.image || apiNormalized.image || '';
-            setHotel(next);
-          } else {
-            setHotel(normalized);
-          }
+          setHotel(normalizeHotel(data));
         }
       } catch (err) {
         setError(err.message || 'Failed to load hotel details.');

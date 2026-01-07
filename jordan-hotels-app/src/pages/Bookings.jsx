@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Calendar, Users, MapPin } from 'lucide-react';
-import realHotelsAPI from '../services/realHotelsData';
+import hotelsService from '../services/hotelsService';
 import { hotelAPI } from '../services/api';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 
@@ -43,7 +43,7 @@ const Bookings = () => {
       const results = await Promise.all(
         missing.map(async (id) => {
           try {
-            const h = await realHotelsAPI.getHotelById(id);
+            const h = await hotelsService.getHotelById(id);
             return [id, h];
           } catch {
             return [id, null];

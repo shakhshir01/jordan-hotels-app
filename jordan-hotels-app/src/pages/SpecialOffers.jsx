@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import realHotelsAPI from '../services/realHotelsData';
+import hotelsService from '../services/hotelsService';
 import { useAuth } from '../context/AuthContext';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,7 @@ export default function SpecialOffers() {
 
   useEffect(() => {
     const loadHotels = async () => {
-      const data = await realHotelsAPI.getFeaturedHotels();
+      const data = await hotelsService.getFeaturedHotels();
       setHotels(data);
     };
     loadHotels();
@@ -26,7 +26,7 @@ export default function SpecialOffers() {
       navigate('/login', { state: { returnUrl: '/special-offers' } });
       return;
     }
-    navigate('/checkout', { state: { hotel, discount } });
+    navigate('/checkout', { state: { hotelId: hotel?.id, hotel, discount } });
   };
 
   return (
@@ -46,6 +46,9 @@ export default function SpecialOffers() {
                 alt={hotelName}
                 onError={createHotelImageOnErrorHandler(hotel.id)}
                 className="w-full h-48 object-cover"
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
               />
               <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full font-bold">
                 -{discounts[idx]}%

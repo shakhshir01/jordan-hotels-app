@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, X, Minimize2, Maximize2, MessageCircle, Headphones } from 'lucide-react';
-import { generateChatResponse, HOTEL_DATA } from '../services/chatbot';
-import realHotelsAPI from '../services/realHotelsData';
+import { generateChatResponse } from '../services/chatbot';
+import hotelsService from '../services/hotelsService';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 
@@ -53,7 +53,7 @@ export default function ChatBot() {
         const results = await Promise.all(
           missing.map(async (id) => {
             try {
-              const hotel = await realHotelsAPI.getHotelById(id);
+              const hotel = await hotelsService.getHotelById(id);
               return [id, hotel];
             } catch {
               return [id, null];
@@ -96,34 +96,26 @@ export default function ChatBot() {
     setLoading(true);
 
     // Get bot response
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        const response = generateChatResponse(input, nextHistory);
+        const response = await generateChatResponse(input, nextHistory);
 
-        let botText = response.text;
-        if (response.hotels && response.hotels.length > 0) {
-          const lines = response.hotels.map((id) => {
-            const meta = HOTEL_DATA[id];
-            const name = meta?.name || id;
-            const bestFor = Array.isArray(meta?.bestFor) ? meta.bestFor.slice(0, 2).join(', ') : '';
-            return bestFor ? `• ${name} — ${t('chat.recommendations.bestFor')} ${bestFor}` : `• ${name}`;
-          }).join('\n');
-
-          botText += `\n\n${t('chat.recommendations.header')}\n${lines}`;
+        const botText = response?.text || '';
+        if (Array.isArray(response?.hotels) && response.hotels.length > 0) {
           setViewedHotels((prev) => [...new Set([...prev, ...response.hotels])]);
         }
 
         const botMessage = {
-          id: messages.length + 2,
+          id: nextHistory.length + 1,
           text: botText,
           sender: 'bot',
           timestamp: new Date(),
-          suggestions: response.suggestions,
-          hotels: response.hotels,
-          links: response.links,
+          suggestions: response?.suggestions,
+          hotels: response?.hotels,
+          links: response?.links,
         };
         setMessages((prev) => [...prev, botMessage]);
-        setSuggestions(response.suggestions || []);
+        setSuggestions(response?.suggestions || []);
       } catch (err) {
         console.error('ChatBot error:', err);
         setMessages((prev) => [
@@ -233,7 +225,7 @@ export default function ChatBot() {
                       <div className="mt-3 space-y-2">
                         {msg.hotels.slice(0, 3).map((id) => {
                           const d = hotelDetailsById[id];
-                          const name = d?.name || HOTEL_DATA[id]?.name || id;
+                          const name = d?.name || id;
                           const location = d?.location || 'Jordan';
                           const image = d?.image || (Array.isArray(d?.images) ? d.images[0] : '') || '';
                           const price = d?.price;

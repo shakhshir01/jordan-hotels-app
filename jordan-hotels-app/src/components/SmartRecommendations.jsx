@@ -1,40 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, MapPin, Sparkles, ArrowRight } from 'lucide-react';
-import realHotelsAPI from '../services/realHotelsData';
+import hotelsService from '../services/hotelsService';
 import { getSmartSuggestions } from '../services/chatbot';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
+import { haversineKm } from '../utils/geo';
 
-export default function SmartRecommendations() {
+const JORDAN_PLACES = [
+  { name: 'Amman', lat: 31.9539, lon: 35.9106 },
+  { name: 'Aqaba', lat: 29.5319, lon: 35.0061 },
+  { name: 'Petra', lat: 30.3285, lon: 35.4444 },
+  { name: 'Wadi Rum', lat: 29.5764, lon: 35.4195 },
+  { name: 'Dead Sea', lat: 31.7191, lon: 35.5744 },
+  { name: 'Jerash', lat: 32.2769, lon: 35.8960 },
+  { name: 'Madaba', lat: 31.7150, lon: 35.7939 },
+];
+
+const getNearestJordanPlace = ({ lat, lon }) => {
+  let best = JORDAN_PLACES[0];
+  let bestDist = Number.POSITIVE_INFINITY;
+  for (const p of JORDAN_PLACES) {
+    const d = haversineKm(lat, lon, p.lat, p.lon);
+    if (d < bestDist) {
+      bestDist = d;
+      best = p;
+    }
+  }
+  return best;
+};
+
+export default function SmartRecommendations({ limit = 8 }) {
   const { i18n } = useTranslation();
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [basedOnLocation, setBasedOnLocation] = useState(false);
 
-  useEffect(() => {
-    loadRecommendations();
-  }, []);
-
-  const loadRecommendations = async () => {
+  const loadRecommendations = useCallback(async () => {
     try {
       setLoading(true);
+      setBasedOnLocation(false);
       
       // Get viewed hotels from localStorage
       const viewedHotels = JSON.parse(localStorage.getItem('viewedHotels') || '[]');
       
-      // Get all hotels
-      const allHotels = await realHotelsAPI.getAllHotels();
-      
       if (viewedHotels.length > 0) {
-        // Get smart suggestions based on viewed hotels
-        const suggestedIds = getSmartSuggestions(viewedHotels, {});
-        const recommended = allHotels.filter(h => suggestedIds.includes(h.id)).slice(0, 4);
+        // Get smart suggestions based on viewed hotels (fetch only needed hotels by id)
+        const suggestedIds = getSmartSuggestions(viewedHotels, {}).slice(0, Math.max(6, limit * 2));
+        const items = await Promise.all(
+          suggestedIds.map((id) => hotelsService.getHotelById(id).catch(() => null))
+        );
+        const recommended = items.filter(Boolean).slice(0, limit);
         setRecommendations(recommended);
       } else {
-        // Show top-rated hotels if no history
-        const topRated = allHotels.sort((a, b) => b.rating - a.rating).slice(0, 4);
-        setRecommendations(topRated);
+        // Otherwise, attempt location-based recommendations.
+        const geoHotels = await new Promise((resolve) => {
+          if (typeof navigator === 'undefined' || !navigator.geolocation) return resolve(null);
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              try {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                const place = getNearestJordanPlace({ lat, lon });
+
+                // Only fetch a few truly-close hotels.
+                const nearby = await hotelsService.getNearbyHotelsByGeo({
+                  lat,
+                  lon,
+                  limit,
+                  targetKm: 15,
+                  pageLimit: 200,
+                  maxPages: 6,
+                });
+
+                resolve({ place: place.name, hotels: nearby });
+              } catch {
+                resolve(null);
+              }
+            },
+            () => resolve(null),
+            { enableHighAccuracy: false, timeout: 3500, maximumAge: 5 * 60 * 1000 }
+          );
+        });
+
+        if (geoHotels && Array.isArray(geoHotels.hotels) && geoHotels.hotels.length > 0) {
+          setBasedOnLocation(true);
+          setRecommendations(geoHotels.hotels.slice(0, limit));
+        } else {
+          const hotels = await hotelsService.getHotelsSample({ limit: 250 });
+          const topRated = [...hotels]
+            .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+            .slice(0, limit);
+          setRecommendations(topRated);
+        }
       }
     } catch (error) {
       console.error('Failed to load recommendations:', error);
@@ -42,7 +101,11 @@ export default function SmartRecommendations() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit]);
+
+  useEffect(() => {
+    loadRecommendations();
+  }, [loadRecommendations]);
 
   if (loading) {
     return (
@@ -53,7 +116,7 @@ export default function SmartRecommendations() {
             <h2 className="text-3xl font-bold text-gray-900">Recommendations For You</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(i => (
+            {Array.from({ length: limit }).map((_, i) => (
               <div key={i} className="bg-white rounded-xl shadow animate-pulse h-64"></div>
             ))}
           </div>
@@ -98,6 +161,9 @@ export default function SmartRecommendations() {
                   src={hotel.image}
                   alt={hotelName}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
                   onError={createHotelImageOnErrorHandler(
                     hotel.id,
                     'data:image/svg+xml;charset=UTF-8,' +
@@ -122,7 +188,7 @@ export default function SmartRecommendations() {
                 </h3>
                 <div className="flex items-center gap-1 text-gray-600 text-sm mb-3">
                   <MapPin size={16} />
-                  <span>{hotel.destination}</span>
+                  <span>{hotel.location || hotel.destination || 'Jordan'}</span>
                 </div>
 
                 {/* Price */}
@@ -130,7 +196,7 @@ export default function SmartRecommendations() {
                   <span className="text-2xl font-bold text-blue-900">
                     {hotel.price}
                   </span>
-                  <span className="text-sm text-gray-600">JOD/night</span>
+                  <span className="text-sm text-gray-600">{hotel.currency || 'JOD'}/night</span>
                 </div>
               </div>
             </Link>
@@ -142,7 +208,7 @@ export default function SmartRecommendations() {
         {/* Call to Action */}
         <div className="mt-12 text-center">
           <p className="text-gray-600 mb-4">
-            ✨ These recommendations are based on your browsing history
+            ✨ These recommendations are based on {basedOnLocation ? 'your location' : 'your browsing history'}
           </p>
           <button
             onClick={() => {

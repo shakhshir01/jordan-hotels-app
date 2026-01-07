@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
-import realHotelsAPI from '../services/realHotelsData';
+import hotelsService from '../services/hotelsService';
 import { validatePromoCode } from '../services/loyalty';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { hotelAPI } from '../services/api';
@@ -12,7 +12,7 @@ const Checkout = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const { hotelId, bookingData } = location.state || {};
+  const { hotelId, bookingData, discount } = location.state || {};
   const resolvedBookingData = bookingData || {
     checkInDate: '',
     checkOutDate: '',
@@ -38,7 +38,7 @@ const Checkout = () => {
       }
 
       try {
-        const hotelData = await realHotelsAPI.getHotelById(hotelId);
+        const hotelData = await hotelsService.getHotelById(hotelId);
         if (!hotelData) {
           setError('Hotel not found');
           setLoading(false);
@@ -54,6 +54,21 @@ const Checkout = () => {
 
     loadHotel();
   }, [hotelId]);
+
+  useEffect(() => {
+    // Deals / offers can pass a percent discount (e.g. 20 for 20% off).
+    // Apply it automatically unless a promo code overrides it later.
+    if (!hotel) return;
+    const pct = Number(discount);
+    if (!Number.isFinite(pct) || pct <= 0) return;
+    const nights = resolvedBookingData.nights || 1;
+    const subtotal = (hotel.price || 0) * nights;
+    const amount = Number(((subtotal * pct) / 100).toFixed(2));
+    if (amount > 0) {
+      setPromoResult({ valid: true, message: `Deal applied! Save ${amount.toFixed(2)} JOD` });
+      setAppliedDiscount(amount);
+    }
+  }, [hotel, discount, resolvedBookingData.nights]);
 
   useEffect(() => {
     let cancelled = false;

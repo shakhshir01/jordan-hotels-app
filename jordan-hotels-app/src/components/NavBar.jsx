@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import { useTranslation } from "react-i18next";
 

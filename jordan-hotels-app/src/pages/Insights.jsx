@@ -12,7 +12,8 @@ const Insights = () => {
       setLoading(true);
       setError("");
       try {
-        const data = await hotelAPI.getAllHotels();
+        const page = await hotelAPI.getHotelsPage({ limit: 600 });
+        const data = Array.isArray(page?.hotels) ? page.hotels : [];
         const normalized = Array.isArray(data)
           ? data.map((h, index) => {
               if (!h) return null;

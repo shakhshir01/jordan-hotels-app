@@ -1,9 +1,9 @@
 import React from "react";
 import useFetch from "../hooks/useFetch";
-import realHotelsAPI from "../services/realHotelsData";
+import { hotelAPI } from "../services/api";
 
 export default function ExperiencesListing() {
-  const { data: items, loading, error } = useFetch(() => realHotelsAPI.getPopularHotels(), []);
+  const { data: items, loading, error } = useFetch(() => hotelAPI.getExperiences(), []);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -11,7 +11,7 @@ export default function ExperiencesListing() {
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-600">{error.message}</p>}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {(items || []).map(x => (
+        {(items || []).map((x) => (
           <div key={x.id} className="hotel-card p-4">
             <h3 className="font-bold">{x.title}</h3>
             <p className="text-sm text-slate-500">{x.meta}</p>

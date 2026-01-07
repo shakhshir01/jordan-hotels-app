@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import realHotelsAPI from '../services/realHotelsData';
+import hotelsService from '../services/hotelsService';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
+import { getHotelCoordinates } from '../utils/geo';
+import { InlineLoader } from '../components/LoadingSpinner';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -21,45 +23,124 @@ L.Icon.Default.mergeOptions({
 const JORDAN_CENTER = [31.24, 36.51];
 
 const getHotelLatLng = (hotel) => {
-  const loc = (hotel?.location || '').toLowerCase();
-  if (loc.includes('amman')) return [31.9539, 35.9106];
-  if (loc.includes('aqaba')) return [29.5319, 35.0061];
-  if (loc.includes('petra') || loc.includes('wadi musa')) return [30.3285, 35.4444];
-  if (loc.includes('wadi rum')) return [29.5764, 35.4195];
-  if (loc.includes('dead sea') || loc.includes('sweimeh')) return [31.7191, 35.5744];
-  return JORDAN_CENTER;
+  const coords = getHotelCoordinates(hotel);
+  if (!coords) return null;
+  return [coords.lat, coords.lon];
 };
 
 export default function HotelsMap() {
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [locationError, setLocationError] = useState('');
   const mapRef = useRef(null);
   const { i18n } = useTranslation();
 
+  const requestUserLocation = () => {
+    setLoading(true);
+    setLocationError('');
+
+    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
+      setLocationError('Location is not supported in this browser.');
+      setLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = Number(pos?.coords?.latitude);
+        const lon = Number(pos?.coords?.longitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+          setLocationError('Could not read your location.');
+          setLoading(false);
+          return;
+        }
+        setUserLocation({ lat, lon });
+      },
+      (err) => {
+        const msg = err?.message || 'Location permission denied.';
+        setLocationError(msg);
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 8000,
+        maximumAge: 60_000,
+      }
+    );
+  };
+
   useEffect(() => {
-    const loadHotels = async () => {
-      const data = await realHotelsAPI.getAllHotels();
-      setHotels(data);
-      if (data.length > 0) setSelectedHotel(data[0]);
-    };
-    loadHotels();
+    requestUserLocation();
   }, []);
+
+  useEffect(() => {
+    const loadNearbyHotels = async () => {
+      if (!userLocation) return;
+      setLoading(true);
+      setLocationError('');
+
+      try {
+        // Only show hotels near the user, with real geo coordinates.
+        const nearby = await hotelsService.getNearbyHotelsByGeo({
+          lat: userLocation.lat,
+          lon: userLocation.lon,
+          limit: 40,
+          targetKm: 25,
+          pageLimit: 200,
+          maxPages: 6,
+        });
+
+        const withCoords = (Array.isArray(nearby) ? nearby : []).filter((h) => getHotelLatLng(h));
+        setHotels(withCoords);
+        setSelectedHotel(withCoords[0] || null);
+      } catch (_e) {
+        setLocationError('Failed to load nearby hotels.');
+        setHotels([]);
+        setSelectedHotel(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNearbyHotels();
+  }, [userLocation]);
 
   useEffect(() => {
     if (!selectedHotel || !mapRef.current) return;
     const latlng = getHotelLatLng(selectedHotel);
-    mapRef.current.setView(latlng, 9, { animate: true });
+    if (!latlng) return;
+    mapRef.current.setView(latlng, 13, { animate: true });
   }, [selectedHotel]);
 
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-8">Hotels Map</h1>
 
+      {loading && (
+        <InlineLoader message="Finding nearby hotels…" />
+      )}
+
+      {!loading && locationError && (
+        <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-900">
+          <div className="font-semibold">Enable location to see nearby hotels on the map.</div>
+          <div className="text-sm mt-1">{locationError}</div>
+          <button
+            type="button"
+            onClick={requestUserLocation}
+            className="mt-3 px-4 py-2 rounded-full border border-amber-200 bg-white text-sm font-semibold text-amber-900 hover:bg-amber-50"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-lg h-96 overflow-hidden border border-gray-200">
           <MapContainer
-            center={JORDAN_CENTER}
-            zoom={8}
+            center={userLocation ? [userLocation.lat, userLocation.lon] : JORDAN_CENTER}
+            zoom={userLocation ? 12 : 8}
             scrollWheelZoom
             className="h-full w-full"
             whenCreated={(map) => {
@@ -73,6 +154,7 @@ export default function HotelsMap() {
 
             {hotels.map((hotel) => {
               const pos = getHotelLatLng(hotel);
+              if (!pos) return null;
               const hotelName = getHotelDisplayName(hotel, i18n.language);
               return (
                 <Marker
@@ -118,6 +200,12 @@ export default function HotelsMap() {
                 );
               })()
             ))}
+
+            {!loading && !locationError && hotels.length === 0 && (
+              <div className="text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                No nearby hotels with coordinates were found.
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -133,6 +221,9 @@ export default function HotelsMap() {
               alt={selectedName}
               onError={createHotelImageOnErrorHandler(selectedHotel.id)}
               className="w-full h-64 object-cover rounded-lg"
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
             />
             <div>
               <h2 className="text-3xl font-bold mb-2">{selectedName}</h2>

@@ -25,8 +25,34 @@ const getCorsHeaders = (event) => {
 };
 
 const parseEventQuery = (event) => {
-  const q = event?.queryStringParameters?.q || "";
-  return q.trim();
+  const qp = event?.queryStringParameters || {};
+  const q = (qp.q || "").trim();
+  const scope = String(qp.scope || "").trim().toLowerCase();
+  const cursor = String(qp.cursor || "").trim();
+  const limitRaw = Number(qp.limit);
+  const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(100, Math.floor(limitRaw))) : 30;
+  return { q, scope, cursor, limit };
+};
+
+const encodeCursor = (key) => {
+  if (!key || typeof key !== 'object') return '';
+  try {
+    return Buffer.from(JSON.stringify(key), 'utf8').toString('base64');
+  } catch {
+    return '';
+  }
+};
+
+const decodeCursor = (cursor) => {
+  const c = String(cursor || '').trim();
+  if (!c) return null;
+  try {
+    const json = Buffer.from(c, 'base64').toString('utf8');
+    const parsed = JSON.parse(json);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
 };
 
 const normalizeQueryToTokens = (q) => {
@@ -95,31 +121,82 @@ export async function handler(event) {
   }
 
   try {
-    const q = parseEventQuery(event);
+    const { q, scope, cursor, limit } = parseEventQuery(event);
     const qTokens = normalizeQueryToTokens(q);
     const hotelsTable = process.env.HOTELS_TABLE;
     const destinationsTable = process.env.DESTINATIONS_TABLE;
     const dealsTable = process.env.DEALS_TABLE;
     const experiencesTable = process.env.EXPERIENCES_TABLE;
 
+    const matchesAnyToken = (it, fields) => {
+      if (!q) return true;
+      const haystacks = fields.map((f) => String(it?.[f] || '').toLowerCase());
+      return qTokens.some((token) => haystacks.some((h) => h.includes(token)));
+    };
+
+    // Hotels-only paged search for smooth infinite scrolling.
+    if (scope === 'hotels') {
+      if (!hotelsTable) {
+        return {
+          statusCode: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+          body: JSON.stringify({ hotels: [], nextCursor: null }),
+        };
+      }
+
+      const scanLimit = 200;
+      const maxScans = 12;
+      const out = [];
+      let lastKey = decodeCursor(cursor);
+      let scans = 0;
+
+      while (out.length < limit && scans < maxScans) {
+        const res = await client.send(
+          new ScanCommand({
+            TableName: hotelsTable,
+            Limit: scanLimit,
+            ExclusiveStartKey: lastKey || undefined,
+          })
+        );
+
+        const items = (res && res.Items) || [];
+        for (const it of items) {
+          if (matchesAnyToken(it, ['name', 'location', 'destination'])) {
+            out.push(it);
+            if (out.length >= limit) break;
+          }
+        }
+
+        lastKey = res?.LastEvaluatedKey || null;
+        scans += 1;
+        if (!lastKey) break;
+      }
+
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+        body: JSON.stringify({ hotels: out, nextCursor: lastKey ? encodeCursor(lastKey) : null }),
+      };
+    }
+
     // Helper: scan + basic filter by contains on 'name' or 'title'
-    const scanAndFilter = async (TableName, fields = ["name", "title"]) => {
+    // NOTE: This is intentionally a *sampled* scan to keep the multi-search fast.
+    const scanAndFilter = async (TableName, fields = ["name", "title"], maxItems = 200) => {
       if (!TableName) return [];
-      const res = await client.send(new ScanCommand({ TableName }));
+      const res = await client.send(new ScanCommand({ TableName, Limit: maxItems }));
       const items = (res && res.Items) || [];
       if (!q) return items;
 
       return items.filter((it) => {
-        const haystacks = fields.map((f) => String(it[f] || '').toLowerCase());
-        return qTokens.some((token) => haystacks.some((h) => h.includes(token)));
+        return matchesAnyToken(it, fields);
       });
     };
 
     const [hotels, destinations, deals, experiences] = await Promise.all([
-      scanAndFilter(hotelsTable, ["name", "location"]),
-      scanAndFilter(destinationsTable, ["name", "description"]),
-      scanAndFilter(dealsTable, ["title", "meta"]),
-      scanAndFilter(experiencesTable, ["title", "meta"]),
+      scanAndFilter(hotelsTable, ["name", "location"], 200),
+      scanAndFilter(destinationsTable, ["name", "description"], 200),
+      scanAndFilter(dealsTable, ["title", "meta"], 200),
+      scanAndFilter(experiencesTable, ["title", "meta"], 200),
     ]);
 
     return {

@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../home.jsx';
 
-vi.mock('../../services/realHotelsData', () => ({
-  default: {
+vi.mock('../../services/api', () => ({
+  hotelAPI: {
     getAllHotels: vi.fn(() =>
       Promise.resolve([
         {
@@ -16,6 +16,38 @@ vi.mock('../../services/realHotelsData', () => ({
           price: 100,
         },
       ])
+    ),
+    getHotelsPage: vi.fn(() =>
+      Promise.resolve({
+        hotels: [
+          {
+            id: 'h1',
+            name: 'Test Hotel',
+            image: '',
+            rating: 4.5,
+            location: 'Amman',
+            price: 100,
+          },
+        ],
+        nextCursor: null,
+      })
+    ),
+    searchAll: vi.fn(() =>
+      Promise.resolve({
+        hotels: [
+          {
+            id: 'h1',
+            name: 'Test Hotel',
+            image: '',
+            rating: 4.5,
+            location: 'Amman',
+            price: 100,
+          },
+        ],
+        destinations: [],
+        deals: [],
+        experiences: [],
+      })
     ),
   },
 }));

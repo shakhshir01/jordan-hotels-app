@@ -1,19 +1,11 @@
 import useFetch from "../hooks/useFetch.js";
-import realHotelsAPI from "../services/realHotelsData.js";
+import { hotelAPI } from "../services/api";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-const DEALS_DATA = [
-  { title: "Weekend escape", titleAr: "عطلة نهاية الأسبوع", meta: "City stays • Limited time", metaAr: "إقامات المدينة • لفترة محدودة" },
-  { title: "Family bundles", titleAr: "عروض العائلات", meta: "Kids-friendly • Breakfast", metaAr: "مناسب للعائلة • إفطار" },
-  { title: "Desert + Petra combo", titleAr: "باقة الصحراء + البتراء", meta: "Curated itinerary • Best value", metaAr: "مسار مقترح • أفضل قيمة" },
-  { title: "Last-minute", titleAr: "آخر لحظة", meta: "Tonight & tomorrow", metaAr: "الليلة وغداً" },
-];
-
 export default function Deals() {
-  const { data: deals, loading } = useFetch(() => realHotelsAPI.getFeaturedHotels(), []);
-  const { t, i18n } = useTranslation();
-  const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
+  const { data: deals, loading } = useFetch(() => hotelAPI.getDeals(), []);
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen">
@@ -40,7 +32,7 @@ export default function Deals() {
         )}
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {(deals || DEALS_DATA).map((d, idx) => {
+            {(Array.isArray(deals) ? deals : []).map((d, idx) => {
               const gradients = [
                 "from-orange-500 to-red-600",
                 "from-pink-500 to-rose-600",
@@ -58,10 +50,10 @@ export default function Deals() {
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                      {isArabic ? d.titleAr : d.title}
+                      {d.title}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                      {isArabic ? d.metaAr : d.meta}
+                      {d.meta}
                     </p>
                     <button className="btn-primary w-full">{t('pages.deals.seeOffers')}</button>
                   </div>

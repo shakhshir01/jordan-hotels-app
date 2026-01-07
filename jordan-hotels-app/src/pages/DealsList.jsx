@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import realHotelsAPI from "../services/realHotelsData";
+import hotelsService from "../services/hotelsService";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import WishlistButton from "../components/WishlistButton";
@@ -18,7 +18,7 @@ export default function DealsList() {
 
   useEffect(() => {
     const loadHotels = async () => {
-      const data = await realHotelsAPI.getFeaturedHotels();
+      const data = await hotelsService.getFeaturedHotels();
       setHotels(data);
       setLoading(false);
     };
@@ -30,7 +30,7 @@ export default function DealsList() {
       navigate('/login', { state: { returnUrl: '/deals' } });
       return;
     }
-    navigate('/checkout', { state: { hotel, discount } });
+    navigate('/checkout', { state: { hotelId: hotel?.id, hotel, discount } });
   };
 
   if (loading) return <div className="p-24 text-center">{t('pages.dealsList.loading')}</div>;
@@ -62,6 +62,9 @@ export default function DealsList() {
                     alt={hotelName}
                     onError={createHotelImageOnErrorHandler(hotel.id)}
                     className="w-full h-full object-cover hover:scale-110 transition"
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
                   />
                   <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full font-bold text-lg">
                     -{discount}%
