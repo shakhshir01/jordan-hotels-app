@@ -1,5 +1,6 @@
 version: 1
 frontend:
+  appRoot: jordan-hotels-app
   phases:
     preBuild:
       commands:
