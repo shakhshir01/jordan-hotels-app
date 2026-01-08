@@ -2,6 +2,22 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 let paypalSdkPromise;
 
+function resetPayPalSdk() {
+  paypalSdkPromise = null;
+  try {
+    const script = document.querySelector('script[data-paypal-sdk="true"]');
+    if (script) script.remove();
+  } catch {
+    // ignore
+  }
+  try {
+    // Best-effort cleanup; PayPal SDK doesn't provide a full unload.
+    if (typeof window !== 'undefined') delete window.paypal;
+  } catch {
+    // ignore
+  }
+}
+
 function normalizeCurrency(currency) {
   const c = String(currency || '').trim().toUpperCase();
   return c || 'USD';
@@ -118,6 +134,7 @@ export default function LazyPayPalButtons({
   const onErrorRef = useRef(onError);
   const [status, setStatus] = useState('idle'); // idle | loading | ready | error
   const [message, setMessage] = useState('');
+  const [retryNonce, setRetryNonce] = useState(0);
 
   const clientId =
     import.meta.env.VITE_PAYPAL_CLIENT_ID ||
@@ -147,7 +164,7 @@ export default function LazyPayPalButtons({
       setStatus('loading');
       setMessage('');
 
-      const initKey = `${clientId}::${normalizedCurrency}::${amountValue.toFixed(2)}`;
+      const initKey = `${clientId}::${normalizedCurrency}::${amountValue.toFixed(2)}::${retryNonce}`;
       if (lastInitKeyRef.current === initKey && buttonsRef.current) {
         // Already initialized for these inputs.
         setStatus('ready');
@@ -157,7 +174,10 @@ export default function LazyPayPalButtons({
       try {
         const paypal = await loadPayPalSdk({ clientId, currency: normalizedCurrency });
         if (cancelled) return;
-        if (!paypal?.Buttons) throw new Error('PayPal Buttons are not available');
+        if (!paypal?.Buttons) {
+          resetPayPalSdk();
+          throw new Error('PayPal Buttons are not available (possibly blocked).');
+        }
 
         containerRef.current.innerHTML = '';
 
@@ -228,7 +248,7 @@ export default function LazyPayPalButtons({
       }
       buttonsRef.current = null;
     };
-  }, [clientId, normalizedCurrency, amountValue, disabled]);
+  }, [clientId, normalizedCurrency, amountValue, disabled, retryNonce]);
 
   if (!clientId) {
     return (
@@ -269,7 +289,20 @@ export default function LazyPayPalButtons({
         <p className="text-xs text-slate-600 mt-2">Loading PayPal…</p>
       )}
       {status === 'error' && message && (
-        <p className="text-xs text-red-600 mt-2">{message}</p>
+        <div className="mt-2 space-y-2">
+          <p className="text-xs text-red-600">{message}</p>
+          <button
+            type="button"
+            onClick={() => {
+              resetPayPalSdk();
+              lastInitKeyRef.current = '';
+              setRetryNonce((n) => n + 1);
+            }}
+            className="text-xs underline text-slate-700 hover:text-slate-900"
+          >
+            Retry PayPal
+          </button>
+        </div>
       )}
     </div>
   );
