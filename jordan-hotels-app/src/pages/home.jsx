@@ -301,8 +301,8 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6">
+    <div>
+      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-12">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-6 py-24 md:py-32 text-center text-white">
           <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4 animate-fade-in">
@@ -336,8 +336,8 @@ const Home = () => {
       </section>
 
       {error && (
-        <div className="max-w-7xl mx-auto px-6 mb-8">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
+        <div className="mb-8">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-3xl p-4 flex items-start gap-3">
             <AlertCircle className="text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" size={20} />
             <div>
               <p className="text-red-900 dark:text-red-100 font-semibold text-sm">Error</p>
@@ -347,7 +347,7 @@ const Home = () => {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 pb-24">
+      <div className="pb-14">
         {loading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-jordan-blue" size={48} />

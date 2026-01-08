@@ -151,13 +151,13 @@ export default function SearchResults() {
   const hasHotels = useMemo(() => Array.isArray(hotels) && hotels.length > 0, [hotels]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
-      <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="space-y-10">
+      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">
+          <h1 className="page-title text-slate-900 dark:text-slate-50">
             Search results
           </h1>
-          <p className="text-sm text-slate-600">
+          <p className="page-subtitle mt-2">
             Showing matches for <span className="font-semibold">“{term || "All"}”</span>
           </p>
         </div>
@@ -166,7 +166,7 @@ export default function SearchResults() {
             type="button"
             onClick={handleSaveSearch}
             disabled={!term}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+            className="btn-secondary flex items-center gap-2 disabled:opacity-50"
           >
             <Search size={16} /> Save this search
           </button>
@@ -175,8 +175,8 @@ export default function SearchResults() {
 
       {/* Saved searches */}
       {savedSearches.length > 0 && (
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-2">
+        <section className="surface p-6 sm:p-8">
+          <div className="flex items-center justify-between mb-4">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
               Saved searches
             </p>
@@ -211,18 +211,18 @@ export default function SearchResults() {
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-xl shadow animate-pulse h-64" />
+            <div key={i} className="surface animate-pulse h-64" />
           ))}
         </div>
       )}
 
       {!loading && error && !hasHotels && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800">
+        <div className="bg-red-50 border border-red-200 rounded-3xl p-5 text-red-800">
           <div className="text-sm font-semibold">{error.message || "Search failed"}</div>
           <button
             type="button"
             onClick={resetAndLoad}
-            className="mt-3 px-4 py-2 rounded-full border border-red-200 bg-white text-sm font-semibold text-red-800 hover:bg-red-50"
+            className="mt-4 btn-secondary"
           >
             Retry
           </button>
@@ -236,7 +236,7 @@ export default function SearchResults() {
             <section>
               <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">Hotels</h2>
               {error && (
-                <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 text-sm">
+                <div className="mb-4 bg-amber-50 border border-amber-200 rounded-2xl p-3 text-amber-900 text-sm">
                   {error.message || "Some results failed to load."}
                 </div>
               )}
@@ -296,7 +296,7 @@ export default function SearchResults() {
                     <button
                       type="button"
                       onClick={loadMore}
-                      className="px-4 py-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                      className="btn-secondary"
                     >
                       Retry loading more
                     </button>
@@ -308,7 +308,7 @@ export default function SearchResults() {
                       type="button"
                       onClick={loadMore}
                       disabled={loadingMore}
-                      className="px-4 py-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                      className="btn-secondary disabled:opacity-50"
                     >
                       {loadingMore ? "Loading more..." : "Load more"}
                     </button>
@@ -317,7 +317,7 @@ export default function SearchResults() {
                 {loadingMore && (
                   <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="bg-white rounded-xl shadow animate-pulse h-64" />
+                      <div key={i} className="surface animate-pulse h-64" />
                     ))}
                   </div>
                 )}

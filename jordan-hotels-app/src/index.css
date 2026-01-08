@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap');
 
-/* LEGACY FILE — no longer imported. All styles are in src/styles/ now. */
+/* App global styles (Tailwind entrypoint). */
 
 @tailwind base;
 @tailwind components;
@@ -10,10 +10,30 @@
   * {
     @apply antialiased;
   }
+
+  html {
+    @apply smooth-scroll;
+  }
   
   body {
     @apply bg-gradient-to-br from-slate-50 to-slate-100 text-slate-900 font-sans;
     @apply dark:from-slate-900 dark:to-slate-800 dark:text-slate-100;
+  }
+
+  ::selection {
+    @apply bg-blue-200 text-slate-900;
+    @apply dark:bg-blue-600/40 dark:text-slate-100;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+
+  a {
+    @apply underline-offset-4;
+  }
+  a:hover {
+    @apply decoration-2;
   }
   
   input, textarea, select {
@@ -80,6 +100,32 @@
 
 /* Custom Components */
 @layer components {
+  /* Consistent page padding + max width */
+  .page-shell {
+    @apply w-full;
+  }
+
+  .page-container {
+    @apply max-w-7xl mx-auto px-6;
+  }
+
+  .page-section {
+    @apply py-10 sm:py-12;
+  }
+
+  .page-title {
+    @apply text-3xl sm:text-4xl md:text-5xl font-black font-display tracking-tight;
+  }
+
+  .page-subtitle {
+    @apply text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed;
+  }
+
+  .surface {
+    @apply bg-white/90 border border-slate-200/60 shadow-xl rounded-3xl;
+    @apply dark:bg-slate-900/60 dark:border-slate-700/50;
+  }
+
   /* Premium Glassmorphic Card */
   .glass-card {
     @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl;
@@ -110,6 +156,14 @@
     @apply w-full px-4 py-3 bg-white text-slate-900 border-2 border-slate-200 rounded-xl shadow-sm;
     @apply focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-200;
     @apply dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder-slate-400;
+  }
+
+  .label-premium {
+    @apply block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2;
+  }
+
+  .helper-text {
+    @apply text-xs text-slate-500 dark:text-slate-400;
   }
   
   /* Hotel Card */

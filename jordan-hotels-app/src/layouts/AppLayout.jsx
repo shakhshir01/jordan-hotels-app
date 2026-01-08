@@ -12,7 +12,7 @@ export default function AppLayout() {
   const showBanner = authError && !dismissed && !useMocks;
 
   return (
-    <>
+    <div className="min-h-screen">
       <NavBar />
 
       {/* Auth error banner */}
@@ -45,10 +45,13 @@ export default function AppLayout() {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-6">
-        <Outlet />
+      <main className="page-shell">
+        <div className="page-container page-section">
+          <Outlet />
+        </div>
       </main>
+
       <Footer />
-    </>
+    </div>
   );
 }

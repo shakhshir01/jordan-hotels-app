@@ -275,12 +275,12 @@ const Checkout = () => {
     }
   };
 
-  if (loading) return <div className="p-24 text-center">Loading checkout...</div>;
+  if (loading) return <div className="py-24 text-center text-slate-600 dark:text-slate-300">Loading checkout...</div>;
 
   if (orderComplete) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+      <div className="page-section">
+        <div className="max-w-md mx-auto surface p-8 text-center">
           <div className="text-6xl mb-4">✓</div>
           <h1 className="text-3xl font-bold text-green-600 mb-4">
             {demoBookings || demoMode ? 'Checkout Complete (Demo)' : 'Checkout Complete'}
@@ -303,13 +303,13 @@ const Checkout = () => {
 
   if (!hotelId) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-4">Checkout</h1>
-        <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="page-section">
+        <h1 className="page-title mb-4">Checkout</h1>
+        <div className="surface p-6">
           <p className="text-gray-700 mb-4">Choose a hotel to start booking.</p>
           <button
             onClick={() => navigate('/search')}
-            className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition"
+            className="btn-primary"
           >
             Browse hotels
           </button>
@@ -319,18 +319,19 @@ const Checkout = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8">Checkout</h1>
+    <div className="page-section">
+      <h1 className="page-title mb-3">Checkout</h1>
+      <p className="page-subtitle mb-8">Review your stay and complete your booking.</p>
 
       {error && (
-        <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">{error}</div>
+        <div className="bg-red-100 text-red-700 p-4 rounded-2xl mb-6 border border-red-200">{error}</div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Order Summary */}
         <div>
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
+          <div className="surface p-6 mb-6">
+            <h2 className="text-2xl font-black font-display tracking-tight mb-4">Order Summary</h2>
 
             {hotel && (
               (() => {
@@ -394,11 +395,11 @@ const Checkout = () => {
                       setPromoResult(null);
                     }}
                     placeholder="Enter promo code"
-                    className="flex-1 border rounded-lg px-3 py-2 text-sm"
+                    className="flex-1 input-premium !py-2 !text-sm"
                   />
                   <button
                     onClick={handleApplyPromoCode}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-bold text-sm"
+                    className="btn-primary !px-5 !py-2 !rounded-xl !text-sm"
                   >
                     Apply
                   </button>
@@ -431,8 +432,8 @@ const Checkout = () => {
         </div>
 
         {/* Payment Form */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold mb-6">Payment Details</h2>
+        <div className="surface p-6">
+          <h2 className="text-2xl font-black font-display tracking-tight mb-6">Payment Details</h2>
 
           {(demoBookings || demoMode) && (
             <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 text-sm mb-6">
@@ -447,34 +448,34 @@ const Checkout = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block font-bold mb-2">Full Name *</label>
+              <label className="label-premium">Full Name *</label>
               <input
                 type="text"
                 value={guestInfo.fullName}
                 onChange={(e) => setGuestInfo((p) => ({ ...p, fullName: e.target.value }))}
-                className="w-full border rounded-lg px-4 py-2"
+                className="input-premium"
                 placeholder="John Doe"
               />
             </div>
 
             <div>
-              <label className="block font-bold mb-2">Email *</label>
+              <label className="label-premium">Email *</label>
               <input
                 type="email"
                 value={guestInfo.email}
                 onChange={(e) => setGuestInfo((p) => ({ ...p, email: e.target.value }))}
-                className="w-full border rounded-lg px-4 py-2"
+                className="input-premium"
                 placeholder="john@example.com"
               />
             </div>
 
             <div>
-              <label className="block font-bold mb-2">Phone *</label>
+              <label className="label-premium">Phone *</label>
               <input
                 type="tel"
                 value={guestInfo.phone}
                 onChange={(e) => setGuestInfo((p) => ({ ...p, phone: e.target.value }))}
-                className="w-full border rounded-lg px-4 py-2"
+                className="input-premium"
                 placeholder="+962"
               />
             </div>
@@ -482,7 +483,7 @@ const Checkout = () => {
             <div className="border-t pt-4 mt-6">
               <h3 className="font-bold mb-4">Payment Method</h3>
               <div className="space-y-3 mb-6">
-                <div className="border rounded-lg p-4 cursor-pointer hover:bg-blue-50">
+                <div className="border border-slate-200/70 dark:border-slate-700/60 rounded-2xl p-4 cursor-pointer hover:bg-blue-50/60 dark:hover:bg-slate-800/50 transition">
                   <label className="flex items-center">
                     <input
                       type="radio"
@@ -495,7 +496,7 @@ const Checkout = () => {
                     <span>Credit/Debit Card</span>
                   </label>
                 </div>
-                <div className="border rounded-lg p-4 cursor-pointer hover:bg-blue-50">
+                <div className="border border-slate-200/70 dark:border-slate-700/60 rounded-2xl p-4 cursor-pointer hover:bg-blue-50/60 dark:hover:bg-slate-800/50 transition">
                   <label className="flex items-center">
                     <input
                       type="radio"
@@ -564,7 +565,7 @@ const Checkout = () => {
                         <button
                           onClick={handlePayment}
                           disabled={processing}
-                          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold disabled:bg-gray-400"
+                          className="w-full btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {processing ? 'Processing...' : `Pay ${calculateTotalWithTax().toFixed(2)} JOD`}
                         </button>

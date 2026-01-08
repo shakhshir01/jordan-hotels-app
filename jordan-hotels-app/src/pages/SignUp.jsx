@@ -58,14 +58,14 @@ const SignUp = () => {
   const passwordErrors = getPasswordErrors(password);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <form onSubmit={handleSignUp} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 className="text-3xl font-black mb-2 text-center">{t('pages.signup.title')}</h2>
-        <p className="text-center text-slate-600 mb-8">{t('pages.signup.subtitle')}</p>
+    <div className="mx-auto w-full max-w-md">
+      <form onSubmit={handleSignUp} className="surface p-8 sm:p-10">
+        <h2 className="page-title text-center text-slate-900 dark:text-slate-50">{t('pages.signup.title')}</h2>
+        <p className="page-subtitle text-center mt-2 mb-8">{t('pages.signup.subtitle')}</p>
 
         {/* Submit Error */}
         {errors.submit && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
             <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
             <div>
               <p className="text-red-900 font-bold text-sm">{errors.submit}</p>
@@ -75,14 +75,16 @@ const SignUp = () => {
 
         {/* Full Name Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-2">{t('auth.fullName')}</label>
+          <label className="label-premium">{t('auth.fullName')}</label>
           <input 
             type="text"
             placeholder="John Doe" 
             value={fullName}
             onChange={e => setFullName(e.target.value)}
-            className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 ${
-              errors.fullName ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
+            className={`input-premium ${
+              errors.fullName
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 bg-red-50'
+                : ''
             }`}
           />
           {errors.fullName && <p className="text-red-600 text-sm mt-1">{renderError(errors.fullName)}</p>}
@@ -90,14 +92,16 @@ const SignUp = () => {
 
         {/* Email Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-2">{t('auth.email')}</label>
+          <label className="label-premium">{t('auth.email')}</label>
           <input 
             type="email"
             placeholder="you@example.com" 
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 ${
-              errors.email ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
+            className={`input-premium ${
+              errors.email
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 bg-red-50'
+                : ''
             }`}
           />
           {errors.email && <p className="text-red-600 text-sm mt-1">{renderError(errors.email)}</p>}
@@ -105,15 +109,17 @@ const SignUp = () => {
 
         {/* Password Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-2">{t('auth.password')}</label>
+          <label className="label-premium">{t('auth.password')}</label>
           <div className="relative">
             <input 
               type={showPassword ? 'text' : 'password'}
               placeholder={t('pages.signup.passwordPlaceholder')}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 pr-10 ${
-                errors.password ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
+              className={`input-premium pr-10 ${
+                errors.password
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 bg-red-50'
+                  : ''
               }`}
             />
             <button
@@ -139,15 +145,17 @@ const SignUp = () => {
 
         {/* Confirm Password Input */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-2">{t('auth.confirmPassword')}</label>
+          <label className="label-premium">{t('auth.confirmPassword')}</label>
           <div className="relative">
             <input 
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder={t('pages.signup.confirmPasswordPlaceholder')}
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
-              className={`w-full p-3 bg-slate-50 border rounded-lg outline-none transition text-slate-900 placeholder-slate-400 pr-10 ${
-                errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-slate-200 focus:border-blue-900'
+              className={`input-premium pr-10 ${
+                errors.confirmPassword
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 bg-red-50'
+                  : ''
               }`}
             />
             <button
@@ -167,7 +175,7 @@ const SignUp = () => {
         <button 
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-primary w-full disabled:opacity-50"
         >
           {loading ? t('pages.signup.creatingAccount') : t('auth.signup')}
         </button>
