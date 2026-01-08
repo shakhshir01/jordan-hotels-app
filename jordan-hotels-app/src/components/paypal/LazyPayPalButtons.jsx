@@ -113,6 +113,9 @@ export default function LazyPayPalButtons({
 }) {
   const containerRef = useRef(null);
   const buttonsRef = useRef(null);
+  const lastInitKeyRef = useRef('');
+  const onApprovedRef = useRef(onApproved);
+  const onErrorRef = useRef(onError);
   const [status, setStatus] = useState('idle'); // idle | loading | ready | error
   const [message, setMessage] = useState('');
 
@@ -122,6 +125,11 @@ export default function LazyPayPalButtons({
     '';
 
   const normalizedCurrency = useMemo(() => normalizeCurrency(currency), [currency]);
+
+  useEffect(() => {
+    onApprovedRef.current = onApproved;
+    onErrorRef.current = onError;
+  }, [onApproved, onError]);
 
   const amountValue = useMemo(() => {
     const n = Number(amount);
@@ -138,6 +146,13 @@ export default function LazyPayPalButtons({
     async function init() {
       setStatus('loading');
       setMessage('');
+
+      const initKey = `${clientId}::${normalizedCurrency}::${amountValue.toFixed(2)}`;
+      if (lastInitKeyRef.current === initKey && buttonsRef.current) {
+        // Already initialized for these inputs.
+        setStatus('ready');
+        return;
+      }
 
       try {
         const paypal = await loadPayPalSdk({ clientId, currency: normalizedCurrency });
@@ -162,17 +177,17 @@ export default function LazyPayPalButtons({
           onApprove: async (_data, actions) => {
             try {
               const details = await actions.order.capture();
-              if (typeof onApproved === 'function') onApproved(details);
+              if (typeof onApprovedRef.current === 'function') onApprovedRef.current(details);
             } catch (e) {
               setStatus('error');
               setMessage(e?.message || 'PayPal approval failed');
-              if (typeof onError === 'function') onError(e);
+              if (typeof onErrorRef.current === 'function') onErrorRef.current(e);
             }
           },
           onError: (e) => {
             setStatus('error');
             setMessage(e?.message || 'PayPal failed to load');
-            if (typeof onError === 'function') onError(e);
+            if (typeof onErrorRef.current === 'function') onErrorRef.current(e);
           },
           style: {
             layout: 'vertical',
@@ -181,17 +196,24 @@ export default function LazyPayPalButtons({
           },
         });
 
+        if (typeof buttons.isEligible === 'function' && !buttons.isEligible()) {
+          setStatus('error');
+          setMessage('PayPal Buttons are not eligible in this browser/session. Try disabling tracking/ad blockers or using a regular (non-incognito) window.');
+          return;
+        }
+
         buttonsRef.current = buttons;
 
         await buttons.render(containerRef.current);
         if (cancelled) return;
 
+        lastInitKeyRef.current = initKey;
         setStatus('ready');
       } catch (e) {
         if (cancelled) return;
         setStatus('error');
         setMessage(e?.message || 'PayPal is unavailable');
-        if (typeof onError === 'function') onError(e);
+        if (typeof onErrorRef.current === 'function') onErrorRef.current(e);
       }
     }
 
@@ -206,7 +228,7 @@ export default function LazyPayPalButtons({
       }
       buttonsRef.current = null;
     };
-  }, [clientId, normalizedCurrency, amountValue, onApproved, onError, disabled]);
+  }, [clientId, normalizedCurrency, amountValue, disabled]);
 
   if (!clientId) {
     return (
