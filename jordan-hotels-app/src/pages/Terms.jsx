@@ -75,6 +75,24 @@ export default function Terms() {
               {t('pages.terms.sections.6.body')}
             </p>
           </section>
+
+          <section className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              {t('pages.terms.sections.7.title')}
+            </h2>
+            <p>
+              {t('pages.terms.sections.7.body')}
+            </p>
+          </section>
+
+          <section className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              {t('pages.terms.sections.8.title')}
+            </h2>
+            <p>
+              {t('pages.terms.sections.8.body')}
+            </p>
+          </section>
         </div>
       </div>
     </div>

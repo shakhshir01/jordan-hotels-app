@@ -299,6 +299,13 @@ See [GITHUB_DEPLOYMENT.md](./GITHUB_DEPLOYMENT.md#-security-best-practices) for 
 - Check API Gateway routes
 - Test with `curl` command
 
+### Visiting `/insights` (or any page) returns 404 on Amplify
+- This app uses React Router `BrowserRouter` (SPA). Amplify Hosting must rewrite deep links to `/index.html`.
+- In Amplify Console → App settings → Rewrites and redirects, add:
+	- Source: `</^((?!\\.).)*$/>`
+	- Target: `/index.html`
+	- Type: `200 (Rewrite)`
+
 ### Build fails
 - Delete `node_modules` and `package-lock.json`
 - Run `npm install` again

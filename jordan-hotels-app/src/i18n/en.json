@@ -399,7 +399,8 @@
           "items": [
             "Availability and prices can change",
             "Policies vary by property and rate",
-            "You are responsible for reviewing booking details"
+            "You are responsible for reviewing booking details",
+            "VisitJo may run in demo/test mode where reservations are not confirmed with hotels"
           ]
         },
         "3": {
@@ -417,6 +418,14 @@
         "6": {
           "title": "Changes",
           "body": "We may update these terms from time to time. Continued use means you accept the updated terms."
+        },
+        "7": {
+          "title": "Demo / testing",
+          "body": "When VisitJo is running in demo or test mode, bookings may be simulated and are not confirmed with hotels. If a payment flow is enabled for testing, charges use test providers and no real money should be transferred."
+        },
+        "8": {
+          "title": "Third‑party content & trademarks",
+          "body": "Hotel names, trademarks, and other brand identifiers belong to their respective owners. Prices, availability, and descriptions may be provided by third‑party sources and can change; VisitJo is not affiliated with or endorsed by the listed hotels unless explicitly stated."
         }
       }
     },

@@ -254,6 +254,19 @@ ls -la dist/
 - Check that amplify.yml is in correct directory
 - Verify package.json is correct
 
+### Issue: "GET /insights (or any route) returns 404 in production"
+**Cause**: This is a SPA (React Router `BrowserRouter`). When you refresh or directly open a deep link like `/insights/`, Amplify tries to find a physical file at that path and returns 404 unless you add a rewrite.
+
+**Fix (Amplify Console)**:
+1. Amplify Console → **App settings** → **Rewrites and redirects**
+2. Add a rule:
+   - Source address: `</^((?!\\.).)*$/>`
+   - Target address: `/index.html`
+   - Type: `200 (Rewrite)`
+3. Save, then redeploy.
+
+After this, `/insights/`, `/deals/`, etc. will load correctly.
+
 ### Issue: "Environment variables not working"
 **Solution**:
 - Make sure variables are prefixed with `VITE_`

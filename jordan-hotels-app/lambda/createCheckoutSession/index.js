@@ -20,6 +20,10 @@ export async function handler(event) {
     const { hotelId, amount, booking } = body;
     const secretArn = process.env.STRIPE_SECRET_ARN;
 
+    // Safety valve: only allow real Stripe sessions when explicitly enabled.
+    // This prevents accidental live charges when the app is running in demo mode.
+    const paymentsEnabled = String(process.env.PAYMENTS_ENABLED || '').toLowerCase() === 'true';
+
     const stripeKey = await getStripeSecret(secretArn);
 
     if (!stripeKey) {
@@ -28,6 +32,17 @@ export async function handler(event) {
         statusCode: 200,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ sessionId: `stub_${Date.now()}`, redirect: false }),
+      };
+    }
+
+    const isLiveKey = typeof stripeKey === 'string' && stripeKey.startsWith('sk_live_');
+    if (!paymentsEnabled || isLiveKey && String(process.env.ALLOW_LIVE_PAYMENTS || '').toLowerCase() !== 'true') {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({
+          message: 'Payments are disabled for this environment. Use Stripe test keys or enable PAYMENTS_ENABLED.',
+        }),
       };
     }
 

@@ -14,15 +14,16 @@ const USERS_TABLE = process.env.USERS_TABLE || "Users";
 
 const ALLOWED_ORIGINS = new Set([
   "https://main.d1ewsonl19kjj7.amplifyapp.com",
+  "https://www.visit-jo.com",
+  "https://visit-jo.com",
   "http://localhost:5173",
   "http://localhost:5174",
+  "http://localhost:5175",
 ]);
 
 const getCorsHeaders = (event) => {
   const origin = event?.headers?.origin || event?.headers?.Origin || "";
-  const allowOrigin = ALLOWED_ORIGINS.has(origin)
-    ? origin
-    : "https://main.d1ewsonl19kjj7.amplifyapp.com";
+  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "*";
 
   return {
     "Access-Control-Allow-Origin": allowOrigin,

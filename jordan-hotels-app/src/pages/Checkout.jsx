@@ -145,6 +145,10 @@ const Checkout = () => {
     return true;
   };
 
+  const paymentsEnabled = String(import.meta.env.VITE_PAYMENTS_ENABLED || '').toLowerCase() === 'true';
+  // Default to demo bookings unless explicitly turned off.
+  const demoBookings = String(import.meta.env.VITE_DEMO_BOOKINGS || 'true').toLowerCase() !== 'false';
+
   const createBooking = async ({ paymentProvider, paymentIntentId, paypalDetails } = {}) => {
     const total = calculateTotalWithTax();
     const bookingPayload = {
@@ -156,13 +160,14 @@ const Checkout = () => {
       nights: resolvedBookingData.nights || 1,
       guests: resolvedBookingData.guests || 2,
       totalPrice: total,
-      status: 'confirmed',
+      status: demoBookings ? 'demo' : 'confirmed',
       userName: guestInfo.fullName.trim(),
       userEmail: guestInfo.email.trim(),
       phone: guestInfo.phone.trim(),
       paymentProvider: paymentProvider || undefined,
       paymentIntentId: paymentIntentId || undefined,
       paypal: paypalDetails || undefined,
+      ...(demoBookings ? { demoBooking: true } : {}),
     };
 
     const created = await hotelAPI.bookHotel(hotelId, bookingPayload);
@@ -224,8 +229,15 @@ const Checkout = () => {
   };
 
   const stripeEnabled = Boolean(
-    import.meta.env.VITE_STRIPE_PUBLIC_KEY || import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+    (import.meta.env.VITE_STRIPE_PUBLIC_KEY || import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) && paymentsEnabled
   );
+
+  const stripePublishableKey =
+    import.meta.env.VITE_STRIPE_PUBLIC_KEY || import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
+  const stripeTestMode = String(stripePublishableKey).startsWith('pk_test_');
+  const paypalClientId = String(import.meta.env.VITE_PAYPAL_CLIENT_ID || '');
+  const paypalSandboxMode = paypalClientId === 'sb' || paypalClientId.startsWith('sb');
+  const demoMode = !paymentsEnabled || stripeTestMode || paypalSandboxMode;
 
   const handleCreateStripePaymentIntent = async ({ amount, currency }) => {
     await persistProfile();
@@ -270,8 +282,16 @@ const Checkout = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
           <div className="text-6xl mb-4">✓</div>
-          <h1 className="text-3xl font-bold text-green-600 mb-4">Payment Successful!</h1>
-          <p className="text-gray-600 mb-6">Your booking has been confirmed.</p>
+          <h1 className="text-3xl font-bold text-green-600 mb-4">
+            {demoBookings || demoMode ? 'Checkout Complete (Demo)' : 'Checkout Complete'}
+          </h1>
+          <p className="text-gray-600 mb-6">
+            {demoBookings
+              ? 'Important: this site is a demo. Your payment does not create a real reservation with any hotel.'
+              : demoMode
+                ? 'This is a test/sandbox payment flow. No real charge was made.'
+                : 'Thank you. Your payment is complete.'}
+          </p>
           {createdBookingId && (
             <p className="text-xs text-gray-500 mb-2">Booking ID: {createdBookingId}</p>
           )}
@@ -414,6 +434,17 @@ const Checkout = () => {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-bold mb-6">Payment Details</h2>
 
+          {(demoBookings || demoMode) && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 text-sm mb-6">
+              <div className="font-bold mb-1">Important</div>
+              <div>
+                {demoBookings
+                  ? 'This is a demo booking. Completing payment does not reserve a room or confirm a reservation with any hotel.'
+                  : 'This payment method is running in test/sandbox mode. No real charge will be made.'}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
             <div>
               <label className="block font-bold mb-2">Full Name *</label>
@@ -501,6 +532,15 @@ const Checkout = () => {
                       />
                     ) : (
                       <>
+                        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm">
+                          {paymentsEnabled
+                            ? 'Stripe is not configured for this environment. This card form is simulated.'
+                            : 'Payments are currently disabled. This card form is simulated.'}
+                          {demoBookings
+                            ? ' No real hotel reservation will be made.'
+                            : ' No real charge is processed.'}
+                        </div>
+
                         <div>
                           <label className="block font-bold mb-2">Card Number</label>
                           <input
@@ -530,22 +570,27 @@ const Checkout = () => {
                         </button>
 
                         <p className="text-xs text-gray-600 text-center mt-4">
-                          Your payment information is secure and encrypted
+                          This is a demo checkout flow.
                         </p>
                       </>
                     )}
                   </>
                 )}
 
-                {paymentMethod === 'paypal' && (
-                  <LazyPayPalButtons
-                    amount={Number(((calculateTotal() - appliedDiscount) * 1.1).toFixed(2))}
-                    currency="USD"
-                    disabled={processing}
-                    onApproved={handlePayPalApproved}
-                    onError={(e) => setError(e?.message || 'PayPal failed')}
-                  />
-                )}
+                {paymentMethod === 'paypal' &&
+                  (paymentsEnabled && paypalClientId ? (
+                    <LazyPayPalButtons
+                      amount={Number(((calculateTotal() - appliedDiscount) * 1.1).toFixed(2))}
+                      currency="USD"
+                      disabled={processing}
+                      onApproved={handlePayPalApproved}
+                      onError={(e) => setError(e?.message || 'PayPal failed')}
+                    />
+                  ) : (
+                    <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm">
+                      PayPal payments are not enabled for this environment.
+                    </div>
+                  ))}
               </div>
             </div>
           </div>

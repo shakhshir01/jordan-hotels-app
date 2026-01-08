@@ -193,6 +193,30 @@ Build output will be in the `dist/` directory. Deploy this to your hosting servi
 ### Environment Variables for Production
 Remember to set the same environment variables on your deployment platform.
 
+## Analytics (Visitors)
+
+### Option A (Recommended): Amplify Hosting Web Analytics (no code)
+If your site is deployed on **AWS Amplify Hosting**, you can enable visitor analytics directly in the console.
+
+- Amplify Console → your app → **Web analytics** (or **Analytics**) → **Enable**
+- Choose the suggested configuration and save.
+
+You’ll then be able to see visitors/sessions in the Amplify console (typically backed by CloudWatch RUM/metrics, depending on the Amplify UI).
+
+### Option B: Amplify CLI Analytics (Amazon Pinpoint)
+If you want event tracking via **Amazon Pinpoint** (e.g., track bookings, logins), use the **Amplify CLI** (not the AWS CLI).
+
+- Wrong (AWS CLI): `aws amplify ...`
+- Correct (Amplify CLI): `amplify ...`
+
+From this project root:
+
+1. `amplify init`
+2. `amplify add analytics` (choose **Amazon Pinpoint**)
+3. `amplify push`
+
+Then view metrics in Amazon Pinpoint (you can open it from the Amplify console or the Pinpoint console).
+
 ## Troubleshooting
 
 **Build fails with "Unknown at rule @theme"**

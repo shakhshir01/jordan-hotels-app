@@ -8,8 +8,6 @@ const RUNTIME_CACHE = 'visitjo-runtime-v3';
 const API_CACHE = 'visitjo-api-v3';
 
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/favicon.ico',
 ];
@@ -103,12 +101,29 @@ async function networkFirstStrategy(request) {
   try {
     const response = await fetch(request);
 
-    // Cache successful responses
+    // Cache successful responses (but never cache mismatched content-types).
     if (response.ok && request.method === 'GET') {
-      const cache = await caches.open(
-        request.url.includes('/api/') ? API_CACHE : RUNTIME_CACHE
-      );
-      cache.put(request, response.clone());
+      const contentType = (response.headers.get('content-type') || '').toLowerCase();
+
+      const accept = (request.headers.get('accept') || '').toLowerCase();
+      const isHtmlRequest = accept.includes('text/html') || request.destination === 'document';
+      const isScriptRequest = request.destination === 'script';
+      const isStyleRequest = request.destination === 'style';
+
+      // Avoid caching HTML documents; deployments change chunk filenames and
+      // stale cached HTML is the most common cause of broken dynamic imports.
+      const shouldCacheHtml = false;
+
+      const scriptOk = !isScriptRequest || contentType.includes('javascript') || contentType.includes('ecmascript') || contentType.includes('wasm');
+      const styleOk = !isStyleRequest || contentType.includes('text/css');
+      const htmlOk = !isHtmlRequest || (shouldCacheHtml && contentType.includes('text/html'));
+
+      if (scriptOk && styleOk && htmlOk) {
+        const cache = await caches.open(
+          request.url.includes('/api/') ? API_CACHE : RUNTIME_CACHE
+        );
+        cache.put(request, response.clone());
+      }
     }
 
     return response;

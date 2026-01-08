@@ -68,6 +68,10 @@ export async function handler(event) {
   }
 
   try {
+    // Safety valve: only allow Stripe PaymentIntents when explicitly enabled.
+    // Prevents accidental live charges in demo environments.
+    const paymentsEnabled = String(process.env.PAYMENTS_ENABLED || "").toLowerCase() === "true";
+
     const body = event.body ? JSON.parse(event.body) : {};
     const currency = String(body.currency || "jod").toLowerCase();
     const amount = Number(body.amount);
@@ -99,6 +103,19 @@ export async function handler(event) {
         statusCode: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
         body: JSON.stringify({ message: "Stripe is not configured" }),
+      };
+    }
+
+    const isLiveKey = typeof stripeKey === "string" && stripeKey.startsWith("sk_live_");
+    const allowLive = String(process.env.ALLOW_LIVE_PAYMENTS || "").toLowerCase() === "true";
+    if (!paymentsEnabled || (isLiveKey && !allowLive)) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+        body: JSON.stringify({
+          message:
+            "Payments are disabled for this environment. Use Stripe test keys or enable PAYMENTS_ENABLED (and ALLOW_LIVE_PAYMENTS for live keys).",
+        }),
       };
     }
 

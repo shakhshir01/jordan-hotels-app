@@ -452,6 +452,8 @@ Resources:
       Environment:
         Variables:
           STRIPE_SECRET_ARN: !Ref StripeSecret
+          PAYMENTS_ENABLED: "true"
+          ALLOW_LIVE_PAYMENTS: "false"
       Events:
         ApiCheckout:
           Type: Api
@@ -474,6 +476,8 @@ Resources:
       Environment:
         Variables:
           STRIPE_SECRET_ARN: !Ref StripeSecret
+          PAYMENTS_ENABLED: "true"
+          ALLOW_LIVE_PAYMENTS: "false"
       Events:
         ApiCreateIntent:
           Type: Api
