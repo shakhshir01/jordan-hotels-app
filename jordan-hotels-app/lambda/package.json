@@ -6,7 +6,9 @@
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.887.0",
     "@aws-sdk/client-dynamodb": "^3.887.0",
+    "@aws-sdk/client-secrets-manager": "^3.887.0",
     "@aws-sdk/client-ses": "^3.887.0",
-    "@aws-sdk/lib-dynamodb": "^3.887.0"
+    "@aws-sdk/lib-dynamodb": "^3.887.0",
+    "stripe": "^14.21.0"
   }
 }

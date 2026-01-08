@@ -7,7 +7,7 @@ import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { hotelAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
-import LazyStripeCardElement from '../components/stripe/LazyStripeCardElement';
+import LazyStripePaymentIntent from '../components/stripe/LazyStripePaymentIntent';
 import LazyPayPalButtons from '../components/paypal/LazyPayPalButtons';
 
 const Checkout = () => {
@@ -100,6 +100,12 @@ const Checkout = () => {
     return hotel.price * nights;
   };
 
+  const calculateTotalWithTax = () => {
+    const subtotal = calculateTotal();
+    const total = Number(((subtotal - appliedDiscount) * 1.1).toFixed(2));
+    return Number.isFinite(total) ? total : 0;
+  };
+
   const handleApplyPromoCode = () => {
     if (!promoCode.trim()) {
       setPromoResult({ valid: false, message: 'Please enter a promo code' });
@@ -123,7 +129,7 @@ const Checkout = () => {
     }
   };
 
-  const persistProfileAndCreateBooking = async () => {
+  const persistProfile = async () => {
     validateGuestInfo();
 
     const [firstName, ...rest] = guestInfo.fullName.trim().split(' ');
@@ -136,8 +142,11 @@ const Checkout = () => {
       phone: guestInfo.phone.trim(),
     });
 
-    const subtotal = calculateTotal();
-    const total = Number(((subtotal - appliedDiscount) * 1.1).toFixed(2));
+    return true;
+  };
+
+  const createBooking = async ({ paymentProvider, paymentIntentId, paypalDetails } = {}) => {
+    const total = calculateTotalWithTax();
     const bookingPayload = {
       hotelId,
       hotelName: hotel?.name,
@@ -151,6 +160,9 @@ const Checkout = () => {
       userName: guestInfo.fullName.trim(),
       userEmail: guestInfo.email.trim(),
       phone: guestInfo.phone.trim(),
+      paymentProvider: paymentProvider || undefined,
+      paymentIntentId: paymentIntentId || undefined,
+      paypal: paypalDetails || undefined,
     };
 
     const created = await hotelAPI.bookHotel(hotelId, bookingPayload);
@@ -167,7 +179,9 @@ const Checkout = () => {
         throw new Error('Please use the PayPal button to complete PayPal payments.');
       }
 
-      const bookingId = await persistProfileAndCreateBooking();
+      // Fallback demo path (when Stripe isn't configured): keep the old simulated processing.
+      await persistProfile();
+      const bookingId = await createBooking({ paymentProvider: 'demo' });
 
       // Simulate payment processing
       await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -191,7 +205,8 @@ const Checkout = () => {
     setProcessing(true);
     setError('');
     try {
-      const bookingId = await persistProfileAndCreateBooking();
+      await persistProfile();
+      const bookingId = await createBooking({ paymentProvider: 'paypal' });
       setOrderComplete(true);
 
       setTimeout(() => {
@@ -204,6 +219,46 @@ const Checkout = () => {
       }, 1800);
     } catch (err) {
       setError(err.message || 'PayPal payment processing failed');
+      setProcessing(false);
+    }
+  };
+
+  const stripeEnabled = Boolean(
+    import.meta.env.VITE_STRIPE_PUBLIC_KEY || import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+  );
+
+  const handleCreateStripePaymentIntent = async ({ amount, currency }) => {
+    await persistProfile();
+    const metadata = {
+      hotelId: String(hotelId || ''),
+    };
+    return await hotelAPI.createPaymentIntent({
+      amount,
+      currency,
+      metadata,
+    });
+  };
+
+  const handleStripeSuccess = async (paymentIntent) => {
+    setProcessing(true);
+    setError('');
+    try {
+      const bookingId = await createBooking({
+        paymentProvider: 'stripe',
+        paymentIntentId: paymentIntent?.id,
+      });
+
+      setOrderComplete(true);
+      setTimeout(() => {
+        navigate('/bookings', {
+          state: {
+            bookingConfirmed: true,
+            bookingId,
+          },
+        });
+      }, 1800);
+    } catch (err) {
+      setError(err.message || 'Failed to create booking after payment');
       setProcessing(false);
     }
   };
@@ -427,11 +482,24 @@ const Checkout = () => {
               <div className="space-y-4 mb-6">
                 {paymentMethod === 'card' && (
                   <>
-                    {/* If Stripe is configured (VITE_STRIPE_PUBLIC_KEY), render the real secure card UI.
-                        Otherwise fall back to simple placeholder inputs. */}
-                    <LazyStripeCardElement />
-
-                    {!import.meta.env.VITE_STRIPE_PUBLIC_KEY && !import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && (
+                    {/* If Stripe is configured, render secure card UI + confirm a PaymentIntent.
+                        Otherwise fall back to placeholder inputs + simulated checkout. */}
+                    {stripeEnabled ? (
+                      <LazyStripePaymentIntent
+                        amount={calculateTotalWithTax()}
+                        currency="jod"
+                        billingDetails={{
+                          name: guestInfo.fullName,
+                          email: guestInfo.email,
+                          phone: guestInfo.phone,
+                        }}
+                        disabled={processing}
+                        onProcessingChange={setProcessing}
+                        onCreatePaymentIntent={handleCreateStripePaymentIntent}
+                        onSuccess={handleStripeSuccess}
+                        onError={(e) => setError(e?.message || 'Stripe payment failed')}
+                      />
+                    ) : (
                       <>
                         <div>
                           <label className="block font-bold mb-2">Card Number</label>
@@ -452,6 +520,18 @@ const Checkout = () => {
                             <input type="text" placeholder="123" className="w-full border rounded-lg px-4 py-2" />
                           </div>
                         </div>
+
+                        <button
+                          onClick={handlePayment}
+                          disabled={processing}
+                          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold disabled:bg-gray-400"
+                        >
+                          {processing ? 'Processing...' : `Pay ${calculateTotalWithTax().toFixed(2)} JOD`}
+                        </button>
+
+                        <p className="text-xs text-gray-600 text-center mt-4">
+                          Your payment information is secure and encrypted
+                        </p>
                       </>
                     )}
                   </>
@@ -467,20 +547,6 @@ const Checkout = () => {
                   />
                 )}
               </div>
-
-              {paymentMethod === 'card' && (
-                <button
-                  onClick={handlePayment}
-                  disabled={processing}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold disabled:bg-gray-400"
-                >
-                  {processing ? 'Processing...' : `Pay ${((calculateTotal() - appliedDiscount) * 1.1).toFixed(2)} JOD`}
-                </button>
-              )}
-
-              <p className="text-xs text-gray-600 text-center mt-4">
-                Your payment information is secure and encrypted
-              </p>
             </div>
           </div>
         </div>

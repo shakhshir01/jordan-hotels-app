@@ -460,6 +460,28 @@ Resources:
             Method: POST
             RestApiId: !Ref Api
 
+  CreatePaymentIntentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: createPaymentIntent/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack: !Ref AWS::StackName
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - !Ref LambdaRolePolicy
+      Environment:
+        Variables:
+          STRIPE_SECRET_ARN: !Ref StripeSecret
+      Events:
+        ApiCreateIntent:
+          Type: Api
+          Properties:
+            Path: /payments/create-intent
+            Method: POST
+            RestApiId: !Ref Api
+
   GetSignedUrlFunction:
     Type: AWS::Serverless::Function
     Properties:

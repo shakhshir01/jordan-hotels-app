@@ -281,6 +281,22 @@ export const hotelAPI = {
     }
   },
 
+  createPaymentIntent: async ({ amount, currency = "jod", metadata } = {}) => {
+    if (getUseMocks()) {
+      throw new Error("Payments are not available in demo mode");
+    }
+    try {
+      const response = await apiClient.post(`/payments/create-intent`, {
+        amount,
+        currency,
+        metadata,
+      });
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      throw error;
+    }
+  },
+
   getS3UploadUrl: async (filename, contentType = "image/jpeg") => {
     if (getUseMocks()) {
       return { url: `https://example.com/mock-upload/${filename}`, key: `mock/${filename}` };
