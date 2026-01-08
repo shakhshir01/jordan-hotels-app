@@ -8,17 +8,6 @@ import { getHotelDisplayName } from '../utils/hotelLocalization';
 import { getHotelCoordinates } from '../utils/geo';
 import { InlineLoader } from '../components/LoadingSpinner';
 
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
 const JORDAN_CENTER = [31.24, 36.51];
 
 const getHotelLatLng = (hotel) => {
@@ -131,12 +120,12 @@ export default function HotelsMap() {
             iconUrl: (await import('leaflet/dist/images/marker-icon.png')).default,
             shadowUrl: (await import('leaflet/dist/images/marker-shadow.png')).default,
           });
-        } catch (e) {
+        } catch (_e) {
           // ignore icon setup failures
         }
 
         if (mounted) setLeafletComponents({ MapContainer, TileLayer, Marker, Popup, L });
-      } catch (err) {
+      } catch (_err) {
         // loading failed — keep map hidden
         // console.warn('Failed to load leaflet components', err);
       }

@@ -1,50 +1,10 @@
-name: CI
+name: Deprecated (do not use)
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
+  noop:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Run tests
-        run: npm run test -- --coverage
-
-      - name: Build
-        run: npm run build
-
-  preview-deploy:
-    needs: build-and-test
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - name: Install dependencies
-        run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: preview-build
-          path: dist
+      - run: echo "This workflow is deprecated. Use /.github/workflows/ci.yml instead."

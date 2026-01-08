@@ -7,6 +7,8 @@ import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { hotelAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
+import LazyStripeCardElement from '../components/stripe/LazyStripeCardElement';
+import LazyPayPalButtons from '../components/paypal/LazyPayPalButtons';
 
 const Checkout = () => {
   const { i18n } = useTranslation();
@@ -29,6 +31,7 @@ const Checkout = () => {
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [guestInfo, setGuestInfo] = useState({ fullName: '', email: '', phone: '' });
   const [createdBookingId, setCreatedBookingId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('card');
 
   useEffect(() => {
     const loadHotel = async () => {
@@ -114,46 +117,57 @@ const Checkout = () => {
     }
   };
 
+  const validateGuestInfo = () => {
+    if (!guestInfo.fullName.trim() || !guestInfo.email.trim() || !guestInfo.phone.trim()) {
+      throw new Error('Please fill in your name, email, and phone');
+    }
+  };
+
+  const persistProfileAndCreateBooking = async () => {
+    validateGuestInfo();
+
+    const [firstName, ...rest] = guestInfo.fullName.trim().split(' ');
+    const lastName = rest.join(' ');
+
+    await hotelAPI.updateUserProfile({
+      firstName,
+      lastName,
+      email: guestInfo.email.trim(),
+      phone: guestInfo.phone.trim(),
+    });
+
+    const subtotal = calculateTotal();
+    const total = Number(((subtotal - appliedDiscount) * 1.1).toFixed(2));
+    const bookingPayload = {
+      hotelId,
+      hotelName: hotel?.name,
+      location: hotel?.location,
+      checkInDate: resolvedBookingData.checkInDate || null,
+      checkOutDate: resolvedBookingData.checkOutDate || null,
+      nights: resolvedBookingData.nights || 1,
+      guests: resolvedBookingData.guests || 2,
+      totalPrice: total,
+      status: 'confirmed',
+      userName: guestInfo.fullName.trim(),
+      userEmail: guestInfo.email.trim(),
+      phone: guestInfo.phone.trim(),
+    };
+
+    const created = await hotelAPI.bookHotel(hotelId, bookingPayload);
+    const bookingId = created?.id || created?.bookingId || `BK-${Date.now()}`;
+    setCreatedBookingId(bookingId);
+    return bookingId;
+  };
+
   const handlePayment = async () => {
     setProcessing(true);
     setError('');
     try {
-      if (!guestInfo.fullName.trim() || !guestInfo.email.trim() || !guestInfo.phone.trim()) {
-        throw new Error('Please fill in your name, email, and phone');
+      if (paymentMethod !== 'card') {
+        throw new Error('Please use the PayPal button to complete PayPal payments.');
       }
 
-      const [firstName, ...rest] = guestInfo.fullName.trim().split(' ');
-      const lastName = rest.join(' ');
-
-      // Persist name/phone/email to Users table
-      await hotelAPI.updateUserProfile({
-        firstName,
-        lastName,
-        email: guestInfo.email.trim(),
-        phone: guestInfo.phone.trim(),
-      });
-
-      // Create the booking record in DynamoDB
-      const subtotal = calculateTotal();
-      const total = Number(((subtotal - appliedDiscount) * 1.1).toFixed(2));
-      const bookingPayload = {
-        hotelId,
-        hotelName: hotel?.name,
-        location: hotel?.location,
-        checkInDate: resolvedBookingData.checkInDate || null,
-        checkOutDate: resolvedBookingData.checkOutDate || null,
-        nights: resolvedBookingData.nights || 1,
-        guests: resolvedBookingData.guests || 2,
-        totalPrice: total,
-        status: 'confirmed',
-        userName: guestInfo.fullName.trim(),
-        userEmail: guestInfo.email.trim(),
-        phone: guestInfo.phone.trim(),
-      };
-
-      const created = await hotelAPI.bookHotel(hotelId, bookingPayload);
-      const bookingId = created?.id || created?.bookingId || `BK-${Date.now()}`;
-      setCreatedBookingId(bookingId);
+      const bookingId = await persistProfileAndCreateBooking();
 
       // Simulate payment processing
       await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -169,6 +183,27 @@ const Checkout = () => {
       }, 1800);
     } catch (err) {
       setError(err.message || 'Payment processing failed');
+      setProcessing(false);
+    }
+  };
+
+  const handlePayPalApproved = async () => {
+    setProcessing(true);
+    setError('');
+    try {
+      const bookingId = await persistProfileAndCreateBooking();
+      setOrderComplete(true);
+
+      setTimeout(() => {
+        navigate('/bookings', {
+          state: {
+            bookingConfirmed: true,
+            bookingId,
+          },
+        });
+      }, 1800);
+    } catch (err) {
+      setError(err.message || 'PayPal payment processing failed');
       setProcessing(false);
     }
   };
@@ -363,53 +398,85 @@ const Checkout = () => {
               <div className="space-y-3 mb-6">
                 <div className="border rounded-lg p-4 cursor-pointer hover:bg-blue-50">
                   <label className="flex items-center">
-                    <input type="radio" name="payment" defaultChecked className="mr-3" />
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="card"
+                      checked={paymentMethod === 'card'}
+                      onChange={() => setPaymentMethod('card')}
+                      className="mr-3"
+                    />
                     <span>Credit/Debit Card</span>
                   </label>
                 </div>
                 <div className="border rounded-lg p-4 cursor-pointer hover:bg-blue-50">
                   <label className="flex items-center">
-                    <input type="radio" name="payment" className="mr-3" />
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="paypal"
+                      checked={paymentMethod === 'paypal'}
+                      onChange={() => setPaymentMethod('paypal')}
+                      className="mr-3"
+                    />
                     <span>PayPal</span>
-                  </label>
-                </div>
-                <div className="border rounded-lg p-4 cursor-pointer hover:bg-blue-50">
-                  <label className="flex items-center">
-                    <input type="radio" name="payment" className="mr-3" />
-                    <span>Apple Pay</span>
                   </label>
                 </div>
               </div>
 
               <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block font-bold mb-2">Card Number</label>
-                  <input
-                    type="text"
-                    placeholder="4242 4242 4242 4242"
-                    className="w-full border rounded-lg px-4 py-2"
-                  />
-                </div>
+                {paymentMethod === 'card' && (
+                  <>
+                    {/* If Stripe is configured (VITE_STRIPE_PUBLIC_KEY), render the real secure card UI.
+                        Otherwise fall back to simple placeholder inputs. */}
+                    <LazyStripeCardElement />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block font-bold mb-2">Expiry</label>
-                    <input type="text" placeholder="MM/YY" className="w-full border rounded-lg px-4 py-2" />
-                  </div>
-                  <div>
-                    <label className="block font-bold mb-2">CVV</label>
-                    <input type="text" placeholder="123" className="w-full border rounded-lg px-4 py-2" />
-                  </div>
-                </div>
+                    {!import.meta.env.VITE_STRIPE_PUBLIC_KEY && !import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && (
+                      <>
+                        <div>
+                          <label className="block font-bold mb-2">Card Number</label>
+                          <input
+                            type="text"
+                            placeholder="4242 4242 4242 4242"
+                            className="w-full border rounded-lg px-4 py-2"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block font-bold mb-2">Expiry</label>
+                            <input type="text" placeholder="MM/YY" className="w-full border rounded-lg px-4 py-2" />
+                          </div>
+                          <div>
+                            <label className="block font-bold mb-2">CVV</label>
+                            <input type="text" placeholder="123" className="w-full border rounded-lg px-4 py-2" />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+
+                {paymentMethod === 'paypal' && (
+                  <LazyPayPalButtons
+                    amount={Number(((calculateTotal() - appliedDiscount) * 1.1).toFixed(2))}
+                    currency="USD"
+                    disabled={processing}
+                    onApproved={handlePayPalApproved}
+                    onError={(e) => setError(e?.message || 'PayPal failed')}
+                  />
+                )}
               </div>
 
-              <button
-                onClick={handlePayment}
-                disabled={processing}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold disabled:bg-gray-400"
-              >
-                {processing ? 'Processing...' : `Pay ${((calculateTotal() - appliedDiscount) * 1.1).toFixed(2)} JOD`}
-              </button>
+              {paymentMethod === 'card' && (
+                <button
+                  onClick={handlePayment}
+                  disabled={processing}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold disabled:bg-gray-400"
+                >
+                  {processing ? 'Processing...' : `Pay ${((calculateTotal() - appliedDiscount) * 1.1).toFixed(2)} JOD`}
+                </button>
+              )}
 
               <p className="text-xs text-gray-600 text-center mt-4">
                 Your payment information is secure and encrypted

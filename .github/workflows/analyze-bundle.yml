@@ -1,0 +1,35 @@
+name: Bundle Analyze
+
+on:
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./jordan-hotels-app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: jordan-hotels-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with analyzer
+        env:
+          ANALYZE: 'true'
+        run: npm run build
+
+      - name: Upload bundle stats
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-stats
+          path: jordan-hotels-app/dist/bundle-stats.html

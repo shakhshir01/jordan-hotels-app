@@ -4,7 +4,47 @@ import hotelsService from '../services/hotelsService';
 import { hotelAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
-import { InlineLoader } from '../components/LoadingSpinner';
+
+const GallerySkeleton = () => {
+  const skeletonCards = Array.from({ length: 3 });
+  const skeletonImages = Array.from({ length: 8 });
+
+  return (
+    <div className="space-y-20" aria-label="Loading gallery" aria-busy="true">
+      {skeletonCards.map((_, cardIndex) => (
+        <div key={cardIndex} className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-8">
+            <div className="h-8 w-1/2 bg-white/20 rounded animate-pulse mb-4" />
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex gap-6">
+                <div className="h-5 w-28 bg-white/20 rounded animate-pulse" />
+                <div className="h-5 w-28 bg-white/20 rounded animate-pulse" />
+                <div className="h-5 w-20 bg-white/20 rounded animate-pulse" />
+              </div>
+              <div className="h-10 w-28 bg-white/30 rounded-lg animate-pulse" />
+            </div>
+          </div>
+
+          <div className="p-8">
+            <div className="h-6 w-40 bg-slate-200 rounded animate-pulse mb-6" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {skeletonImages.map((_, imageIndex) => (
+                <div key={imageIndex} className="rounded-lg overflow-hidden shadow-md">
+                  <div className="relative h-56 bg-slate-200 overflow-hidden">
+                    <div className="absolute inset-0 bg-slate-300/60 animate-pulse" />
+                  </div>
+                  <div className="bg-slate-50 p-2 text-center">
+                    <div className="h-4 w-20 mx-auto bg-slate-200 rounded animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default function Gallery() {
   const [hotels, setHotels] = useState([]);
@@ -50,7 +90,7 @@ export default function Gallery() {
       {/* Gallery */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         {loading ? (
-          <InlineLoader message="Loading gallery…" />
+          <GallerySkeleton />
         ) : (
           <div className="space-y-20">
             {hotels.map((hotel) => (
