@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+// react-leaflet and leaflet are lazy-loaded to reduce initial bundle size
 import hotelsService from '../services/hotelsService';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +34,7 @@ export default function HotelsMap() {
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState('');
   const mapRef = useRef(null);
+  const [LeafletComponents, setLeafletComponents] = useState(null);
   const { i18n } = useTranslation();
 
   const requestUserLocation = () => {
@@ -114,6 +114,37 @@ export default function HotelsMap() {
     mapRef.current.setView(latlng, 13, { animate: true });
   }, [selectedHotel]);
 
+  useEffect(() => {
+    let mounted = true;
+    async function loadLeaflet() {
+      try {
+        const [{ MapContainer, TileLayer, Marker, Popup }, L] = await Promise.all([
+          import('react-leaflet'),
+          import('leaflet'),
+        ]);
+
+        // configure default icon urls
+        try {
+          delete L.Icon.Default.prototype._getIconUrl;
+          L.Icon.Default.mergeOptions({
+            iconRetinaUrl: (await import('leaflet/dist/images/marker-icon-2x.png')).default,
+            iconUrl: (await import('leaflet/dist/images/marker-icon.png')).default,
+            shadowUrl: (await import('leaflet/dist/images/marker-shadow.png')).default,
+          });
+        } catch (e) {
+          // ignore icon setup failures
+        }
+
+        if (mounted) setLeafletComponents({ MapContainer, TileLayer, Marker, Popup, L });
+      } catch (err) {
+        // loading failed — keep map hidden
+        // console.warn('Failed to load leaflet components', err);
+      }
+    }
+    loadLeaflet();
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-8">Hotels Map</h1>
@@ -138,43 +169,47 @@ export default function HotelsMap() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-lg h-96 overflow-hidden border border-gray-200">
-          <MapContainer
-            center={userLocation ? [userLocation.lat, userLocation.lon] : JORDAN_CENTER}
-            zoom={userLocation ? 12 : 8}
-            scrollWheelZoom
-            className="h-full w-full"
-            whenCreated={(map) => {
-              mapRef.current = map;
-            }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+          {LeafletComponents ? (
+            <LeafletComponents.MapContainer
+              center={userLocation ? [userLocation.lat, userLocation.lon] : JORDAN_CENTER}
+              zoom={userLocation ? 12 : 8}
+              scrollWheelZoom
+              className="h-full w-full"
+              whenCreated={(map) => {
+                mapRef.current = map;
+              }}
+            >
+              <LeafletComponents.TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
 
-            {hotels.map((hotel) => {
-              const pos = getHotelLatLng(hotel);
-              if (!pos) return null;
-              const hotelName = getHotelDisplayName(hotel, i18n.language);
-              return (
-                <Marker
-                  key={hotel.id}
-                  position={pos}
-                  eventHandlers={{
-                    click: () => setSelectedHotel(hotel),
-                  }}
-                >
-                  <Popup>
-                    <div className="min-w-[180px]">
-                      <div className="font-bold text-sm">{hotelName}</div>
-                      <div className="text-xs text-gray-600">{hotel.location}</div>
-                      <div className="text-xs font-bold text-blue-900 mt-1">{hotel.price} JOD/night</div>
-                    </div>
-                  </Popup>
-                </Marker>
-              );
-            })}
-          </MapContainer>
+              {hotels.map((hotel) => {
+                const pos = getHotelLatLng(hotel);
+                if (!pos) return null;
+                const hotelName = getHotelDisplayName(hotel, i18n.language);
+                return (
+                  <LeafletComponents.Marker
+                    key={hotel.id}
+                    position={pos}
+                    eventHandlers={{
+                      click: () => setSelectedHotel(hotel),
+                    }}
+                  >
+                    <LeafletComponents.Popup>
+                      <div className="min-w-[180px]">
+                        <div className="font-bold text-sm">{hotelName}</div>
+                        <div className="text-xs text-gray-600">{hotel.location}</div>
+                        <div className="text-xs font-bold text-blue-900 mt-1">{hotel.price} JOD/night</div>
+                      </div>
+                    </LeafletComponents.Popup>
+                  </LeafletComponents.Marker>
+                );
+              })}
+            </LeafletComponents.MapContainer>
+          ) : (
+            <div className="h-full flex items-center justify-center">Loading map…</div>
+          )}
         </div>
 
         <div>

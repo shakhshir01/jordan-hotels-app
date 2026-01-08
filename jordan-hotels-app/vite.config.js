@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 const normalizeBaseUrl = (value) => String(value || '').trim().replace(/\/$/, '')
 
@@ -27,7 +28,10 @@ export default defineConfig(({ mode }) => {
   const normalizeId = (id) => String(id || '').replace(/\\/g, '/')
 
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      (env.VITE_ANALYZE === 'true' || process.env.ANALYZE === 'true') ? visualizer({ filename: 'dist/bundle-stats.html', open: false }) : undefined,
+    ].filter(Boolean),
     build: {
       rollupOptions: {
         output: {
