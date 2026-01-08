@@ -353,11 +353,22 @@ const Home = () => {
             <Loader2 className="animate-spin text-jordan-blue" size={48} />
           </div>
         ) : (
-          <HotelsVirtualizedGrid
-            hotels={hotels}
-            viewLabel={viewLabel}
-            i18nLanguage={i18n.language}
-          />
+          <div className="space-y-8">
+            <header className="flex flex-col gap-2">
+              <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-slate-900 dark:text-slate-50">
+                Recommendations for you
+              </h2>
+              <p className="page-subtitle">
+                Handpicked stays near you — based on your location when available.
+              </p>
+            </header>
+
+            <HotelsVirtualizedGrid
+              hotels={hotels}
+              viewLabel={viewLabel}
+              i18nLanguage={i18n.language}
+            />
+          </div>
         )}
       </div>
 

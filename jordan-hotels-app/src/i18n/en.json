@@ -309,13 +309,13 @@
     "reviews": {
       "hero": {
         "kicker": "Reviews",
-        "title": "Real Guest Reviews",
+        "title": "Guest Reviews",
         "subtitle": "Honest feedback to help you choose with confidence."
       },
       "features": {
         "verified": {
           "title": "Verified stays",
-          "meta": "Reviews from real bookings."
+          "meta": "Reviews from verified bookings."
         },
         "context": {
           "title": "Context & details",
