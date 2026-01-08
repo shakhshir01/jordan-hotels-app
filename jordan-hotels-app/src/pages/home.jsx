@@ -54,30 +54,39 @@ const getUserRecommendedHotels = async () => {
   });
 
   if (geo) {
-    const nearby = await hotelsService.getNearbyHotelsByGeo({
-      lat: geo.lat,
-      lon: geo.lon,
-      limit: 6,
-      targetKm: 20,
-      pageLimit: 200,
-      maxPages: 6,
-    });
+    try {
+      const nearby = await hotelsService.getNearbyHotelsByGeo({
+        lat: geo.lat,
+        lon: geo.lon,
+        limit: 6,
+        // Slightly wider radius to avoid extra paging.
+        targetKm: 30,
+        // Keep this light; the API can be slow/unavailable.
+        pageLimit: 60,
+        maxPages: 2,
+      });
 
-    if (Array.isArray(nearby) && nearby.length > 0) return nearby;
+      if (Array.isArray(nearby) && nearby.length > 0) return nearby;
 
-    // Fallback if geo exists but we couldn't compute distances (missing geo on hotels).
-    const place = getNearestJordanPlace(geo);
-    const page = await hotelAPI.getHotelsPage({ limit: 60 });
-    const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
-    const sorted = [...hotels].sort((a, b) => {
-      const aLoc = String(a?.location || a?.destination || "").toLowerCase();
-      const bLoc = String(b?.location || b?.destination || "").toLowerCase();
-      const aBoost = aLoc.includes(place.name.toLowerCase()) ? 1 : 0;
-      const bBoost = bLoc.includes(place.name.toLowerCase()) ? 1 : 0;
-      if (bBoost !== aBoost) return bBoost - aBoost;
-      return (b?.rating || 0) - (a?.rating || 0);
-    });
-    return sorted.slice(0, 6);
+      // Fallback if geo exists but we couldn't compute distances (missing geo on hotels).
+      const place = getNearestJordanPlace(geo);
+      const page = await hotelAPI.getHotelsPage({ limit: 36 });
+      const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
+      const sorted = [...hotels].sort((a, b) => {
+        const aLoc = String(a?.location || a?.destination || "").toLowerCase();
+        const bLoc = String(b?.location || b?.destination || "").toLowerCase();
+        const aBoost = aLoc.includes(place.name.toLowerCase()) ? 1 : 0;
+        const bBoost = bLoc.includes(place.name.toLowerCase()) ? 1 : 0;
+        if (bBoost !== aBoost) return bBoost - aBoost;
+        return (b?.rating || 0) - (a?.rating || 0);
+      });
+      return sorted.slice(0, 6);
+    } catch {
+      // If geo-based recommendations fail (timeouts, API down), show a small first page instead.
+      const page = await hotelAPI.getHotelsPage({ limit: 6 });
+      const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
+      return hotels.slice(0, 6);
+    }
   }
 
   const page = await hotelAPI.getHotelsPage({ limit: 6 });

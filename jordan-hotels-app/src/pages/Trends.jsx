@@ -37,7 +37,13 @@ const Trends = () => {
       setActiveQuery(q || "");
     } catch (err) {
       console.error("Search failed", err);
-      setError(err.message || "Search failed");
+      const msg = String(err?.message || "");
+      const isTimeout = /timeout/i.test(msg);
+      setError(
+        isTimeout
+          ? "Search is taking longer than expected right now. Please try again in a moment."
+          : msg || "Search failed"
+      );
       setResults({ hotels: [], experiences: [], deals: [], destinations: [] });
     } finally {
       setLoading(false);

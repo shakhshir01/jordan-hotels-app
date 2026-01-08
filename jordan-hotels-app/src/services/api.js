@@ -28,8 +28,26 @@ const getRuntimeApiUrl = () => {
   return cfg && typeof cfg.VITE_API_GATEWAY_URL === "string" ? cfg.VITE_API_GATEWAY_URL : "";
 };
 
+const getRuntimeApiTimeoutMs = () => {
+  if (typeof window === "undefined") return null;
+  const cfg = window.__VISITJO_RUNTIME_CONFIG__;
+  const raw = cfg ? cfg.VITE_API_TIMEOUT_MS : null;
+  if (raw == null) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+};
+
 const rawRuntimeApiUrl = getRuntimeApiUrl();
 const rawEnvApiUrl = import.meta.env.VITE_API_GATEWAY_URL || "";
+
+const rawRuntimeTimeoutMs = getRuntimeApiTimeoutMs();
+const rawEnvTimeoutMs = import.meta.env.VITE_API_TIMEOUT_MS;
+const resolvedTimeoutMs = (() => {
+  const candidates = [rawRuntimeTimeoutMs, rawEnvTimeoutMs].map((v) => Number(v));
+  const picked = candidates.find((n) => Number.isFinite(n) && n > 0);
+  const base = picked ?? 15000;
+  return Math.min(60000, Math.max(5000, Math.round(base)));
+})();
 
 const effectiveApiUrl =
   rawRuntimeApiUrl && !isStaleApiUrl(rawRuntimeApiUrl)
@@ -58,7 +76,7 @@ const API_KEY = import.meta.env.VITE_API_KEY || "";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: resolvedTimeoutMs,
   headers: API_KEY ? { "x-api-key": API_KEY } : undefined,
 });
 

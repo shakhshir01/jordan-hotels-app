@@ -67,8 +67,8 @@ const hotelsService = {
     lon,
     limit = 12,
     targetKm = 20,
-    pageLimit = 200,
-    maxPages = 6,
+    pageLimit = 80,
+    maxPages = 3,
   } = {}) => {
     const userLat = Number(lat);
     const userLon = Number(lon);
