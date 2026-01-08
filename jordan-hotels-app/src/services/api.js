@@ -124,6 +124,8 @@ export const enableMocks = (enable = true) => {
   }
 };
 
+const paymentsEnabled = String(import.meta.env.VITE_PAYMENTS_ENABLED || "").toLowerCase() === "true";
+
 export const getLastAuthError = () => lastAuthError;
 
 // Lambda proxy response normalizer
@@ -269,9 +271,8 @@ export const hotelAPI = {
   },
 
   createCheckoutSession: async (hotelId, bookingData) => {
-    if (getUseMocks()) {
-      return { sessionId: `stub_${Date.now()}` };
-    }
+    // Do not block payments just because mock mode is enabled.
+    if (getUseMocks() && !paymentsEnabled) return { sessionId: `stub_${Date.now()}` };
     try {
       const response = await apiClient.post(`/payments/create-checkout-session`, { hotelId, ...bookingData });
       return normalizeLambdaResponse(response.data);
@@ -282,9 +283,8 @@ export const hotelAPI = {
   },
 
   createPaymentIntent: async ({ amount, currency = "jod", metadata } = {}) => {
-    if (getUseMocks()) {
-      throw new Error("Payments are not available in demo mode");
-    }
+    // Do not block Stripe payments due to mock data mode.
+    if (getUseMocks() && !paymentsEnabled) throw new Error("Payments are not enabled for this environment");
     const response = await apiClient.post(`/payments/create-intent`, {
       amount,
       currency,
