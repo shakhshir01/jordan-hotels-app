@@ -9,6 +9,8 @@ import "./i18n/i18n.js";
 // Import Tailwind CSS
 import "./index.css";
 
+import { initCloudWatchRum } from "./rum/initRum.js";
+
 async function cleanupStaleServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
@@ -48,6 +50,9 @@ async function cleanupStaleServiceWorker() {
 if (import.meta.env.PROD) {
   cleanupStaleServiceWorker();
 }
+
+// CloudWatch RUM (safe no-op unless env vars are set)
+initCloudWatchRum();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
