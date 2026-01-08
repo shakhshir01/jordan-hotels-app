@@ -45,10 +45,8 @@ export default function AppLayout() {
         </div>
       )}
 
-      <main className="page-shell">
-        <div className="page-container page-section">
-          <Outlet />
-        </div>
+      <main className="page-shell py-6 sm:py-8">
+        <Outlet />
       </main>
 
       <Footer />

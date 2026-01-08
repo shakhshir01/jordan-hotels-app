@@ -5,7 +5,7 @@ export default function Terms() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-      <div className="max-w-4xl mx-auto px-6 py-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
         <div className="glass-card rounded-3xl p-10 space-y-6">
           <header>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400 mb-2">

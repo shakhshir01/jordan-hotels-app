@@ -90,7 +90,7 @@ export default function TripPlanner() {
     <div className="min-h-screen">
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
-        <div className="relative px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
+        <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
             {t('pages.tripPlanner.hero.kicker')}
           </p>
@@ -103,7 +103,7 @@ export default function TripPlanner() {
         </div>
       </section>
 
-      <div className="max-w-5xl mx-auto px-6 pb-24 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-24 space-y-6">
         <div className="flex items-center justify-between mb-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             {t('pages.tripPlanner.itinerary')}

@@ -157,7 +157,7 @@ export default function HotelsMap() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 rounded-lg h-96 overflow-hidden border border-gray-200">
+        <div className="lg:col-span-2 rounded-lg h-[55vh] sm:h-96 overflow-hidden border border-gray-200">
           {LeafletComponents ? (
             <LeafletComponents.MapContainer
               center={userLocation ? [userLocation.lat, userLocation.lon] : JORDAN_CENTER}
@@ -186,9 +186,9 @@ export default function HotelsMap() {
                     }}
                   >
                     <LeafletComponents.Popup>
-                      <div className="min-w-[180px]">
-                        <div className="font-bold text-sm">{hotelName}</div>
-                        <div className="text-xs text-gray-600">{hotel.location}</div>
+                      <div className="min-w-0 max-w-[16rem]">
+                        <div className="font-bold text-sm break-words">{hotelName}</div>
+                        <div className="text-xs text-gray-600 break-words">{hotel.location}</div>
                         <div className="text-xs font-bold text-blue-900 mt-1">{hotel.price} JOD/night</div>
                       </div>
                     </LeafletComponents.Popup>

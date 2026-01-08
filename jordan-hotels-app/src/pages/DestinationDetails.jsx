@@ -11,7 +11,7 @@ export default function DestinationDetails() {
   const { i18n } = useTranslation();
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
       {loading && <p>Loading destination...</p>}
       {error && <p className="text-red-600">{error.message}</p>}
 

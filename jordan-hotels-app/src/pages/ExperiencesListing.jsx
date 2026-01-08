@@ -6,7 +6,7 @@ export default function ExperiencesListing() {
   const { data: items, loading, error } = useFetch(() => hotelAPI.getExperiences(), []);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
       <h1 className="text-3xl font-bold mb-6">Experiences</h1>
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-600">{error.message}</p>}

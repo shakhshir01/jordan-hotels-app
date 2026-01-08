@@ -25,6 +25,7 @@
     "@stripe/stripe-js": "^1.54.2",
     "@tanstack/react-virtual": "^3.13.17",
     "amazon-cognito-identity-js": "^6.3.16",
+    "aws-amplify": "^6.15.9",
     "aws-rum-web": "^1.25.0",
     "axios": "^1.13.2",
     "i18next": "^25.7.3",

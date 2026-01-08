@@ -5,9 +5,9 @@ export default function About() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 shadow-2xl mb-16 mx-6 mt-10">
+      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 shadow-2xl mb-16 mx-4 sm:mx-6 mt-10">
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative px-6 py-16 md:py-20 text-center text-white max-w-4xl mx-auto">
+        <div className="relative px-4 sm:px-6 py-16 md:py-20 text-center text-white max-w-4xl mx-auto">
           <div className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-80 mb-3">
             {t('pages.about.kicker')}
           </div>
@@ -20,7 +20,7 @@ export default function About() {
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-6 pb-20 space-y-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 space-y-16">
         <section className="grid md:grid-cols-3 gap-8">
           <div className="glass-card rounded-2xl p-6 flex flex-col gap-3">
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('pages.about.cards.localFirst.title')}</h2>

@@ -14,13 +14,13 @@ export default function Wishlist() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6 mt-8">
           <div className="absolute inset-0 bg-black/10" />
-          <div className="relative px-6 py-20 text-center text-white">
+          <div className="relative px-4 sm:px-6 py-20 text-center text-white">
             <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title')}</h1>
             <p className="text-lg opacity-95">{t('pages.wishlist.subtitle')}</p>
           </div>
         </section>
 
-        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center">
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12">
             <div className="text-6xl mb-4">💭</div>
             <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">{t('pages.wishlist.empty.title')}</h2>
@@ -43,13 +43,13 @@ export default function Wishlist() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6 mt-8">
         <div className="absolute inset-0 bg-black/10" />
-        <div className="relative px-6 py-20 text-center text-white">
+        <div className="relative px-4 sm:px-6 py-20 text-center text-white">
           <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title')}</h1>
           <p className="text-lg opacity-95">{t('pages.wishlist.itemsSaved', { count: wishlist.length })}</p>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-6 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {wishlist.map((item) => (
             <article key={item.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">

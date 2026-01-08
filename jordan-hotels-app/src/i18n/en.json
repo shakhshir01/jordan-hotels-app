@@ -19,7 +19,9 @@
     "gallery": "Gallery",
     "offers": "Offers",
     "concierge": "Concierge",
-    "account": "Account"
+    "account": "Account",
+    "menu": "Menu",
+    "close": "Close"
   },
   "hero": {
     "title": "Discover Jordan's Best Hotels",

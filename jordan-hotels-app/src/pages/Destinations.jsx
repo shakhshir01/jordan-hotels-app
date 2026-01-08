@@ -86,7 +86,7 @@ export default function Destinations() {
     <div className="min-h-screen">
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
-        <div className="relative px-6 py-20 text-center text-white">
+        <div className="relative px-4 sm:px-6 py-20 text-center text-white">
           <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.destinations.hero.kicker')}</div>
           <h1 className="text-5xl md:text-6xl font-black font-display mb-6 tracking-tight">{t('pages.destinations.hero.title')}</h1>
           <p className="text-lg max-w-3xl mx-auto opacity-95 leading-relaxed">
@@ -95,7 +95,7 @@ export default function Destinations() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-6 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
         {loading && (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-jordan-blue" size={48} />

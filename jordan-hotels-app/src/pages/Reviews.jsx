@@ -36,7 +36,7 @@ export default function Reviews() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-700 via-slate-900 to-slate-950 shadow-2xl mb-16 mx-6 mt-10">
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative px-6 py-16 md:py-20 text-center text-white max-w-3xl mx-auto">
+        <div className="relative px-4 sm:px-6 py-16 md:py-20 text-center text-white max-w-3xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-80 mb-3">
             {t('pages.reviews.hero.kicker')}
           </p>
@@ -49,7 +49,7 @@ export default function Reviews() {
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-6 pb-24 space-y-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 space-y-12">
         <section className="grid md:grid-cols-3 gap-6">
           {FEATURES.map((f) => (
             <article

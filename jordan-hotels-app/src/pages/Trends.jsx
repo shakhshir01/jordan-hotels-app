@@ -64,7 +64,7 @@ const Trends = () => {
       {/* Hero */}
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-sky-600 via-blue-700 to-indigo-700 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
-        <div className="relative px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
+        <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
             {t('pages.trends.hero.kicker')}
           </p>
@@ -110,7 +110,7 @@ const Trends = () => {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-6 pb-24 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 space-y-12">
         {loading && (
           <div className="flex justify-center py-16">
             <Loader2 className="animate-spin text-jordan-blue" size={40} />

@@ -1,1 +1,26 @@
-{}
+{
+  "analytics": {
+    "jordanhotelsapp": {
+      "providerPlugin": "awscloudformation",
+      "service": "Pinpoint"
+    }
+  },
+  "auth": {
+    "jordanhotelsapp": {
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaTypes": [],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": []
+        },
+        "signupAttributes": [],
+        "socialProviders": [],
+        "usernameAttributes": [],
+        "verificationMechanisms": []
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "managed"
+    }
+  }
+}

@@ -15,14 +15,14 @@ export default function Blog() {
     <div className="min-h-screen">
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
-        <div className="relative px-6 py-20 text-center text-white">
+        <div className="relative px-4 sm:px-6 py-20 text-center text-white">
           <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.blog.hero.kicker')}</div>
           <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.blog.hero.title')}</h1>
           <p className="text-lg max-w-3xl mx-auto opacity-95">{t('pages.blog.hero.subtitle')}</p>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-6 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {POSTS.map((p) => (
             <article key={p.slug} className="hotel-card">

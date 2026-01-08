@@ -10,6 +10,7 @@ import "./i18n/i18n.js";
 import "./index.css";
 
 import { initCloudWatchRum } from "./rum/initRum.js";
+import { initAmplify } from "./amplifyInit.js";
 
 async function cleanupStaleServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -53,6 +54,9 @@ if (import.meta.env.PROD) {
 
 // CloudWatch RUM (safe no-op unless env vars are set)
 initCloudWatchRum();
+
+// Amplify (Analytics/Auth/etc) init
+initAmplify();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

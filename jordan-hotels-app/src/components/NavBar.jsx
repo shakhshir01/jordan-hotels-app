@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle.jsx";
 import { useAuth } from "../context/AuthContext";
@@ -8,24 +9,31 @@ const Navbar = () => {
   const { user, userProfile, logout } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const displayName = user
-    ? (userProfile?.displayName || (() => {
-        const email = user.email || '';
-        const isUUID = email.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
-        return isUUID ? t('nav.account') : email.split('@')[0];
-      })())
-    : '';
+  const displayName = useMemo(() => {
+    if (!user) return "";
+    if (userProfile?.displayName) return userProfile.displayName;
+
+    const email = user.email || "";
+    const isUUID = email.match(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    );
+    return isUUID ? t("nav.account") : email.split("@")[0];
+  }, [t, user, userProfile?.displayName]);
 
   const handleLogout = () => {
     logout();
     navigate("/");
+    setMobileOpen(false);
   };
+
+  const closeMobile = () => setMobileOpen(false);
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-slate-200/50 dark:bg-slate-900/80 dark:border-slate-700/50 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <div className="flex items-center justify-between gap-3">
           {/* Brand */}
           <Link
             to="/"
@@ -119,11 +127,11 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-3">
+          {/* Actions (desktop) */}
+          <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300 max-w-[14rem] truncate">
                   {displayName}
                 </span>
                 <Link
@@ -158,7 +166,110 @@ const Navbar = () => {
             <LanguageSwitcher />
             <ThemeToggle />
           </div>
+
+          {/* Actions (mobile) */}
+          <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:bg-white dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100"
+            >
+              {mobileOpen ? t("nav.close") : t("nav.menu")}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile menu panel */}
+        {mobileOpen && (
+          <div
+            id="mobile-nav"
+            className="md:hidden mt-3 rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-xl shadow-xl dark:border-slate-700/50 dark:bg-slate-900/70"
+          >
+            <div className="p-4 flex flex-col gap-2">
+              <Link to="/destinations" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.destinations")}
+              </Link>
+              <Link to="/trends" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.trends")}
+              </Link>
+              <Link to="/insights" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.insights")}
+              </Link>
+              <Link to="/experiences" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.experiences")}
+              </Link>
+              <Link to="/deals" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.deals")}
+              </Link>
+              <Link to="/blog" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.blog")}
+              </Link>
+              <Link to="/reviews" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.reviews")}
+              </Link>
+              <Link to="/support" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.support")}
+              </Link>
+
+              <div className="my-2 h-px w-full bg-slate-200/70 dark:bg-slate-700/60" />
+
+              <Link to="/gallery" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.gallery")}
+              </Link>
+              <Link to="/special-offers" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.offers")}
+              </Link>
+              <Link to="/concierge" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t("nav.concierge")}
+              </Link>
+
+              <div className="my-2 h-px w-full bg-slate-200/70 dark:bg-slate-700/60" />
+
+              {user ? (
+                <>
+                  <div className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
+                    {displayName}
+                  </div>
+                  <Link
+                    to="/profile"
+                    onClick={closeMobile}
+                    className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200"
+                  >
+                    {t("nav.profile")}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl shadow-md transition-colors"
+                  >
+                    {t("nav.logout")}
+                  </button>
+                </>
+              ) : (
+                <div className="grid grid-cols-1 gap-2">
+                  <Link
+                    to="/login"
+                    onClick={closeMobile}
+                    className="w-full text-center px-4 py-2 bg-white text-slate-800 text-sm font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700"
+                  >
+                    {t("nav.login")}
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={closeMobile}
+                    className="w-full text-center px-4 py-2 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white text-sm font-semibold rounded-xl shadow-md"
+                  >
+                    {t("nav.signup")}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

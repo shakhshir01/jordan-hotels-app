@@ -28,7 +28,7 @@ const SavedSearches = () => {
     <div className="min-h-screen">
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-sky-700 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative px-6 py-20 md:py-24 text-center text-white max-w-3xl mx-auto">
+        <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-3xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
             YOUR DISCOVERY TRAIL
           </p>
@@ -42,7 +42,7 @@ const SavedSearches = () => {
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-6 pb-24">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24">
         {saved.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-slate-600 dark:text-slate-400 mb-4 text-sm">

@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "cognitoConfig": {
+    "identityPoolName": "jordanhotelsapp_identitypool_c72539a3",
+    "allowUnauthenticatedIdentities": true,
+    "authSelections": "identityPoolOnly",
+    "resourceName": "jordanhotelsapp",
+    "sharedId": "c72539a3",
+    "serviceName": "Cognito",
+    "useDefault": "manual"
+  }
+}

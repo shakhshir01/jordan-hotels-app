@@ -77,7 +77,7 @@ const Bookings = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-12">
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Your Bookings</h1>
           <p className="text-slate-600 dark:text-slate-400">Manage and track your hotel reservations</p>
@@ -146,7 +146,7 @@ const Bookings = () => {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                       <div>
                         <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">Check-in</p>
                         <p className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
@@ -174,18 +174,18 @@ const Bookings = () => {
                       </div>
                     </div>
 
-                    <div className="border-t border-slate-200 dark:border-slate-700 pt-4 flex items-center justify-between">
+                    <div className="border-t border-slate-200 dark:border-slate-700 pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
                         <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">Total Price</p>
-                        <p className="text-3xl font-bold text-blue-600">{total} JOD</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-blue-600">{total} JOD</p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Reference: {reference}</p>
-                        <div className="flex gap-2">
+                      <div className="text-left sm:text-right">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-2 break-all">Reference: {reference}</p>
+                        <div className="flex gap-2 sm:justify-end">
                           <button
                             onClick={() => handleCancel(booking.id)}
                             disabled={cancellingId === booking.id}
-                            className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition font-semibold disabled:opacity-60"
+                            className="w-full sm:w-auto px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition font-semibold disabled:opacity-60"
                           >
                             {cancellingId === booking.id ? 'Cancelling…' : 'Cancel'}
                           </button>

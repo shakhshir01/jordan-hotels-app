@@ -20,6 +20,17 @@
     @apply dark:from-slate-900 dark:to-slate-800 dark:text-slate-100;
   }
 
+  img,
+  video,
+  canvas,
+  svg {
+    @apply max-w-full h-auto;
+  }
+
+  pre {
+    @apply max-w-full overflow-x-auto;
+  }
+
   ::selection {
     @apply bg-blue-200 text-slate-900;
     @apply dark:bg-blue-600/40 dark:text-slate-100;
@@ -106,7 +117,7 @@
   }
 
   .page-container {
-    @apply max-w-7xl mx-auto px-6;
+    @apply max-w-7xl mx-auto px-4 sm:px-6;
   }
 
   .page-section {

@@ -80,7 +80,7 @@ export default function Gallery() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       {/* Header */}
-      <section className="relative bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 px-6">
+      <section className="relative bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-5xl font-bold mb-4">Hotel Gallery</h1>
           <p className="text-blue-100 text-lg">Explore stunning images from all our partner hotels across Jordan</p>
@@ -88,7 +88,7 @@ export default function Gallery() {
       </section>
 
       {/* Gallery */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
         {loading ? (
           <GallerySkeleton />
         ) : (

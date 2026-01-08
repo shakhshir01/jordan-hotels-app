@@ -23,7 +23,7 @@ export default function FlightsSearch() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
       <h1 className="text-2xl font-bold mb-6">Search Flights</h1>
       <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
         <input className="input-premium" placeholder="Origin" value={origin} onChange={e => setOrigin(e.target.value)} />
