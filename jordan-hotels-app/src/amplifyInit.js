@@ -1,6 +1,6 @@
 import { Amplify } from "aws-amplify";
 import { record } from "aws-amplify/analytics";
-import awsExports from "./aws-exports";
+import amplifyConfig from "./amplifyconfiguration.json";
 
 let didInit = false;
 
@@ -9,7 +9,7 @@ export function initAmplify() {
   didInit = true;
 
   try {
-    Amplify.configure(awsExports);
+    Amplify.configure(amplifyConfig);
   } catch {
     // Non-fatal: app should still boot even if Amplify isn't fully configured yet.
   }

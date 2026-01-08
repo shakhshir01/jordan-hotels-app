@@ -68,7 +68,7 @@
     "micromatch": "4.0.8"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.19.0"
   },
   "lint-staged": {
     "*.+(js|jsx|ts|tsx)": [
