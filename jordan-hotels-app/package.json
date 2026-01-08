@@ -76,10 +76,5 @@
     "*.+(css|md|json)": [
       "prettier --write"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npx lint-staged"
-    }
   }
 }

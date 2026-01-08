@@ -285,16 +285,12 @@ export const hotelAPI = {
     if (getUseMocks()) {
       throw new Error("Payments are not available in demo mode");
     }
-    try {
-      const response = await apiClient.post(`/payments/create-intent`, {
-        amount,
-        currency,
-        metadata,
-      });
-      return normalizeLambdaResponse(response.data);
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiClient.post(`/payments/create-intent`, {
+      amount,
+      currency,
+      metadata,
+    });
+    return normalizeLambdaResponse(response.data);
   },
 
   getS3UploadUrl: async (filename, contentType = "image/jpeg") => {
