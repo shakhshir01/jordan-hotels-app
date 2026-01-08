@@ -4,14 +4,6 @@ import { UserPool } from '../authConfig';
 import { setAuthToken } from '../services/api';
 import { showSuccess, showError } from '../services/toastService';
 import { deriveNameFromEmail, loadSavedProfile, saveProfile } from '../utils/userProfile';
-import { parseJwtClaims, isJwtExpired } from '../utils/jwt';
-import { getHostedUILogoutUrl, startHostedUISignIn } from '../auth/hostedUi';
-
-const hostedTokenKeys = {
-  idToken: 'visitjo.auth.idToken',
-  accessToken: 'visitjo.auth.accessToken',
-  refreshToken: 'visitjo.auth.refreshToken',
-};
 
 export const AuthContext = createContext();
 
@@ -40,74 +32,9 @@ export const AuthProvider = ({ children }) => {
     setUserProfile(nextProfile);
   };
 
-  const setUserFromIdToken = (idToken) => {
-    const claims = parseJwtClaims(idToken) || {};
-    const email = String(claims.email || claims['cognito:username'] || '').trim();
-    if (email) {
-      setUserAndProfileFromEmail(email);
-      return;
-    }
-
-    // Fallback: user pools sometimes omit email depending on scopes/attributes.
-    const sub = String(claims.sub || '').trim();
-    if (sub) {
-      setUser({ email: sub });
-      setUserProfile({ email: sub, displayName: sub, hasCustomName: false });
-    }
-  };
-
-  const loadHostedTokens = () => {
-    try {
-      return {
-        idToken: localStorage.getItem(hostedTokenKeys.idToken) || '',
-        accessToken: localStorage.getItem(hostedTokenKeys.accessToken) || '',
-        refreshToken: localStorage.getItem(hostedTokenKeys.refreshToken) || '',
-      };
-    } catch {
-      return { idToken: '', accessToken: '', refreshToken: '' };
-    }
-  };
-
-  const persistHostedTokens = ({ idToken, accessToken, refreshToken } = {}) => {
-    try {
-      if (idToken) localStorage.setItem(hostedTokenKeys.idToken, idToken);
-      if (accessToken) localStorage.setItem(hostedTokenKeys.accessToken, accessToken);
-      if (refreshToken) localStorage.setItem(hostedTokenKeys.refreshToken, refreshToken);
-    } catch {
-      // ignore
-    }
-  };
-
-  const clearHostedTokens = () => {
-    try {
-      localStorage.removeItem(hostedTokenKeys.idToken);
-      localStorage.removeItem(hostedTokenKeys.accessToken);
-      localStorage.removeItem(hostedTokenKeys.refreshToken);
-    } catch {
-      // ignore
-    }
-  };
-
-  const setSessionFromHostedTokens = ({ idToken, accessToken, refreshToken } = {}) => {
-    if (!idToken) throw new Error('Missing ID token');
-    persistHostedTokens({ idToken, accessToken, refreshToken });
-    setUserFromIdToken(idToken);
-    setAuthToken(idToken);
-    setError(null);
-  };
-
   // Check if user is already logged in on mount
   useEffect(() => {
     try {
-      // 1) Hosted UI session (social login) - restore from localStorage
-      const hosted = loadHostedTokens();
-      if (hosted?.idToken && !isJwtExpired(hosted.idToken)) {
-        setUserFromIdToken(hosted.idToken);
-        setAuthToken(hosted.idToken);
-        setLoading(false);
-        return;
-      }
-
       if (!UserPool) {
         setLoading(false);
         return;
@@ -225,24 +152,11 @@ export const AuthProvider = ({ children }) => {
         cognitoUser.signOut();
       }
     }
-    clearHostedTokens();
     setUser(null);
     setUserProfile(null);
     setAuthToken(null);
     setError(null);
     showSuccess('Logged out successfully');
-  };
-
-  const logoutFully = () => {
-    logout();
-    const url = getHostedUILogoutUrl();
-    if (url && typeof window !== 'undefined') {
-      window.location.assign(url);
-    }
-  };
-
-  const loginWithProvider = async (provider) => {
-    await startHostedUISignIn({ provider, postLoginPath: '/' });
   };
 
   const updateUserProfileName = (patch) => {
@@ -353,9 +267,6 @@ export const AuthProvider = ({ children }) => {
     signUp,
     login,
     logout,
-    logoutFully,
-    loginWithProvider,
-    setSessionFromHostedTokens,
     verifyEmail,
     forgotPassword,
     confirmNewPassword,
