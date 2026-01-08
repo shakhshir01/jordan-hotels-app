@@ -5,7 +5,7 @@ applications:
       phases:
         preBuild:
           commands:
-            - 'if [ -s "$NVM_DIR/nvm.sh" ]; then . "$NVM_DIR/nvm.sh"; nvm install 22; nvm use 22; fi'
+            - 'if [ -s "$NVM_DIR/nvm.sh" ]; then . "$NVM_DIR/nvm.sh"; nvm install 22.21.1; nvm use 22.21.1; fi'
             - node -v
             - npm ci --include=dev
         build:
