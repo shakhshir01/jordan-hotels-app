@@ -6,11 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "prepare": "husky install",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "check:format": "prettier --check .",
     "preview": "vite preview",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
+    "analyze": "vite build --sourcemap && echo 'open dist for analysis'",
+    "audit": "npm audit --audit-level=moderate",
     "deploy:aws": "bash lambda/deploy-and-seed.sh",
     "deploy:aws:windows": "powershell -ExecutionPolicy Bypass -File lambda\\deploy-and-seed.ps1"
   },
@@ -49,9 +55,30 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19",
     "vite": "^7.2.4",
-    "vitest": "^1.6.1"
+    "vitest": "^1.6.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0",
+    "prettier": "^2.8.8",
+    "rollup-plugin-visualizer": "^5.8.0"
   },
   "overrides": {
     "esbuild": "0.27.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "lint-staged": {
+    "*.+(js|jsx|ts|tsx)": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.+(css|md|json)": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx lint-staged"
+    }
   }
 }
