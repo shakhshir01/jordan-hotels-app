@@ -28,6 +28,10 @@ export default defineConfig(({ mode }) => {
   const normalizeId = (id) => String(id || '').replace(/\\/g, '/')
 
   return {
+    resolve: {
+      // Avoid duplicate React copies (can cause invalid hook calls after OAuth redirects)
+      dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
+    },
     plugins: [
       react(),
       (env.VITE_ANALYZE === 'true' || process.env.ANALYZE === 'true') ? visualizer({ filename: 'dist/bundle-stats.html', open: false }) : undefined,

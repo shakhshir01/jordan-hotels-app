@@ -16,6 +16,7 @@ const HotelDetails = React.lazy(() => import('./pages/HotelDetails.jsx'));
 const SignUp = React.lazy(() => import('./pages/SignUp.jsx'));
 const Verify = React.lazy(() => import('./pages/Verify'));
 const Login = React.lazy(() => import('./pages/Login'));
+const OAuthCallback = React.lazy(() => import('./pages/OAuthCallback.jsx'));
 const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
 const Profile = React.lazy(() => import('./pages/Profile'));
@@ -65,6 +66,7 @@ function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
         <Route path="/signup" element={user ? <Navigate to="/" /> : <SignUp />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />

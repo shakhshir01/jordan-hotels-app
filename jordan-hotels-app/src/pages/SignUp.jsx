@@ -13,10 +13,11 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { signUp, loginWithProvider } = useAuth();
   const { t } = useTranslation();
 
   const renderError = (value) => {
@@ -55,6 +56,19 @@ const SignUp = () => {
     }
   };
 
+  const handleSocial = async (provider) => {
+    setErrors({});
+    setSocialLoading(true);
+    try {
+      await loginWithProvider(provider);
+    } catch (err) {
+      const errorMsg = err?.message || 'Failed to start social sign-in';
+      showError(errorMsg);
+      setErrors({ submit: errorMsg });
+      setSocialLoading(false);
+    }
+  };
+
   const passwordErrors = getPasswordErrors(password);
 
   return (
@@ -62,6 +76,40 @@ const SignUp = () => {
       <form onSubmit={handleSignUp} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-black mb-2 text-center">{t('pages.signup.title')}</h2>
         <p className="text-center text-slate-600 mb-8">{t('pages.signup.subtitle')}</p>
+
+        {/* Social Sign-up */}
+        <div className="mb-6">
+          <button
+            type="button"
+            disabled={socialLoading}
+            onClick={() => handleSocial('Google')}
+            className="w-full p-3 rounded-lg font-bold border border-slate-200 bg-white hover:bg-slate-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {t('auth.continueWithGoogle')}
+          </button>
+          <button
+            type="button"
+            disabled={socialLoading}
+            onClick={() => handleSocial('Facebook')}
+            className="w-full p-3 rounded-lg font-bold border border-slate-200 bg-white hover:bg-slate-50 transition-all mt-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {t('auth.continueWithFacebook')}
+          </button>
+          <button
+            type="button"
+            disabled={socialLoading}
+            onClick={() => handleSocial('SignInWithApple')}
+            className="w-full p-3 rounded-lg font-bold border border-slate-200 bg-white hover:bg-slate-50 transition-all mt-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {t('auth.continueWithApple')}
+          </button>
+
+          <div className="flex items-center gap-3 my-6">
+            <div className="h-px bg-slate-200 flex-1" />
+            <span className="text-xs text-slate-500 font-bold">{t('auth.or')}</span>
+            <div className="h-px bg-slate-200 flex-1" />
+          </div>
+        </div>
 
         {/* Submit Error */}
         {errors.submit && (

@@ -133,6 +133,65 @@ Sign up form that calls `useAuth().signUp()`
 - [ ] Set up email templates (optional)
 - [ ] Enable social providers (optional)
 
+## 🌐 Social Sign-In (Google / Facebook / Apple) — Hosted UI
+
+This app uses **Cognito Hosted UI (OAuth2 Authorization Code + PKCE)** for social sign-in.
+
+### 1) Add callback + logout URLs
+
+In **Cognito User Pool → App integration → App client settings / Hosted UI**:
+
+- **Allowed callback URLs** (add all you need):
+  - `http://localhost:5173/oauth/callback`
+  - `https://www.visit-jo.com/oauth/callback`
+  - `https://visit-jo.com/oauth/callback`
+- **Allowed sign-out URLs**:
+  - `http://localhost:5173/`
+  - `https://www.visit-jo.com/`
+  - `https://visit-jo.com/`
+
+Recommended scopes: `openid`, `email`, `profile`.
+
+### 2) Configure identity providers
+
+In **Cognito User Pool → Social and external providers** (wording varies by console):
+
+**Google**
+- Create OAuth client in Google Cloud Console.
+- Configure the **Authorized redirect URI** to point to Cognito (Hosted UI callback), not your SPA.
+- Paste the Google client ID/secret into Cognito.
+
+**Facebook**
+- Create an app in Meta for Developers.
+- Add the Facebook App ID/secret to Cognito.
+
+**Apple (Sign in with Apple)**
+- Create Services ID + Key in Apple Developer.
+- Configure Sign in with Apple in Cognito.
+
+### 3) Enable providers on the app client
+
+In the Cognito app client settings:
+- Check **Google**, **Facebook**, **Sign in with Apple** as enabled identity providers.
+
+### 4) Provider names used by the app
+
+The SPA redirects to Cognito Hosted UI using these provider identifiers:
+- Google: `Google`
+- Facebook: `Facebook`
+- Apple: `SignInWithApple`
+
+### 5) Required frontend config
+
+The app needs these values at runtime (local `.env` or Amplify env vars):
+
+```dotenv
+VITE_COGNITO_CLIENT_ID=...
+VITE_COGNITO_DOMAIN=...auth.<region>.amazoncognito.com
+```
+
+If you use the repo’s `public/runtime-config.js` approach in production, make sure the same values are present there.
+
 ## 🆘 Troubleshooting
 
 ### Issue: "User not found" when signing in
