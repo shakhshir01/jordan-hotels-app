@@ -15,7 +15,7 @@ async function cleanupStaleServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   // Avoid reload loops.
-  const markerKey = 'visitjo_sw_cleanup_done_v1';
+  const markerKey = 'visitjo_sw_cleanup_done_v2';
   if (sessionStorage.getItem(markerKey)) return;
 
   try {

@@ -83,9 +83,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // JS/CSS bundles - network first (avoid mixed cached chunks after deploy)
+  // JS/CSS bundles - network ONLY.
+  // Serving cached JS/CSS after a deployment can mix old/new bundles and crash React.
   if (request.destination === 'script' || request.destination === 'style') {
-    event.respondWith(networkFirstStrategy(request));
+    event.respondWith(fetch(request));
     return;
   }
 
