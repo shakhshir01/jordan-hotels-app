@@ -42,37 +42,45 @@ export async function handler(event) {
   if (method === "OPTIONS") return { statusCode: 200, headers: defaultHeaders, body: "" };
 
   try {
+    // Fetch hotels from DynamoDB as before
     const tableName = process.env.HOTELS_TABLE || process.env.DYNAMODB_TABLE_HOTELS;
-    if (!tableName) {
-      return json(200, {
-        hotels: [
-          { id: "h1", name: "Amman Palace", city: "Amman", rating: 4.5 },
-          { id: "h2", name: "Petra Inn", city: "Wadi Musa", rating: 4.7 },
-        ],
-      });
-    }
-
     const qs = event?.queryStringParameters || {};
     const limit = clampInt(qs.limit, 1, 200, 100);
     const cursor = decodeCursor(qs.cursor);
 
-    const { DynamoDBClient } = await import("@aws-sdk/client-dynamodb");
-    const { DynamoDBDocumentClient, ScanCommand } = await import("@aws-sdk/lib-dynamodb");
-    const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+    let hotels = [];
+    if (tableName) {
+      const { DynamoDBClient } = await import("@aws-sdk/client-dynamodb");
+      const { DynamoDBDocumentClient, ScanCommand } = await import("@aws-sdk/lib-dynamodb");
+      const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+      const input = {
+        TableName: tableName,
+        Limit: limit,
+        ...(cursor ? { ExclusiveStartKey: cursor } : {}),
+      };
+      const res = await client.send(new ScanCommand(input));
+      hotels = Array.isArray(res?.Items) ? res.Items : [];
+    }
 
-    const input = {
-      TableName: tableName,
-      Limit: limit,
-      ...(cursor ? { ExclusiveStartKey: cursor } : {}),
-    };
+    // Fetch public hotel data from Xotelo
+    let publicHotels = [];
+    try {
+      const { fetchXoteloHotels } = await import("../providers/xotelo.js");
+      publicHotels = await fetchXoteloHotels({ locationKey: "g293985", limit: 200 });
+    } catch (err) {
+      console.warn("Failed to fetch public hotels from Xotelo:", err.message || err);
+    }
 
-    const res = await client.send(new ScanCommand(input));
-    const hotels = Array.isArray(res?.Items) ? res.Items : [];
-    const nextCursor = encodeCursor(res?.LastEvaluatedKey);
+    // Merge DynamoDB and public hotels (by id)
+    const byId = new Map();
+    for (const h of [...publicHotels, ...hotels]) {
+      if (h && h.id) byId.set(h.id, h);
+    }
+    const mergedHotels = Array.from(byId.values());
 
     return json(200, {
-      hotels,
-      nextCursor: nextCursor || null,
+      hotels: mergedHotels,
+      nextCursor: null,
     });
   } catch (err) {
     console.error("getHotels error", err);

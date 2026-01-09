@@ -404,4 +404,5 @@ export const realHotelsAPI = {
   },
 };
 
+export { REAL_HOTELS };
 export default realHotelsAPI;

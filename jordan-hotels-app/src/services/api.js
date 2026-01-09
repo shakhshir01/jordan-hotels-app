@@ -7,6 +7,8 @@ import {
   mockBlogPosts,
   mockSearchResult,
 } from "./mockData.js";
+import { REAL_HOTELS } from "./realHotelsData.js";
+import { XOTELO_JORDAN_HOTELS } from "./xoteloJordanHotelsData.js";
 import { sanitizeHotelImageUrls } from "../utils/hotelImageFallback";
 
 // Resolve API URL in this order:
@@ -74,13 +76,48 @@ const shouldUseDevProxy = isLocalDevHost && (hasRuntimeApiUrl || hasEnvApiUrl);
 // In local dev always use the Vite dev proxy path `/api` so requests are proxied
 // to the configured `VITE_API_GATEWAY_URL`. This avoids CORS / 403 problems
 // when the frontend and local API gateway are on different ports.
-const API_BASE_URL = import.meta.env.DEV ? "/api" : (shouldUseDevProxy ? "/api" : resolvedApiBaseUrl);
-const API_KEY = import.meta.env.VITE_API_KEY || "";
+// Smart routing: use public API for hotels, deals, destinations, experiences, search
+const PUBLIC_API_BASE_URL = resolvedApiBaseUrl || "https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod";
+const LOCAL_API_BASE_URL = import.meta.env.VITE_API_GATEWAY_URL || "";
+// API Key for public endpoints (if required)
+// Try runtime config, then Vite env, else undefined
+let API_KEY = undefined;
+if (typeof window !== "undefined" && window.__VISITJO_RUNTIME_CONFIG__ && window.__VISITJO_RUNTIME_CONFIG__.VITE_API_KEY) {
+  API_KEY = window.__VISITJO_RUNTIME_CONFIG__.VITE_API_KEY;
+} else if (import.meta.env.VITE_API_KEY) {
+  API_KEY = import.meta.env.VITE_API_KEY;
+}
+
+function getApiBaseUrl(path) {
+  // Always use public API for hotels, deals, destinations, experiences, search
+  if (/^\/hotels/.test(path) || /^\/deals/.test(path) || /^\/destinations/.test(path) || /^\/experiences/.test(path) || /^\/search/.test(path)) {
+    // In local dev, use Vite proxy to avoid CORS issues
+    if (isLocalDevHost) {
+      return "/api";
+    }
+    return PUBLIC_API_BASE_URL;
+  }
+  // In local dev, force Vite proxy for user/profile endpoints to avoid CORS
+  if (isLocalDevHost && (/^\/user/.test(path) || /^\/profile/.test(path) || /^\/bookings/.test(path) || /^\/uploads/.test(path) || /^\/payments/.test(path))) {
+    return "/api";
+  }
+  // Otherwise, use local backend or fallback to public API
+  return LOCAL_API_BASE_URL || PUBLIC_API_BASE_URL;
+}
 
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: PUBLIC_API_BASE_URL,
   timeout: resolvedTimeoutMs,
   headers: API_KEY ? { "x-api-key": API_KEY } : undefined,
+});
+
+// Patch axios to use correct baseURL per endpoint
+apiClient.interceptors.request.use((config) => {
+  if (config && config.url) {
+    const baseUrl = getApiBaseUrl(config.url);
+    config.baseURL = baseUrl;
+  }
+  return config;
 });
 
 // Export function to set auth token (used by AuthContext)
@@ -125,6 +162,8 @@ apiClient.interceptors.response.use(
 
 // Helpers for mock mode
 export const getUseMocks = () => {
+  // Temporarily disable mock mode to use real API
+  return false;
   if (typeof window === "undefined") return false;
   try {
     return localStorage.getItem("visitjo.useMocks") === "1";
@@ -173,43 +212,52 @@ const normalizeHotel = (rawHotel) => {
   if (!rawHotel || typeof rawHotel !== "object") return rawHotel;
 
   const key = rawHotel.id || rawHotel.hotelId || rawHotel.name || "";
-  const rawImages = Array.isArray(rawHotel.images) ? rawHotel.images.filter(Boolean) : [];
-  const rawImage = typeof rawHotel.image === "string" && rawHotel.image.trim() ? rawHotel.image.trim() : "";
-
-  const sanitized = sanitizeHotelImageUrls([rawImage, ...rawImages], key);
+  // Prefer images array, fallback to image string
+  let images = [];
+  if (Array.isArray(rawHotel.images) && rawHotel.images.length > 0) {
+    images = rawHotel.images.filter((img) => typeof img === "string" && img.trim());
+  } else if (typeof rawHotel.image === "string" && rawHotel.image.trim()) {
+    images = [rawHotel.image.trim()];
+  }
+  const sanitized = sanitizeHotelImageUrls(images, key);
   const image = sanitized[0] || "";
-  const images = sanitized;
-
   return {
     ...rawHotel,
-    images,
+    images: sanitized,
     image,
   };
 };
 
 export const hotelAPI = {
   getHotelsPage: async ({ cursor = "", limit = 100 } = {}) => {
-    if (getUseMocks()) {
+    const useMocks = getUseMocks();
+    console.log("API: useMocks =", useMocks);
+    if (useMocks) {
+      console.log("API: Using mock data");
       return {
         hotels: Array.isArray(mockHotels) ? mockHotels : [],
         nextCursor: null,
       };
     }
+    console.log("API: Trying real API...");
     try {
       const params = new URLSearchParams();
       if (limit) params.set("limit", String(limit));
       if (cursor) params.set("cursor", String(cursor));
       const url = params.toString() ? `/hotels?${params.toString()}` : "/hotels";
+      console.log("API: Making request to:", url);
       const response = await apiClient.get(url);
       const data = normalizeLambdaResponse(response.data);
       const hotels = Array.isArray(data?.hotels) ? data.hotels.map(normalizeHotel) : Array.isArray(data) ? data.map(normalizeHotel) : [];
       const nextCursor = data?.nextCursor ? String(data.nextCursor) : null;
+      console.log("API: Success! Got", hotels.length, "hotels from API");
       return { hotels, nextCursor };
     } catch (error) {
-      if (lastAuthError) {
-        return { hotels: mockHotels, nextCursor: null };
-      }
-      throw error;
+      console.warn("API failed, falling back to real hotel data:", error.message);
+      // Fallback to real hotel data when API fails
+      const hotels = Array.isArray(REAL_HOTELS) ? REAL_HOTELS.slice(0, limit).map(normalizeHotel) : [];
+      console.log("API: Fallback - returning", hotels.length, "real hotels");
+      return { hotels, nextCursor: null };
     }
   },
 
