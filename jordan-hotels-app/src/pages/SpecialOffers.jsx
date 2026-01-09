@@ -4,6 +4,7 @@ import hotelsService from '../services/hotelsService';
 import { useAuth } from '../context/AuthContext';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
+import getDefaultBookingData from "../utils/bookingDefaults";
 import { getHotelDisplayName } from '../utils/hotelLocalization';
 
 export default function SpecialOffers() {
@@ -26,7 +27,8 @@ export default function SpecialOffers() {
       navigate('/login', { state: { returnUrl: '/special-offers' } });
       return;
     }
-    navigate('/checkout', { state: { hotelId: hotel?.id, hotel, discount } });
+    const bookingData = getDefaultBookingData();
+    navigate('/checkout', { state: { hotelId: hotel?.id, hotel, discount, bookingData } });
   };
 
   return (

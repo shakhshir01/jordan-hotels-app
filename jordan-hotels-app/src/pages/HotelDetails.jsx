@@ -48,6 +48,7 @@ const HotelDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [checkInDate, setCheckInDate] = useState('');
+  const [checkOutDate, setCheckOutDate] = useState('');
   const [guests, setGuests] = useState('1');
   const [bookingLoading, setBookingLoading] = useState(false);
 
@@ -81,13 +82,26 @@ const HotelDetails = () => {
       alert(t('hotelDetails.errors.selectCheckIn'));
       return;
     }
+    if (!checkOutDate) {
+      alert(t('hotelDetails.errors.selectCheckOut') || 'Please select a check-out date');
+      return;
+    }
+
+    // ensure check-out is after check-in
+    if (new Date(checkOutDate) <= new Date(checkInDate)) {
+      alert(t('hotelDetails.errors.invalidCheckOut') || 'Check-out must be after check-in');
+      return;
+    }
 
     setBookingLoading(true);
     try {
+      const nights = Math.max(1, Math.ceil((new Date(checkOutDate) - new Date(checkInDate)) / (24 * 60 * 60 * 1000)));
       const bookingData = {
         checkInDate,
-        numberOfGuests: parseInt(guests),
-        totalPrice: hotel.price * parseInt(guests),
+        checkOutDate,
+        nights,
+        guests: parseInt(guests, 10),
+        totalPrice: (hotel.price || 0) * nights,
       };
       // Navigate to checkout with hotel and booking data
       navigate('/checkout', { state: { hotelId: id, bookingData, hotel } });
@@ -342,6 +356,19 @@ const HotelDetails = () => {
               />
             </div>
 
+            {/* Check-out Date */}
+            <div>
+              <label className="label-premium">{t('hotelDetails.booking.checkOut')}</label>
+              <input
+                type="date"
+                value={checkOutDate}
+                onChange={(e) => setCheckOutDate(e.target.value)}
+                min={checkInDate || new Date().toISOString().split('T')[0]}
+                className="input-premium"
+                required
+              />
+            </div>
+
             {/* Number of Guests */}
             <div>
               <label className="label-premium">{t('hotelDetails.booking.guests')}</label>
@@ -362,10 +389,10 @@ const HotelDetails = () => {
             <div className="border-t border-slate-200/70 dark:border-slate-700/60 pt-6">
               <div className="flex justify-between items-center mb-4 gap-4">
                 <span className="text-sm text-slate-700 dark:text-slate-200">
-                  {hotel.price} JOD × {guests} {t('hotelDetails.booking.nights', { count: Number(guests) })}
+                  {hotel.price} JOD × {Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)))} {t('hotelDetails.booking.nights', { count: 1 })}
                 </span>
                 <span className="font-bold text-lg text-slate-900 dark:text-slate-50">
-                  {(hotel.price * parseInt(guests)).toLocaleString()} JOD
+                  {((hotel.price || 0) * Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)))).toLocaleString()} JOD
                 </span>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import getDefaultBookingData from "../utils/bookingDefaults";
 import { useAuth } from "../context/AuthContext";
 import WishlistButton from "../components/WishlistButton";
 import { useTranslation } from "react-i18next";
@@ -116,7 +117,8 @@ export default function Experiences() {
       navigate('/login', { state: { returnUrl: '/experiences' } });
       return;
     }
-    navigate('/checkout', { state: { experience } });
+    const bookingData = getDefaultBookingData();
+    navigate('/checkout', { state: { experience, bookingData } });
   };
 
   return (

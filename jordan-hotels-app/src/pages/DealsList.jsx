@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import hotelsService from "../services/hotelsService";
 import { Link, useNavigate } from "react-router-dom";
+import getDefaultBookingData from "../utils/bookingDefaults";
 import { useAuth } from "../context/AuthContext";
 import WishlistButton from "../components/WishlistButton";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
@@ -30,7 +31,8 @@ export default function DealsList() {
       navigate('/login', { state: { returnUrl: '/deals' } });
       return;
     }
-    navigate('/checkout', { state: { hotelId: hotel?.id, hotel, discount } });
+    const bookingData = getDefaultBookingData();
+    navigate('/checkout', { state: { hotelId: hotel?.id, hotel, discount, bookingData } });
   };
 
   if (loading) return <div className="p-24 text-center">{t('pages.dealsList.loading')}</div>;
