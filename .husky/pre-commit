@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
-. "$(dirname "$0")/_/husky.sh"
+. "$(dirname \"$0\")/_/husky.sh"
 
+# Run frontend lint-staged from the nested project so eslint.config.js and node_modules resolve
+cd "$(pwd)/jordan-hotels-app" || exit 0
 npx lint-staged
