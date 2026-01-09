@@ -125,13 +125,13 @@ export const AuthProvider = ({ children }) => {
 
       cognitoUser.authenticateUser(authDetails, {
         onSuccess: (session) => {
-            setUserAndProfileFromEmail(email);
-            try {
-              const idToken = session.getIdToken().getJwtToken();
-              setAuthToken(idToken);
-            } catch (e) {
-              console.warn('Failed to set auth token on login', e);
-            }
+          setUserAndProfileFromEmail(email);
+          try {
+            const idToken = session.getIdToken().getJwtToken();
+            setAuthToken(idToken);
+          } catch (e) {
+            console.warn('Failed to set auth token on login', e);
+          }
           setError(null);
           showSuccess(`Welcome back, ${email}!`);
           resolve(session);
@@ -139,6 +139,43 @@ export const AuthProvider = ({ children }) => {
         onFailure: (err) => {
           setError(err.message);
           showError(err.message || 'Login failed');
+          reject(err);
+        },
+        // Provide handlers for possible Cognito challenges so callbacks exist
+        mfaRequired: (challengeName, challengeParameters) => {
+          const err = new Error('MFA required for this account. Please complete MFA setup via your account.');
+          setError(err.message);
+          showError(err.message);
+          reject(err);
+        },
+        selectMFAType: (challengeName, challengeParameters) => {
+          const err = new Error('Please select an MFA type to continue.');
+          setError(err.message);
+          showError(err.message);
+          reject(err);
+        },
+        mfaSetup: (challengeName, challengeParameters) => {
+          const err = new Error('MFA setup is required for this account.');
+          setError(err.message);
+          showError(err.message);
+          reject(err);
+        },
+        totpRequired: (challengeName, challengeParameters) => {
+          const err = new Error('TOTP (authenticator app) verification is required.');
+          setError(err.message);
+          showError(err.message);
+          reject(err);
+        },
+        customChallenge: (challengeParameters) => {
+          const err = new Error('A custom authentication challenge was presented and cannot be handled here.');
+          setError(err.message);
+          showError(err.message);
+          reject(err);
+        },
+        newPasswordRequired: (userAttributes, requiredAttributes) => {
+          const err = new Error('A new password is required for this account.');
+          setError(err.message);
+          showError(err.message);
           reject(err);
         },
       });
