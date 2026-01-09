@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
+# Run lint-staged from this project's root (this script lives in .husky/)
+cd "$(dirname "$0")/.." || exit 0
 npx lint-staged
