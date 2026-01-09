@@ -228,78 +228,124 @@ const normalizeHotel = (rawHotel) => {
   };
 };
 
+// Fallback function to fetch hotels from Xotelo API directly
+const fetchXoteloFallback = async (limit = 100) => {
+  try {
+    const url = `https://data.xotelo.com/api/list?location_key=g293985&limit=${limit}&sort=best_value`;
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "VisitJo/1.0 (+https://visitjo.com)",
+        "Accept": "application/json",
+      },
+    });
+    const json = await response.json();
+    if (json?.error) throw new Error(json.error.message || 'Xotelo API error');
+    const list = Array.isArray(json?.result?.list) ? json.result.list : [];
+    // Map to hotel format
+    const hotels = list.map((item) => {
+      const name = String(item?.name || "").trim();
+      const key = String(item?.key || "").trim();
+      const url = String(item?.url || "").trim();
+      const rating = Number(item?.review_summary?.rating) || 0;
+      const reviews = Number(item?.review_summary?.count) || 0;
+      const min = item?.price_ranges?.minimum;
+      const price = min != null ? Number(min) : 0;
+      const image = typeof item?.image === "string" ? item.image.trim() : "";
+      return {
+        id: key || `xotelo-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+        name: name || "Jordan stay",
+        location: "Jordan",
+        destination: "Jordan",
+        price,
+        currency: "USD",
+        rating,
+        reviews,
+        image,
+        images: image ? [image] : [],
+        description: "",
+        source: "xotelo",
+        tripadvisorUrl: url,
+        accommodationType: String(item?.accommodation_type || ""),
+        mentions: Array.isArray(item?.mentions) ? item.mentions : [],
+        merchandisingLabels: Array.isArray(item?.merchandising_labels) ? item.merchandising_labels : [],
+        geo: item?.geo || null,
+        priceRanges: item?.price_ranges || null,
+        createdAt: new Date().toISOString(),
+      };
+    });
+    return hotels;
+  } catch (error) {
+    console.warn("Failed to fetch from Xotelo API:", error.message);
+    // Fallback to static Xotelo data
+    return Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS.slice(0, limit) : [];
+  }
+};
+
 export const hotelAPI = {
   getHotelsPage: async ({ cursor = "", limit = 100 } = {}) => {
-    const useMocks = getUseMocks();
-    console.log("API: useMocks =", useMocks);
-    if (useMocks) {
-      console.log("API: Using mock data");
-      return {
-        hotels: Array.isArray(mockHotels) ? mockHotels : [],
-        nextCursor: null,
-      };
+    console.log("API: Using real hotel data from Xotelo and curated sources");
+
+    // Combine Xotelo and curated real hotels data
+    const allHotels = [
+      ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : []),
+      ...(Array.isArray(REAL_HOTELS) ? REAL_HOTELS : []),
+    ];
+
+    // Deduplicate by id, preferring Xotelo data
+    const seenIds = new Set();
+    const uniqueHotels = [];
+    for (const hotel of allHotels) {
+      if (hotel?.id && !seenIds.has(hotel.id)) {
+        seenIds.add(hotel.id);
+        uniqueHotels.push(hotel);
+      }
     }
-    console.log("API: Trying real API...");
-    try {
-      const params = new URLSearchParams();
-      if (limit) params.set("limit", String(limit));
-      if (cursor) params.set("cursor", String(cursor));
-      const url = params.toString() ? `/hotels?${params.toString()}` : "/hotels";
-      console.log("API: Making request to:", url);
-      const response = await apiClient.get(url);
-      const data = normalizeLambdaResponse(response.data);
-      const hotels = Array.isArray(data?.hotels) ? data.hotels.map(normalizeHotel) : Array.isArray(data) ? data.map(normalizeHotel) : [];
-      const nextCursor = data?.nextCursor ? String(data.nextCursor) : null;
-      console.log("API: Success! Got", hotels.length, "hotels from API");
-      return { hotels, nextCursor };
-    } catch (error) {
-      console.warn("API failed, falling back to real hotel data:", error.message);
-      // Fallback to real hotel data when API fails
-      const hotels = Array.isArray(REAL_HOTELS) ? REAL_HOTELS.slice(0, limit).map(normalizeHotel) : [];
-      console.log("API: Fallback - returning", hotels.length, "real hotels");
-      return { hotels, nextCursor: null };
-    }
+
+    // Normalize hotels
+    const normalizedHotels = uniqueHotels.map(normalizeHotel);
+
+    // Handle pagination
+    const startIndex = cursor ? parseInt(cursor, 10) || 0 : 0;
+    const endIndex = startIndex + limit;
+    const hotels = normalizedHotels.slice(startIndex, endIndex);
+    const nextCursor = endIndex < normalizedHotels.length ? String(endIndex) : null;
+
+    console.log("API: Returning", hotels.length, "hotels from combined real data sources");
+    return { hotels, nextCursor };
   },
 
   getAllHotels: async (location = "") => {
-    if (getUseMocks()) {
-      return mockHotels.filter(
-        (h) => !location || h.location.toLowerCase().includes(location.toLowerCase())
+    console.log("API: Using combined real hotel data from Xotelo and curated sources");
+
+    // Combine Xotelo and curated real hotels data
+    const allHotels = [
+      ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : []),
+      ...(Array.isArray(REAL_HOTELS) ? REAL_HOTELS : []),
+    ];
+
+    // Deduplicate by id, preferring Xotelo data
+    const seenIds = new Set();
+    const uniqueHotels = [];
+    for (const hotel of allHotels) {
+      if (hotel?.id && !seenIds.has(hotel.id)) {
+        seenIds.add(hotel.id);
+        uniqueHotels.push(hotel);
+      }
+    }
+
+    // Normalize hotels
+    const normalizedHotels = uniqueHotels.map(normalizeHotel);
+
+    // Filter by location if specified
+    if (location && String(location).trim()) {
+      const normalizedLocation = String(location).toLowerCase().trim();
+      return normalizedHotels.filter((h) =>
+        h.location.toLowerCase().includes(normalizedLocation) ||
+        h.destination.toLowerCase().includes(normalizedLocation)
       );
     }
-    try {
-      // When a filter is requested, use /search (it already supports multi-table search)
-      // instead of scanning the full hotels table.
-      if (location && String(location).trim()) {
-        const search = await hotelAPI.searchAll(location);
-        const hotels = Array.isArray(search?.hotels) ? search.hotels : [];
-        return hotels.map(normalizeHotel);
-      }
 
-      // Cursor-paginated scan of all hotels.
-      const maxHotels = 6000;
-      const limit = 200;
-      const out = [];
-      let cursor = "";
-      let guard = 0;
-
-      while (guard < 50 && out.length < maxHotels) {
-        const page = await hotelAPI.getHotelsPage({ cursor, limit });
-        const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
-        out.push(...hotels);
-
-        const next = page?.nextCursor ? String(page.nextCursor) : "";
-        if (!next || next === cursor || hotels.length === 0) break;
-        cursor = next;
-        guard += 1;
-      }
-
-      return out;
-    } catch (error) {
-      // fallback to mocks on auth error
-      if (lastAuthError) return mockHotels;
-      throw error;
-    }
+    return normalizedHotels;
   },
 
   getHotelById: async (id) => {

@@ -130,6 +130,10 @@ if (-not $env:XOTELO_SLEEP_MS) { $env:XOTELO_SLEEP_MS = "140" }
 node lambda/seed/seed.js
 if ($LASTEXITCODE -ne 0) { throw "seed failed (exit $LASTEXITCODE)" }
 
+Write-Host "Seeding destinations..." -ForegroundColor Green
+node scripts/seed-destinations.mjs
+if ($LASTEXITCODE -ne 0) { throw "destinations seed failed (exit $LASTEXITCODE)" }
+
 Write-Host "4) Fetching ApiUrl output (if AWS CLI is available)..." -ForegroundColor Green
 $apiUrl = $null
 try {

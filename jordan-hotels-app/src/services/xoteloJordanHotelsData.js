@@ -1,7 +1,7 @@
 /* eslint-disable */
 // GENERATED FILE — do not edit by hand
 // Source: https://data.xotelo.com/api/list?location_key=g293985
-// Generated at: 2026-01-09T17:49:07.449Z
+// Generated at: 2026-01-09T18:33:10.768Z
 
 export const XOTELO_JORDAN_HOTELS = [
   {
