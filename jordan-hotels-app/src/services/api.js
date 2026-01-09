@@ -77,7 +77,7 @@ const shouldUseDevProxy = isLocalDevHost && (hasRuntimeApiUrl || hasEnvApiUrl);
 // to the configured `VITE_API_GATEWAY_URL`. This avoids CORS / 403 problems
 // when the frontend and local API gateway are on different ports.
 // Smart routing: use public API for hotels, deals, destinations, experiences, search
-const PUBLIC_API_BASE_URL = resolvedApiBaseUrl || "https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod";
+const PUBLIC_API_BASE_URL = resolvedApiBaseUrl || "";
 const LOCAL_API_BASE_URL = import.meta.env.VITE_API_GATEWAY_URL || "";
 // API Key for public endpoints (if required)
 // Try runtime config, then Vite env, else undefined
@@ -162,8 +162,7 @@ apiClient.interceptors.response.use(
 
 // Helpers for mock mode
 export const getUseMocks = () => {
-  // Temporarily disable mock mode to use real API
-  return false;
+  // Allow opt-in mock mode via localStorage in the browser.
   if (typeof window === "undefined") return false;
   try {
     return localStorage.getItem("visitjo.useMocks") === "1";
@@ -228,6 +227,52 @@ const normalizeHotel = (rawHotel) => {
   };
 };
 
+// Helper function to get hotels from static data with filtering and pagination
+const getHotelsFromStatic = ({ q = "", cursor = "", limit = 30 } = {}) => {
+  // Combine Xotelo and curated real hotels data
+  const allHotels = [
+    ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : []),
+    ...(Array.isArray(REAL_HOTELS) ? REAL_HOTELS : []),
+  ];
+
+  // Deduplicate by id, preferring Xotelo data
+  const seenIds = new Set();
+  const uniqueHotels = [];
+  for (const hotel of allHotels) {
+    if (hotel?.id && !seenIds.has(hotel.id)) {
+      seenIds.add(hotel.id);
+      uniqueHotels.push(hotel);
+    }
+  }
+
+  // Normalize hotels
+  const normalizedHotels = uniqueHotels.map(normalizeHotel);
+
+  // Filter by query if provided
+  let filteredHotels = normalizedHotels;
+  if (q && String(q).trim()) {
+    const normalizedQuery = String(q).toLowerCase().trim();
+    filteredHotels = normalizedHotels.filter((hotel) => {
+      const searchFields = [
+        hotel.name,
+        hotel.location,
+        hotel.destination,
+        hotel.city
+      ].filter(Boolean).map(field => String(field).toLowerCase());
+
+      return searchFields.some(field => field.includes(normalizedQuery));
+    });
+  }
+
+  // Handle pagination
+  const startIndex = cursor ? parseInt(cursor, 10) || 0 : 0;
+  const endIndex = startIndex + limit;
+  const hotels = filteredHotels.slice(startIndex, endIndex);
+  const nextCursor = endIndex < filteredHotels.length ? String(endIndex) : null;
+
+  return { hotels, nextCursor };
+};
+
 // Fallback function to fetch hotels from Xotelo API directly
 const fetchXoteloFallback = async (limit = 100) => {
   try {
@@ -285,33 +330,10 @@ export const hotelAPI = {
   getHotelsPage: async ({ cursor = "", limit = 100 } = {}) => {
     console.log("API: Using real hotel data from Xotelo and curated sources");
 
-    // Combine Xotelo and curated real hotels data
-    const allHotels = [
-      ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : []),
-      ...(Array.isArray(REAL_HOTELS) ? REAL_HOTELS : []),
-    ];
+    const result = getHotelsFromStatic({ cursor, limit });
 
-    // Deduplicate by id, preferring Xotelo data
-    const seenIds = new Set();
-    const uniqueHotels = [];
-    for (const hotel of allHotels) {
-      if (hotel?.id && !seenIds.has(hotel.id)) {
-        seenIds.add(hotel.id);
-        uniqueHotels.push(hotel);
-      }
-    }
-
-    // Normalize hotels
-    const normalizedHotels = uniqueHotels.map(normalizeHotel);
-
-    // Handle pagination
-    const startIndex = cursor ? parseInt(cursor, 10) || 0 : 0;
-    const endIndex = startIndex + limit;
-    const hotels = normalizedHotels.slice(startIndex, endIndex);
-    const nextCursor = endIndex < normalizedHotels.length ? String(endIndex) : null;
-
-    console.log("API: Returning", hotels.length, "hotels from combined real data sources");
-    return { hotels, nextCursor };
+    console.log("API: Returning", result.hotels.length, "hotels from combined real data sources");
+    return result;
   },
 
   getAllHotels: async (location = "") => {
@@ -552,28 +574,12 @@ export const hotelAPI = {
       return { hotels: filtered.slice(0, Math.max(1, Number(limit) || 30)).map(normalizeHotel), nextCursor: null };
     }
 
-    try {
-      const params = new URLSearchParams();
-      params.set("scope", "hotels");
-      if (q && String(q).trim()) params.set("q", String(q));
-      if (limit) params.set("limit", String(limit));
-      if (cursor) params.set("cursor", String(cursor));
-      const url = `/search?${params.toString()}`;
-      const response = await apiClient.get(url, signal ? { signal } : undefined);
-      const data = normalizeLambdaResponse(response.data);
-      const hotels = Array.isArray(data?.hotels)
-        ? data.hotels.map(normalizeHotel)
-        : Array.isArray(data)
-          ? data.map(normalizeHotel)
-          : [];
-      const nextCursor = data?.nextCursor ? String(data.nextCursor) : null;
-      return { hotels, nextCursor };
-    } catch (error) {
-      if (lastAuthError) {
-        return { hotels: Array.isArray(mockHotels) ? mockHotels.map(normalizeHotel) : [], nextCursor: null };
-      }
-      throw error;
-    }
+    console.log("API: Using static hotel data for search");
+
+    const result = getHotelsFromStatic({ q, cursor, limit });
+
+    console.log("API: Returning", result.hotels.length, "hotels from search");
+    return result;
   },
 
   searchAll: async (q = "") => {
