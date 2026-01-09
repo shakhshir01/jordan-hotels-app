@@ -53,24 +53,25 @@ const getUserRecommendedHotels = async () => {
     );
   });
 
-  if (geo) {
+    if (geo) {
     try {
+      // Increase nearby results so desktop shows more recommendations
       const nearby = await hotelsService.getNearbyHotelsByGeo({
         lat: geo.lat,
         lon: geo.lon,
-        limit: 6,
+        limit: 12,
         // Slightly wider radius to avoid extra paging.
         targetKm: 30,
         // Keep this light; the API can be slow/unavailable.
-        pageLimit: 60,
-        maxPages: 2,
+        pageLimit: 120,
+        maxPages: 3,
       });
 
       if (Array.isArray(nearby) && nearby.length > 0) return nearby;
 
       // Fallback if geo exists but we couldn't compute distances (missing geo on hotels).
       const place = getNearestJordanPlace(geo);
-      const page = await hotelAPI.getHotelsPage({ limit: 36 });
+      const page = await hotelAPI.getHotelsPage({ limit: 72 });
       const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
       const sorted = [...hotels].sort((a, b) => {
         const aLoc = String(a?.location || a?.destination || "").toLowerCase();
@@ -80,18 +81,18 @@ const getUserRecommendedHotels = async () => {
         if (bBoost !== aBoost) return bBoost - aBoost;
         return (b?.rating || 0) - (a?.rating || 0);
       });
-      return sorted.slice(0, 6);
+      return sorted.slice(0, 12);
     } catch {
       // If geo-based recommendations fail (timeouts, API down), show a small first page instead.
-      const page = await hotelAPI.getHotelsPage({ limit: 6 });
+      const page = await hotelAPI.getHotelsPage({ limit: 12 });
       const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
-      return hotels.slice(0, 6);
+      return hotels.slice(0, 12);
     }
   }
 
-  const page = await hotelAPI.getHotelsPage({ limit: 6 });
+  const page = await hotelAPI.getHotelsPage({ limit: 12 });
   const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
-  return hotels.slice(0, 6);
+  return hotels.slice(0, 12);
 };
 
 const FALLBACK_IMG =
@@ -153,25 +154,25 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 leading-snug">
+      <div className="p-4">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 leading-snug">
           {hotelName}
         </h3>
-        <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 mb-6">
+        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-4">
           <MapPin size={14} />
           {hotel.location}
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
           <div>
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
               {hotel.price} {hotel.currency || "JOD"}
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400">/night</div>
           </div>
           <Link
             to={`/hotels/${hotel.id}`}
-            className="px-6 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-semibold text-sm rounded-xl hover:bg-jordan-blue hover:text-white dark:hover:bg-jordan-blue transition-all duration-300"
+            className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-semibold text-sm rounded-lg hover:bg-jordan-blue hover:text-white dark:hover:bg-jordan-blue transition-all duration-300"
           >
             {viewLabel}
           </Link>
@@ -199,8 +200,8 @@ const HotelsVirtualizedGrid = React.memo(function HotelsVirtualizedGrid({
 
   const rowVirtualizer = useWindowVirtualizer({
     count: rows,
-    estimateSize: () => 560,
-    overscan: 4,
+    estimateSize: () => 380,
+    overscan: 6,
     scrollMargin,
   });
 
