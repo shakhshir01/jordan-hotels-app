@@ -119,12 +119,14 @@ const Bookings = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                   {/* Image */}
                   <div className="md:col-span-1">
-                    <img 
-                      src={image} 
-                      alt={name} 
-                      onError={createHotelImageOnErrorHandler(`booking:${booking.id}`)}
-                      className="w-full h-48 object-cover rounded-lg"
-                    />
+                    <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                      <img
+                        src={image}
+                        alt={name}
+                        onError={createHotelImageOnErrorHandler(`booking:${booking.id}`)}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
 
                   {/* Details */}

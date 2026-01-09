@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Minimal template to build ChatFunction
+Resources:
+  ChatFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs22.x
+      CodeUri: .
+      MemorySize: 512
+      Timeout: 10
+      Environment:
+        Variables:
+          AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
+          OPENAI_API_KEY: "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"
+
+Parameters:
+  OpenAISecretArn:
+    Type: String
+    Description: "ARN or name of the Secrets Manager secret containing OPENAI_API_KEY (SecretString key: OPENAI_API_KEY). Leave empty to set later."
+    Default: ""
+
+Outputs:
+  ChatFunctionArn:
+    Description: ARN of the ChatFunction
+    Value: !GetAtt ChatFunction.Arn

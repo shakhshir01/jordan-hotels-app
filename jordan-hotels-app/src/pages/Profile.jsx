@@ -6,6 +6,8 @@ import { showSuccess, showError } from '../services/toastService';
 import { InlineLoader } from '../components/LoadingSpinner';
 import { hotelAPI } from '../services/api';
 
+// Email MFA UI is handled in the MFA modal now; inline manager removed.
+
 const normalizeBooking = (booking, index = 0) => {
   if (!booking) return null;
 
@@ -69,12 +71,13 @@ const normalizeBooking = (booking, index = 0) => {
 };
 
 const Profile = () => {
-  const { user, userProfile, updateUserProfileName, logout, setupTotp } = useAuth();
+  const { user, userProfile, updateUserProfileName, logout, setupTotp, mfaEnabled, openEmailSetup } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [showEnableOptions, setShowEnableOptions] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -195,6 +198,48 @@ const Profile = () => {
     }
   };
 
+  // Inline component to choose enable method
+  function Enable2FaChooser({ setupTotp }) {
+    const [loading, setLoading] = React.useState(false);
+    const startTotp = async () => {
+      try {
+        setLoading(true);
+        await setupTotp();
+        showSuccess('Follow the modal instructions to finish setting up your authenticator app.');
+      } catch (err) {
+        console.error('TOTP setup error', err);
+        showError(err?.message || 'Failed to start 2FA setup');
+      } finally {
+        setLoading(false);
+        setShowEnableOptions(false);
+      }
+    };
+
+    const chooseEmail = () => {
+      setShowEnableOptions(false);
+      // open Email MFA setup inside the centralized MFA modal
+      openEmailSetup?.();
+    };
+
+    return (
+      <div className="relative">
+        <button onClick={() => setShowEnableOptions((s) => !s)} className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+          <Check size={16} />
+          Enable 2FA
+        </button>
+        {showEnableOptions && (
+          <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-3 z-50">
+            <p className="text-sm font-semibold mb-2">Choose 2FA method</p>
+              <div className="flex flex-col gap-2">
+                <button onClick={startTotp} disabled={loading} className="px-3 py-2 text-left rounded-lg hover:bg-slate-50">Authenticator app (TOTP)</button>
+                <button onClick={chooseEmail} className="px-3 py-2 text-left rounded-lg hover:bg-slate-50">Email (alternate address)</button>
+              </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (loading) return <InlineLoader message="Loading profile..." />;
 
   const totalNights = bookings.reduce((sum, b) => sum + (b.nights || 0), 0);
@@ -242,24 +287,19 @@ const Profile = () => {
                       Edit Profile
                     </button>
 
-                    <button
-                      onClick={async () => {
-                        try {
-                          await setupTotp();
-                          showSuccess('Follow the modal instructions to finish setting up your authenticator app.');
-                        } catch (err) {
-                          console.error('TOTP setup error', err);
-                          showError(err?.message || 'Failed to start 2FA setup');
-                        }
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-                    >
-                      <Check size={16} />
-                      Enable 2FA
-                    </button>
+                    {mfaEnabled ? (
+                      <div className="flex items-center gap-2 px-4 py-2 border border-green-200 bg-green-50 text-green-800 rounded-lg">
+                        <Check size={16} />
+                        Enabled
+                      </div>
+                    ) : (
+                      <Enable2FaChooser setupTotp={setupTotp} />
+                    )}
                   </div>
               )}
             </div>
+
+            {/* Email-based 2FA is configured via the MFA modal when choosing Email from Enable 2FA */}
 
             {editing ? (
               <div className="space-y-4">

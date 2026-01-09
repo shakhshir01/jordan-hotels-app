@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, X, Minimize2, Maximize2, MessageCircle, Headphones } from 'lucide-react';
-import { generateChatResponse } from '../services/chatbot';
+import { chatQuery } from '../services/chatService';
 import hotelsService from '../services/hotelsService';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
@@ -98,7 +98,7 @@ export default function ChatBot() {
     // Get bot response
     setTimeout(async () => {
       try {
-        const response = await generateChatResponse(input, nextHistory);
+        const response = await chatQuery(input, nextHistory);
 
         const botText = response?.text || '';
         if (Array.isArray(response?.hotels) && response.hotels.length > 0) {

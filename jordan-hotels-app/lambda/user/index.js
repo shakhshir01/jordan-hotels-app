@@ -4,10 +4,13 @@ import {
   GetCommand,
   PutCommand,
   QueryCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" });
 const docClient = DynamoDBDocumentClient.from(client);
+const ses = new SESClient({ region: process.env.AWS_REGION || 'us-east-1' });
 
 const BOOKINGS_TABLE = process.env.BOOKINGS_TABLE || "Bookings";
 const USERS_TABLE = process.env.USERS_TABLE || "Users";
@@ -77,6 +80,26 @@ export async function handler(event) {
     // PUT /user/profile
     if (path === '/user/profile' && method === 'PUT') {
       return await updateUserProfile(userId, event);
+    }
+
+    // POST /user/mfa/email/setup
+    if (path === '/user/mfa/email/setup' && method === 'POST') {
+      return await setupEmailMfa(userId, event);
+    }
+
+    // POST /user/mfa/email/verify
+    if (path === '/user/mfa/email/verify' && method === 'POST') {
+      return await verifyEmailMfa(userId, event);
+    }
+
+    // POST /auth/email-mfa/request
+    if (path === '/auth/email-mfa/request' && method === 'POST') {
+      return await requestEmailMfaChallenge(userId, event);
+    }
+
+    // POST /user/mfa/disable
+    if (path === '/user/mfa/disable' && method === 'POST') {
+      return await disableMfa(userId, event);
     }
 
     // GET /user/bookings
@@ -193,6 +216,10 @@ async function updateUserProfile(userId, event) {
       location: body.location || '',
       joinedDate: body.joinedDate || '',
       membershipTier: body.membershipTier || '',
+      // preserve MFA fields if provided
+      mfaEnabled: body.mfaEnabled === undefined ? (body.mfaEnabled) : body.mfaEnabled,
+      mfaMethod: body.mfaMethod || undefined,
+      mfaSecondaryEmail: body.mfaSecondaryEmail || undefined,
     };
 
     if (USERS_TABLE) {
@@ -261,5 +288,170 @@ async function getUserBookings(userId, event) {
       headers: { "Content-Type": "application/json", ...corsHeaders },
       body: JSON.stringify({ bookings: [], count: 0 }),
     };
+  }
+}
+
+// Helpers for email MFA
+function generateNumericCode(digits = 6) {
+  const max = 10 ** digits;
+  const n = Math.floor(Math.random() * (max - 1)) + 1;
+  return String(n).padStart(digits, '0');
+}
+
+async function sendEmail(toAddress, subject, textBody, htmlBody) {
+  const from = process.env.SES_FROM_EMAIL || process.env.SENDER_EMAIL || `no-reply@${process.env.DOMAIN || 'visit-jo.com'}`;
+  const params = {
+    Destination: { ToAddresses: [toAddress] },
+    Message: {
+      Body: {
+        Text: { Data: textBody || '' },
+        Html: { Data: htmlBody || textBody || '' },
+      },
+      Subject: { Data: subject || 'VisitJO verification' },
+    },
+    Source: from,
+  };
+  try {
+    await ses.send(new SendEmailCommand(params));
+    return true;
+  } catch (e) {
+    console.error('SES send error:', e);
+    return false;
+  }
+}
+
+async function setupEmailMfa(userId, event) {
+  const corsHeaders = getCorsHeaders(event);
+  try {
+    const body = event.body ? JSON.parse(event.body) : {};
+    const secondaryEmail = String(body.secondaryEmail || body.email || '').trim();
+    if (!secondaryEmail) {
+      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'secondaryEmail required' }) };
+    }
+
+    // Prevent using the same address that's already registered to the user
+    let existingItem = {};
+    if (USERS_TABLE) {
+      const found = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+      existingItem = found?.Item || {};
+    }
+    const registeredEmail = String(existingItem.email || '').trim().toLowerCase();
+    if (registeredEmail && registeredEmail === secondaryEmail.toLowerCase()) {
+      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Secondary email must be different from the primary account email' }) };
+    }
+
+    const code = generateNumericCode(6);
+    const expiresAt = Date.now() + 1000 * 60 * 15; // 15 minutes
+
+    // update user item with pending MFA fields
+    if (USERS_TABLE) {
+      const existing = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+      const item = existing?.Item || { userId };
+      item.mfaPendingEmail = secondaryEmail;
+      item.mfaPendingCode = code;
+      item.mfaPendingExpires = expiresAt;
+      item.mfaMethodPending = 'EMAIL';
+      await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
+    }
+
+    // send email (best-effort)
+    const sent = await sendEmail(
+      secondaryEmail,
+      'VisitJO verification code',
+      `Your VisitJO verification code is: ${code}`,
+      `<p>Your VisitJO verification code is: <strong>${code}</strong></p>`
+    );
+
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ sent: !!sent }) };
+  } catch (error) {
+    console.error('setupEmailMfa error', error);
+    return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to setup email MFA' }) };
+  }
+}
+
+async function verifyEmailMfa(userId, event) {
+  const corsHeaders = getCorsHeaders(event);
+  try {
+    const body = event.body ? JSON.parse(event.body) : {};
+    const code = String(body.code || body.token || '').trim();
+    if (!code) return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'code required' }) };
+
+    if (!USERS_TABLE) return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Users table not configured' }) };
+
+    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+    const item = result?.Item || {};
+    const pendingCode = String(item.mfaPendingCode || '');
+    const expires = Number(item.mfaPendingExpires || 0);
+    const pendingEmail = item.mfaPendingEmail;
+
+    if (!pendingCode || Date.now() > expires) {
+      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'No valid pending code' }) };
+    }
+
+    if (pendingCode !== code) {
+      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Invalid code' }) };
+    }
+
+    // mark MFA enabled
+    const updated = { ...(item || {}), mfaEnabled: true, mfaMethod: 'EMAIL', mfaSecondaryEmail: pendingEmail };
+    delete updated.mfaPendingCode;
+    delete updated.mfaPendingExpires;
+    delete updated.mfaPendingEmail;
+    delete updated.mfaMethodPending;
+
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
+
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ verified: true }) };
+  } catch (error) {
+    console.error('verifyEmailMfa error', error);
+    return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to verify code' }) };
+  }
+}
+
+async function requestEmailMfaChallenge(userId, event) {
+  const corsHeaders = getCorsHeaders(event);
+  try {
+    if (!USERS_TABLE) return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Users table not configured' }) };
+    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+    const item = result?.Item || {};
+    if (!item.mfaEnabled || item.mfaMethod !== 'EMAIL' || !item.mfaSecondaryEmail) {
+      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Email MFA not enabled' }) };
+    }
+
+    const code = generateNumericCode(6);
+    const expiresAt = Date.now() + 1000 * 60 * 10; // 10 minutes
+
+    item.mfaChallengeCode = code;
+    item.mfaChallengeExpires = expiresAt;
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
+
+    const sent = await sendEmail(
+      item.mfaSecondaryEmail,
+      'Your VisitJO login code',
+      `Your VisitJO login code is: ${code}`,
+      `<p>Your VisitJO login code is: <strong>${code}</strong></p>`
+    );
+
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ sent: !!sent }) };
+  } catch (error) {
+    console.error('requestEmailMfaChallenge error', error);
+    return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to request challenge' }) };
+  }
+}
+
+async function disableMfa(userId, event) {
+  const corsHeaders = getCorsHeaders(event);
+  try {
+    if (!USERS_TABLE) return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Users table not configured' }) };
+    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+    const item = result?.Item || {};
+    item.mfaEnabled = false;
+    delete item.mfaMethod;
+    delete item.mfaSecondaryEmail;
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
+    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ success: true }) };
+  } catch (error) {
+    console.error('disableMfa error', error);
+    return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to disable MFA' }) };
   }
 }

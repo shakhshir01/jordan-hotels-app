@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import { UserPool } from '../authConfig';
-import { setAuthToken } from '../services/api';
+import { setAuthToken, hotelAPI } from '../services/api';
 import { showSuccess, showError } from '../services/toastService';
 import { deriveNameFromEmail, loadSavedProfile, saveProfile } from '../utils/userProfile';
 
@@ -13,6 +13,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mfaChallenge, setMfaChallenge] = useState(null);
+  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [pendingSecondaryEmail, setPendingSecondaryEmail] = useState(null);
   const cognitoUserRef = React.useRef(null);
 
   const setUserAndProfileFromEmail = (email) => {
@@ -56,7 +58,13 @@ export const AuthProvider = ({ children }) => {
               } else {
                 const emailAttr = attributes?.find(attr => attr.Name === 'email');
                 const email = emailAttr?.Value || cognitoUser.getUsername();
-                setUserAndProfileFromEmail(email);
+                    setUserAndProfileFromEmail(email);
+                    try {
+                      const stored = localStorage.getItem(`visitjo.mfaEnabled.${email}`);
+                      if (stored === '1') setMfaEnabled(true);
+                    } catch (_e) {
+                      console.warn('Failed reading stored MFA flag', _e);
+                    }
               }
               try {
                 const idToken = session.getIdToken().getJwtToken();
@@ -178,11 +186,19 @@ export const AuthProvider = ({ children }) => {
     setUserProfile(null);
     setAuthToken(null);
     setError(null);
+    try {
+      const email = cognitoUserRef.current?.getUsername?.() || null;
+      if (email) localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
+    } catch (_e) { console.warn('Ignored during logout cleanup', _e); }
     showSuccess('Logged out successfully');
   };
 
   const clearMfaChallenge = () => {
     setMfaChallenge(null);
+  };
+
+  const openEmailSetup = () => {
+    setMfaChallenge({ type: 'EMAIL_SETUP' });
   };
 
   const submitMfaCode = (code, mfaType) => {
@@ -194,9 +210,19 @@ export const AuthProvider = ({ children }) => {
           try {
             const idToken = session.getIdToken().getJwtToken();
             setAuthToken(idToken);
-          } catch (e) {}
+          } catch (_e) { console.warn('Ignored during login token set', _e); }
           setUserAndProfileFromEmail(cognitoUser.getUsername());
+          try {
+            const email = cognitoUser.getUsername();
+            localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+          } catch (_e) { console.warn('Ignored during login token set', _e); }
+          setMfaEnabled(true);
+          // persist server-side if possible
+          try {
+            hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' }).catch(() => {});
+          } catch (_e) { console.warn('Ignored during session refresh', _e); }
           clearMfaChallenge();
+          showSuccess('MFA verified');
           resolve(session);
         },
         onFailure: (err) => {
@@ -251,14 +277,15 @@ export const AuthProvider = ({ children }) => {
               try {
                 const idToken = newSession.getIdToken().getJwtToken();
                 setAuthToken(idToken);
-              } catch (e) {
-                // ignore
-              }
+                  } catch (_e) {
+                    console.warn('Failed to set auth token from refreshed session', _e);
+                  }
               proceedWithAssociate();
             });
             return;
           }
-        } catch (e) {
+        } catch (_e) {
+          console.warn('Session refresh check failed', _e);
           // continue to reject below
         }
 
@@ -274,6 +301,16 @@ export const AuthProvider = ({ children }) => {
     return new Promise((resolve, reject) => {
       cognitoUser.verifySoftwareToken(userCode, friendlyName, {
         onSuccess: (res) => {
+          showSuccess('Two-factor authentication enabled');
+          try {
+            const email = cognitoUser.getUsername();
+            localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+          } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
+          setMfaEnabled(true);
+          // persist server-side (best-effort)
+          try {
+            hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' }).catch(() => {});
+          } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
           clearMfaChallenge();
           resolve(res);
         },
@@ -283,6 +320,69 @@ export const AuthProvider = ({ children }) => {
         },
       });
     });
+  };
+
+  // Email MFA flows (secondary address)
+  const setupEmailMfa = async (secondaryEmail) => {
+    if (!secondaryEmail) throw new Error('Secondary email required');
+    // Disallow using primary/registered email as secondary
+    const primary = user?.email || cognitoUserRef.current?.getUsername?.();
+    if (primary && String(primary).trim().toLowerCase() === String(secondaryEmail).trim().toLowerCase()) {
+      const msg = 'Secondary email must be different from your primary account email';
+      setError(msg);
+      showError(msg);
+      throw new Error(msg);
+    }
+    try {
+      setPendingSecondaryEmail(secondaryEmail);
+      const res = await hotelAPI.setupEmailMfa(secondaryEmail);
+      showSuccess('Verification email sent to secondary address');
+      return res;
+    } catch (e) {
+      setError(e?.message || String(e));
+      showError(e?.message || 'Failed to send verification email');
+      throw e;
+    }
+  };
+
+  const verifyEmailMfa = async (code) => {
+    try {
+      const res = await hotelAPI.verifyEmailMfa(code);
+      // on success, persist state
+      const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
+      try {
+        const email = cognitoUser?.getUsername?.() || user?.email;
+        if (email) localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+      } catch (_e) { console.warn('Ignored while persisting local MFA flag', _e); }
+      setMfaEnabled(true);
+      // persist server-side profile with method and secondary email
+      try {
+        await hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'EMAIL', mfaSecondaryEmail: pendingSecondaryEmail });
+      } catch (_e) { console.warn('Ignored while persisting MFA profile', _e); }
+      showSuccess('Email MFA enabled');
+      return res;
+    } catch (e) {
+      setError(e?.message || String(e));
+      showError(e?.message || 'Failed to verify code');
+      throw e;
+    } finally {
+      setPendingSecondaryEmail(null);
+    }
+  };
+
+  const disableMfa = async () => {
+    try {
+      await hotelAPI.disableMfa();
+      const email = cognitoUserRef.current?.getUsername?.() || user?.email;
+      if (email) {
+        localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
+      }
+      setMfaEnabled(false);
+      showSuccess('MFA disabled');
+    } catch (e) {
+      showError(e?.message || 'Failed to disable MFA');
+      throw e;
+    }
   };
 
   const updateUserProfileName = (patch) => {
@@ -404,6 +504,11 @@ export const AuthProvider = ({ children }) => {
     setupTotp,
     verifyTotp,
     clearMfaChallenge,
+    openEmailSetup,
+    mfaEnabled,
+    setupEmailMfa,
+    verifyEmailMfa,
+    disableMfa,
     isAuthenticated: !!user,
   };
 

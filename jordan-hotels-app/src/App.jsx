@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -58,6 +59,16 @@ import MfaModal from './components/MfaModal.jsx';
 
 function AppRoutes() {
   const { user } = useAuth();
+
+  // Scroll to top on route change for better UX
+  const loc = useLocation();
+  React.useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    } catch (_e) {
+      window.scrollTo(0, 0);
+    }
+  }, [loc.pathname]);
 
   return (
     <Routes>

@@ -1,0 +1,660 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "VisitJo SAM template \xE2\u20AC\u201D API, Lambdas, DynamoDB, S3, Secrets\
+  \ Manager"
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 10
+    MemorySize: 512
+    Environment:
+      Variables:
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1'
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowOrigin: '''*'''
+        AllowMethods: '''GET,POST,PUT,DELETE,OPTIONS'''
+        AllowHeaders: '''*'''
+      EndpointConfiguration: REGIONAL
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: Api
+  HotelsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: HotelsTable
+  DestinationsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: DestinationsTable
+  DealsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: DealsTable
+  ExperiencesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: ExperiencesTable
+  BookingsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: userId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      GlobalSecondaryIndexes:
+      - IndexName: UserIdIndex
+        KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        Projection:
+          ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: BookingsTable
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: userId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: userId
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: UsersTable
+  LogsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: LogsBucket
+  UploadsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+      LoggingConfiguration:
+        DestinationBucketName:
+          Ref: LogsBucket
+        LogFilePrefix: access-logs/
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: UploadsBucket
+  StripeSecret:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
+      KmsKeyId: alias/aws/secretsmanager
+      Tags:
+      - Key: App
+        Value: VisitJo
+      - Key: ManagedBy
+        Value: SAM
+      - Key: Stack
+        Value:
+          Ref: AWS::StackName
+    Metadata:
+      SamResourceId: StripeSecret
+  LambdaRolePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - s3:PutObject
+          - s3:GetObject
+          - s3:PutObjectAcl
+          Resource:
+            Fn::Sub: arn:aws:s3:::${UploadsBucket}/*
+        - Effect: Allow
+          Action:
+          - secretsmanager:GetSecretValue
+          Resource:
+            Fn::Sub: arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*stripe*
+    Metadata:
+      SamResourceId: LambdaRolePolicy
+  GetHotelsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getHotels/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          HOTELS_TABLE:
+            Ref: HotelsTable
+      Events:
+        ApiGetHotels:
+          Type: Api
+          Properties:
+            Path: /hotels
+            Method: GET
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: GetHotelsFunction
+  GetHotelByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getHotelById/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          HOTELS_TABLE:
+            Ref: HotelsTable
+      Events:
+        ApiGetHotelById:
+          Type: Api
+          Properties:
+            Path: /hotels/{id}
+            Method: GET
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: GetHotelByIdFunction
+  SearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: search/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          HOTELS_TABLE:
+            Ref: HotelsTable
+          DESTINATIONS_TABLE:
+            Ref: DestinationsTable
+          DEALS_TABLE:
+            Ref: DealsTable
+          EXPERIENCES_TABLE:
+            Ref: ExperiencesTable
+      Events:
+        ApiSearch:
+          Type: Api
+          Properties:
+            Path: /search
+            Method: GET
+            RestApiId:
+              Ref: Api
+        
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: SearchFunction
+  DestinationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: destinations/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          DESTINATIONS_TABLE:
+            Ref: DestinationsTable
+      Events:
+        ApiDestinations:
+          Type: Api
+          Properties:
+            Path: /destinations
+            Method: GET
+            RestApiId:
+              Ref: Api
+        ApiDestinationById:
+          Type: Api
+          Properties:
+            Path: /destinations/{id}
+            Method: GET
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: DestinationsFunction
+  DealsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: deals/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          DEALS_TABLE:
+            Ref: DealsTable
+      Events:
+        ApiDeals:
+          Type: Api
+          Properties:
+            Path: /deals
+            Method: GET
+            RestApiId:
+              Ref: Api
+        ApiDealById:
+          Type: Api
+          Properties:
+            Path: /deals/{id}
+            Method: GET
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: DealsFunction
+  ExperiencesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: experiences/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          EXPERIENCES_TABLE:
+            Ref: ExperiencesTable
+      Events:
+        ApiExperiences:
+          Type: Api
+          Properties:
+            Path: /experiences
+            Method: GET
+            RestApiId:
+              Ref: Api
+        ApiExperienceById:
+          Type: Api
+          Properties:
+            Path: /experiences/{id}
+            Method: GET
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: ExperiencesFunction
+  BookingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: bookings/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          BOOKINGS_TABLE:
+            Ref: BookingsTable
+      Events:
+        ApiBookings:
+          Type: Api
+          Properties:
+            Path: /bookings
+            Method: ANY
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: BookingsFunction
+  CreateCheckoutSessionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: createCheckoutSession/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          STRIPE_SECRET_ARN:
+            Ref: StripeSecret
+          PAYMENTS_ENABLED: 'true'
+          ALLOW_LIVE_PAYMENTS: 'false'
+      Events:
+        ApiCheckout:
+          Type: Api
+          Properties:
+            Path: /payments/create-checkout-session
+            Method: POST
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: CreateCheckoutSessionFunction
+  CreatePaymentIntentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: createPaymentIntent/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          STRIPE_SECRET_ARN:
+            Ref: StripeSecret
+          PAYMENTS_ENABLED: 'true'
+          ALLOW_LIVE_PAYMENTS: 'false'
+      Events:
+        ApiCreateIntent:
+          Type: Api
+          Properties:
+            Path: /payments/create-intent
+            Method: POST
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: CreatePaymentIntentFunction
+  GetSignedUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getSignedUrl/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          S3_UPLOAD_BUCKET:
+            Ref: UploadsBucket
+      Events:
+        ApiSignedUrl:
+          Type: Api
+          Properties:
+            Path: /uploads/signed-url
+            Method: POST
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: GetSignedUrlFunction
+  UserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: user/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          BOOKINGS_TABLE:
+            Ref: BookingsTable
+          USERS_TABLE:
+            Ref: UsersTable
+      Events:
+        ApiUserProfileGet:
+          Type: Api
+          Properties:
+            Path: /user/profile
+            Method: GET
+            RestApiId:
+              Ref: Api
+        ApiUserProfilePut:
+          Type: Api
+          Properties:
+            Path: /user/profile
+            Method: PUT
+            RestApiId:
+              Ref: Api
+        
+        ApiUserBookings:
+          Type: Api
+          Properties:
+            Path: /user/bookings
+            Method: GET
+            RestApiId:
+              Ref: Api
+        
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: UserFunction
+  SendBookingEmailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: sendBookingEmail/index.handler
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          SES_EMAIL_FROM: noreply@visitjo.com
+          FRONTEND_URL: https://main.d1ewsonl19kjj7.amplifyapp.com
+      Events:
+        ApiSendBookingEmail:
+          Type: Api
+          Properties:
+            Path: /send-booking-email
+            Method: POST
+            RestApiId:
+              Ref: Api
+      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+    Metadata:
+      SamResourceId: SendBookingEmailFunction
+Outputs:
+  ApiUrl:
+    Description: Base URL for API
+    Value:
+      Fn::Sub: https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}-ApiUrl
