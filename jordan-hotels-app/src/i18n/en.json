@@ -540,6 +540,8 @@
       "notFound": "Hotel not found.",
       "backToHotels": "Back to Hotels",
       "selectCheckIn": "Please select a check-in date",
+      "selectCheckOut": "Please select a check-out date",
+      "invalidCheckOut": "Check-out must be after check-in",
       "bookingFailed": "Booking failed. Please try again."
     },
     "gallery": {
@@ -563,6 +565,7 @@
     "booking": {
       "averagePrice": "Average price based on availability",
       "checkIn": "Check-in Date",
+      "checkOut": "Check-out Date",
       "guests": "Number of Guests",
       "guestCount": "{{count}} Guest",
       "guestCount_other": "{{count}} Guests",

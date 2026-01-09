@@ -540,6 +540,8 @@
       "notFound": "لم يتم العثور على الفندق.",
       "backToHotels": "العودة إلى الفنادق",
       "selectCheckIn": "يرجى اختيار تاريخ تسجيل الدخول",
+      "selectCheckOut": "يرجى اختيار تاريخ تسجيل الخروج",
+      "invalidCheckOut": "يجب أن يكون تاريخ تسجيل الخروج بعد تاريخ تسجيل الدخول",
       "bookingFailed": "فشل الحجز. يرجى المحاولة مرة أخرى."
     },
     "gallery": {
@@ -563,6 +565,7 @@
     "booking": {
       "averagePrice": "متوسط السعر حسب التوفر",
       "checkIn": "تاريخ تسجيل الدخول",
+      "checkOut": "تاريخ تسجيل الخروج",
       "guests": "عدد الضيوف",
       "guestCount": "{{count}} ضيف",
       "guestCount_other": "{{count}} ضيوف",
