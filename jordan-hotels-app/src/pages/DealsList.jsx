@@ -58,7 +58,7 @@ export default function DealsList() {
             
             return (
               <article key={hotel.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden">
                   <img
                     src={hotel.image}
                     alt={hotelName}

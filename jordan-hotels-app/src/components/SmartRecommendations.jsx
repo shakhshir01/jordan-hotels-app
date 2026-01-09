@@ -156,7 +156,7 @@ export default function SmartRecommendations({ limit = 8 }) {
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition transform hover:scale-105"
             >
               {/* Hotel Image */}
-              <div className="relative h-48 overflow-hidden bg-gray-200">
+              <div className="relative aspect-[4/3] overflow-hidden bg-gray-200">
                 <img
                   src={hotel.image}
                   alt={hotelName}

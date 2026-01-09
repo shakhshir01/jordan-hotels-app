@@ -240,15 +240,17 @@ export default function HotelsMap() {
           return (
         <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <img
-              src={selectedHotel.image}
-              alt={selectedName}
-              onError={createHotelImageOnErrorHandler(selectedHotel.id)}
-              className="w-full h-64 object-cover rounded-lg"
-              loading="lazy"
-              decoding="async"
-              referrerPolicy="no-referrer"
-            />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+              <img
+                src={selectedHotel.image}
+                alt={selectedName}
+                onError={createHotelImageOnErrorHandler(selectedHotel.id)}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
+              />
+            </div>
             <div>
               <h2 className="text-3xl font-bold mb-2">{selectedName}</h2>
               <p className="text-gray-600 mb-4">{selectedHotel.description}</p>

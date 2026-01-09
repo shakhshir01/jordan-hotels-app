@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Minimal template to deploy UserFunction with SES permissions
+
+Resources:
+  UserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs22.x
+      CodeUri: .
+      MemorySize: 512
+      Timeout: 10
+      Environment:
+        Variables:
+          BOOKINGS_TABLE: "Bookings"
+          USERS_TABLE: "Users"
+          SES_EMAIL_FROM: noreply@visitjo.com
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+                - ses:SendRawEmail
+              Resource: "*"
+
+Outputs:
+  UserFunctionArn:
+    Description: ARN of the deployed user function
+    Value: !GetAtt UserFunction.Arn

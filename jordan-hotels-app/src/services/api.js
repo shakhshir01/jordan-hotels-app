@@ -71,7 +71,10 @@ const hasEnvApiUrl = Boolean(rawEnvApiUrl && !isStaleApiUrl(rawEnvApiUrl));
 
 const shouldUseDevProxy = isLocalDevHost && (hasRuntimeApiUrl || hasEnvApiUrl);
 
-const API_BASE_URL = shouldUseDevProxy ? "/api" : resolvedApiBaseUrl;
+// In local dev always use the Vite dev proxy path `/api` so requests are proxied
+// to the configured `VITE_API_GATEWAY_URL`. This avoids CORS / 403 problems
+// when the frontend and local API gateway are on different ports.
+const API_BASE_URL = import.meta.env.DEV ? "/api" : (shouldUseDevProxy ? "/api" : resolvedApiBaseUrl);
 const API_KEY = import.meta.env.VITE_API_KEY || "";
 
 const apiClient = axios.create({
@@ -377,6 +380,51 @@ export const hotelAPI = {
       return response.data;
     } catch (error) {
       if (lastAuthError) return { ...profile, userId: profile.userId || "demo-user" };
+      throw error;
+    }
+  },
+
+  // Email MFA management (backend endpoints expected)
+  setupEmailMfa: async (secondaryEmail) => {
+    if (getUseMocks()) return { success: true };
+    try {
+      const response = await apiClient.post("/user/mfa/email/setup", { secondaryEmail });
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { success: true };
+      throw error;
+    }
+  },
+
+  verifyEmailMfa: async (code) => {
+    if (getUseMocks()) return { verified: true };
+    try {
+      const response = await apiClient.post("/user/mfa/email/verify", { code });
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { verified: true };
+      throw error;
+    }
+  },
+
+  requestEmailMfaChallenge: async () => {
+    if (getUseMocks()) return { sent: true };
+    try {
+      const response = await apiClient.post("/auth/email-mfa/request");
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { sent: true };
+      throw error;
+    }
+  },
+
+  disableMfa: async () => {
+    if (getUseMocks()) return { success: true };
+    try {
+      const response = await apiClient.post("/user/mfa/disable");
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { success: true };
       throw error;
     }
   },

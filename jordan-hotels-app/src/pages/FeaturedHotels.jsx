@@ -31,7 +31,7 @@ export default function FeaturedHotels() {
             const hotelName = getHotelDisplayName(hotel, i18n.language);
             return (
           <div key={hotel.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition">
-            <div className="relative h-64 overflow-hidden">
+            <div className="relative aspect-[4/3] overflow-hidden">
               <img
                 src={hotel.image}
                 alt={hotelName}

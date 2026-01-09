@@ -31,6 +31,8 @@
     "i18next": "^25.7.3",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.518.0",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^16.5.1",
@@ -38,9 +40,7 @@
     "react-loading-skeleton": "^3.5.0",
     "react-router-dom": "^7.11.0",
     "react-toastify": "^11.0.5",
-    "sam": "^0.0.7",
-    "qrcode": "^1.5.1",
-    "otplib": "^12.0.1"
+    "sam": "^0.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -62,7 +62,7 @@
     "prettier": "^2.8.8",
     "rollup-plugin-visualizer": "^5.8.0",
     "tailwindcss": "^3.4.19",
-    "vite": "^7.2.4",
+    "vite": "^7.3.0",
     "vitest": "^1.6.1"
   },
   "overrides": {
