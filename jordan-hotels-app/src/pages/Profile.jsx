@@ -69,7 +69,7 @@ const normalizeBooking = (booking, index = 0) => {
 };
 
 const Profile = () => {
-  const { user, userProfile, updateUserProfileName, logout } = useAuth();
+  const { user, userProfile, updateUserProfileName, logout, setupTotp } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -233,13 +233,31 @@ const Profile = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Profile Information</h2>
               {!editing && (
-                  <button
-                    onClick={() => setEditing(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-900 dark:bg-slate-800 text-white rounded-lg hover:bg-black dark:hover:bg-slate-700 transition"
-                  >
-                  <Edit2 size={18} />
-                  Edit Profile
-                </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setEditing(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-900 dark:bg-slate-800 text-white rounded-lg hover:bg-black dark:hover:bg-slate-700 transition"
+                    >
+                      <Edit2 size={18} />
+                      Edit Profile
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        try {
+                          await setupTotp();
+                          showSuccess('Follow the modal instructions to finish setting up your authenticator app.');
+                        } catch (err) {
+                          console.error('TOTP setup error', err);
+                          showError(err?.message || 'Failed to start 2FA setup');
+                        }
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                    >
+                      <Check size={16} />
+                      Enable 2FA
+                    </button>
+                  </div>
               )}
             </div>
 
