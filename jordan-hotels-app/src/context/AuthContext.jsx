@@ -354,6 +354,12 @@ export const AuthProvider = ({ children }) => {
     confirmNewPassword,
     resendConfirmation,
     updateUserProfileName,
+    // MFA helpers and state
+    mfaChallenge,
+    submitMfaCode,
+    setupTotp,
+    verifyTotp,
+    clearMfaChallenge,
     isAuthenticated: !!user,
   };
 

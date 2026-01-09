@@ -54,6 +54,7 @@ const ContactConcierge = React.lazy(() => import('./pages/ContactConcierge.jsx')
 const SavedSearches = React.lazy(() => import('./pages/SavedSearches.jsx'));
 import { ErrorBoundary } from './components/ErrorBoundary';
 import ChatBot from './components/ChatBot.jsx';
+import MfaModal from './components/MfaModal.jsx';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -125,6 +126,7 @@ function App() {
           >
             <AppRoutes />
           </Suspense>
+          <MfaModal />
           <ToastContainer
             position="top-right"
             autoClose={3000}

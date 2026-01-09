@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import QRCode from 'qrcode';
 import { useAuth } from '../context/AuthContext';
 
 export default function MfaModal() {
   const { mfaChallenge, submitMfaCode, setupTotp, verifyTotp, clearMfaChallenge } = useAuth();
   const [code, setCode] = useState('');
   const [secret, setSecret] = useState('');
+  const [qrDataUrl, setQrDataUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -15,6 +17,17 @@ export default function MfaModal() {
     }
     if (mfaChallenge?.secretCode) setSecret(mfaChallenge.secretCode);
   }, [mfaChallenge]);
+
+  useEffect(() => {
+    if (!secret) {
+      setQrDataUrl('');
+      return;
+    }
+    const otpauth = `otpauth://totp/VisitJo?secret=${encodeURIComponent(secret)}&issuer=VisitJo`;
+    QRCode.toDataURL(otpauth)
+      .then((url) => setQrDataUrl(url))
+      .catch(() => setQrDataUrl(''));
+  }, [secret]);
 
   if (!mfaChallenge) return null;
 
@@ -53,7 +66,13 @@ export default function MfaModal() {
         {mfaChallenge.type === 'MFA_SETUP_TOTP' && (
           <form onSubmit={onSubmit} className="space-y-3">
             <p>Scan this secret into your authenticator app:</p>
-            <div className="p-3 bg-slate-100 rounded">{secret}</div>
+            <div className="p-3 bg-slate-100 rounded">
+              {qrDataUrl ? (
+                <img src={qrDataUrl} alt="TOTP QR code" className="mx-auto" />
+              ) : (
+                <div className="break-words">{secret}</div>
+              )}
+            </div>
             <p className="text-sm text-slate-500">Then enter the 6-digit code from your app to verify.</p>
             <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" className="input-premium w-full" />
             <div className="flex justify-end gap-2">

@@ -1,0 +1,13 @@
+{
+  "SmsMfaConfiguration": {
+    "SmsAuthenticationMessage": "Your authentication code is {####}",
+    "SmsConfiguration": {
+      "SnsCallerArn": "arn:aws:iam::497339097084:role/CognitoMfaRole",
+      "ExternalId": "optional"
+    }
+  },
+  "SoftwareTokenMfaConfiguration": {
+    "Enabled": true
+  },
+  "MfaConfiguration": "OPTIONAL"
+}
