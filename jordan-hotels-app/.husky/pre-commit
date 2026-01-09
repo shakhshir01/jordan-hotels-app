@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+. "$(dirname -- \"$0\")/_/husky.sh"
 
+# Ensure lint-staged runs from the project root (where package.json and node_modules live)
+cd "$(dirname -- \"$0\")/.." || exit 0
 npx lint-staged

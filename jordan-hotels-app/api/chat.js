@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Query too long (max 2000 characters)' });
     }
 
-    const systemPrompt = `You are an assistant for VisitJo, a hotel booking site. Respond in JSON only with the following keys: \n- text: a short natural-language reply to the user.\n- hotels: an array of hotel ids (strings) that match recommendations (can be empty).\n- suggestions: an array of objects with {text, link} for suggested next actions.\nReturn valid JSON and nothing else.`;
+    const systemPrompt = `You are the VisitJo assistant. ALWAYS respond with a single VALID JSON object and NOTHING ELSE (no markdown, no commentary). The object must have exactly these keys:\n- text: a short natural-language reply (string).\n- hotels: array of VisitJo hotel id strings (e.g. "hotel-123"). If you cannot identify any matching ids, return an empty array.\n- suggestions: array of objects with {"text":"...","link":"/path"}.\nIf the user asks for recommendations, include hotel ids where possible. If you need clarification, put the question in the "text" field and return an empty "hotels" array. Example: {"text":"Here are options","hotels":["hotel-123"],"suggestions":[{"text":"View hotel 123","link":"/hotels/hotel-123"}]}`;
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -46,6 +46,7 @@ export default async function handler(req, res) {
 
     const data = await resp.json();
     const content = data.choices?.[0]?.message?.content || '';
+    console.log('AI raw content:', content);
 
     let parsed = null;
     try {
@@ -64,6 +65,7 @@ export default async function handler(req, res) {
     if (!parsed) {
       parsed = { text: content.slice(0, 1000), hotels: [], suggestions: [] };
     }
+    console.log('AI parsed JSON:', parsed);
 
     res.setHeader('Content-Type', 'application/json');
     return res.status(200).json(parsed);

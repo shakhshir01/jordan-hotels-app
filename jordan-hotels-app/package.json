@@ -28,6 +28,7 @@
     "aws-amplify": "^6.15.9",
     "aws-rum-web": "^1.25.0",
     "axios": "^1.13.2",
+    "gh": "^2.8.9",
     "i18next": "^25.7.3",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.518.0",
@@ -74,11 +75,11 @@
   },
   "lint-staged": {
     "*.+(js|jsx|ts|tsx)": [
-      "eslint --fix",
-      "prettier --write"
+      "npx eslint --fix",
+      "npx prettier --write"
     ],
     "*.+(css|md|json)": [
-      "prettier --write"
+      "npx prettier --write"
     ]
   }
 }

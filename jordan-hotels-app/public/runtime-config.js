@@ -7,7 +7,7 @@ window.__VISITJO_RUNTIME_CONFIG__ = {
   VITE_COGNITO_CLIENT_ID: "1v5kg2qprjtsnvia0hikm1blvd",
   VITE_COGNITO_DOMAIN: "us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com",
   // Optional: set to your deployed chat function URL (Vercel/Netlify). Leave empty to use local fallback.
-  VITE_CHAT_API_URL: "",
+  VITE_CHAT_API_URL: "https://jordan-hotels-app.vercel.app/api/chat",
 };
 
 
