@@ -210,16 +210,60 @@ export const AuthProvider = ({ children }) => {
   const setupTotp = () => {
     const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
     if (!cognitoUser) return Promise.reject(new Error('No active user to setup TOTP'));
+
     return new Promise((resolve, reject) => {
-      cognitoUser.associateSoftwareToken({
-        associateSecretCode: (secretCode) => {
-          setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
-          resolve(secretCode);
-        },
-        onFailure: (err) => {
-          setError(err.message || String(err));
-          reject(err);
-        },
+      // Ensure we have a valid session before attempting TOTP association
+      cognitoUser.getSession((err, session) => {
+        if (err) {
+          setError('Session error. Please sign in again.');
+          reject(new Error('Session error'));
+          return;
+        }
+
+        const proceedWithAssociate = () => {
+          cognitoUser.associateSoftwareToken({
+            associateSecretCode: (secretCode) => {
+              setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
+              resolve(secretCode);
+            },
+            onFailure: (e) => {
+              setError(e.message || String(e));
+              reject(e);
+            },
+          });
+        };
+
+        if (session && session.isValid && session.isValid()) {
+          proceedWithAssociate();
+          return;
+        }
+
+        // Try to refresh session if a refresh token exists
+        try {
+          const refreshToken = session && session.getRefreshToken && session.getRefreshToken();
+          if (refreshToken) {
+            cognitoUser.refreshSession(refreshToken, (rErr, newSession) => {
+              if (rErr) {
+                setError('Session refresh failed. Please sign in again.');
+                reject(new Error('Session refresh failed'));
+                return;
+              }
+              try {
+                const idToken = newSession.getIdToken().getJwtToken();
+                setAuthToken(idToken);
+              } catch (e) {
+                // ignore
+              }
+              proceedWithAssociate();
+            });
+            return;
+          }
+        } catch (e) {
+          // continue to reject below
+        }
+
+        setError('Session expired. Please sign in again to setup 2FA.');
+        reject(new Error('Session expired'));
       });
     });
   };
