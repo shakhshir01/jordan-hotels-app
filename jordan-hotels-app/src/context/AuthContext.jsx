@@ -12,6 +12,8 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [mfaChallenge, setMfaChallenge] = useState(null);
+  const cognitoUserRef = React.useRef(null);
 
   const setUserAndProfileFromEmail = (email) => {
     const derived = deriveNameFromEmail(email);
@@ -117,6 +119,7 @@ export const AuthProvider = ({ children }) => {
         Username: email,
         Pool: UserPool,
       });
+      cognitoUserRef.current = cognitoUser;
 
       const authDetails = new AuthenticationDetails({
         Username: email,
@@ -141,42 +144,24 @@ export const AuthProvider = ({ children }) => {
           showError(err.message || 'Login failed');
           reject(err);
         },
-        // Provide handlers for possible Cognito challenges so callbacks exist
+        // Handle possible Cognito challenges by exposing them to the UI
         mfaRequired: (challengeName, challengeParameters) => {
-          const err = new Error('MFA required for this account. Please complete MFA setup via your account.');
-          setError(err.message);
-          showError(err.message);
-          reject(err);
+          setMfaChallenge({ type: 'SMS_MFA', challengeName, challengeParameters });
         },
         selectMFAType: (challengeName, challengeParameters) => {
-          const err = new Error('Please select an MFA type to continue.');
-          setError(err.message);
-          showError(err.message);
-          reject(err);
+          setMfaChallenge({ type: 'SELECT_MFA_TYPE', challengeName, challengeParameters });
         },
         mfaSetup: (challengeName, challengeParameters) => {
-          const err = new Error('MFA setup is required for this account.');
-          setError(err.message);
-          showError(err.message);
-          reject(err);
+          setMfaChallenge({ type: 'MFA_SETUP', challengeName, challengeParameters });
         },
         totpRequired: (challengeName, challengeParameters) => {
-          const err = new Error('TOTP (authenticator app) verification is required.');
-          setError(err.message);
-          showError(err.message);
-          reject(err);
+          setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA', challengeName, challengeParameters });
         },
         customChallenge: (challengeParameters) => {
-          const err = new Error('A custom authentication challenge was presented and cannot be handled here.');
-          setError(err.message);
-          showError(err.message);
-          reject(err);
+          setMfaChallenge({ type: 'CUSTOM_CHALLENGE', challengeParameters });
         },
         newPasswordRequired: (userAttributes, requiredAttributes) => {
-          const err = new Error('A new password is required for this account.');
-          setError(err.message);
-          showError(err.message);
-          reject(err);
+          setMfaChallenge({ type: 'NEW_PASSWORD_REQUIRED', userAttributes, requiredAttributes });
         },
       });
     });
@@ -194,6 +179,66 @@ export const AuthProvider = ({ children }) => {
     setAuthToken(null);
     setError(null);
     showSuccess('Logged out successfully');
+  };
+
+  const clearMfaChallenge = () => {
+    setMfaChallenge(null);
+  };
+
+  const submitMfaCode = (code, mfaType) => {
+    const cognitoUser = cognitoUserRef.current;
+    if (!cognitoUser) return Promise.reject(new Error('No active Cognito user for MFA'));
+    return new Promise((resolve, reject) => {
+      cognitoUser.sendMFACode(code, {
+        onSuccess: (session) => {
+          try {
+            const idToken = session.getIdToken().getJwtToken();
+            setAuthToken(idToken);
+          } catch (e) {}
+          setUserAndProfileFromEmail(cognitoUser.getUsername());
+          clearMfaChallenge();
+          resolve(session);
+        },
+        onFailure: (err) => {
+          setError(err.message || String(err));
+          reject(err);
+        },
+      }, mfaType || undefined);
+    });
+  };
+
+  const setupTotp = () => {
+    const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
+    if (!cognitoUser) return Promise.reject(new Error('No active user to setup TOTP'));
+    return new Promise((resolve, reject) => {
+      cognitoUser.associateSoftwareToken({
+        associateSecretCode: (secretCode) => {
+          setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
+          resolve(secretCode);
+        },
+        onFailure: (err) => {
+          setError(err.message || String(err));
+          reject(err);
+        },
+      });
+    });
+  };
+
+  const verifyTotp = (userCode, friendlyName = 'My device') => {
+    const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
+    if (!cognitoUser) return Promise.reject(new Error('No active user to verify TOTP'));
+    return new Promise((resolve, reject) => {
+      cognitoUser.verifySoftwareToken(userCode, friendlyName, {
+        onSuccess: (res) => {
+          clearMfaChallenge();
+          resolve(res);
+        },
+        onFailure: (err) => {
+          setError(err.message || String(err));
+          reject(err);
+        },
+      });
+    });
   };
 
   const updateUserProfileName = (patch) => {
