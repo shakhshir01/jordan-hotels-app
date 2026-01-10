@@ -328,11 +328,13 @@ const fetchXoteloFallback = async (limit = 100) => {
 
 export const hotelAPI = {
   getHotelsPage: async ({ cursor = "", limit = 100 } = {}) => {
-    console.log("API: Using real hotel data from Xotelo and curated sources");
-
+    // Always use combined Xotelo + real hotel data
     const result = getHotelsFromStatic({ cursor, limit });
-
-    console.log("API: Returning", result.hotels.length, "hotels from combined real data sources");
+    if (!result.hotels || result.hotels.length === 0) {
+      // Fallback: try Xotelo API
+      const hotels = await fetchXoteloFallback(limit);
+      return { hotels, nextCursor: null };
+    }
     return result;
   },
 
@@ -561,24 +563,13 @@ export const hotelAPI = {
 
   // new dynamic endpoints: search / destinations / deals / experiences / blog
   searchHotelsPage: async ({ q = "", cursor = "", limit = 30, signal } = {}) => {
-    if (getUseMocks()) {
-      const term = String(q || "").toLowerCase().trim();
-      const filtered = Array.isArray(mockHotels)
-        ? mockHotels.filter((h) => {
-            if (!term) return true;
-            const name = String(h?.name || "").toLowerCase();
-            const loc = String(h?.location || "").toLowerCase();
-            return name.includes(term) || loc.includes(term);
-          })
-        : [];
-      return { hotels: filtered.slice(0, Math.max(1, Number(limit) || 30)).map(normalizeHotel), nextCursor: null };
-    }
-
-    console.log("API: Using static hotel data for search");
-
+    // Always use combined Xotelo + real hotel data for search
     const result = getHotelsFromStatic({ q, cursor, limit });
-
-    console.log("API: Returning", result.hotels.length, "hotels from search");
+    if (!result.hotels || result.hotels.length === 0) {
+      // Fallback: try Xotelo API
+      const hotels = await fetchXoteloFallback(limit);
+      return { hotels, nextCursor: null };
+    }
     return result;
   },
 
@@ -595,14 +586,31 @@ export const hotelAPI = {
   },
 
   getDestinations: async () => {
-    if (getUseMocks()) return mockDestinations;
+    // Try API, then mock, then derive from hotel data
     try {
       const res = await apiClient.get("/destinations");
-      return normalizeLambdaResponse(res.data) || mockDestinations;
+      const apiDest = normalizeLambdaResponse(res.data);
+      if (Array.isArray(apiDest) && apiDest.length > 0) return apiDest;
     } catch (error) {
-      if (lastAuthError) return mockDestinations;
-      throw error;
+      // ignore, fallback below
     }
+    if (getUseMocks() && Array.isArray(mockDestinations) && mockDestinations.length > 0) return mockDestinations;
+    // Derive destinations from hotel data
+    const hotels = await hotelAPI.getAllHotels();
+    const destMap = {};
+    hotels.forEach(h => {
+      const dest = h.destination || h.location || "Jordan";
+      if (!destMap[dest]) {
+        destMap[dest] = {
+          id: `d-${dest.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+          name: dest,
+          description: `Hotels and stays in ${dest}`,
+          hotels: [],
+        };
+      }
+      destMap[dest].hotels.push(h.id);
+    });
+    return Object.values(destMap);
   },
   getDestinationById: async (id) => {
     if (getUseMocks()) return mockDestinations.find((d) => d.id === id) || null;
