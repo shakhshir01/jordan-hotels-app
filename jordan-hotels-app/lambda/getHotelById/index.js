@@ -30,6 +30,27 @@ export async function handler(event) {
           };
         }
 
+        // If not found in DynamoDB, try to fetch from Xotelo
+        try {
+          const { fetchXoteloHotels } = await import("../providers/xotelo.js");
+          const xoteloHotels = await fetchXoteloHotels({ locationKey: "g293985", limit: 1000 });
+          const xoteloHotel = xoteloHotels.find(h => h.id === id);
+          if (xoteloHotel) {
+            return {
+              statusCode: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Authorization,Content-Type',
+                'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PUT,DELETE',
+              },
+              body: JSON.stringify(xoteloHotel),
+            };
+          }
+        } catch (xoteloErr) {
+          console.warn('Xotelo fallback failed:', xoteloErr.message || xoteloErr);
+        }
+
         return {
           statusCode: 404,
           headers: {

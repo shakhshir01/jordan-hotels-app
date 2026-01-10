@@ -55,9 +55,14 @@ const INTEGRATIONS = [
   // Uploads
   { path: '/uploads/signed-url', method: 'POST', lambda: 'getSignedUrl' },
   
-  // User (NEW)
-  { path: '/user/profile', method: 'GET', lambda: 'user' },
-  { path: '/user/bookings', method: 'GET', lambda: 'user' },
+  // User (NEW) - with Cognito authorizer
+  { path: '/user/profile', method: 'GET', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
+  { path: '/user/profile', method: 'PUT', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
+  { path: '/user/bookings', method: 'GET', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
+  { path: '/user/mfa/email/setup', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
+  { path: '/user/mfa/email/verify', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
+  { path: '/user/mfa/disable', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
+  { path: '/auth/email-mfa/request', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   
   // Blog (NEW)
   { path: '/blog', method: 'GET', lambda: 'blog' },
