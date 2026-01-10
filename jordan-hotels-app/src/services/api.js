@@ -573,16 +573,69 @@ export const hotelAPI = {
     return result;
   },
 
-  searchAll: async (q = "") => {
-    if (getUseMocks()) return mockSearchResult({ q });
+  searchAll: async (q = '') => {
+    const ql = (q || "").toLowerCase().trim();
+
+    // Get filtered hotels from real data
+    const { hotels } = getHotelsFromStatic({ q: ql, limit: 50 });
+
+    // Try to get real destinations, fallback to mock
+    let destinations = [];
     try {
-      const url = q ? `/search?q=${encodeURIComponent(q)}` : "/search";
-      const response = await apiClient.get(url);
-      return normalizeLambdaResponse(response.data) || mockSearchResult({ q });
+      const apiDestinations = await hotelAPI.getDestinations();
+      destinations = Array.isArray(apiDestinations) ? apiDestinations : [];
+      if (ql) {
+        destinations = destinations.filter(d =>
+          !ql || d.name.toLowerCase().includes(ql) || d.description.toLowerCase().includes(ql)
+        );
+      }
     } catch (error) {
-      if (lastAuthError) return mockSearchResult({ q });
-      throw error;
+      console.warn("Failed to fetch destinations, using mock data:", error.message);
+      destinations = mockDestinations.filter(d =>
+        !ql || d.name.toLowerCase().includes(ql) || d.description.toLowerCase().includes(ql)
+      );
     }
+
+    // Try to get real deals, fallback to mock
+    let deals = [];
+    try {
+      const apiDeals = await hotelAPI.getDeals();
+      deals = Array.isArray(apiDeals) ? apiDeals : [];
+      if (ql) {
+        deals = deals.filter(d =>
+          !ql || d.title.toLowerCase().includes(ql) || (d.meta && d.meta.toLowerCase().includes(ql))
+        );
+      }
+    } catch (error) {
+      console.warn("Failed to fetch deals, using mock data:", error.message);
+      deals = mockDeals.filter(d =>
+        !ql || d.title.toLowerCase().includes(ql) || (d.meta && d.meta.toLowerCase().includes(ql))
+      );
+    }
+
+    // Try to get real experiences, fallback to mock
+    let experiences = [];
+    try {
+      const apiExperiences = await hotelAPI.getExperiences();
+      experiences = Array.isArray(apiExperiences) ? apiExperiences : [];
+      if (ql) {
+        experiences = experiences.filter(e =>
+          !ql || e.title.toLowerCase().includes(ql) || (e.meta && e.meta.toLowerCase().includes(ql))
+        );
+      }
+    } catch (error) {
+      console.warn("Failed to fetch experiences, using mock data:", error.message);
+      experiences = mockExperiences.filter(e =>
+        !ql || e.title.toLowerCase().includes(ql) || (e.meta && e.meta.toLowerCase().includes(ql))
+      );
+    }
+
+    return {
+      hotels: hotels || [],
+      destinations: destinations || [],
+      deals: deals || [],
+      experiences: experiences || [],
+    };
   },
 
   getDestinations: async () => {
