@@ -22,7 +22,7 @@ Resources:
   Api:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Stage1
+      StageName: Stage
       EndpointConfiguration: REGIONAL
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
@@ -636,7 +636,7 @@ Resources:
 Outputs:
   ApiUrl:
     Description: "Base URL for API"
-    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Stage1"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Stage"
     Export:
       Name: !Sub "${AWS::StackName}-ApiUrl"
 

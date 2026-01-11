@@ -6,7 +6,7 @@ import { sanitizeHotelImageUrls } from "../utils/hotelImageFallback";
 // 1) runtime config (public/runtime-config.js) - works in Amplify without env vars
 // 2) Vite env var (works locally)
 // Avoid old API IDs that are known to be stale.
-const STALE_API_IDS = ["ny5ohksmc3"];
+const STALE_API_IDS = ["ny5ohksmc3", "g7itqnbol9", "b47h3h8tnb"];
 
 const normalizeBaseUrl = (value) => String(value || "").trim().replace(/\/$/, "");
 
@@ -838,19 +838,23 @@ export const hotelAPI = {
     }
   },
   getExperiences: async () => {
-    // Always use mock data for now to ensure experiences show up
+    // Always use mock data for now to ensure experiences show up and avoid CORS issues
     return mockExperiences;
   },
 
   getExperienceById: async (id) => {
+    // Always use mock data first to avoid CORS issues, then try API as fallback
+    const mockExperience = mockExperiences.find((exp) => exp.id === id);
+    if (mockExperience) return mockExperience;
+
     if (getUseMocks()) {
-      return mockExperiences.find((exp) => exp.id === id) || null;
+      return null;
     }
     try {
       const res = await apiClient.get(`/experiences/${id}`);
       return normalizeLambdaResponse(res.data);
     } catch (error) {
-      if (lastAuthError) return mockExperiences.find((exp) => exp.id === id) || null;
+      if (lastAuthError) return null;
       throw error;
     }
   },

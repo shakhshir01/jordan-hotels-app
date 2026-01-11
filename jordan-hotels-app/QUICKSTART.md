@@ -77,7 +77,7 @@ Create `.env.local` in the project root:
 ```env
 VITE_COGNITO_USER_POOL_ID=us-east-1_wEYeRj64s
 VITE_COGNITO_CLIENT_ID=7khcvg0ge70sotb9rp1muns504
-VITE_API_GATEWAY_URL=https://b47h3h8tnb.execute-api.us-east-1.amazonaws.com/Stage
+VITE_API_GATEWAY_URL=https://z9u6p9basl.execute-api.us-east-1.amazonaws.com/Stage
 ```
 
 ### 2. Install & Run

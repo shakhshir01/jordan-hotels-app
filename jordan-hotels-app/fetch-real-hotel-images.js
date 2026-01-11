@@ -2,7 +2,7 @@ import fs from 'fs';
 import https from 'https';
 
 // Read the Xotelo data
-const fileData = fs.readFileSync('C:\\Users\\khale\\Desktop\\VisitJo\\jordan-hotels-app\\src\\services\\xoteloJordanHotelsData.js', 'utf8');
+const fileData = fs.readFileSync('./src/services/xoteloJordanHotelsData.js', 'utf8');
 const startIndex = fileData.indexOf('export const XOTELO_JORDAN_HOTELS = [');
 const endIndex = fileData.lastIndexOf('];') + 2;
 const hotelsJson = fileData.substring(startIndex + 'export const XOTELO_JORDAN_HOTELS = '.length, endIndex - 2);
