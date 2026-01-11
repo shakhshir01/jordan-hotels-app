@@ -37,7 +37,7 @@ const encodeCursor = (lastKey) => {
   }
 };
 
-export async function handler(event) {
+module.exports.handler = async function (event) {
   const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
   if (method === "OPTIONS") return { statusCode: 200, headers: defaultHeaders, body: "" };
 
@@ -50,8 +50,8 @@ export async function handler(event) {
 
     let hotels = [];
     if (tableName) {
-      const { DynamoDBClient } = await import("@aws-sdk/client-dynamodb");
-      const { DynamoDBDocumentClient, ScanCommand } = await import("@aws-sdk/lib-dynamodb");
+      const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+      const { DynamoDBDocumentClient, ScanCommand } = require("@aws-sdk/lib-dynamodb");
       const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
       const input = {
         TableName: tableName,
@@ -65,7 +65,7 @@ export async function handler(event) {
     // Fetch public hotel data from Xotelo
     let publicHotels = [];
     try {
-      const { fetchXoteloHotels } = await import("../providers/xotelo.js");
+      const { fetchXoteloHotels } = require("./xotelo.js");
       publicHotels = await fetchXoteloHotels({ locationKey: "g293985", limit: 200 });
     } catch (err) {
       console.warn("Failed to fetch public hotels from Xotelo:", err.message || err);

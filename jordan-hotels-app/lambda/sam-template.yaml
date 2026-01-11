@@ -23,11 +23,12 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
-      Cors:
-        AllowOrigin: ["https://main.d1ewsonl19kjj7.amplifyapp.com", "https://www.visit-jo.com", "https://visit-jo.com", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175"]
-        AllowMethods: "GET,POST,PUT,DELETE,OPTIONS"
-        AllowHeaders: "*"
       EndpointConfiguration: REGIONAL
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
+        AllowOrigin: "'https://www.visit-jo.com,https://visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com,http://localhost:5173,http://localhost:5174,http://localhost:5175'"
+        AllowCredentials: false
       Tags:
         App: VisitJo
         ManagedBy: SAM

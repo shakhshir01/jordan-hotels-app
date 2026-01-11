@@ -1,12 +1,12 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import {
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
   QueryCommand,
   UpdateCommand,
-} from "@aws-sdk/lib-dynamodb";
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+} = require("@aws-sdk/lib-dynamodb");
+const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" });
 const docClient = DynamoDBDocumentClient.from(client);
@@ -51,7 +51,7 @@ const parseJwtClaims = (event) => {
   }
 };
 
-export async function handler(event) {
+async function handler(event) {
   console.log("Event:", JSON.stringify(event, null, 2));
 
   const corsHeaders = getCorsHeaders(event);
@@ -455,3 +455,5 @@ async function disableMfa(userId, event) {
     return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to disable MFA' }) };
   }
 }
+
+module.exports.handler = handler;
