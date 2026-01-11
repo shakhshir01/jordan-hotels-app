@@ -47,18 +47,9 @@ export default function ChatBot() {
       // Generate response using the AI service
       const response = await generateChatResponse(currentInput, conversationHistory, userProfile);
 
-      // Personalize response with user's name if available
-      let personalizedText = response.text;
-      if (userProfile?.displayName && !personalizedText.includes(userProfile.displayName)) {
-        // Add personalization for certain types of responses
-        if (personalizedText.includes('Hello') || personalizedText.includes('Hi') || personalizedText.includes('Hey')) {
-          personalizedText = personalizedText.replace(/^(Hello|Hi|Hey)/, `$1 ${userProfile.displayName}`);
-        }
-      }
-
       const botResponse = {
         id: messages.length + 2,
-        text: personalizedText,
+        text: response.text,
         sender: 'bot',
         images: response.images || [],
         offers: response.offers || [],
