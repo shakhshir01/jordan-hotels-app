@@ -1,5 +1,8 @@
 const defaultHeaders = {
   "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
+  "Access-Control-Allow-Methods": "GET,OPTIONS",
 };
 
 const json = (statusCode, body) => ({

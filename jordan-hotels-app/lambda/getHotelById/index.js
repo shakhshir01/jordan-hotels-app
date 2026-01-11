@@ -81,7 +81,12 @@ export async function handler(event) {
     console.error('handler error', err);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Authorization,Content-Type',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PUT,DELETE',
+      },
       body: JSON.stringify({ message: 'Internal server error' }),
     };
   }
