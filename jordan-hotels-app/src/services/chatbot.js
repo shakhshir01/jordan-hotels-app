@@ -1,29 +1,99 @@
 /**
- * AI Chatbot Service - Smart travel recommendations and support
+ * Nashmi - The Witty Jordan Travel Companion 🤖✨
+ *
+ * Nashmi is your intelligent, charismatic guide to Jordan's wonders.
+ * She's knowledgeable about every corner of the Kingdom, from Petra's
+ * ancient mysteries to Aqaba's coral reefs, and she's got a sharp wit
+ * that makes planning your trip as enjoyable as the journey itself.
  */
 
 import i18n from '../i18n/i18n.js';
 import { hotelAPI } from './api';
 
-const CONVERSATIONS = {
-  greeting: [
-    "Hello! 👋 Welcome to VisitJo! I'm your travel assistant. How can I help you find the perfect hotel today?",
-    "Hi there! Looking for an amazing stay in Jordan? Tell me about your preferences and I'll recommend the best hotels for you!",
-    "Welcome! 🎉 I'm here to help you discover incredible accommodations across Jordan. What are you interested in?"
-  ],
-  notFound: [
-    "I'm not sure I understand that. Try asking about hotels by location, type of experience, or your preferences!",
-    "Could you rephrase that? I can help with hotel recommendations, booking info, amenities, and more!",
-    "Hmm, I didn't catch that. Want to tell me what kind of experience you're looking for?"
-  ],
-  followUp: [
-    "Would you like more details about any specific hotel?",
-    "Can I help you find anything else?",
-    "Interested in any of these options?",
-    "Would you like to book one of these?"
+// Nashmi's personality constants
+const NASHMI_PERSONALITY = {
+  name: "Nashmi",
+  greeting: "Ahlan wa Sahlan! I'm Nashmi, your witty Jordan travel companion! 🌟 Ready to turn your Jordan dreams into unforgettable adventures?",
+  fallback: "Hmm, I'm not quite sure I caught that. But don't worry, I'm excellent at reading between the lines! Tell me more about what you're looking for.",
+  wittyRemarks: [
+    "Ah, the Dead Sea - where you can float like a boss and forget your worries! 🏊‍♀️",
+    "Petra at sunrise? Pure magic. Just don't forget your walking shoes - those Nabataeans knew how to build stairs! 🏛️",
+    "Wadi Rum's desert vibes? It's like Mars, but with better falafel. 🚀🌵",
+    "Amman's got that perfect blend of ancient history and modern buzz. Think Rome meets Dubai! 🏛️✨"
   ]
 };
 
+// Comprehensive Jordan knowledge base
+const JORDAN_KNOWLEDGE = {
+  destinations: {
+    petra: {
+      description: "The Rose City, a UNESCO World Heritage site carved into rose-red cliffs by the Nabataeans over 2,000 years ago.",
+      bestTime: "March-May or September-November",
+      highlights: ["Treasury", "Monastery", "Royal Tombs", "Petra by Night"],
+      tips: "Bring comfortable shoes, water, and prepare for lots of walking and stairs!",
+      vibe: "Ancient mystery meets natural beauty"
+    },
+    "dead sea": {
+      description: "The lowest point on Earth, famous for its mineral-rich waters that make you float effortlessly.",
+      bestTime: "Year-round, but October-May is most comfortable",
+      highlights: ["Floating in the sea", "Mud treatments", "Mineral spas", "Sunset views"],
+      tips: "Don't shave before swimming - the minerals sting! Bring water shoes for the salty shore.",
+      vibe: "Relaxation and rejuvenation"
+    },
+    amman: {
+      description: "Jordan's vibrant capital, blending ancient Roman theaters with modern Middle Eastern culture.",
+      bestTime: "March-May or September-November",
+      highlights: ["Roman Theater", "Citadel", "Rainbow Street", "Local souks"],
+      tips: "Try mansaf (Jordan's national dish) and explore the street art scene!",
+      vibe: "Urban energy with ancient roots"
+    },
+    aqaba: {
+      description: "Jordan's only coastal city on the Red Sea, perfect for diving, snorkeling, and beach relaxation.",
+      bestTime: "April-June or September-November",
+      highlights: ["Coral reefs", "Diving sites", "South Beach", "Marine life"],
+      tips: "Great for water sports and has the clearest waters in the region!",
+      vibe: "Tropical paradise in the desert"
+    },
+    "wadi rum": {
+      description: "The Valley of the Moon - vast desert landscapes that inspired Lawrence of Arabia.",
+      bestTime: "October-April (cooler months)",
+      highlights: ["Sand dunes", "Rock formations", "Bedouin camps", "Stargazing"],
+      tips: "Stay in a desert camp for the authentic experience. The silence at night is magical!",
+      vibe: "Epic adventure and tranquility"
+    },
+    jerash: {
+      description: "One of the best-preserved Roman cities outside Italy, with massive columns and theaters.",
+      bestTime: "March-May or September-November",
+      highlights: ["Oval Plaza", "South Theater", "Temple of Artemis", "Colonnaded Street"],
+      tips: "It's like stepping back to Roman times - bring your imagination!",
+      vibe: "Living history"
+    },
+    madaba: {
+      description: "The City of Mosaics, famous for its Byzantine churches and the oldest map of the Holy Land.",
+      bestTime: "Year-round",
+      highlights: ["St. George's Church mosaic", "Madaba Archaeological Park", "Local crafts"],
+      tips: "Perfect day trip from Amman, and the mosaics are absolutely stunning!",
+      vibe: "Artistic heritage"
+    }
+  },
+
+  culture: {
+    food: ["Mansaf (national dish)", "Falafel", "Hummus", "Maqluba", "Kunafa", "Baklava"],
+    customs: ["Hospitality is sacred", "Tea/coffee ceremonies", "Friday prayers", "Family-oriented society"],
+    festivals: ["Jerash Festival (July)", "Aqaba Jazz Festival", "Dead Sea Ultra Marathon"],
+    tips: ["Dress modestly at religious sites", "Remove shoes when entering mosques", "Learn basic Arabic phrases"]
+  },
+
+  practical: {
+    currency: "Jordanian Dinar (JOD) - very strong currency!",
+    language: "Arabic (official), English widely spoken in tourist areas",
+    visa: "Visa on arrival for most nationalities",
+    safety: "Very safe country, but stay aware in crowded areas",
+    tipping: "10-15% at restaurants, small amounts for helpful service"
+  }
+};
+
+      
 const levenshtein = (a, b) => {
   const s = String(a || '');
   const t = String(b || '');
@@ -118,287 +188,143 @@ async function callOpenAI(messages, apiKey) {
   }
 }
 
-export const generateChatResponse = async (userMessage, conversationHistory = []) => {
-  const rawMessage = String(userMessage || '');
-  const message = normalizeText(rawMessage);
-  let response = '';
-
-  const findHotelIdsByText = async (text) => {
-    const q = String(text || '').trim();
-    if (!q) return [];
-    const res = await hotelAPI.searchAll(q);
-    const hotels = Array.isArray(res?.hotels) ? res.hotels : [];
-    return hotels
-      .map((h) => h?.id)
-      .filter(Boolean)
-      .slice(0, 6);
+async function gatherContextData(message) {
+  const data = {
+    hotels: [],
+    deals: [],
+    destination: null,
+    intent: 'chat'
   };
 
-  const lastBot = [...conversationHistory].reverse().find((m) => m?.sender === 'bot');
-  const lastHotels = Array.isArray(lastBot?.hotels) ? lastBot.hotels : [];
+  // Detect destination
+  data.destination = extractDestination(message);
 
-  // 1. Try AI Generation if Key is available
-  const apiKey = getOpenAIKey();
-  if (apiKey) {
-    let contextHotels = [];
+  // Detect intent & fetch data
+  const isBooking = fuzzyIncludes(message, 'hotel') || fuzzyIncludes(message, 'book') || fuzzyIncludes(message, 'stay') || fuzzyIncludes(message, 'room');
+  const isDeal = fuzzyIncludes(message, 'deal') || fuzzyIncludes(message, 'offer') || fuzzyIncludes(message, 'price') || fuzzyIncludes(message, 'cheap');
+
+  if (isBooking || data.destination) {
+    data.intent = 'booking';
     try {
-      const searchRes = await hotelAPI.searchAll(rawMessage);
-      if (searchRes && Array.isArray(searchRes.hotels)) {
-        contextHotels = searchRes.hotels.slice(0, 5);
+      const allHotels = await hotelAPI.getAllHotels();
+      if (data.destination) {
+        data.hotels = allHotels.filter(h => 
+          fuzzyIncludes(h.location, data.destination) || 
+          fuzzyIncludes(h.name, data.destination) ||
+          fuzzyIncludes(h.destination, data.destination)
+        ).slice(0, 3);
+      } else if (isBooking) {
+        // If asking for hotels generally, show top rated
+        data.hotels = allHotels.sort((a, b) => b.rating - a.rating).slice(0, 3);
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) { console.error("Error fetching hotels for chat:", e); }
+  }
 
-    const systemPrompt = `You are VisitJo, a helpful AI travel assistant for Jordan.
-    Context - Hotels found for query:
-    ${contextHotels.map(h => `- ${h.name} (${h.location}): ${h.price} JOD, ${h.rating} stars.`).join('\n')}
+  if (isDeal) {
+    data.intent = 'deals';
+    try {
+      data.deals = await hotelAPI.getDeals();
+      // If we have deals, maybe grab the hotels associated with them if possible, or just generic deals
+    } catch (e) { console.error("Error fetching deals for chat:", e); }
+  }
+
+  return data;
+}
+
+export const generateChatResponse = async (message, history = [], userProfile = {}) => {
+  const userName = userProfile?.displayName || userProfile?.name || 'Friend';
+  const apiKey = getOpenAIKey();
+  const contextData = await gatherContextData(message);
+  
+  let responseText = '';
+  
+  if (apiKey) {
+    // AI Path
+    const systemPrompt = `You are Nashmi, a witty, charming, and knowledgeable Jordanian travel companion. 
+    Your personality: ${JSON.stringify(NASHMI_PERSONALITY)}.
+    User Name: ${userName}.
+    Current Context Data (Hotels/Deals found): ${JSON.stringify({
+      hotels: contextData.hotels.map(h => ({ name: h.name, location: h.location, price: h.price })),
+      destination: contextData.destination
+    })}.
+    Knowledge Base: ${JSON.stringify(JORDAN_KNOWLEDGE)}.
     
     Instructions:
-    - Answer the user's question in a friendly, concise way.
-    - If hotels are listed above and relevant, recommend them.
-    - If asked about general Jordan travel (Petra, Wadi Rum, etc.), provide tips.
-    - Use emojis.`;
-
+    1. Always address the user by their name (${userName}) naturally in the conversation.
+    2. Be funny, warm, and use Jordanian flair (like "Yalla", "Habibi/Habibti", "Ahlan").
+    3. If the user asks about hotels or booking, mention the hotels provided in the context data enthusiastically.
+    4. If the user asks about a city (Amman, Petra, etc.), use the Knowledge Base to give a vivid description.
+    5. Keep responses concise (under 3 sentences usually) but engaging.
+    6. If you don't know something, make a witty joke about it and suggest visiting Petra instead.
+    `;
+    
     const messages = [
       { role: "system", content: systemPrompt },
-      ...conversationHistory.slice(-4).map(m => ({
-        role: m.sender === 'user' ? 'user' : 'assistant',
-        content: m.text
-      })),
-      { role: "user", content: rawMessage }
+      ...history.map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })),
+      { role: "user", content: message }
     ];
-
+    
     const aiText = await callOpenAI(messages, apiKey);
     if (aiText) {
-      return {
-        text: aiText,
-        hotels: contextHotels.slice(0, 3),
-        suggestions: [i18n.t('chat.suggestions.deals'), 'Amman', 'Petra', 'Dead Sea']
-      };
+      responseText = aiText;
     }
   }
-
-  // Smalltalk (typo-tolerant): "how areu", "hru", etc.
-  const smallTalkHowAreYou = [
-    'how are you',
-    'how are u',
-    'how r u',
-    'how areu',
-    'hru',
-    'whats up',
-    'what is up',
-    'كيف حالك',
-    'شلونك',
-  ];
-  if (smallTalkHowAreYou.some((p) => fuzzyIncludes(message, p))) {
-    return {
-      text: i18n.t('chat.smalltalk.howAreYou'),
-      hotels: [],
-      suggestions: [
-        i18n.t('chat.suggestions.luxury'),
-        i18n.t('chat.suggestions.budget'),
-        i18n.t('chat.suggestions.spa'),
-        i18n.t('chat.suggestions.adventure'),
-      ],
-    };
+  
+  if (!responseText) {
+    // Fallback Path (Local Logic)
+    responseText = generateLocalResponse(message, userName, contextData);
   }
 
-  // Greeting detection (also Arabic)
-  const greetings = ['hi', 'hello', 'hey', 'greetings', 'start', 'مرحبا', 'أهلا', 'اهلا', 'السلام عليكم'];
-  if (greetings.some((g) => message === normalizeText(g) || message.startsWith(normalizeText(g) + ' '))) {
-    return {
-      text: i18n.t('chat.greeting.default'),
-      hotels: [],
-      suggestions: [
-        i18n.t('chat.suggestions.luxury'),
-        i18n.t('chat.suggestions.budget'),
-        i18n.t('chat.suggestions.adventure'),
-        i18n.t('chat.suggestions.relaxation'),
-      ]
-    };
-  }
-
-  // Destination extraction from free-form text
-  const destination = extractDestination(rawMessage);
-  if (destination) {
-    const matches = await findHotelIdsByText(destination).catch(() => []);
-    if (matches.length > 0) {
-      return {
-        text: i18n.t('chat.recommendations.header'),
-        hotels: matches.slice(0, 3),
-        links: matches.slice(0, 3).map((id) => ({
-          label: `${i18n.t('chat.links.open')} ${id}`,
-          to: `/hotels/${id}`
-        })),
-        suggestions: [
-          i18n.t('chat.suggestions.deals'),
-          i18n.t('chat.suggestions.map'),
-          'Amman',
-          'Dead Sea',
-        ]
-      };
-    }
-  }
-
-  // Direct hotel intents
-  if (message.startsWith('book ') || message.startsWith('reserve ') || message.startsWith('احجز ') || message.startsWith('حجز ')) {
-    const query = message.replace(/^(book|reserve|احجز|حجز)\s+/, '').trim();
-    const matches = (await findHotelIdsByText(query).catch(() => [])).slice(0, 3);
-    if (matches.length > 0) {
-      return {
-        text: i18n.t('chat.recommendations.pickToBook'),
-        hotels: matches,
-        links: [
-          ...matches.map((id) => ({ label: `${i18n.t('chat.links.view')} ${id}`, to: `/hotels/${id}` })),
-          { label: i18n.t('chat.links.checkout'), to: '/checkout' },
-        ],
-        suggestions: [i18n.t('chat.suggestions.deals'), i18n.t('chat.suggestions.map')],
-      };
-    }
-  }
-
-  if (
-    message.match(/\b(show|view)\b.*\b(images?|photos?)\b/) ||
-    (message.includes('صور') && (message.includes('عرض') || message.includes('شوف') || message.includes('اظهر')))
-  ) {
-    const matches = (await findHotelIdsByText(message).catch(() => [])).slice(0, 3);
-    if (matches.length > 0) {
-      return {
-        text: i18n.t('chat.recommendations.openToSeeGallery'),
-        hotels: matches,
-        links: matches.map((id) => ({ label: `${i18n.t('chat.links.open')} ${id}`, to: `/hotels/${id}` })),
-        suggestions: [i18n.t('chat.suggestions.deals'), i18n.t('chat.suggestions.map')],
-      };
-    }
-  }
-
-  // Navigation intents ("take me to deals", "open map", etc.)
-  if (message.match(/\b(deals?|offers?)\b/) || message.includes('عروض') || message.includes('خصم') || message.includes('عرض')) {
-    return {
-      text: i18n.t('chat.recommendations.deals'),
-      hotels: [],
-      links: [
-        { label: i18n.t('chat.links.deals'), to: "/deals" },
-        { label: i18n.t('chat.links.specialOffers'), to: "/special-offers" },
-      ],
-      suggestions: [i18n.t('chat.suggestions.deals'), i18n.t('chat.suggestions.luxury'), i18n.t('chat.suggestions.budget')],
-    };
-  }
-  if (message.match(/\b(map|nearby)\b/) || message.includes('خريطة') || message.includes('بالقرب')) {
-    return {
-      text: i18n.t('chat.recommendations.map'),
-      hotels: [],
-      links: [{ label: i18n.t('chat.links.hotelsMap'), to: "/hotels-map" }],
-      suggestions: ['Dead Sea', 'Amman', 'Aqaba', 'Petra'],
-    };
-  }
-  if (message.match(/\b(trends?|popular)\b/) || message.includes('رائج') || message.includes('الأكثر رواج')) {
-    return {
-      text: i18n.t('chat.recommendations.trends'),
-      hotels: [],
-      links: [{ label: i18n.t('chat.links.trends'), to: "/trends" }],
-      suggestions: ['Dead Sea', 'Petra', 'Wadi Rum', 'Amman'],
-    };
-  }
-  if (message.match(/\b(wishlist|saved)\b/) || message.includes('مفض') || message.includes('محفوظ')) {
-    return {
-      text: i18n.t('chat.recommendations.wishlist'),
-      hotels: [],
-      links: [{ label: i18n.t('chat.links.wishlist'), to: "/wishlist" }],
-      suggestions: [i18n.t('chat.suggestions.spa'), i18n.t('chat.suggestions.beach'), i18n.t('chat.suggestions.adventure'), i18n.t('chat.suggestions.luxury')],
-    };
-  }
-  if (message.match(/\b(destinations?)\b/) || message.includes('وجه') || message.includes('الوجهات')) {
-    return {
-      text: i18n.t('chat.recommendations.destinations'),
-      hotels: [],
-      links: [{ label: i18n.t('chat.links.destinations'), to: "/destinations" }],
-      suggestions: ['Dead Sea', 'Petra', 'Aqaba', 'Wadi Rum'],
-    };
-  }
-
-  // Simple follow-up
-  if (message === 'yes' || message === 'yeah' || message === 'yep' || message === 'ok') {
-    if (lastHotels.length > 0) {
-      return {
-        text: `${i18n.t('chat.followUp.default')}`,
-        hotels: lastHotels,
-        links: lastHotels.map((id) => ({ label: `${i18n.t('chat.links.open')} ${id}`, to: `/hotels/${id}` })),
-        suggestions: [i18n.t('chat.suggestions.deals'), i18n.t('chat.suggestions.map')],
-      };
-    }
-    return {
-      text: i18n.t('chat.recommendations.askVibe'),
-      hotels: [],
-      suggestions: [i18n.t('chat.suggestions.spa'), i18n.t('chat.suggestions.beach'), i18n.t('chat.suggestions.adventure'), i18n.t('chat.suggestions.city')],
-    };
-  }
-
-  // Vibe/location-y intents: guide user to search + offer quick links.
-  if (
-    message.match(/spa|wellness|health|therapy|relax|massage|treatment/) ||
-    message.includes('سبا') ||
-    message.includes('استرخ') ||
-    message.match(/beach|diving|snorkel|water|swim|red sea/) ||
-    message.match(/adventure|hike|trek|camel|desert|wadi|explore|thrill/) ||
-    message.match(/history|culture|ancient|archaeological|sightseeing|tour/) ||
-    message.match(/luxury|premium|exclusive|upscale|high-end/) ||
-    message.match(/family|kids|children|couple|romantic|honeymoon|groups/)
-  ) {
-    return {
-      text: i18n.t('chat.recommendations.askVibe'),
-      hotels: [],
-      links: [{ label: i18n.t('chat.links.searchHotels'), to: '/search' }],
-      suggestions: ['Amman', 'Dead Sea', 'Aqaba', 'Petra', 'Wadi Rum'],
-    };
-  }
-
-  // Budget inquiries
-  else if (message.match(/budget|cheap|affordable|price|cost|how much/)) {
-    response = "What's your budget range? I can recommend hotels from budget-friendly to luxury options across all price points!";
-    return { text: response, hotels: [], suggestions: ['80-100 JOD', '100-120 JOD', '120-150 JOD', 'No limit'] };
-  }
-
-  // Amenities
-  else if (
-    message.match(/amenities|facilities|gym|pool|restaurant|wifi|parking/) ||
-    message.includes('مرافق') ||
-    message.includes('خدمات') ||
-    message.includes('واي فاي') ||
-    message.includes('مسبح') ||
-    message.includes('مطعم') ||
-    message.includes('موقف')
-  ) {
-    response = i18n.t('chat.misc.amenitiesAsk');
-    return { text: response, hotels: [], suggestions: ['WiFi', 'Pool', 'Gym', 'Restaurant', i18n.t('chat.suggestions.spa'), i18n.t('chat.suggestions.beach')] };
-  }
-
-  // Booking/Reservation
-  else if (message.match(/book|reserve|booking|checkout|dates/) || message.includes('حجز') || message.includes('احجز') || message.includes('الدفع') || message.includes('تواريخ')) {
-    response = i18n.t('chat.misc.bookingHelp');
-    return {
-      text: response,
-      hotels: [],
-      links: [{ label: i18n.t('chat.links.searchHotels'), to: '/search' }],
-      suggestions: [i18n.t('chat.misc.pickHotelFirst'), i18n.t('chat.misc.alreadyPickedHotel'), 'Next week', 'Specific dates'],
-    };
-  }
-
-  // Not understood
-  else {
-    return {
-      text: i18n.t('chat.notFound.default'),
-      hotels: [],
-      suggestions: [i18n.t('chat.suggestions.spa'), i18n.t('chat.suggestions.beach'), i18n.t('chat.suggestions.adventure'), i18n.t('chat.suggestions.luxury'), i18n.t('chat.suggestions.city')]
-    };
-  }
-
-  // All branches above return.
+  // Construct final response object
+  return {
+    text: responseText,
+    hotels: contextData.hotels || [],
+    offers: contextData.deals || [],
+    // Only show images if we found specific hotels, otherwise keep chat clean
+    images: contextData.hotels.length > 0 ? contextData.hotels.map(h => ({ url: h.image, alt: h.name })).filter(i => i.url) : [],
+    suggestions: getSmartSuggestions(contextData.hotels.map(h => h.id))
+  };
 };
+
+function generateLocalResponse(message, userName, data) {
+  const msg = normalizeText(message);
+  
+  // 1. Destination specific
+  if (data.destination && JORDAN_KNOWLEDGE.destinations[data.destination]) {
+    const dest = JORDAN_KNOWLEDGE.destinations[data.destination];
+    return `Ahlan ${userName}! ${data.destination.charAt(0).toUpperCase() + data.destination.slice(1)} is amazing! ${dest.description} ${dest.tips}`;
+  }
+
+  // 2. Booking/Hotels
+  if (data.hotels.length > 0) {
+    return `I've found some fantastic places for you, ${userName}! Check out these gems in ${data.destination || 'Jordan'}. Shall I book one for you?`;
+  }
+
+  // 3. Deals
+  if (data.deals && data.deals.length > 0) {
+    return `You're in luck, ${userName}! We have some special offers right now. Who doesn't love a good bargain?`;
+  }
+
+  // 4. Greetings
+  if (fuzzyIncludes(msg, 'hello') || fuzzyIncludes(msg, 'hi') || fuzzyIncludes(msg, 'salam')) {
+    return `Ya hala, ${userName}! Nashmi here. Where are we going today? Petra? The Dead Sea? Or maybe just hunting for the best falafel?`;
+  }
+
+  // 5. Default Witty
+  const randomWit = NASHMI_PERSONALITY.wittyRemarks[Math.floor(Math.random() * NASHMI_PERSONALITY.wittyRemarks.length)];
+  return `${randomWit} By the way, ${userName}, how can I help you plan your trip?`;
+}
 
 export const getSmartSuggestions = (viewedHotels = [], _preferences = {}) => {
   const unique = [...new Set(Array.isArray(viewedHotels) ? viewedHotels : [])].filter(Boolean);
-  // Without a static catalog, best-effort: prioritize most recently viewed.
-  return unique.slice(-10).reverse();
+  const suggestions = ["Best hotels in Amman", "Deals in Aqaba", "Visit Petra", "Dead Sea Spas"];
+  
+  // Add dynamic suggestions based on viewed hotels if available
+  if (unique.length > 0) {
+    suggestions.unshift("Similar to your last view");
+  }
+  
+  return suggestions.slice(0, 4);
 };
 
 export default {
