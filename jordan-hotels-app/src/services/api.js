@@ -91,10 +91,6 @@ if (typeof window !== "undefined" && window.__VISITJO_RUNTIME_CONFIG__ && window
 function getApiBaseUrl(path) {
   // Always use public API for hotels, deals, destinations, experiences, search
   if (/^\/hotels/.test(path) || /^\/deals/.test(path) || /^\/destinations/.test(path) || /^\/experiences/.test(path) || /^\/search/.test(path)) {
-    // In local dev, use Vite proxy to avoid CORS issues
-    if (isLocalDevHost) {
-      return "/api";
-    }
     return PUBLIC_API_BASE_URL;
   }
   // In local dev, force Vite proxy for user/profile endpoints to avoid CORS

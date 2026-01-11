@@ -23,7 +23,11 @@ const defaultHeaders = {
 };
 
 const getCorsHeaders = (event) => {
-  return defaultHeaders;
+  const origin = event.headers?.origin || event.headers?.Origin || "*";
+  return {
+    ...defaultHeaders,
+    "Access-Control-Allow-Origin": origin,
+  };
 };
 
 const parseJwtClaims = (event) => {
@@ -113,6 +117,7 @@ async function handler(event) {
 }
 
 async function getUserProfile(userId, event) {
+  const corsHeaders = getCorsHeaders(event);
   try {
     if (USERS_TABLE) {
       const result = await docClient.send(
@@ -127,9 +132,7 @@ async function getUserProfile(userId, event) {
           statusCode: 200,
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-            "Access-Control-Allow-Methods": "GET,PUT,OPTIONS",
+            ...corsHeaders,
           },
           body: JSON.stringify(result.Item),
         };
@@ -173,9 +176,7 @@ async function getUserProfile(userId, event) {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-        "Access-Control-Allow-Methods": "GET,PUT,OPTIONS",
+        ...corsHeaders,
       },
       body: JSON.stringify(item),
     };
