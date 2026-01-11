@@ -1,7 +1,6 @@
 import axios from "axios";
 import { XOTELO_JORDAN_HOTELS } from "./xoteloJordanHotelsData.js";
-import { REAL_HOTELS } from "./realHotelsData.js";
-import { sanitizeHotelImageUrls } from "../utils/hotelImageFallback";
+import { sanitizeHotelImageUrls, GENERIC_HOTEL_FALLBACK_IMAGES, getGenericHotelFallbackImage } from "../utils/hotelImageFallback";
 
 // Resolve API URL in this order:
 // 1) runtime config (public/runtime-config.js) - works in Amplify without env vars
@@ -359,14 +358,7 @@ const normalizeHotel = (rawHotel) => {
 
 // Helper function to get hotels from static data with filtering and pagination
 const getHotelsFromStatic = ({ q = "", cursor = "", limit = 30 } = {}) => {
-  const realIds = new Set(REAL_HOTELS.map(h => h.id));
-  const xoteloFiltered = (Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [])
-    .filter(h => !realIds.has(h.id));
-
-  const allHotels = [
-    ...REAL_HOTELS,
-    ...xoteloFiltered
-  ];
+  const allHotels = Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [];
 
   // No deduplication needed since we only use one dataset
   const uniqueHotels = allHotels;
@@ -467,15 +459,7 @@ export const hotelAPI = {
   getAllHotels: async (location = "") => {
     console.log("API: Using Xotelo hotel data only");
 
-    // Use only Xotelo data as requested
-    const realIds = new Set(REAL_HOTELS.map(h => h.id));
-    const xoteloFiltered = (Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [])
-      .filter(h => !realIds.has(h.id));
-
-    const allHotels = [
-      ...REAL_HOTELS,
-      ...xoteloFiltered
-    ];
+    const allHotels = Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [];
 
     // No deduplication needed since we only use one dataset
     const uniqueHotels = allHotels;
@@ -497,10 +481,7 @@ export const hotelAPI = {
 
   getHotelById: async (id) => {
     // Always try static data first for reliability
-    const allHotels = [
-      ...REAL_HOTELS,
-      ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [])
-    ];
+    const allHotels = Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [];
     const staticHotel = allHotels.find((h) => h.id === id);
     if (staticHotel) {
       console.log('Found hotel in static data:', id);
@@ -986,3 +967,117 @@ const mockBlogPosts = [
 
 export const api = apiClient;
 export default apiClient;
+
+// --- realHotelsAPI Replacement (Using Xotelo Data) ---
+
+const toUniqueStrings = (values) => {
+  const out = [];
+  const seen = new Set();
+  for (const v of values || []) {
+    if (typeof v !== "string") continue;
+    const s = v.trim();
+    if (!s) continue;
+    if (seen.has(s)) continue;
+    seen.add(s);
+    out.push(s);
+  }
+  return out;
+};
+
+const normalizeDestinationInput = (value) => {
+  const v = String(value || '').trim();
+  if (!v) return '';
+  const compact = v.replace(/\s+/g, ' ');
+
+  // Arabic -> canonical English destination strings
+  if (/^عمّ?ان$/.test(compact)) return 'Amman';
+  if (/^(ال)?بترا$/.test(compact) || /^البتراء$/.test(compact)) return 'Petra';
+  if (/^البحر الميت$/.test(compact)) return 'Dead Sea';
+  if (/^العقبة$/.test(compact)) return 'Aqaba';
+  if (/^وادي رم$/.test(compact)) return 'Wadi Rum';
+
+  return compact;
+};
+
+const normalizeHotelsForUi = (hotels) => {
+  const fallbackSet = new Set(GENERIC_HOTEL_FALLBACK_IMAGES);
+  const usedNonFallback = new Set();
+
+  return (hotels || []).map((h) => {
+    const rawImages = [h?.image, ...(Array.isArray(h?.images) ? h.images : [])];
+    const sanitizedInput = sanitizeHotelImageUrls(rawImages, h?.id || h?.name || "");
+    const unique = [];
+
+    for (const url of toUniqueStrings(sanitizedInput)) {
+      if (fallbackSet.has(url)) {
+        unique.push(url);
+        continue;
+      }
+      if (usedNonFallback.has(url)) continue;
+      usedNonFallback.add(url);
+      unique.push(url);
+    }
+
+    const fallback = getGenericHotelFallbackImage(h?.id || h?.name || "");
+    const primary = unique[0] || fallback || "";
+    const images = unique.length ? unique : (primary ? [primary] : []);
+
+    return {
+      ...h,
+      image: primary,
+      images,
+    };
+  });
+};
+
+let NORMALIZED_CACHE = null;
+const getNormalizedHotels = () => {
+  if (!NORMALIZED_CACHE) {
+    // Use XOTELO_JORDAN_HOTELS instead of REAL_HOTELS
+    NORMALIZED_CACHE = normalizeHotelsForUi(XOTELO_JORDAN_HOTELS);
+  }
+  return NORMALIZED_CACHE;
+};
+
+export const realHotelsAPI = {
+  getAllHotels: async (location = '') => {
+    const normalizedLocation = normalizeDestinationInput(location);
+    if (normalizedLocation) {
+      return getNormalizedHotels().filter((h) =>
+        h.location.toLowerCase().includes(normalizedLocation.toLowerCase())
+      );
+    }
+    return getNormalizedHotels();
+  },
+
+  getHotelById: async (id) => {
+    return getNormalizedHotels().find((h) => h.id === id) || null;
+  },
+
+  getHotelsByDestination: async (destination) => {
+    const normalizedDestination = normalizeDestinationInput(destination);
+    return getNormalizedHotels().filter((h) =>
+      h.destination.toLowerCase() === normalizedDestination.toLowerCase()
+    );
+  },
+
+  searchHotels: async (filters) => {
+    let results = getNormalizedHotels();
+    if (filters.location) {
+      const normalizedLocation = normalizeDestinationInput(filters.location);
+      results = results.filter((h) => h.location.toLowerCase().includes(normalizedLocation.toLowerCase()));
+    }
+    if (filters.minPrice) results = results.filter((h) => h.price >= filters.minPrice);
+    if (filters.maxPrice) results = results.filter((h) => h.price <= filters.maxPrice);
+    if (filters.minRating) results = results.filter((h) => h.rating >= filters.minRating);
+    return results;
+  },
+
+  getPopularHotels: async () => {
+    return [...getNormalizedHotels()].sort((a, b) => b.rating - a.rating).slice(0, 6);
+  },
+
+  getFeaturedHotels: async () => {
+    return getNormalizedHotels().filter((h) => h.rating >= 4.7);
+  },
+};
