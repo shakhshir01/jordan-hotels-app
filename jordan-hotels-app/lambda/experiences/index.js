@@ -1,8 +1,5 @@
 const defaultHeaders = {
   "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-  "Access-Control-Allow-Methods": "GET,OPTIONS",
 };
 
 const json = (statusCode, body) => ({
@@ -11,7 +8,7 @@ const json = (statusCode, body) => ({
   body: body == null ? "" : JSON.stringify(body),
 });
 
-export async function handler(event) {
+async function handler(event) {
   const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
   if (method === "OPTIONS") return { statusCode: 200, headers: defaultHeaders, body: "" };
 
@@ -21,12 +18,12 @@ export async function handler(event) {
   try {
     if (!tableName) return json(200, { experiences: [] });
 
-    const { DynamoDBClient } = await import("@aws-sdk/client-dynamodb");
+    const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
     const {
       DynamoDBDocumentClient,
       ScanCommand,
       GetCommand,
-    } = await import("@aws-sdk/lib-dynamodb");
+    } = require("@aws-sdk/lib-dynamodb");
 
     const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
@@ -44,3 +41,5 @@ export async function handler(event) {
     return json(500, { message: "Internal server error" });
   }
 }
+
+module.exports.handler = handler;

@@ -1,3 +1,12 @@
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const {
+  DynamoDBDocumentClient,
+  ScanCommand,
+  GetCommand,
+} = require("@aws-sdk/lib-dynamodb");
+
+const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+
 const defaultHeaders = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
@@ -11,24 +20,13 @@ const json = (statusCode, body) => ({
   body: body == null ? "" : JSON.stringify(body),
 });
 
-export async function handler(event) {
+async function handler(event) {
   const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
   if (method === "OPTIONS") return { statusCode: 200, headers: defaultHeaders, body: "" };
 
-  const tableName = process.env.DESTINATIONS_TABLE;
-  const id = event?.pathParameters?.id ? String(event.pathParameters.id) : "";
-
   try {
-    if (!tableName) return json(200, { destinations: [] });
-
-    const { DynamoDBClient } = await import("@aws-sdk/client-dynamodb");
-    const {
-      DynamoDBDocumentClient,
-      ScanCommand,
-      GetCommand,
-    } = await import("@aws-sdk/lib-dynamodb");
-
-    const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+    const tableName = process.env.DESTINATIONS_TABLE;
+    const id = event?.pathParameters?.id ? String(event.pathParameters.id) : "";
 
     if (id) {
       const res = await client.send(new GetCommand({ TableName: tableName, Key: { id } }));
@@ -44,3 +42,5 @@ export async function handler(event) {
     return json(500, { message: "Internal server error" });
   }
 }
+
+module.exports.handler = handler;

@@ -15,25 +15,15 @@ const ses = new SESClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const BOOKINGS_TABLE = process.env.BOOKINGS_TABLE || "Bookings";
 const USERS_TABLE = process.env.USERS_TABLE || "Users";
 
-const ALLOWED_ORIGINS = new Set([
-  "https://main.d1ewsonl19kjj7.amplifyapp.com",
-  "https://www.visit-jo.com",
-  "https://visit-jo.com",
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-]);
+const defaultHeaders = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
+  "Access-Control-Allow-Methods": "GET,PUT,OPTIONS",
+};
 
 const getCorsHeaders = (event) => {
-  const origin = event?.headers?.origin || event?.headers?.Origin || "";
-  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "*";
-
-  return {
-    "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "GET,PUT,OPTIONS",
-    "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-    "Vary": "Origin",
-  };
+  return defaultHeaders;
 };
 
 const parseJwtClaims = (event) => {
@@ -123,7 +113,6 @@ async function handler(event) {
 }
 
 async function getUserProfile(userId, event) {
-  const corsHeaders = getCorsHeaders(event);
   try {
     if (USERS_TABLE) {
       const result = await docClient.send(
@@ -138,7 +127,6 @@ async function getUserProfile(userId, event) {
           statusCode: 200,
           headers: {
             "Content-Type": "application/json",
-            ...corsHeaders,
           },
           body: JSON.stringify(result.Item),
         };
@@ -182,7 +170,6 @@ async function getUserProfile(userId, event) {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        ...corsHeaders,
       },
       body: JSON.stringify(item),
     };
