@@ -1,37 +1,67 @@
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
-
-const STORAGE_KEY = "visitjo.theme";
-
-function getInitialTheme() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved === "light" || saved === "dark") return saved;
-  return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
-}
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState(getInitialTheme);
+  const [theme, setTheme] = useState(() => {
+    // Check for saved theme preference or default to light mode
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") || "light";
+    }
+    return "light";
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
+
+    // Remove existing theme classes
     root.classList.remove("light", "dark");
+
+    // Add current theme class
     root.classList.add(theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+
+    // Save to localStorage
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   return (
     <button
-      type="button"
       onClick={toggleTheme}
-      className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200"
-      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+      className="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors duration-200"
+      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
-      {theme === "dark" ? (
-        <Sun size={18} className="text-yellow-500" />
+      {theme === "light" ? (
+        // Moon icon for dark mode
+        <svg
+          className="w-5 h-5 text-slate-700 dark:text-slate-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+          />
+        </svg>
       ) : (
-        <Moon size={18} className="text-slate-700" />
+        // Sun icon for light mode
+        <svg
+          className="w-5 h-5 text-slate-700 dark:text-slate-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+          />
+        </svg>
       )}
     </button>
   );

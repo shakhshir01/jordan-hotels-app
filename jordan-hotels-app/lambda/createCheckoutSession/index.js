@@ -2,6 +2,13 @@ import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-sec
 
 const sm = new SecretsManagerClient({});
 
+const defaultHeaders = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
+  "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+};
+
 async function getStripeSecret(secretArn) {
   if (!secretArn) return null;
   try {
@@ -16,6 +23,15 @@ async function getStripeSecret(secretArn) {
 
 export async function handler(event) {
   try {
+    const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
+    if (method === "OPTIONS") {
+      return {
+        statusCode: 200,
+        headers: defaultHeaders,
+        body: "",
+      };
+    }
+
     const body = event.body ? JSON.parse(event.body) : {};
     const { hotelId, amount, booking } = body;
     const secretArn = process.env.STRIPE_SECRET_ARN;
@@ -30,7 +46,7 @@ export async function handler(event) {
       // Return a stub session when Stripe not configured
       return {
         statusCode: 200,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        headers: defaultHeaders,
         body: JSON.stringify({ sessionId: `stub_${Date.now()}`, redirect: false }),
       };
     }
@@ -39,7 +55,7 @@ export async function handler(event) {
     if (!paymentsEnabled || isLiveKey && String(process.env.ALLOW_LIVE_PAYMENTS || '').toLowerCase() !== 'true') {
       return {
         statusCode: 400,
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        headers: defaultHeaders,
         body: JSON.stringify({
           message: 'Payments are disabled for this environment. Use Stripe test keys or enable PAYMENTS_ENABLED.',
         }),
@@ -69,14 +85,14 @@ export async function handler(event) {
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      headers: defaultHeaders,
       body: JSON.stringify({ sessionId: session.id }),
     };
   } catch (err) {
     console.error("checkout error", err);
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      headers: defaultHeaders,
       body: JSON.stringify({ message: "Checkout failed" }),
     };
   }

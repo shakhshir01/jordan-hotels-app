@@ -5,11 +5,11 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WishlistProvider } from './context/WishlistContext';
-import { InlineLoader } from './components/LoadingSpinner';
-
 // Shared layout
 import AppLayout from './layouts/AppLayout.jsx';
+// Components
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import ChatBot from './components/ChatBot.jsx';
 
 // Pages
 const Home = React.lazy(() => import('./pages/home.jsx'));
@@ -24,10 +24,7 @@ const Bookings = React.lazy(() => import('./pages/Bookings'));
 const Checkout = React.lazy(() => import('./pages/Checkout'));
 const AdminUpload = React.lazy(() => import('./pages/AdminUpload'));
 const Destinations = React.lazy(() => import('./pages/Destinations.jsx'));
-const Deals = React.lazy(() => import('./pages/Deals.jsx'));
-const Flights = React.lazy(() => import('./pages/Flights.jsx'));
-const Cars = React.lazy(() => import('./pages/Cars.jsx'));
-const Experiences = React.lazy(() => import('./pages/Experiences.jsx'));
+
 const Trends = React.lazy(() => import('./pages/Trends.jsx'));
 const Insights = React.lazy(() => import('./pages/Insights.jsx'));
 const TripPlanner = React.lazy(() => import('./pages/TripPlanner.jsx'));
@@ -46,6 +43,7 @@ const DealsList = React.lazy(() => import('./pages/DealsList.jsx'));
 const FlightsSearch = React.lazy(() => import('./pages/FlightsSearch.jsx'));
 const CarsSearch = React.lazy(() => import('./pages/CarsSearch.jsx'));
 const ExperiencesListing = React.lazy(() => import('./pages/ExperiencesListing.jsx'));
+const ExperienceBooking = React.lazy(() => import('./pages/ExperienceBooking.jsx'));
 const Gallery = React.lazy(() => import('./pages/Gallery.jsx'));
 const SpecialOffers = React.lazy(() => import('./pages/SpecialOffers.jsx'));
 const InsureTrip = React.lazy(() => import('./pages/InsureTrip.jsx'));
@@ -53,9 +51,6 @@ const HotelsMap = React.lazy(() => import('./pages/HotelsMap.jsx'));
 const FeaturedHotels = React.lazy(() => import('./pages/FeaturedHotels.jsx'));
 const ContactConcierge = React.lazy(() => import('./pages/ContactConcierge.jsx'));
 const SavedSearches = React.lazy(() => import('./pages/SavedSearches.jsx'));
-import { ErrorBoundary } from './components/ErrorBoundary';
-import ChatBot from './components/ChatBot.jsx';
-import MfaModal from './components/MfaModal.jsx';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -103,7 +98,9 @@ function AppRoutes() {
         <Route path="/destinations/:id" element={<DestinationDetails />} />
         <Route path="/trends" element={<Trends />} />
         <Route path="/insights" element={<Insights />} />
-        <Route path="/experiences" element={<Experiences />} />
+        <Route path="/experiences" element={<ExperiencesListing />} />
+        <Route path="/experiences/:experienceId" element={<ExperienceBooking />} />
+        <Route path="/experiences/book/:experienceId" element={<ProtectedRoute><ExperienceBooking /></ProtectedRoute>} />
         <Route path="/deals" element={<DealsList />} />
         <Route path="/flights" element={<FlightsSearch />} />
         <Route path="/cars" element={<CarsSearch />} />
@@ -124,35 +121,31 @@ function AppRoutes() {
 
 function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <WishlistProvider>
-          <ChatBot />
-          <Suspense
-            fallback={
-              <div className="flex justify-center py-10">
-                <InlineLoader />
-              </div>
-            }
-          >
-            <AppRoutes />
-          </Suspense>
-          <MfaModal />
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={true}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-        </WishlistProvider>
-      </AuthProvider>
-    </ErrorBoundary>
+    <AuthProvider>
+      <WishlistProvider>
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-10">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          }
+        >
+          <AppRoutes />
+        </Suspense>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+      </WishlistProvider>
+    </AuthProvider>
   );
 }
 

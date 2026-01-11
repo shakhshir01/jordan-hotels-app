@@ -1,13 +1,30 @@
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
+const defaultHeaders = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
+  "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+};
+
 exports.handler = async (event) => {
   try {
+    const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
+    if (method === "OPTIONS") {
+      return {
+        statusCode: 200,
+        headers: defaultHeaders,
+        body: "",
+      };
+    }
+
     const body = event.body ? JSON.parse(event.body) : {};
     const { query, history } = body;
 
     if (!query) {
       return {
         statusCode: 400,
+        headers: defaultHeaders,
         body: JSON.stringify({ error: 'Missing query in request body' }),
       };
     }
@@ -15,14 +32,15 @@ exports.handler = async (event) => {
     if (!process.env.OPENAI_API_KEY) {
       return {
         statusCode: 500,
+        headers: defaultHeaders,
         body: JSON.stringify({ error: 'OPENAI_API_KEY not configured in Lambda environment' }),
       };
     }
 
-    // Basic input validation to avoid huge prompts and control cost.
     if (typeof query === 'string' && query.length > 2000) {
       return {
         statusCode: 400,
+        headers: defaultHeaders,
         body: JSON.stringify({ error: 'Query too long (max 2000 characters)' }),
       };
     }
@@ -92,14 +110,13 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: defaultHeaders,
       body: JSON.stringify(parsed),
-      headers: {
-        'Content-Type': 'application/json',
-      },
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: defaultHeaders,
       body: JSON.stringify({ error: 'Internal server error', details: String(error) }),
     };
   }

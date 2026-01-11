@@ -3,9 +3,10 @@ export async function handler(event) {
     const method = (event.httpMethod || 'GET').toUpperCase();
 
     const getCorsHeaders = () => ({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Authorization,Content-Type',
-      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PUT,DELETE',
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
+      "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
     });
 
     const parseJwtClaims = () => {

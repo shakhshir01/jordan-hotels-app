@@ -6,6 +6,13 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 const BLOG_TABLE = process.env.BLOG_TABLE || "Blog";
 
+const defaultHeaders = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
+  "Access-Control-Allow-Methods": "GET,OPTIONS",
+};
+
 // Mock blog posts for demo mode
 const mockBlogPosts = [
   {
@@ -64,6 +71,15 @@ const mockBlogPosts = [
 
 export async function handler(event) {
   console.log('Event:', JSON.stringify(event, null, 2));
+
+  const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
+  if (method === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: defaultHeaders,
+      body: "",
+    };
+  }
 
   try {
     const path = event.rawPath || event.path || '';
@@ -126,10 +142,7 @@ async function listBlogPosts(event) {
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: defaultHeaders,
       body: JSON.stringify({
         posts: postsWithoutContent,
         page,
@@ -143,10 +156,7 @@ async function listBlogPosts(event) {
     // Return mock data on error (demo mode)
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: defaultHeaders,
       body: JSON.stringify({
         posts: mockBlogPosts.map(post => ({
           id: post.id,
@@ -184,7 +194,7 @@ async function getBlogPostBySlug(slug) {
     if (!result.Items || result.Items.length === 0) {
       return {
         statusCode: 404,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        headers: defaultHeaders,
         body: JSON.stringify({ message: 'Blog post not found' })
       };
     }
@@ -193,10 +203,7 @@ async function getBlogPostBySlug(slug) {
     
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: defaultHeaders,
       body: JSON.stringify(post)
     };
   } catch (error) {
@@ -208,17 +215,14 @@ async function getBlogPostBySlug(slug) {
     if (mockPost) {
       return {
         statusCode: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
+        headers: defaultHeaders,
         body: JSON.stringify(mockPost)
       };
     }
 
     return {
       statusCode: 404,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: defaultHeaders,
       body: JSON.stringify({ message: 'Blog post not found' })
     };
   }

@@ -21,7 +21,10 @@
     "concierge": "Concierge",
     "account": "Account",
     "menu": "Menu",
-    "close": "Close"
+    "close": "Close",
+    "about": "About",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
   },
   "hero": {
     "title": "Discover Jordan's Best Hotels",
@@ -567,6 +570,9 @@
       "checkIn": "Check-in Date",
       "checkOut": "Check-out Date",
       "guests": "Number of Guests",
+      "roomType": "Room Type",
+      "selectRoomType": "Select a room type",
+      "capacity": "Capacity",
       "guestCount": "{{count}} Guest",
       "guestCount_other": "{{count}} Guests",
       "guestCountPlus": "5+ Guests",

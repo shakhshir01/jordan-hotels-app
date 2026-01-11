@@ -1,216 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import QRCode from 'qrcode';
-import { useAuth } from '../context/AuthContext';
-import { showError, showSuccess } from '../services/toastService';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function MfaModal() {
-  const {
-    mfaChallenge,
-    submitMfaCode,
-    setupTotp,
-    verifyTotp,
-    clearMfaChallenge,
-    setupEmailMfa,
-    verifyEmailMfa,
-  } = useAuth();
-
+  const [isOpen, setIsOpen] = useState(false);
   const [code, setCode] = useState('');
-  const [secret, setSecret] = useState('');
-  const [qrDataUrl, setQrDataUrl] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [success, setSuccess] = useState(false);
+  const { t } = useTranslation();
 
-  const [secondaryEmail, setSecondaryEmail] = useState('');
-  const [emailSent, setEmailSent] = useState(false);
-
-  useEffect(() => {
-    if (!mfaChallenge) {
-      setCode('');
-      setSecret('');
-      setQrDataUrl('');
-      setLoading(false);
-      setErrorMessage('');
-      setSuccess(false);
-      setSecondaryEmail('');
-      setEmailSent(false);
-      return;
-    }
-    if (mfaChallenge?.secretCode) setSecret(mfaChallenge.secretCode);
-  }, [mfaChallenge]);
-
-  useEffect(() => {
-    if (!secret) {
-      setQrDataUrl('');
-      return;
-    }
-    const otpauth = `otpauth://totp/VisitJo?secret=${encodeURIComponent(secret)}&issuer=VisitJo`;
-    QRCode.toDataURL(otpauth)
-      .then((url) => setQrDataUrl(url))
-      .catch(() => setQrDataUrl(''));
-  }, [secret]);
-
-  if (!mfaChallenge) return null;
-
-  const onSubmit = async (e) => {
-    e?.preventDefault();
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      if (mfaChallenge.type === 'MFA_SETUP') {
-        const s = await setupTotp();
-        setSecret(s);
-      } else if (mfaChallenge.type === 'MFA_SETUP_TOTP') {
-        await verifyTotp(code);
-        setSuccess(true);
-        showSuccess('Two-factor authentication enabled');
-        setTimeout(() => clearMfaChallenge(), 1400);
-      } else if (mfaChallenge.type === 'SMS_MFA' || mfaChallenge.type === 'SOFTWARE_TOKEN_MFA') {
-        await submitMfaCode(code, mfaChallenge.type === 'SOFTWARE_TOKEN_MFA' ? 'SOFTWARE_TOKEN_MFA' : undefined);
-        setSuccess(true);
-        showSuccess('MFA verified');
-        setTimeout(() => clearMfaChallenge(), 1200);
-      }
-    } catch (_err) {
-      const codeErr = _err?.code || '';
-      const msg = String(_err?.message || _err || 'Failed to verify code');
-      if (/mismatch|invalid/i.test(msg) || /CodeMismatchException/i.test(codeErr)) {
-        setErrorMessage('Invalid code — please try again');
-        showError('Invalid code. Please try again.');
-      } else if (/expired/i.test(msg) || /ExpiredCodeException/i.test(codeErr)) {
-        setErrorMessage('Code expired — request a new code and try again');
-        showError('Code expired. Request a new code.');
-      } else if (/SessionExpired|Session error|Invalid Access Token/i.test(msg)) {
-        setErrorMessage('Session expired — please sign out and sign back in');
-        showError('Session expired. Please sign out and sign back in.');
-      } else {
-        setErrorMessage(msg);
-        showError(msg);
-      }
-    } finally {
-      setLoading(false);
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle MFA verification logic here
+    console.log('MFA Code:', code);
+    setIsOpen(false);
+    setCode('');
   };
 
-  const onSendEmail = async (e) => {
-    e?.preventDefault?.();
-    if (!secondaryEmail) return setErrorMessage('Please enter a secondary email');
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      await setupEmailMfa(secondaryEmail);
-      setEmailSent(true);
-      showSuccess('Verification email sent to secondary address');
-    } catch (_err) {
-      const msg = String(_err?.message || _err || 'Failed to send verification email');
-      setErrorMessage(msg);
-      showError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onVerifyEmail = async (e) => {
-    e?.preventDefault?.();
-    if (!code) return setErrorMessage('Enter verification code');
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      await verifyEmailMfa(code);
-      showSuccess('Email MFA enabled');
-      setTimeout(() => clearMfaChallenge(), 900);
-    } catch (_err) {
-      const msg = String(_err?.message || _err || 'Failed to verify code');
-      setErrorMessage(msg);
-      showError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // This component would be triggered by authentication flow
+  // For now, it's a placeholder that can be opened programmatically
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-md">
-        <h3 className="font-bold text-lg mb-4">Multi-factor Authentication</h3>
-
-        {mfaChallenge.type === 'MFA_SETUP' && (
-          <div>
-            <p className="mb-3">Set up an authenticator app (TOTP) or use SMS verification.</p>
-            <div className="flex gap-3">
-              <button onClick={onSubmit} className="btn-primary">Set up Authenticator App</button>
-              <button onClick={() => { clearMfaChallenge(); }} className="ml-3 btn-ghost">Cancel</button>
-            </div>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-md w-full p-6">
+        <div className="text-center mb-6">
+          <div className="mx-auto w-12 h-12 bg-jordan-blue/10 rounded-full flex items-center justify-center mb-4">
+            <svg className="w-6 h-6 text-jordan-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
           </div>
-        )}
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+            {t('mfa.title', 'Two-Factor Authentication')}
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400">
+            {t('mfa.description', 'Enter the 6-digit code from your authenticator app')}
+          </p>
+        </div>
 
-        {mfaChallenge.type === 'MFA_SETUP_TOTP' && (
-          <form onSubmit={onSubmit} className="space-y-3">
-            <p>Scan this secret into your authenticator app:</p>
-            <div className="p-3 bg-slate-100 rounded">
-              {qrDataUrl ? (
-                <img src={qrDataUrl} alt="TOTP QR code" className="mx-auto" />
-              ) : (
-                <div className="break-words">{secret}</div>
-              )}
-            </div>
-            <p className="text-sm text-slate-500">Then enter the 6-digit code from your app to verify.</p>
-            <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" className="input-premium w-full" />
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => clearMfaChallenge()} className="btn-ghost">Cancel</button>
-              <button type="submit" disabled={loading} className="btn-primary">Verify</button>
-            </div>
-          </form>
-        )}
-
-        {mfaChallenge.type === 'SMS_MFA' && (
-          <form onSubmit={onSubmit} className="space-y-3">
-            <p>Enter the SMS code sent to your phone.</p>
-            <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" className="input-premium w-full" />
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => clearMfaChallenge()} className="btn-ghost">Cancel</button>
-              <button type="submit" disabled={loading} className="btn-primary">Verify</button>
-            </div>
-          </form>
-        )}
-
-        {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA' && (
-          <form onSubmit={onSubmit} className="space-y-3">
-            <p>Enter the code from your authenticator app.</p>
-            <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" className="input-premium w-full" />
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => clearMfaChallenge()} className="btn-ghost">Cancel</button>
-              <button type="submit" disabled={loading} className="btn-primary">Verify</button>
-            </div>
-          </form>
-        )}
-
-        {mfaChallenge.type === 'EMAIL_SETUP' && (
-          <div>
-            {!emailSent ? (
-              <form onSubmit={onSendEmail} className="space-y-3">
-                <p>Enter an alternate email address to receive a verification code.</p>
-                <input value={secondaryEmail} onChange={(e) => setSecondaryEmail(e.target.value)} placeholder="alternate@example.com" className="input-premium w-full" />
-                <div className="flex justify-end gap-2">
-                  <button type="button" onClick={() => clearMfaChallenge()} className="btn-ghost">Close</button>
-                  <button type="submit" disabled={loading} className="btn-primary">Send verification email</button>
-                </div>
-              </form>
-            ) : (
-              <form onSubmit={onVerifyEmail} className="space-y-3">
-                <p>Enter the verification code sent to {secondaryEmail || 'your secondary email'}.</p>
-                <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" className="input-premium w-full" />
-                <div className="flex justify-end gap-2">
-                  <button type="button" onClick={() => clearMfaChallenge()} className="btn-ghost">Close</button>
-                  <button type="submit" disabled={loading} className="btn-primary">Verify</button>
-                </div>
-              </form>
-            )}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-6">
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+              className="w-full text-center text-2xl font-mono tracking-widest px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-jordan-blue dark:bg-slate-700 dark:text-slate-100"
+              maxLength={6}
+              required
+            />
           </div>
-        )}
 
-        {errorMessage && <p className="text-sm text-red-600 mt-2">{errorMessage}</p>}
-        {success && <p className="text-sm text-green-600 mt-2">Two-factor authentication enabled.</p>}
-
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            >
+              {t('common.cancel', 'Cancel')}
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-jordan-blue hover:bg-jordan-teal text-white rounded-lg transition-colors"
+            >
+              {t('mfa.verify', 'Verify')}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

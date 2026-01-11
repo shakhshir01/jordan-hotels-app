@@ -1,11 +1,29 @@
 export async function handler(event) {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent',
+    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+  };
+
+  // Handle preflight OPTIONS request
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: '',
+    };
+  }
+
   try {
     console.log('Event received:', JSON.stringify(event, null, 2));
     const id = event.pathParameters && event.pathParameters.id;
     if (!id) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        },
         body: JSON.stringify({ message: 'Missing id path parameter' }),
       };
     }
@@ -22,9 +40,7 @@ export async function handler(event) {
             statusCode: 200,
             headers: {
               'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Headers': 'Authorization,Content-Type',
-              'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PUT,DELETE',
+              ...corsHeaders
             },
             body: JSON.stringify(res.Item),
           };
@@ -36,16 +52,14 @@ export async function handler(event) {
           const xoteloHotels = await fetchXoteloHotels({ locationKey: "g293985", limit: 1000 });
           const xoteloHotel = xoteloHotels.find(h => h.id === id);
           if (xoteloHotel) {
-            return {
-              statusCode: 200,
-              headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Authorization,Content-Type',
-                'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PUT,DELETE',
-              },
-              body: JSON.stringify(xoteloHotel),
-            };
+          return {
+            statusCode: 200,
+            headers: {
+              'Content-Type': 'application/json',
+              ...corsHeaders
+            },
+            body: JSON.stringify(xoteloHotel),
+          };
           }
         } catch (xoteloErr) {
           console.warn('Xotelo fallback failed:', xoteloErr.message || xoteloErr);
@@ -55,9 +69,7 @@ export async function handler(event) {
           statusCode: 404,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Authorization,Content-Type',
-            'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PUT,DELETE',
+            ...corsHeaders
           },
           body: JSON.stringify({ message: 'Hotel not found', id }),
         };
@@ -71,9 +83,7 @@ export async function handler(event) {
       statusCode: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Authorization,Content-Type',
-        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PUT,DELETE',
+        ...corsHeaders
       },
       body: JSON.stringify({ message: 'Hotels table not configured', id }),
     };
@@ -83,9 +93,7 @@ export async function handler(event) {
       statusCode: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Authorization,Content-Type',
-        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PUT,DELETE',
+        ...corsHeaders
       },
       body: JSON.stringify({ message: 'Internal server error' }),
     };

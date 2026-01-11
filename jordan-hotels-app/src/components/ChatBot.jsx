@@ -1,343 +1,137 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Send, X, Minimize2, Maximize2, MessageCircle, Headphones } from 'lucide-react';
-import { chatQuery } from '../services/chatService';
-import hotelsService from '../services/hotelsService';
-import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function ChatBot() {
-  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: t('chat.greeting.default'),
-      sender: 'bot',
-      timestamp: new Date()
-    }
+    { id: 1, text: 'Hello! How can I help you with your Jordan hotel booking today?', sender: 'bot' }
   ]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [, setSuggestions] = useState([
-    t('chat.suggestions.spa'),
-    t('chat.suggestions.beach'),
-    t('chat.suggestions.adventure'),
-    t('chat.suggestions.luxury'),
-    t('chat.suggestions.city'),
-  ]);
-  const [, setViewedHotels] = useState([]);
-  const [, setAwaitingHuman] = useState(false);
-  const [hotelDetailsById, setHotelDetailsById] = useState({});
+  const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
+  const { t } = useTranslation();
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    const ids = new Set();
-    for (const msg of messages) {
-      if (msg?.sender === 'bot' && Array.isArray(msg?.hotels)) {
-        for (const id of msg.hotels) ids.add(id);
-      }
-    }
-
-    const missing = [...ids].filter((id) => id && !hotelDetailsById[id]);
-    if (missing.length === 0) return;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const results = await Promise.all(
-          missing.map(async (id) => {
-            try {
-              const hotel = await hotelsService.getHotelById(id);
-              return [id, hotel];
-            } catch {
-              return [id, null];
-            }
-          })
-        );
-
-        if (cancelled) return;
-        setHotelDetailsById((prev) => {
-          const next = { ...prev };
-          for (const [id, hotel] of results) {
-            if (!next[id]) next[id] = hotel;
-          }
-          return next;
-        });
-      } catch {
-        // ignore
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [messages, hotelDetailsById]);
-
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!inputValue.trim()) return;
 
-    // Add user message
     const userMessage = {
       id: messages.length + 1,
-      text: input,
-      sender: 'user',
-      timestamp: new Date()
+      text: inputValue,
+      sender: 'user'
     };
-    const nextHistory = [...messages, userMessage];
+
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setLoading(true);
+    setInputValue('');
 
-    // Get bot response
-    setTimeout(async () => {
-      try {
-        const response = await chatQuery(input, nextHistory);
-
-        const botText = response?.text || '';
-        if (Array.isArray(response?.hotels) && response.hotels.length > 0) {
-          setViewedHotels((prev) => [...new Set([...prev, ...response.hotels])]);
-        }
-
-        const botMessage = {
-          id: nextHistory.length + 1,
-          text: botText,
-          sender: 'bot',
-          timestamp: new Date(),
-          suggestions: response?.suggestions,
-          hotels: response?.hotels,
-          links: response?.links,
-        };
-        setMessages((prev) => [...prev, botMessage]);
-        setSuggestions(response?.suggestions || []);
-      } catch (err) {
-        console.error('ChatBot error:', err);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: prev.length + 1,
-            text: t('chat.ui.error'),
-            sender: 'bot',
-            timestamp: new Date(),
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    }, 600);
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse = {
+        id: messages.length + 2,
+        text: getBotResponse(inputValue),
+        sender: 'bot'
+      };
+      setMessages(prev => [...prev, botResponse]);
+    }, 1000);
   };
 
-  const handleSuggestion = (suggestion) => {
-    setInput(suggestion);
-  };
+  const getBotResponse = (userInput) => {
+    const input = userInput.toLowerCase();
 
-  const handleEscalateToHuman = () => {
-    setAwaitingHuman(true);
-    setMessages(prev => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        text:
-          t('chat.ui.escalate'),
-        sender: 'bot',
-        timestamp: new Date(),
-      },
-    ]);
-  };
+    if (input.includes('hotel') || input.includes('booking')) {
+      return t('chatbot.hotel_help', 'I can help you find and book the perfect hotel in Jordan! What type of accommodation are you looking for?');
+    }
+    if (input.includes('price') || input.includes('cost')) {
+      return t('chatbot.price_help', 'Hotel prices in Jordan vary by location and season. Petra and Aqaba tend to be more expensive. Would you like me to show you current deals?');
+    }
+    if (input.includes('location') || input.includes('where')) {
+      return t('chatbot.location_help', 'Popular destinations include Amman, Petra, Aqaba, and the Dead Sea. Each offers unique experiences!');
+    }
+    if (input.includes('help') || input.includes('support')) {
+      return t('chatbot.support_help', 'I can assist with hotel bookings, destination information, and travel tips. What would you like to know?');
+    }
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all hover:scale-110 z-40"
-        aria-label={t('chat.ui.open')}
-      >
-        <MessageCircle size={24} />
-      </button>
-    );
-  }
+    return t('chatbot.default', 'I\'m here to help with your Jordan travel plans! Feel free to ask about hotels, destinations, or booking assistance.');
+  };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)]">
-      <div className={`bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all ${isMinimized ? 'h-16' : 'h-96'}`}>
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <MessageCircle size={20} />
-            <h3 className="font-bold">{t('chat.ui.title')}</h3>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setIsMinimized(!isMinimized)}
-              className="hover:bg-blue-600 p-2 rounded transition"
-            >
-              {isMinimized ? <Maximize2 size={18} /> : <Minimize2 size={18} />}
-            </button>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="hover:bg-blue-600 p-2 rounded transition"
-            >
-              <X size={18} />
-            </button>
-          </div>
-        </div>
-
-        {!isMinimized && (
-          <>
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-xs px-4 py-2 rounded-lg ${
-                      msg.sender === 'user'
-                        ? 'bg-blue-900 text-white rounded-br-none'
-                        : 'bg-gray-200 text-gray-900 rounded-bl-none'
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-
-                    {Array.isArray(msg.links) && msg.links.length > 0 && msg.sender === 'bot' && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {msg.links.slice(0, 3).map((l, idx) => (
-                          <Link
-                            key={`${l.to}-${idx}`}
-                            to={l.to}
-                            onClick={() => setIsOpen(false)}
-                            className="text-xs bg-blue-700 text-white px-2 py-1 rounded hover:bg-blue-800 transition"
-                          >
-                            {l.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-
-                    {Array.isArray(msg.hotels) && msg.hotels.length > 0 && msg.sender === 'bot' && (
-                      <div className="mt-3 space-y-2">
-                        {msg.hotels.slice(0, 3).map((id) => {
-                          const d = hotelDetailsById[id];
-                          const name = d?.name || id;
-                          const location = d?.location || 'Jordan';
-                          const image = d?.image || (Array.isArray(d?.images) ? d.images[0] : '') || '';
-                          const price = d?.price;
-
-                          return (
-                            <div key={id} className="flex gap-3 bg-white/70 rounded-lg p-2 border border-gray-200">
-                              <img
-                                src={image}
-                                alt={name}
-                                onError={createHotelImageOnErrorHandler(`chat:${id}`)}
-                                className="w-16 h-16 rounded-md object-cover flex-shrink-0"
-                                loading="lazy"
-                                referrerPolicy="no-referrer"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="font-bold text-sm truncate">{name}</div>
-                                <div className="text-xs text-gray-600 truncate">{location}</div>
-                                {typeof price === 'number' && price > 0 && (
-                                  <div className="text-xs text-blue-900 font-bold">{price} JOD {t('hotels.perNight')}</div>
-                                )}
-                                <div className="mt-2 flex flex-wrap gap-2">
-                                  <Link
-                                    to={`/hotels/${id}`}
-                                    onClick={() => setIsOpen(false)}
-                                    className="text-xs bg-gray-200 text-gray-900 px-2 py-1 rounded hover:bg-gray-300 transition"
-                                  >
-                                    {t('common.view')}
-                                  </Link>
-                                  <Link
-                                    to="/checkout"
-                                    state={{
-                                      hotelId: id,
-                                      bookingData: { checkInDate: '', checkOutDate: '', nights: 1, guests: 2 },
-                                    }}
-                                    onClick={() => setIsOpen(false)}
-                                    className="text-xs bg-blue-700 text-white px-2 py-1 rounded hover:bg-blue-800 transition"
-                                  >
-                                    {t('common.book')}
-                                  </Link>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {msg.suggestions && msg.suggestions.length > 0 && msg.sender === 'bot' && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {msg.suggestions.slice(0, 3).map((sug, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => handleSuggestion(sug)}
-                            className="text-xs bg-blue-700 text-white px-2 py-1 rounded hover:bg-blue-800 transition"
-                          >
-                            {sug}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {loading && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-200 text-gray-900 px-4 py-2 rounded-lg rounded-bl-none">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input */}
-            <div className="border-t p-4 bg-white">
-              <form onSubmit={handleSendMessage} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={t('chat.ui.placeholder')}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                />
-                <button
-                  type="submit"
-                  disabled={loading || !input.trim()}
-                  className="bg-blue-900 text-white p-2 rounded-lg hover:bg-blue-800 transition disabled:opacity-50"
-                >
-                  <Send size={18} />
-                </button>
-              </form>
-              <div className="flex items-center justify-between text-[11px] text-gray-500">
-                <span>
-                  {t('chat.ui.tip')}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleEscalateToHuman}
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-gray-300 text-[11px] hover:bg-gray-50"
-                >
-                  <Headphones size={12} />
-                  {t('chat.ui.askHuman')}
-                </button>
-              </div>
-            </div>
-          </>
+    <>
+      {/* Chat Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-40"
+        aria-label="Open chat"
+      >
+        {isOpen ? (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
         )}
-      </div>
-    </div>
+      </button>
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="fixed bottom-24 right-6 w-80 h-96 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 z-50 flex flex-col">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-jordan-blue to-jordan-teal text-white p-4 rounded-t-lg">
+            <h3 className="font-semibold">{t('chatbot.title', 'Jordan Travel Assistant')}</h3>
+            <p className="text-sm opacity-90">{t('chatbot.subtitle', 'Ask me anything about your trip!')}</p>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] p-3 rounded-lg ${
+                    message.sender === 'user'
+                      ? 'bg-jordan-blue text-white'
+                      : 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
+                  }`}
+                >
+                  <p className="text-sm">{message.text}</p>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={t('chatbot.placeholder', 'Type your message...')}
+                className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-jordan-blue dark:bg-slate-700 dark:text-slate-100"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-jordan-blue hover:bg-jordan-teal text-white rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
   );
 }

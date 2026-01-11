@@ -20,15 +20,7 @@ const defaultHeaders = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-  "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-};
-
-const getCorsHeaders = (event) => {
-  const origin = event.headers?.origin || event.headers?.Origin || "*";
-  return {
-    ...defaultHeaders,
-    "Access-Control-Allow-Origin": origin,
-  };
+  "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
 };
 
 const parseJwtClaims = (event) => {
@@ -49,15 +41,11 @@ const parseJwtClaims = (event) => {
 async function handler(event) {
   console.log("Event:", JSON.stringify(event, null, 2));
 
-  const corsHeaders = getCorsHeaders(event);
   const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
   if (method === "OPTIONS") {
     return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: defaultHeaders,
       body: "",
     };
   }
@@ -104,21 +92,20 @@ async function handler(event) {
 
     return {
       statusCode: 404,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: defaultHeaders,
       body: JSON.stringify({ message: "Not found" })
     };
   } catch (error) {
     console.error("Error:", error);
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: defaultHeaders,
       body: JSON.stringify({ message: "Internal server error", error: error.message })
     };
   }
 }
 
 async function getUserProfile(userId, event) {
-  const corsHeaders = getCorsHeaders(event);
   try {
     if (USERS_TABLE) {
       const result = await docClient.send(
@@ -131,10 +118,7 @@ async function getUserProfile(userId, event) {
       if (result && result.Item) {
         return {
           statusCode: 200,
-          headers: {
-            "Content-Type": "application/json",
-            ...corsHeaders,
-          },
+          headers: defaultHeaders,
           body: JSON.stringify(result.Item),
         };
       }
@@ -175,24 +159,20 @@ async function getUserProfile(userId, event) {
 
     return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: defaultHeaders,
       body: JSON.stringify(item),
     };
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: defaultHeaders,
       body: JSON.stringify({ message: 'Failed to fetch profile' }),
     };
   }
 }
 
 async function updateUserProfile(userId, event) {
-  const corsHeaders = getCorsHeaders(event);
   try {
     const body = event.body ? JSON.parse(event.body) : {};
 
@@ -228,27 +208,20 @@ async function updateUserProfile(userId, event) {
 
     return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: defaultHeaders,
       body: JSON.stringify(item),
     };
   } catch (error) {
     console.error("Error updating user profile:", error);
     return {
       statusCode: 500,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: defaultHeaders,
       body: JSON.stringify({ message: "Failed to update profile" }),
     };
   }
 }
 
 async function getUserBookings(userId, event) {
-  const corsHeaders = getCorsHeaders(event);
   try {
     // Query Bookings table for user's bookings
     const params = {
@@ -263,13 +236,10 @@ async function getUserBookings(userId, event) {
     const result = await docClient.send(new QueryCommand(params));
 
     const bookings = (result.Items || []).filter((b) => String(b?.status || '').toLowerCase() !== 'cancelled');
-    
+
     return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: defaultHeaders,
       body: JSON.stringify({
         bookings,
         count: result.Count || 0
@@ -280,7 +250,7 @@ async function getUserBookings(userId, event) {
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: defaultHeaders,
       body: JSON.stringify({ bookings: [], count: 0 }),
     };
   }
@@ -316,12 +286,11 @@ async function sendEmail(toAddress, subject, textBody, htmlBody) {
 }
 
 async function setupEmailMfa(userId, event) {
-  const corsHeaders = getCorsHeaders(event);
   try {
     const body = event.body ? JSON.parse(event.body) : {};
     const secondaryEmail = String(body.secondaryEmail || body.email || '').trim();
     if (!secondaryEmail) {
-      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'secondaryEmail required' }) };
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'secondaryEmail required' }) };
     }
 
     // Prevent using the same address that's already registered to the user
@@ -332,7 +301,7 @@ async function setupEmailMfa(userId, event) {
     }
     const registeredEmail = String(existingItem.email || '').trim().toLowerCase();
     if (registeredEmail && registeredEmail === secondaryEmail.toLowerCase()) {
-      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Secondary email must be different from the primary account email' }) };
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Secondary email must be different from the primary account email' }) };
     }
 
     const code = generateNumericCode(6);
@@ -357,21 +326,20 @@ async function setupEmailMfa(userId, event) {
       `<p>Your VisitJO verification code is: <strong>${code}</strong></p>`
     );
 
-    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ sent: !!sent }) };
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ sent: !!sent }) };
   } catch (error) {
     console.error('setupEmailMfa error', error);
-    return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to setup email MFA' }) };
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to setup email MFA' }) };
   }
 }
 
 async function verifyEmailMfa(userId, event) {
-  const corsHeaders = getCorsHeaders(event);
   try {
     const body = event.body ? JSON.parse(event.body) : {};
     const code = String(body.code || body.token || '').trim();
-    if (!code) return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'code required' }) };
+    if (!code) return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'code required' }) };
 
-    if (!USERS_TABLE) return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Users table not configured' }) };
+    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
 
     const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
     const item = result?.Item || {};
@@ -380,11 +348,11 @@ async function verifyEmailMfa(userId, event) {
     const pendingEmail = item.mfaPendingEmail;
 
     if (!pendingCode || Date.now() > expires) {
-      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'No valid pending code' }) };
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'No valid pending code' }) };
     }
 
     if (pendingCode !== code) {
-      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Invalid code' }) };
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Invalid code' }) };
     }
 
     // mark MFA enabled
@@ -396,21 +364,20 @@ async function verifyEmailMfa(userId, event) {
 
     await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
 
-    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ verified: true }) };
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ verified: true }) };
   } catch (error) {
     console.error('verifyEmailMfa error', error);
-    return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to verify code' }) };
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to verify code' }) };
   }
 }
 
 async function requestEmailMfaChallenge(userId, event) {
-  const corsHeaders = getCorsHeaders(event);
   try {
-    if (!USERS_TABLE) return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Users table not configured' }) };
+    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
     const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
     const item = result?.Item || {};
     if (!item.mfaEnabled || item.mfaMethod !== 'EMAIL' || !item.mfaSecondaryEmail) {
-      return { statusCode: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Email MFA not enabled' }) };
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Email MFA not enabled' }) };
     }
 
     const code = generateNumericCode(6);
@@ -427,27 +394,26 @@ async function requestEmailMfaChallenge(userId, event) {
       `<p>Your VisitJO login code is: <strong>${code}</strong></p>`
     );
 
-    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ sent: !!sent }) };
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ sent: !!sent }) };
   } catch (error) {
     console.error('requestEmailMfaChallenge error', error);
-    return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to request challenge' }) };
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to request challenge' }) };
   }
 }
 
 async function disableMfa(userId, event) {
-  const corsHeaders = getCorsHeaders(event);
   try {
-    if (!USERS_TABLE) return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Users table not configured' }) };
+    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
     const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
     const item = result?.Item || {};
     item.mfaEnabled = false;
     delete item.mfaMethod;
     delete item.mfaSecondaryEmail;
     await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
-    return { statusCode: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ success: true }) };
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ success: true }) };
   } catch (error) {
     console.error('disableMfa error', error);
-    return { statusCode: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }, body: JSON.stringify({ message: 'Failed to disable MFA' }) };
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to disable MFA' }) };
   }
 }
 

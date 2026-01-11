@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import NavBar from "../components/NavBar.jsx";
 import Footer from "../components/Footer.jsx";
+import ChatBot from "../components/ChatBot.jsx";
 import { getLastAuthError, enableMocks, getUseMocks } from "../services/api.js";
 
 export default function AppLayout() {
@@ -50,6 +51,7 @@ export default function AppLayout() {
       </main>
 
       <Footer />
+      <ChatBot />
     </div>
   );
 }

@@ -50,6 +50,7 @@ const HotelDetails = () => {
   const [checkInDate, setCheckInDate] = useState('');
   const [checkOutDate, setCheckOutDate] = useState('');
   const [guests, setGuests] = useState('1');
+  const [selectedRoomType, setSelectedRoomType] = useState('');
   const [bookingLoading, setBookingLoading] = useState(false);
 
   useEffect(() => {
@@ -96,12 +97,17 @@ const HotelDetails = () => {
     setBookingLoading(true);
     try {
       const nights = Math.max(1, Math.ceil((new Date(checkOutDate) - new Date(checkInDate)) / (24 * 60 * 60 * 1000)));
+      const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
+      const roomPrice = selectedRoom ? selectedRoom.price : hotel.price;
+      
       const bookingData = {
         checkInDate,
         checkOutDate,
         nights,
         guests: parseInt(guests, 10),
-        totalPrice: (hotel.price || 0) * nights,
+        roomType: selectedRoomType || 'Standard Room',
+        roomPrice,
+        totalPrice: roomPrice * nights,
       };
       // Navigate to checkout with hotel and booking data
       navigate('/checkout', { state: { hotelId: id, bookingData, hotel } });
@@ -385,14 +391,43 @@ const HotelDetails = () => {
               </select>
             </div>
 
+            {/* Room Type Selection */}
+            {hotel.roomTypes && hotel.roomTypes.length > 0 && (
+              <div>
+                <label className="label-premium">{t('hotelDetails.booking.roomType')}</label>
+                <select
+                  value={selectedRoomType}
+                  onChange={(e) => setSelectedRoomType(e.target.value)}
+                  className="input-premium"
+                >
+                  <option value="">{t('hotelDetails.booking.selectRoomType')}</option>
+                  {hotel.roomTypes.map((roomType, index) => (
+                    <option key={index} value={roomType.name}>
+                      {roomType.name} - {roomType.price} JOD ({t('hotelDetails.booking.capacity')}: {roomType.capacity})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Total Price */}
             <div className="border-t border-slate-200/70 dark:border-slate-700/60 pt-6">
               <div className="flex justify-between items-center mb-4 gap-4">
                 <span className="text-sm text-slate-700 dark:text-slate-200">
-                  {hotel.price} JOD × {Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)))} {t('hotelDetails.booking.nights', { count: 1 })}
+                  {(() => {
+                    const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
+                    const price = selectedRoom ? selectedRoom.price : hotel.price;
+                    const nights = Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)));
+                    return `${price} JOD × ${nights} ${t('hotelDetails.booking.nights', { count: nights })}`;
+                  })()}
                 </span>
                 <span className="font-bold text-lg text-slate-900 dark:text-slate-50">
-                  {((hotel.price || 0) * Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)))).toLocaleString()} JOD
+                  {(() => {
+                    const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
+                    const price = selectedRoom ? selectedRoom.price : hotel.price;
+                    const nights = Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)));
+                    return `${(price * nights).toLocaleString()} JOD`;
+                  })()}
                 </span>
               </div>
             </div>

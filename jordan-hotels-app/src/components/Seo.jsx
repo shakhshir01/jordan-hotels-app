@@ -1,62 +1,55 @@
 import { useEffect } from 'react';
 
-const ensureMetaByName = (name) => {
-  let tag = document.querySelector(`meta[name="${name}"]`);
-  if (!tag) {
-    tag = document.createElement('meta');
-    tag.setAttribute('name', name);
-    document.head.appendChild(tag);
-  }
-  return tag;
-};
-
-const ensureCanonicalLink = () => {
-  let link = document.querySelector('link[rel="canonical"]');
-  if (!link) {
-    link = document.createElement('link');
-    link.setAttribute('rel', 'canonical');
-    document.head.appendChild(link);
-  }
-  return link;
-};
-
-export default function Seo({ title, description, canonicalUrl, jsonLd }) {
+const Seo = ({ title, description, canonicalUrl, jsonLd }) => {
   useEffect(() => {
-    if (title) document.title = title;
+    // Set document title
+    if (title) {
+      document.title = title;
+    }
 
+    // Set meta description
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = 'description';
+      document.head.appendChild(metaDescription);
+    }
     if (description) {
-      const meta = ensureMetaByName('description');
-      meta.setAttribute('content', description);
+      metaDescription.content = description;
     }
 
+    // Set canonical URL
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = 'canonical';
+      document.head.appendChild(canonicalLink);
+    }
     if (canonicalUrl) {
-      const canonical = ensureCanonicalLink();
-      canonical.setAttribute('href', canonicalUrl);
-    }
-  }, [title, description, canonicalUrl]);
-
-  useEffect(() => {
-    if (!jsonLd) return;
-
-    const scripts = [];
-    const items = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
-
-    for (const entry of items) {
-      const payload = typeof entry === 'string' ? entry : JSON.stringify(entry);
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.setAttribute('data-visitjo-jsonld', 'true');
-      script.text = payload;
-      document.head.appendChild(script);
-      scripts.push(script);
+      canonicalLink.href = canonicalUrl;
     }
 
+    // Add JSON-LD structured data
+    if (jsonLd) {
+      let script = document.querySelector('script[type="application/ld+json"]');
+      if (!script) {
+        script = document.createElement('script');
+        script.type = 'application/ld+json';
+        document.head.appendChild(script);
+      }
+      script.textContent = JSON.stringify(jsonLd);
+    }
+
+    // Cleanup function
     return () => {
-      for (const script of scripts) {
-        script.parentNode?.removeChild(script);
+      // Reset title if needed
+      if (title) {
+        document.title = 'VisitJo - Discover Jordan';
       }
     };
-  }, [jsonLd]);
+  }, [title, description, canonicalUrl, jsonLd]);
 
-  return null;
-}
+  return null; // This component doesn't render anything
+};
+
+export default Seo;

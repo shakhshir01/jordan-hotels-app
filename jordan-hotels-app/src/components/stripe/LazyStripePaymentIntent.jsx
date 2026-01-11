@@ -60,24 +60,38 @@ function StripePaymentIntentForm({
         throw new Error('Payment initialization failed (missing client secret)');
       }
 
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-          billing_details: {
-            name: billingDetails?.name || '',
-            email: billingDetails?.email || '',
-            phone: billingDetails?.phone || '',
+      let paymentIntent;
+
+      // Handle mock payment intents for development/testing
+      if (clientSecret.startsWith('pi_mock_')) {
+        // Simulate successful payment for mock intents
+        paymentIntent = {
+          id: clientSecret.replace('_secret_mock', ''),
+          status: 'succeeded',
+          amount: amount,
+          currency: currency,
+        };
+      } else {
+        // Real Stripe payment processing
+        const result = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: elements.getElement(CardElement),
+            billing_details: {
+              name: billingDetails?.name || '',
+              email: billingDetails?.email || '',
+              phone: billingDetails?.phone || '',
+            },
           },
-        },
-      });
+        });
 
-      if (result.error) {
-        throw new Error(result.error.message || 'Card payment failed');
-      }
+        if (result.error) {
+          throw new Error(result.error.message || 'Card payment failed');
+        }
 
-      const paymentIntent = result.paymentIntent;
-      if (!paymentIntent) {
-        throw new Error('Payment failed (no payment intent returned)');
+        paymentIntent = result.paymentIntent;
+        if (!paymentIntent) {
+          throw new Error('Payment failed (no payment intent returned)');
+        }
       }
 
       if (paymentIntent.status !== 'succeeded') {

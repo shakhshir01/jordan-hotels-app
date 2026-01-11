@@ -21,7 +21,10 @@
     "concierge": "الكونسيرج",
     "account": "الحساب",
     "menu": "القائمة",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "about": "حولنا",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الخدمة"
   },
   "hero": {
     "title": "اكتشف أفضل فنادق الأردن",
@@ -567,6 +570,9 @@
       "checkIn": "تاريخ تسجيل الدخول",
       "checkOut": "تاريخ تسجيل الخروج",
       "guests": "عدد الضيوف",
+      "roomType": "نوع الغرفة",
+      "selectRoomType": "اختر نوع الغرفة",
+      "capacity": "السعة",
       "guestCount": "{{count}} ضيف",
       "guestCount_other": "{{count}} ضيوف",
       "guestCountPlus": "أكثر من 5 ضيوف",
