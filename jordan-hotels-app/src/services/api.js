@@ -987,7 +987,7 @@ const mockBlogPosts = [
     author: "VisitJo Team",
     publishedAt: new Date().toISOString(),
     tags: ["welcome", "travel", "jordan"],
-    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/33/fc/f0/jordan.jpg?w=1200&h=-1&s=1",
+    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=1200",
   },
 ];
 

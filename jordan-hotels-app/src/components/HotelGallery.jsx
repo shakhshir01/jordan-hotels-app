@@ -1,0 +1,161 @@
+import React, { useState, useEffect } from 'react';
+import { X, ChevronLeft, ChevronRight, Grid } from 'lucide-react';
+
+const HotelGallery = ({ images = [], hotelName }) => {
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Ensure we have at least some images
+  const displayImages = images.length > 0 ? images : ['/placeholder-hotel.jpg'];
+  const mainImage = displayImages[0];
+  const sideImages = displayImages.slice(1, 5);
+  const remainingCount = Math.max(0, displayImages.length - 5);
+
+  const openLightbox = (index) => {
+    setCurrentIndex(index);
+    setShowLightbox(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeLightbox = () => {
+    setShowLightbox(false);
+    document.body.style.overflow = 'auto';
+  };
+
+  const nextImage = (e) => {
+    e?.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % displayImages.length);
+  };
+
+  const prevImage = (e) => {
+    e?.stopPropagation();
+    setCurrentIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
+  };
+
+  useEffect(() => {
+    if (!showLightbox) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') prevImage();
+      if (e.key === 'ArrowRight') nextImage();
+      if (e.key === 'Escape') closeLightbox();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showLightbox, displayImages.length]);
+
+  return (
+    <div className="relative">
+      {/* Desktop Grid Layout */}
+      <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-2 h-[400px] rounded-xl overflow-hidden">
+        <div 
+          className="col-span-2 row-span-2 relative cursor-pointer group"
+          onClick={() => openLightbox(0)}
+        >
+          <img 
+            src={mainImage} 
+            alt={`${hotelName} Main`} 
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+        </div>
+        
+        {sideImages.map((img, idx) => (
+          <div 
+            key={idx} 
+            className="relative cursor-pointer group"
+            onClick={() => openLightbox(idx + 1)}
+          >
+            <img 
+              src={img} 
+              alt={`${hotelName} ${idx + 2}`} 
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+            
+            {/* "View All" Overlay on the last image if there are more */}
+            {idx === 3 && remainingCount > 0 && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); openLightbox(idx + 1); }}
+                className="absolute inset-0 w-full h-full bg-black/50 flex items-center justify-center text-white font-medium text-lg backdrop-blur-[2px] group-hover:bg-black/60 transition-colors z-10 cursor-pointer"
+              >
+                +{remainingCount} Photos
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile Carousel Layout */}
+      <div className="md:hidden relative h-[300px] -mx-4 sm:mx-0">
+        <img 
+          src={displayImages[currentIndex]} 
+          alt={hotelName} 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+          {currentIndex + 1} / {displayImages.length}
+        </div>
+        <button 
+          onClick={prevImage}
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full shadow-lg z-10"
+        >
+          <ChevronLeft className="w-5 h-5 text-gray-800" />
+        </button>
+        <button 
+          onClick={nextImage}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full shadow-lg z-10"
+        >
+          <ChevronRight className="w-5 h-5 text-gray-800" />
+        </button>
+      </div>
+
+      {/* View All Button (Desktop) */}
+      <button
+        onClick={() => openLightbox(0)}
+        className="hidden md:flex absolute bottom-4 right-4 bg-white text-gray-900 px-4 py-2 rounded-lg shadow-lg items-center gap-2 hover:bg-gray-50 transition-colors font-medium text-sm"
+      >
+        <Grid className="w-4 h-4" />
+        View All Photos
+      </button>
+
+      {/* Lightbox Modal */}
+      {showLightbox && (
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center backdrop-blur-sm">
+          <button 
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 text-white/80 hover:text-white p-2 z-50"
+          >
+            <X className="w-8 h-8" />
+          </button>
+
+          <button 
+            onClick={prevImage}
+            className="absolute left-4 text-white/80 hover:text-white p-4 hover:bg-white/10 rounded-full transition-colors z-50"
+          >
+            <ChevronLeft className="w-10 h-10" />
+          </button>
+
+          <img 
+            src={displayImages[currentIndex]} 
+            alt={`${hotelName} Fullscreen`} 
+            className="max-h-[90vh] max-w-[90vw] object-contain shadow-2xl"
+          />
+
+          <button 
+            onClick={nextImage}
+            className="absolute right-4 text-white/80 hover:text-white p-4 hover:bg-white/10 rounded-full transition-colors z-50"
+          >
+            <ChevronRight className="w-10 h-10" />
+          </button>
+
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/90 font-medium tracking-wide">
+            {currentIndex + 1} of {displayImages.length}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default HotelGallery;

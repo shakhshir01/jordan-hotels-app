@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } from 'lucide-react';
 import hotelsService from '../services/hotelsService';
 import WishlistButton from '../components/WishlistButton';
+import HotelGallery from '../components/HotelGallery';
 import Seo from '../components/Seo.jsx';
 import {
   createHotelImageOnErrorHandler,
@@ -219,50 +220,8 @@ const HotelDetails = () => {
       {/* Gallery with all hotel images */}
       <section className="surface p-5 sm:p-8">
         <h2 className="text-xl sm:text-2xl font-bold mb-6 text-slate-900 dark:text-slate-100">{t('hotelDetails.gallery.title')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden rounded-2xl">
-            {hotel.images && hotel.images.length > 0 ? (
-              hotel.images.slice(0, 8).map((img, idx) => (
-                <div key={idx} className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition group h-48 md:h-56">
-                  <img 
-                    src={img}
-                    onError={createHotelImageOnErrorHandler(`${hotel.id}:${idx}`, FALLBACK_IMG)}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    alt={t('hotelDetails.gallery.imageAlt', { name: hotelName, index: idx + 1 })}
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              ))
-            ) : (
-              <div className="md:col-span-4 h-64 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                <p className="text-gray-500">{t('hotelDetails.gallery.none')}</p>
-              </div>
-            )}
-          </div>
-          {hotel.images && hotel.images.length > 8 && (
-            <p className="text-center text-gray-500 mt-4">
-              + {hotel.images.length - 8} {t('hotelDetails.gallery.morePhotos')}
-            </p>
-          )}
+        <HotelGallery images={hotel.images} hotelName={hotelName} />
       </section>
-
-        {/* Replace flaky Unsplash gallery with one reliable hero image + placeholders */}
-        <div className="hidden grid-cols-1 md:grid-cols-3 gap-4 mb-10 overflow-hidden rounded-2xl">
-          <div className="md:col-span-2">
-            <img
-              src={hotel.image || FALLBACK_IMG}
-              onError={createHotelImageOnErrorHandler(hotel.id, FALLBACK_IMG)}
-              className="w-full h-[420px] object-cover rounded-2xl"
-              alt={hotelName}
-              loading="lazy"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-          <div className="grid gap-4">
-            <div className="h-[200px] rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-100" />
-            <div className="h-[200px] rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-100" />
-          </div>
-        </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
         {/* Left Column: Info */}

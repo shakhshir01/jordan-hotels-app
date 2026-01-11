@@ -1,18 +1,23 @@
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Read the Xotelo data
-const fileData = fs.readFileSync('./src/services/xoteloJordanHotelsData.js', 'utf8');
+// Robust path handling
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dataFilePath = path.join(__dirname, 'src', 'services', 'xoteloJordanHotelsData.js');
+
+// Read the Xotelo data safely
+const fileData = fs.readFileSync(dataFilePath, 'utf8');
 const startIndex = fileData.indexOf('export const XOTELO_JORDAN_HOTELS = [');
-const endIndex = fileData.lastIndexOf('];') + 2;
-const hotelsJson = fileData.substring(startIndex + 'export const XOTELO_JORDAN_HOTELS = '.length, endIndex - 2);
+const hotelsJson = fileData.substring(startIndex + 'export const XOTELO_JORDAN_HOTELS = '.length).replace(/;\s*export default.*$/s, '').replace(/;$/, '');
 
 let hotels;
 try {
   hotels = JSON.parse(hotelsJson);
 } catch (e) {
-  const evalCode = fileData.substring(startIndex, endIndex);
+  const evalCode = fileData.substring(startIndex);
   const tempFunc = new Function('return ' + evalCode.replace('export const XOTELO_JORDAN_HOTELS = ', ''));
   hotels = tempFunc();
 }
@@ -35,10 +40,43 @@ function fetchWebpage(url) {
   });
 }
 
-// Function to search Google Images (Fallback)
-function searchGoogleImages(hotelName, location) {
+// Image Quality & Enhancement Utilities
+function isHighQualityImage(url) {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  
+  // Filter out common junk
+  const junkTerms = [
+    'avatar', 'icon', 'logo', 'map', 'sprite', 'blank', 'spacer', 'user_image', 'pixel',
+    'floorplan', 'floor_plan', 'layout', 'brochure', 'menu', 'qrcode', 'barcode',
+    'banner', 'promo', 'offer', 'advert', 'tripadvisor_logo', 'ta_logo', 'overlay',
+    'review', 'rating', 'stars'
+  ];
+  if (junkTerms.some(term => lower.includes(term))) return false;
+  
+  // Filter out known low-res patterns
+  if (lower.includes('w=50') || lower.includes('w=100')) return false;
+  
+  return true;
+}
+
+function enhanceImageUrl(url) {
+  if (!url) return url;
+  
+  // TripAdvisor: Force high resolution
+  if (url.includes('tripadvisor.com') && url.includes('/media/photo-')) {
+    const base = url.split('?')[0];
+    // Add high-res params (w=1200 is standard HD for TA)
+    return `${base}?w=1200&h=-1&s=1`;
+  }
+  
+  return url;
+}
+
+// Function to search Bing Images (More reliable fallback)
+function searchBingImages(hotelName, location) {
   const query = encodeURIComponent(`${hotelName} ${location} hotel exterior`);
-  const url = `https://www.google.com/search?q=${query}&tbm=isch&source=hp`;
+  const url = `https://www.bing.com/images/search?q=${query}&first=1`;
 
   return new Promise((resolve, reject) => {
     https.get(url, {
@@ -50,18 +88,27 @@ function searchGoogleImages(hotelName, location) {
       res.on('data', (chunk) => data += chunk);
       res.on('end', () => {
         const images = [];
-        // Regex to find image URLs in Google search results
-        const imgMatches = data.match(/https:\/\/[^\"]*\.(?:jpg|jpeg|png|webp)/g);
+        // Bing embeds high-res URLs in 'murl' property within 'iusc' attribute
+        // Pattern: murl&quot;:&quot;https://...&quot;
+        const murlRegex = /murl&quot;:&quot;(https:\/\/.*?)&quot;/g;
+        let match;
 
-        if (imgMatches) {
-          const uniqueImages = [...new Set(imgMatches)]
-            .filter(url => url.includes('http') && !url.includes('favicon') && !url.includes('gstatic') && !url.includes('icon'))
-            .filter(url => url.length > 60) // Filter out thumbnails/icons
-            .slice(0, 8);
-
-          images.push(...uniqueImages);
+        while ((match = murlRegex.exec(data)) !== null) {
+          const imgUrl = match[1];
+          if (imgUrl.match(/\.(jpg|jpeg|png|webp)(\?|$)/i) && !imgUrl.includes('bing.com/th') && isHighQualityImage(imgUrl)) {
+            images.push(imgUrl);
+          }
         }
-        resolve(images);
+
+        // Fallback: look for direct src attributes if murl fails
+        if (images.length === 0) {
+          const srcRegex = /src="(https:\/\/[^"]+\.(jpg|jpeg|png))"/g;
+          while ((match = srcRegex.exec(data)) !== null) {
+            if (!match[1].includes('base64') && isHighQualityImage(match[1])) images.push(match[1]);
+          }
+        }
+
+        resolve([...new Set(images)].slice(0, 45));
       });
     }).on('error', (err) => {
       resolve([]); // Resolve empty on error to continue
@@ -73,30 +120,22 @@ function searchGoogleImages(hotelName, location) {
 function extractImagesFromTripAdvisor(html, hotelName) {
   const images = [];
 
-  // Look for image URLs in the HTML
-  // TripAdvisor uses various patterns for images
-  const patterns = [
-    /"url":"([^"]*\.jpg[^"]*)"/g,
-    /"photoUrl":"([^"]*\.jpg[^"]*)"/g,
-    /"originalUrl":"([^"]*\.jpg[^"]*)"/g,
-    /https:\/\/media\.cdn\.tripadvisor\.com\/media\/photo-[^"]*\.jpg/g,
-    /https:\/\/dynamic-media\.cdn\.tripadvisor\.com\/media\/photo-[^"]*\.jpg/g,
-    /https:\/\/images\.tripadvisor\.com\/media\/photo-[^"]*\.jpg/g
-  ];
+  // Aggressive regex to find any TripAdvisor media URL
+  // Matches: https://...tripadvisor.com/media/photo-...
+  const regex = /(https:\/\/[a-zA-Z0-9-]+\.tripadvisor\.com\/media\/photo-[^"'\s\\]+)/g;
 
-  patterns.forEach(pattern => {
-    let match;
-    while ((match = pattern.exec(html)) !== null) {
-      let url = match[1] || match[0];
-      // Clean up the URL
-      url = url.replace(/\\u0026/g, '&').replace(/\\u002F/g, '/');
-      // Convert to higher quality if possible
-      url = url.replace(/w=\d+/, 'w=1200').replace(/h=\d+/, 'h=800');
-      if (!images.includes(url) && url.includes('.jpg')) {
-        images.push(url);
-      }
+  let match;
+  while ((match = regex.exec(html)) !== null) {
+    let url = match[1];
+    // Clean up URL: remove escape chars and force high resolution
+    url = url.replace(/\\u002F/g, '/');
+    
+    // Enhance and Validate
+    url = enhanceImageUrl(url);
+    if (!images.includes(url) && (url.includes('.jpg') || url.includes('.png')) && isHighQualityImage(url)) {
+      images.push(url);
     }
-  });
+  }
 
   // Also try to find images in script tags
   const scriptMatches = html.match(/<script[^>]*>[\s\S]*?<\/script>/g);
@@ -107,8 +146,9 @@ function extractImagesFromTripAdvisor(html, hotelName) {
         imgMatches.forEach(match => {
           let url = match.slice(1, -1);
           url = url.replace(/\\u0026/g, '&').replace(/\\u002F/g, '/');
-          url = url.replace(/w=\d+/, 'w=1200').replace(/h=\d+/, 'h=800');
-          if (!images.includes(url) && url.includes('.jpg') && url.includes('tripadvisor.com')) {
+          
+          url = enhanceImageUrl(url);
+          if (!images.includes(url) && url.includes('.jpg') && url.includes('tripadvisor.com') && isHighQualityImage(url)) {
             images.push(url);
           }
         });
@@ -116,8 +156,8 @@ function extractImagesFromTripAdvisor(html, hotelName) {
     });
   }
 
-  // Remove duplicates and limit to 15 images
-  const uniqueImages = [...new Set(images)].slice(0, 15);
+  // Remove duplicates and limit to 45 images
+  const uniqueImages = [...new Set(images)].slice(0, 45);
 
   console.log(`Found ${uniqueImages.length} images for ${hotelName}`);
   return uniqueImages;
@@ -138,6 +178,24 @@ async function processHotelsBatch(startIndex, batchSize) {
       hotel.images = hotel.images.filter(url => !url.includes('unsplash.com'));
     }
 
+    // 1.5 ENHANCE: Upgrade existing real images
+    if (hotel.images && hotel.images.length > 0) {
+      hotel.images = hotel.images.map(enhanceImageUrl).filter(isHighQualityImage);
+      hotel.images = [...new Set(hotel.images)];
+      if (hotel.images.length > 0) {
+        hotel.image = hotel.images[0];
+      } else {
+        hotel.images = [];
+        hotel.image = '';
+      }
+    }
+
+    // SKIP if already processed (has sufficient real images)
+    const existingRealImages = (hotel.images || []);
+    if (existingRealImages.length >= 40) {
+      continue;
+    }
+
     // 2. STRATEGY A: TripAdvisor
     if (hotel.tripadvisorUrl) {
       try {
@@ -149,18 +207,18 @@ async function processHotelsBatch(startIndex, batchSize) {
       }
     }
 
-    // 3. STRATEGY B: Google Images (Fallback if no images found)
+    // 3. STRATEGY B: Bing Images (Fallback if no images found)
     if (realImages.length === 0) {
       try {
-        process.stdout.write(`Checking Google... `);
-        // Add delay before Google request
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        const googleImages = await searchGoogleImages(hotel.name, hotel.location);
-        if (googleImages.length > 0) {
-          realImages = googleImages;
+        process.stdout.write(`Checking Bing... `);
+        // Add delay before request
+        await new Promise(resolve => setTimeout(resolve, 300)); // Reduced from 1500ms
+        const bingImages = await searchBingImages(hotel.name, hotel.location);
+        if (bingImages.length > 0) {
+          realImages = bingImages;
         }
       } catch (error) {
-        process.stdout.write(`Google failed. `);
+        process.stdout.write(`Bing failed. `);
       }
     }
 
@@ -180,7 +238,7 @@ async function processHotelsBatch(startIndex, batchSize) {
     }
 
     // Respectful delay between hotels
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 100)); // Reduced from 1000ms
   }
 
   return endIndex;
@@ -189,11 +247,10 @@ async function processHotelsBatch(startIndex, batchSize) {
 // Helper to save progress
 function saveProgress(currentHotels) {
   try {
-    const updatedData = fileData.replace(
-      /export const XOTELO_JORDAN_HOTELS = \[[\s\S]*?\];/,
-      'export const XOTELO_JORDAN_HOTELS = ' + JSON.stringify(currentHotels, null, 2) + ';'
-    );
-    fs.writeFileSync('./src/services/xoteloJordanHotelsData.js', updatedData);
+    // Completely rewrite the file to avoid regex issues with nested arrays
+    const content = `export const XOTELO_JORDAN_HOTELS = ${JSON.stringify(currentHotels, null, 2)};\n\nexport default XOTELO_JORDAN_HOTELS;`;
+    
+    fs.writeFileSync(dataFilePath, content);
     console.log('💾 Data file updated successfully.');
   } catch (err) {
     console.error('Error saving file:', err.message);
@@ -213,8 +270,8 @@ async function updateAllHotelsWithRealImages() {
       
       // Delay between batches
       if (currentIndex < maxHotels) {
-        console.log('Waiting 3 seconds before next batch...');
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        console.log('Waiting 1 second before next batch...');
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Reduced from 3000ms
       }
     } catch (error) {
       console.log(`❌ Critical Batch Error: ${error.message}`);
