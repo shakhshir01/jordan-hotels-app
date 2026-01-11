@@ -9,13 +9,13 @@ export default function About() {
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative px-4 sm:px-6 py-16 md:py-20 text-center text-white max-w-4xl mx-auto">
           <div className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-80 mb-3">
-            {t('pages.about.kicker')}
+            {t('pages.about.kicker', 'Our Philosophy')}
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-display mb-4">
-            {t('pages.about.title')}
+            {t('pages.about.title', 'We Are VisitJo')}
           </h1>
           <p className="text-sm md:text-base opacity-95 leading-relaxed max-w-3xl mx-auto">
-            {t('pages.about.intro')}
+            {t('pages.about.intro', 'We are more than just a booking platform. We are your gateway to the authentic soul of Jordan, dedicated to showing you the hidden gems and warm hospitality of our home.')}
           </p>
         </div>
       </section>

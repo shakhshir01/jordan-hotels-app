@@ -15,8 +15,8 @@ export default function Wishlist() {
         <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6 mt-8">
           <div className="absolute inset-0 bg-black/10" />
           <div className="relative px-4 sm:px-6 py-20 text-center text-white">
-            <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title')}</h1>
-            <p className="text-lg opacity-95">{t('pages.wishlist.subtitle')}</p>
+            <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title', 'Your Dream List')}</h1>
+            <p className="text-lg opacity-95">{t('pages.wishlist.subtitle', 'The places you\'re dreaming of, all in one place.')}</p>
           </div>
         </section>
 
@@ -44,8 +44,8 @@ export default function Wishlist() {
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6 mt-8">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 text-center text-white">
-          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title')}</h1>
-          <p className="text-lg opacity-95">{t('pages.wishlist.itemsSaved', { count: wishlist.length })}</p>
+          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title', 'Your Dream List')}</h1>
+          <p className="text-lg opacity-95">{t('pages.wishlist.itemsSaved', { count: wishlist.length, defaultValue: `${wishlist.length} adventures waiting for you` })}</p>
         </div>
       </section>
 

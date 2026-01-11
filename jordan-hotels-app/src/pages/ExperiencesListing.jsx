@@ -36,13 +36,13 @@ export default function ExperiencesListing() {
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 text-center text-white">
           <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">
-            {t('pages.experiences.hero.kicker', 'Authentic Experiences')}
+            {t('pages.experiences.hero.kicker', 'Unforgettable Moments')}
           </div>
           <h1 className="text-5xl md:text-6xl font-black font-display mb-6 tracking-tight">
-            {t('pages.experiences.hero.title', 'Discover Jordan')}
+            {t('pages.experiences.hero.title', 'Go Beyond the Ordinary')}
           </h1>
           <p className="text-lg max-w-3xl mx-auto opacity-95 leading-relaxed">
-            {t('pages.experiences.hero.subtitle', 'Immerse yourself in the rich culture, history, and natural beauty of Jordan through unforgettable experiences')}
+            {t('pages.experiences.hero.subtitle', 'Don\'t just visit Jordan—live it. From Bedouin tea in the desert to diving in the Red Sea, create memories that last a lifetime.')}
           </p>
         </div>
       </section>

@@ -86,6 +86,38 @@ const extractDestination = (text) => {
   return null;
 };
 
+const getOpenAIKey = () => {
+  if (typeof window !== 'undefined' && window.__VISITJO_RUNTIME_CONFIG__ && window.__VISITJO_RUNTIME_CONFIG__.OPENAI_API_KEY) {
+    return window.__VISITJO_RUNTIME_CONFIG__.OPENAI_API_KEY;
+  }
+  return import.meta.env.VITE_OPENAI_API_KEY;
+};
+
+async function callOpenAI(messages, apiKey) {
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 300
+      })
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || null;
+  } catch (error) {
+    console.error("AI Chat Error:", error);
+    return null;
+  }
+}
+
 export const generateChatResponse = async (userMessage, conversationHistory = []) => {
   const rawMessage = String(userMessage || '');
   const message = normalizeText(rawMessage);
@@ -104,6 +136,46 @@ export const generateChatResponse = async (userMessage, conversationHistory = []
 
   const lastBot = [...conversationHistory].reverse().find((m) => m?.sender === 'bot');
   const lastHotels = Array.isArray(lastBot?.hotels) ? lastBot.hotels : [];
+
+  // 1. Try AI Generation if Key is available
+  const apiKey = getOpenAIKey();
+  if (apiKey) {
+    let contextHotels = [];
+    try {
+      const searchRes = await hotelAPI.searchAll(rawMessage);
+      if (searchRes && Array.isArray(searchRes.hotels)) {
+        contextHotels = searchRes.hotels.slice(0, 5);
+      }
+    } catch (e) { /* ignore */ }
+
+    const systemPrompt = `You are VisitJo, a helpful AI travel assistant for Jordan.
+    Context - Hotels found for query:
+    ${contextHotels.map(h => `- ${h.name} (${h.location}): ${h.price} JOD, ${h.rating} stars.`).join('\n')}
+    
+    Instructions:
+    - Answer the user's question in a friendly, concise way.
+    - If hotels are listed above and relevant, recommend them.
+    - If asked about general Jordan travel (Petra, Wadi Rum, etc.), provide tips.
+    - Use emojis.`;
+
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...conversationHistory.slice(-4).map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.text
+      })),
+      { role: "user", content: rawMessage }
+    ];
+
+    const aiText = await callOpenAI(messages, apiKey);
+    if (aiText) {
+      return {
+        text: aiText,
+        hotels: contextHotels.slice(0, 3),
+        suggestions: [i18n.t('chat.suggestions.deals'), 'Amman', 'Petra', 'Dead Sea']
+      };
+    }
+  }
 
   // Smalltalk (typo-tolerant): "how areu", "hru", etc.
   const smallTalkHowAreYou = [

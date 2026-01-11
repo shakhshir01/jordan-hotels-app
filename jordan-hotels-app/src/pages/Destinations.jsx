@@ -6,31 +6,31 @@ import { hotelAPI } from "../services/api";
 
 const DESTINATION_INFO = {
   'Dead Sea': {
-    desc: 'Experience the lowest point on Earth with mineral-rich waters',
+    desc: 'Float effortlessly in the mineral-rich waters of the lowest point on Earth.',
     descAr: 'اختبر أخفض نقطة على سطح الأرض بمياه غنية بالمعادن',
     nameAr: 'البحر الميت',
     emoji: '💧',
   },
   'Amman': {
-    desc: 'Capital city with Roman history, vibrant markets, and modern culture',
+    desc: 'A mesmerizing blend of ancient Roman history and vibrant modern culture.',
     descAr: 'العاصمة بتاريخ روماني وأسواق نابضة بالحياة وثقافة حديثة',
     nameAr: 'عمّان',
     emoji: '🏛️',
   },
   'Petra': {
-    desc: 'UNESCO World Heritage site - the legendary rose-red city carved in stone',
+    desc: 'Walk through history in the Rose City, a world wonder carved into red stone.',
     descAr: 'موقع تراث عالمي لليونسكو — المدينة الوردية الأسطورية المنحوتة في الصخر',
     nameAr: 'البتراء',
     emoji: '🪨',
   },
   'Aqaba': {
-    desc: 'Red Sea beach resort with diving, water sports and stunning coral reefs',
+    desc: 'Dive into the crystal-clear waters and vibrant coral reefs of the Red Sea.',
     descAr: 'منتجع شاطئي على البحر الأحمر مع الغوص والرياضات المائية وشعاب مرجانية خلابة',
     nameAr: 'العقبة',
     emoji: '🏖️',
   },
   'Wadi Rum': {
-    desc: 'Desert landscape of Mars-like terrain, Bedouin camps and adventure',
+    desc: 'Lose yourself in the Martian landscapes of the Valley of the Moon.',
     descAr: 'مناظر صحراوية تشبه سطح المريخ ومخيمات بدوية وتجارب مغامرة',
     nameAr: 'وادي رم',
     emoji: '🏜️',
@@ -87,10 +87,10 @@ export default function Destinations() {
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 text-center text-white">
-          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.destinations.hero.kicker')}</div>
-          <h1 className="text-5xl md:text-6xl font-black font-display mb-6 tracking-tight">{t('pages.destinations.hero.title')}</h1>
+          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.destinations.hero.kicker', 'Explore Jordan')}</div>
+          <h1 className="text-5xl md:text-6xl font-black font-display mb-6 tracking-tight">{t('pages.destinations.hero.title', 'Journey Through Time')}</h1>
           <p className="text-lg max-w-3xl mx-auto opacity-95 leading-relaxed">
-            {t('pages.destinations.hero.subtitle')}
+            {t('pages.destinations.hero.subtitle', 'From the bustling streets of Amman to the silent majesty of Wadi Rum, discover destinations that will capture your heart.')}
           </p>
         </div>
       </section>

@@ -38,13 +38,13 @@ export default function Reviews() {
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative px-4 sm:px-6 py-16 md:py-20 text-center text-white max-w-3xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-80 mb-3">
-            {t('pages.reviews.hero.kicker')}
+            {t('pages.reviews.hero.kicker', 'Traveler Stories')}
           </p>
           <h1 className="text-4xl md:text-5xl font-black font-display mb-4">
-            {t('pages.reviews.hero.title')}
+            {t('pages.reviews.hero.title', 'Hear from the Community')}
           </h1>
           <p className="text-sm md:text-base opacity-95 leading-relaxed">
-            {t('pages.reviews.hero.subtitle')}
+            {t('pages.reviews.hero.subtitle', 'Real experiences from real travelers. Discover why visitors fall in love with Jordan.')}
           </p>
         </div>
       </section>

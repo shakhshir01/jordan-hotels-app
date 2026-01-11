@@ -114,14 +114,13 @@ const Insights = () => {
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
-            TRAVEL INTELLIGENCE
+            SMART TRAVEL INSIGHTS
           </p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-display tracking-tight mb-4">
-            Smart insights for planning Jordan
+            Data-Driven Travel Planning
           </h1>
           <p className="text-base md:text-lg opacity-95 leading-relaxed max-w-3xl mx-auto">
-            Explore curated hotel data across Jordan: destinations, prices, and ratings all in one place,
-            so you can quickly spot the cities and stays that fit your style and budget.
+            Make informed decisions with our curated data. Compare destinations, prices, and ratings at a glance to find the perfect fit for your style and budget.
           </p>
         </div>
       </section>

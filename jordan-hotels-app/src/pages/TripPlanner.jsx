@@ -92,13 +92,13 @@ export default function TripPlanner() {
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
-            {t('pages.tripPlanner.hero.kicker')}
+            {t('pages.tripPlanner.hero.kicker', 'Your Journey, Your Way')}
           </p>
           <h1 className="text-4xl md:text-5xl font-black font-display tracking-tight mb-3">
-            {t('pages.tripPlanner.hero.title')}
+            {t('pages.tripPlanner.hero.title', 'Craft Your Perfect Itinerary')}
           </h1>
           <p className="text-base md:text-lg opacity-95 leading-relaxed max-w-3xl mx-auto">
-            {t('pages.tripPlanner.hero.subtitle')}
+            {t('pages.tripPlanner.hero.subtitle', 'Map out your dream adventure day by day. From arrival to departure, ensure every moment counts.')}
           </p>
         </div>
       </section>

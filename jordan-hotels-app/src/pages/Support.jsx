@@ -27,9 +27,9 @@ export default function Support() {
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-cyan-600 via-blue-600 to-indigo-600 shadow-2xl mb-12 sm:mb-16 mx-4 sm:mx-6 mt-8 sm:mt-10">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-12 sm:py-16 text-center text-white max-w-3xl mx-auto">
-          <div className="text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">{t('support.hero.kicker')}</div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black font-display mb-4">{t('support.hero.title')}</h1>
-          <p className="text-sm md:text-base opacity-95">{t('support.hero.subtitle')}</p>
+          <div className="text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">{t('support.hero.kicker', 'We\'re Here to Help')}</div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black font-display mb-4">{t('support.hero.title', 'Support Center')}</h1>
+          <p className="text-sm md:text-base opacity-95">{t('support.hero.subtitle', 'Have questions? We have answers. Let us help you make your trip seamless.')}</p>
         </div>
       </section>
 

@@ -30,14 +30,13 @@ const SavedSearches = () => {
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-3xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
-            YOUR DISCOVERY TRAIL
+            YOUR PERSONAL DISCOVERY TRAIL
           </p>
           <h1 className="text-4xl md:text-5xl font-black font-display tracking-tight mb-3">
-            Saved searches
+            Pick Up Where You Left Off
           </h1>
           <p className="text-base md:text-lg opacity-90 leading-relaxed">
-            Quickly jump back to your favourite ideas: Petra weekends, Red Sea escapes,
-            city breaks in Amman, and more.
+            Don't lose track of your inspiration. Quickly return to your favorite ideas, from Petra weekends to Red Sea escapes.
           </p>
         </div>
       </section>

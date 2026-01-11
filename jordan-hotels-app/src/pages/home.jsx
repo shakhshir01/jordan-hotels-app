@@ -67,7 +67,7 @@ const getUserRecommendedHotels = async () => {
         maxPages: 3,
       });
 
-      if (Array.isArray(nearby) && nearby.length > 0) return nearby;
+      if (Array.isArray(nearby) && nearby.length > 0) return { hotels: nearby, isLocationBased: true };
 
       // Fallback if geo exists but we couldn't compute distances (missing geo on hotels).
       const place = getNearestJordanPlace(geo);
@@ -82,17 +82,22 @@ const getUserRecommendedHotels = async () => {
         return (b?.rating || 0) - (a?.rating || 0);
       });
       return sorted.slice(0, 12);
+      return { hotels: sorted.slice(0, 12), isLocationBased: true };
     } catch {
       // If geo-based recommendations fail (timeouts, API down), show a small first page instead.
-      const page = await hotelAPI.getHotelsPage({ limit: 12 });
-      const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
-      return hotels.slice(0, 12);
+      // Fall through to best hotels
     }
+  }
+
+  // Fallback: Get best rated hotels if location is not available
+  const featured = await hotelsService.getFeaturedHotels();
+  if (featured && featured.length > 0) {
+    return { hotels: featured.slice(0, 12), isLocationBased: false };
   }
 
   const page = await hotelAPI.getHotelsPage({ limit: 12 });
   const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
-  return hotels.slice(0, 12);
+  return { hotels: hotels.slice(0, 12), isLocationBased: false };
 };
 
 const FALLBACK_IMG =
@@ -250,6 +255,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLocationBased, setIsLocationBased] = useState(false);
 
   const viewLabel = useMemo(() => t("common.view"), [t]);
   const noResultsLabel = useMemo(() => t("hotels.noResults"), [t]);
@@ -261,13 +267,17 @@ const Home = () => {
       try {
         // Home should not load the entire Jordan dataset by default.
         // If user is searching, use /search (hotelAPI.getAllHotels(location) routes to search).
-        const data = location && String(location).trim()
-          ? await hotelAPI.getAllHotels(location)
-          : await getUserRecommendedHotels();
-        const hotelsArray = Array.isArray(data) ? data : [];
-        setHotels(hotelsArray);
-        if (hotelsArray.length === 0) {
-          setError(noResultsLabel);
+        if (location && String(location).trim()) {
+          const data = await hotelAPI.getAllHotels(location);
+          const hotelsArray = Array.isArray(data) ? data : [];
+          setHotels(hotelsArray);
+          setIsLocationBased(false);
+          if (hotelsArray.length === 0) setError(noResultsLabel);
+        } else {
+          const { hotels: recHotels, isLocationBased: locBased } = await getUserRecommendedHotels();
+          setHotels(recHotels);
+          setIsLocationBased(locBased);
+          if (recHotels.length === 0) setError(noResultsLabel);
         }
       } catch (err) {
         console.error("Fetch error:", err);
@@ -316,20 +326,20 @@ const Home = () => {
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-6 py-24 md:py-32 text-center text-white">
           <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4 animate-fade-in">
-            {t("home.hero.kicker")}
+            {t("home.hero.kicker", "The Kingdom of Time")}
           </div>
           <h1 className="text-5xl md:text-7xl font-black font-display mb-6 tracking-tight leading-tight animate-slide-up">
-            {t("home.hero.titleMain")}{" "}
-            <span className="text-yellow-300">{t("home.hero.titleAccent")}</span>
+            {t("home.hero.titleMain", "Experience Jordan's")}{" "}
+            <span className="text-yellow-300">{t("home.hero.titleAccent", "Timeless Magic")}</span>
           </h1>
           <p className="text-lg md:text-xl max-w-3xl mx-auto opacity-95 mb-12 leading-relaxed animate-fade-in">
-            {t("home.hero.subtitle")}
+            {t("home.hero.subtitle", "Journey through ancient cities, float in healing waters, and sleep under desert stars. Your perfect Jordanian adventure starts here.")}
           </p>
 
           <div className="search-bar max-w-3xl mx-auto animate-slide-up">
             <input
               className="flex-1 px-6 py-4 bg-transparent text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 outline-none text-base rounded-full"
-              placeholder={t("home.hero.searchPlaceholder")}
+              placeholder={t("home.hero.searchPlaceholder", "Where do you want to go?")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -339,7 +349,7 @@ const Home = () => {
               className="px-8 py-4 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
             >
               <Search size={20} />
-              <span className="hidden sm:inline">{t("home.hero.findStays")}</span>
+              <span className="hidden sm:inline">{t("home.hero.findStays", "Find Stays")}</span>
             </button>
           </div>
         </div>
@@ -366,10 +376,13 @@ const Home = () => {
           <div className="space-y-8">
             <header className="flex flex-col gap-2">
               <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-slate-900 dark:text-slate-50">
-                Recommendations for you
+                {isLocationBased ? "Recommendations for you" : "Best Rated Hotels"}
               </h2>
               <p className="page-subtitle">
                 Handpicked stays near you — based on your location when available.
+                {isLocationBased
+                  ? "Handpicked stays near you — based on your location."
+                  : "Discover the highest rated stays across Jordan."}
               </p>
             </header>
 

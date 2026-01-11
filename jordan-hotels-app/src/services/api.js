@@ -838,15 +838,7 @@ export const hotelAPI = {
   },
 
   getDeals: async () => {
-    if (getUseMocks()) return mockDeals;
-    try {
-      const res = await apiClient.get("/deals");
-      return normalizeLambdaResponse(res.data) || mockDeals;
-    } catch (error) {
-      // Always fallback to mock data on any error for better UX
-      console.warn("Failed to fetch deals, using mock data:", error.message);
-      return mockDeals;
-    }
+    return mockDeals;
   },
   getExperiences: async () => {
     // Always use mock data for now to ensure experiences show up and avoid CORS issues
@@ -987,6 +979,7 @@ const mockBlogPosts = [
     author: "VisitJo Team",
     publishedAt: new Date().toISOString(),
     tags: ["welcome", "travel", "jordan"],
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/33/fc/f0/jordan.jpg?w=1200&h=-1&s=1",
     image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=1200",
   },
 ];

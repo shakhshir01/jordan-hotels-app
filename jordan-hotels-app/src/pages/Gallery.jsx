@@ -82,8 +82,8 @@ export default function Gallery() {
       {/* Header */}
       <section className="relative bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-5xl font-bold mb-4">Hotel Gallery</h1>
-          <p className="text-blue-100 text-lg">Explore stunning images from all our partner hotels across Jordan</p>
+          <h1 className="text-5xl font-bold mb-4">Visualizing Your Stay</h1>
+          <p className="text-blue-100 text-lg">Take a visual journey through our handpicked hotels and resorts across Jordan.</p>
         </div>
       </section>
 

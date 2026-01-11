@@ -50,12 +50,16 @@ function isHighQualityImage(url) {
     'avatar', 'icon', 'logo', 'map', 'sprite', 'blank', 'spacer', 'user_image', 'pixel',
     'floorplan', 'floor_plan', 'layout', 'brochure', 'menu', 'qrcode', 'barcode',
     'banner', 'promo', 'offer', 'advert', 'tripadvisor_logo', 'ta_logo', 'overlay',
-    'review', 'rating', 'stars'
+    'review', 'rating', 'stars', 'thumb', 'thumbnail', 'tiny', 'small', 'widget'
   ];
   if (junkTerms.some(term => lower.includes(term))) return false;
   
   // Filter out known low-res patterns
   if (lower.includes('w=50') || lower.includes('w=100')) return false;
+  
+  // Filter out dimensions in filenames that look small (e.g. 100x100, 320x240)
+  // Matches patterns like: image_100x100.jpg, photo-320x240.png
+  if (lower.match(/[-_](?:50|60|80|100|120|140|150|160|180|200|240|300|320)x(?:50|60|80|100|120|140|150|160|180|200|240|300|320)\./)) return false;
   
   return true;
 }
@@ -65,7 +69,11 @@ function enhanceImageUrl(url) {
   
   // TripAdvisor: Force high resolution
   if (url.includes('tripadvisor.com') && url.includes('/media/photo-')) {
-    const base = url.split('?')[0];
+    let enhanced = url;
+    // Try to upgrade small/thumbnail paths (photo-s, photo-t, photo-l) to original (photo-o)
+    enhanced = enhanced.replace(/\/media\/photo-[stml]\//, '/media/photo-o/');
+    
+    const base = enhanced.split('?')[0];
     // Add high-res params (w=1200 is standard HD for TA)
     return `${base}?w=1200&h=-1&s=1`;
   }

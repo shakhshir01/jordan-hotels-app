@@ -66,13 +66,13 @@ const Trends = () => {
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
-            {t('pages.trends.hero.kicker')}
+            {t('pages.trends.hero.kicker', 'Trending Now')}
           </p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-display tracking-tight mb-4">
-            {t('pages.trends.hero.title')}
+            {t('pages.trends.hero.title', 'What Everyone is Talking About')}
           </h1>
           <p className="text-base md:text-lg opacity-95 leading-relaxed max-w-3xl mx-auto">
-            {t('pages.trends.hero.subtitle')}
+            {t('pages.trends.hero.subtitle', 'Discover the hottest destinations, top-rated stays, and experiences that travelers are falling in love with right now.')}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 max-w-xl mx-auto flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 rounded-full px-3 py-2 shadow-2xl border border-white/30 dark:border-slate-700/60">

@@ -16,6 +16,9 @@ export default function Footer() {
             <p className="mt-4 text-slate-300 text-sm leading-relaxed">
               {t("footer.description", "Discover the wonders of Jordan with personalized travel experiences, authentic local insights, and unforgettable adventures.")}
             </p>
+            <p className="mt-4 text-slate-300 text-sm leading-relaxed">
+              {t("footer.description", "Your gateway to the Kingdom of Time. We curate the finest stays and experiences to help you discover the authentic soul of Jordan.")}
+            </p>
           </div>
 
           {/* Quick Links */}
