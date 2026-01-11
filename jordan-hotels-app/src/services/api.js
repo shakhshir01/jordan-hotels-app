@@ -1,5 +1,6 @@
 import axios from "axios";
 import { XOTELO_JORDAN_HOTELS } from "./xoteloJordanHotelsData.js";
+import { REAL_HOTELS } from "./realHotelsData.js";
 import { sanitizeHotelImageUrls } from "../utils/hotelImageFallback";
 
 // Resolve API URL in this order:
@@ -358,9 +359,13 @@ const normalizeHotel = (rawHotel) => {
 
 // Helper function to get hotels from static data with filtering and pagination
 const getHotelsFromStatic = ({ q = "", cursor = "", limit = 30 } = {}) => {
-  // Use Xotelo API data instead of curated real hotels
+  const realIds = new Set(REAL_HOTELS.map(h => h.id));
+  const xoteloFiltered = (Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [])
+    .filter(h => !realIds.has(h.id));
+
   const allHotels = [
-    ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : []),
+    ...REAL_HOTELS,
+    ...xoteloFiltered
   ];
 
   // No deduplication needed since we only use one dataset
@@ -463,8 +468,13 @@ export const hotelAPI = {
     console.log("API: Using Xotelo hotel data only");
 
     // Use only Xotelo data as requested
+    const realIds = new Set(REAL_HOTELS.map(h => h.id));
+    const xoteloFiltered = (Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [])
+      .filter(h => !realIds.has(h.id));
+
     const allHotels = [
-      ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : []),
+      ...REAL_HOTELS,
+      ...xoteloFiltered
     ];
 
     // No deduplication needed since we only use one dataset
@@ -488,7 +498,8 @@ export const hotelAPI = {
   getHotelById: async (id) => {
     // Always try static data first for reliability
     const allHotels = [
-      ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : []),
+      ...REAL_HOTELS,
+      ...(Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [])
     ];
     const staticHotel = allHotels.find((h) => h.id === id);
     if (staticHotel) {
@@ -871,40 +882,6 @@ export const hotelAPI = {
   },
 };
 
-// Mock data for development and fallbacks
-const mockHotels = [
-  {
-    id: "h-movenpick-deadsea",
-    name: "Mövenpick Resort Dead Sea",
-    location: "Dead Sea",
-    price: 180,
-    rating: 4.9,
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200",
-    description: "Luxury resort on the Dead Sea with spa and pools.",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "h-wadi-rum-bubble",
-    name: "Wadi Rum Bubble Luxotel",
-    location: "Wadi Rum",
-    price: 240,
-    rating: 5.0,
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200",
-    description: "Unique bubble tents in the desert under stars.",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "h-st-regis-amman",
-    name: "The St. Regis Amman",
-    location: "Amman",
-    price: 210,
-    rating: 4.8,
-    image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?q=80&w=1200",
-    description: "Five-star service in the heart of Amman.",
-    createdAt: new Date().toISOString(),
-  },
-];
-
 const mockDestinations = [
   { id: "d-amman", name: "Amman", description: "Capital city with rich culture", count: 15, createdAt: new Date().toISOString() },
   { id: "d-petra", name: "Petra", description: "Ancient rock-cut city", count: 8, createdAt: new Date().toISOString() },
@@ -1010,7 +987,7 @@ const mockBlogPosts = [
     author: "VisitJo Team",
     publishedAt: new Date().toISOString(),
     tags: ["welcome", "travel", "jordan"],
-    image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?q=80&w=1200",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/33/fc/f0/jordan.jpg?w=1200&h=-1&s=1",
   },
 ];
 

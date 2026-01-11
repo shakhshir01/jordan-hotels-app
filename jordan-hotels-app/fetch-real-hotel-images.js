@@ -1,5 +1,6 @@
 import fs from 'fs';
 import https from 'https';
+import path from 'path';
 
 // Read the Xotelo data
 const fileData = fs.readFileSync('./src/services/xoteloJordanHotelsData.js', 'utf8');
@@ -16,20 +17,55 @@ try {
   hotels = tempFunc();
 }
 
-console.log(`Processing ${hotels.length} hotels for real images...`);
+console.log(`Loaded ${hotels.length} hotels. Starting real image fetch process...`);
 
 // Function to fetch webpage content
 function fetchWebpage(url) {
   return new Promise((resolve, reject) => {
     https.get(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+      },
     }, (res) => {
       let htmlData = '';
       res.on('data', (chunk) => htmlData += chunk);
       res.on('end', () => resolve(htmlData));
     }).on('error', reject);
+  });
+}
+
+// Function to search Google Images (Fallback)
+function searchGoogleImages(hotelName, location) {
+  const query = encodeURIComponent(`${hotelName} ${location} hotel exterior`);
+  const url = `https://www.google.com/search?q=${query}&tbm=isch&source=hp`;
+
+  return new Promise((resolve, reject) => {
+    https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        const images = [];
+        // Regex to find image URLs in Google search results
+        const imgMatches = data.match(/https:\/\/[^\"]*\.(?:jpg|jpeg|png|webp)/g);
+
+        if (imgMatches) {
+          const uniqueImages = [...new Set(imgMatches)]
+            .filter(url => url.includes('http') && !url.includes('favicon') && !url.includes('gstatic') && !url.includes('icon'))
+            .filter(url => url.length > 60) // Filter out thumbnails/icons
+            .slice(0, 8);
+
+          images.push(...uniqueImages);
+        }
+        resolve(images);
+      });
+    }).on('error', (err) => {
+      resolve([]); // Resolve empty on error to continue
+    });
   });
 }
 
@@ -90,80 +126,106 @@ function extractImagesFromTripAdvisor(html, hotelName) {
 // Process hotels in batches
 async function processHotelsBatch(startIndex, batchSize) {
   const endIndex = Math.min(startIndex + batchSize, hotels.length);
-  console.log(`Processing hotels ${startIndex + 1} to ${endIndex}...`);
+  console.log(`\n--- Processing Batch: ${startIndex + 1} to ${endIndex} ---`);
 
   for (let i = startIndex; i < endIndex; i++) {
     const hotel = hotels[i];
+    let realImages = [];
 
+    // 1. CLEANUP: Remove any existing Unsplash images
+    if (hotel.image && hotel.image.includes('unsplash.com')) hotel.image = '';
+    if (hotel.images) {
+      hotel.images = hotel.images.filter(url => !url.includes('unsplash.com'));
+    }
+
+    // 2. STRATEGY A: TripAdvisor
     if (hotel.tripadvisorUrl) {
       try {
-        console.log(`Fetching images for: ${hotel.name}`);
+        process.stdout.write(`[${i + 1}/${hotels.length}] ${hotel.name}: Checking TripAdvisor... `);
         const html = await fetchWebpage(hotel.tripadvisorUrl);
-
-        // Add delay to be respectful to TripAdvisor
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const realImages = extractImagesFromTripAdvisor(html, hotel.name);
-
-        if (realImages.length > 0) {
-          // Update the hotel with real images
-          hotel.image = realImages[0]; // Main image
-          hotel.images = realImages; // Gallery images
-          console.log(`✅ Updated ${hotel.name} with ${realImages.length} real images`);
-        } else {
-          console.log(`❌ No images found for ${hotel.name}`);
-        }
-
+        realImages = extractImagesFromTripAdvisor(html, hotel.name);
       } catch (error) {
-        console.log(`❌ Error fetching ${hotel.name}: ${error.message}`);
+        process.stdout.write(`Failed (${error.message}). `);
       }
-    } else {
-      console.log(`⚠️ No TripAdvisor URL for ${hotel.name}`);
     }
 
-    // Progress indicator
-    if ((i - startIndex + 1) % 10 === 0) {
-      console.log(`Progress: ${i - startIndex + 1}/${endIndex - startIndex} hotels processed`);
+    // 3. STRATEGY B: Google Images (Fallback if no images found)
+    if (realImages.length === 0) {
+      try {
+        process.stdout.write(`Checking Google... `);
+        // Add delay before Google request
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const googleImages = await searchGoogleImages(hotel.name, hotel.location);
+        if (googleImages.length > 0) {
+          realImages = googleImages;
+        }
+      } catch (error) {
+        process.stdout.write(`Google failed. `);
+      }
     }
+
+    // 4. UPDATE HOTEL DATA
+    if (realImages.length > 0) {
+      // Keep existing non-unsplash images if any
+      const existingImages = (hotel.images || []).filter(url => !url.includes('unsplash.com'));
+      
+      // Combine and deduplicate
+      const allImages = [...new Set([...existingImages, ...realImages])];
+      
+      hotel.image = allImages[0];
+      hotel.images = allImages;
+      console.log(`✅ Found ${realImages.length} new images.`);
+    } else {
+      console.log(`❌ No images found.`);
+    }
+
+    // Respectful delay between hotels
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
   return endIndex;
 }
 
+// Helper to save progress
+function saveProgress(currentHotels) {
+  try {
+    const updatedData = fileData.replace(
+      /export const XOTELO_JORDAN_HOTELS = \[[\s\S]*?\];/,
+      'export const XOTELO_JORDAN_HOTELS = ' + JSON.stringify(currentHotels, null, 2) + ';'
+    );
+    fs.writeFileSync('./src/services/xoteloJordanHotelsData.js', updatedData);
+    console.log('💾 Data file updated successfully.');
+  } catch (err) {
+    console.error('Error saving file:', err.message);
+  }
+}
+
 // Main processing function
 async function updateAllHotelsWithRealImages() {
-  const batchSize = 5; // Start with just 5 hotels for testing
+  const batchSize = 10; 
   let currentIndex = 0;
-
-  // Only process first 10 hotels for testing
-  const maxHotels = Math.min(10, hotels.length);
+  const maxHotels = hotels.length; // Process ALL hotels
 
   while (currentIndex < maxHotels) {
     try {
       currentIndex = await processHotelsBatch(currentIndex, batchSize);
-
-      // Save progress after each batch
-      const updatedData = fileData.replace(
-        /export const XOTELO_JORDAN_HOTELS = \[[\s\S]*?\];/,
-        'export const XOTELO_JORDAN_HOTELS = ' + JSON.stringify(hotels, null, 2) + ';'
-      );
-
-      fs.writeFileSync('C:\\Users\\khale\\Desktop\\VisitJo\\jordan-hotels-app\\src\\services\\xoteloJordanHotelsData.js', updatedData);
-      console.log(`💾 Progress saved after processing ${currentIndex} hotels`);
-
-      // Add delay between batches to avoid being blocked
+      saveProgress(hotels);
+      
+      // Delay between batches
       if (currentIndex < maxHotels) {
-        console.log('Waiting 5 seconds before next batch...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        console.log('Waiting 3 seconds before next batch...');
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
-
     } catch (error) {
-      console.log(`❌ Error in batch processing: ${error.message}`);
-      break;
+      console.log(`❌ Critical Batch Error: ${error.message}`);
+      // Save what we have so far
+      saveProgress(hotels);
+      // Wait a bit longer then try to continue
+      await new Promise(resolve => setTimeout(resolve, 10000));
     }
   }
 
-  console.log('🎉 Finished processing test batch!');
+  console.log('🎉 Finished processing ALL hotels!');
 }
 
 // Run the update
