@@ -187,7 +187,7 @@ const Navbar = () => {
         {mobileOpen && (
           <div
             id="mobile-nav"
-            className="md:hidden mt-3 rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-xl shadow-xl dark:border-slate-700/50 dark:bg-slate-900/70"
+            className="md:hidden mt-3 rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-xl shadow-xl dark:border-slate-700/50 dark:bg-slate-900/70 overflow-y-auto max-h-[70vh]"
           >
             <div className="p-4 flex flex-col gap-2">
               <Link to="/destinations" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
