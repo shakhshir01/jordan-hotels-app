@@ -81,18 +81,20 @@ if (typeof window !== "undefined" && window.__VISITJO_RUNTIME_CONFIG__ && window
 
 function getApiBaseUrl(path) {
   // Always use public API for hotels, deals, destinations, experiences, search
-  if (/^\/hotels/.test(path) || /^\/deals/.test(path) || /^\/destinations/.test(path) || /^\/experiences/.test(path) || /^\/search/.test(path) || /^\/blog/.test(path)) {
-    return PUBLIC_API_BASE_URL;
-  }
-  
-  // If we have a valid public API URL, use it directly. 
-  // This avoids "ENOTFOUND" errors from the Vite proxy if the local .env is stale.
   if (PUBLIC_API_BASE_URL) return PUBLIC_API_BASE_URL;
 
   // In local dev, force Vite proxy for user/profile endpoints to avoid CORS
-  if (isLocalDevHost && (/^\/user/.test(path) || /^\/profile/.test(path) || /^\/bookings/.test(path) || /^\/uploads/.test(path) || /^\/payments/.test(path))) {
+  if (
+    isLocalDevHost &&
+    (/^\/user/.test(path) ||
+      /^\/profile/.test(path) ||
+      /^\/bookings/.test(path) ||
+      /^\/uploads/.test(path) ||
+      /^\/payments/.test(path))
+  ) {
     return "/api";
   }
+
   // Otherwise, use local backend or fallback to public API
   return LOCAL_API_BASE_URL || PUBLIC_API_BASE_URL;
 }
@@ -962,7 +964,7 @@ const mockBlogPosts = [
     author: "VisitJo Team",
     publishedAt: new Date().toISOString(),
     tags: ["welcome", "travel", "jordan"],
-    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/33/fc/f0/jordan.jpg?w=1200&h=-1&s=1",
+    image: "https://media-cdn.tripadvisor.com/media/photo-o/15/33/fc/f0/jordan.jpg?w=1200&h=-1&s=1",
     image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=1200",
   },
 ];

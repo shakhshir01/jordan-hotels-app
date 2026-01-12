@@ -1,4 +1,4 @@
-import fs from 'fs';
+ import fs from 'fs';
 import https from 'https';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -22,12 +22,68 @@ try {
   hotels = tempFunc();
 }
 
+// Function to reset hotel images
+function resetHotelImages(hotels) {
+  hotels.forEach(hotel => {
+    hotel.image = '';
+    hotel.images = [];
+  });
+  saveProgress(hotels);
+  console.log('Images reset for all hotels.');
+}
+
 console.log(`Loaded ${hotels.length} hotels. Starting real image fetch process...`);
 
-// Function to fetch webpage content
+// Reset images before fetching new ones
+// resetHotelImages(hotels);
+
+// Function to validate image URL
+function validateImageUrl(url) {
+  return new Promise((resolve) => {
+    const req = https.request(url, { method: 'HEAD' }, (res) => {
+      resolve(res.statusCode === 200);
+    }).on('error', () => {
+      resolve(false);
+    });
+    req.setTimeout(5000, () => {
+      req.destroy();
+      resolve(false);
+    });
+    req.end();
+  });
+}
+
+// Function to validate an array of image URLs (with concurrency limit)
+async function validateImageUrls(urls) {
+  const validUrls = [];
+  const concurrencyLimit = 5; // Process 5 URLs at a time instead of 1
+
+  for (let i = 0; i < urls.length; i += concurrencyLimit) {
+    const batch = urls.slice(i, i + concurrencyLimit);
+    const promises = batch.map(async (url) => {
+      try {
+        const isValid = await validateImageUrl(url);
+        if (isValid) {
+          return url;
+        } else {
+          console.log(`❌ Invalid URL: ${url}`);
+          return null;
+        }
+      } catch (error) {
+        console.log(`❌ Error validating URL ${url}: ${error.message}`);
+        return null;
+      }
+    });
+
+    const results = await Promise.all(promises);
+    validUrls.push(...results.filter(url => url !== null));
+  }
+
+  return validUrls;
+}
 function fetchWebpage(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, {
+    const req = https.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -37,6 +93,10 @@ function fetchWebpage(url) {
       res.on('data', (chunk) => htmlData += chunk);
       res.on('end', () => resolve(htmlData));
     }).on('error', reject);
+    req.setTimeout(10000, () => {
+      req.destroy();
+      reject(new Error('Request timeout'));
+    });
   });
 }
 
@@ -87,7 +147,7 @@ function searchBingImages(hotelName, location) {
   const url = `https://www.bing.com/images/search?q=${query}&first=1`;
 
   return new Promise((resolve, reject) => {
-    https.get(url, {
+    const req = https.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       }
@@ -116,10 +176,75 @@ function searchBingImages(hotelName, location) {
           }
         }
 
-        resolve([...new Set(images)].slice(0, 45));
+        resolve([...new Set(images)].slice(0, 50));
       });
     }).on('error', (err) => {
       resolve([]); // Resolve empty on error to continue
+    });
+    req.setTimeout(10000, () => {
+      req.destroy();
+      resolve([]);
+    });
+  });
+}
+
+// Function to search Google Images
+function searchGoogleImages(hotelName, location) {
+  const query = encodeURIComponent(`${hotelName} ${location} hotel exterior`);
+  const url = `https://www.google.com/search?q=${query}&tbm=isch&source=hp`;
+
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        const images = [];
+
+        // Google Images embeds URLs in various ways
+        // Look for data-src or src attributes in img tags
+        const imgRegex = /<img[^>]+(?:data-src|src)="([^"]+)"/g;
+        let match;
+
+        while ((match = imgRegex.exec(data)) !== null) {
+          const imgUrl = match[1];
+          // Skip base64, data URLs, and Google-specific URLs
+          if (imgUrl.startsWith('http') &&
+              !imgUrl.includes('data:') &&
+              !imgUrl.includes('googleusercontent.com') &&
+              !imgUrl.includes('gstatic.com') &&
+              imgUrl.match(/\.(jpg|jpeg|png|webp)(\?|$)/i) &&
+              isHighQualityImage(imgUrl)) {
+            images.push(imgUrl);
+          }
+        }
+
+        // Also look for URLs in script tags (Google sometimes embeds them there)
+        const scriptMatches = data.match(/\[.*?"ou":"([^"]+)".*?\]/g);
+        if (scriptMatches) {
+          scriptMatches.forEach(script => {
+            try {
+              const parsed = JSON.parse(script);
+              if (parsed && parsed.ou && isHighQualityImage(parsed.ou)) {
+                images.push(parsed.ou);
+              }
+            } catch (e) {
+              // Ignore parsing errors
+            }
+          });
+        }
+
+        resolve([...new Set(images)].slice(0, 50));
+      });
+    }).on('error', (err) => {
+      resolve([]); // Resolve empty on error to continue
+    });
+    req.setTimeout(10000, () => {
+      req.destroy();
+      resolve([]);
     });
   });
 }
@@ -164,8 +289,8 @@ function extractImagesFromTripAdvisor(html, hotelName) {
     });
   }
 
-  // Remove duplicates and limit to 45 images
-  const uniqueImages = [...new Set(images)].slice(0, 45);
+  // Remove duplicates and limit to 50 images
+  const uniqueImages = [...new Set(images)].slice(0, 50);
 
   console.log(`Found ${uniqueImages.length} images for ${hotelName}`);
   return uniqueImages;
@@ -178,6 +303,7 @@ async function processHotelsBatch(startIndex, batchSize) {
 
   for (let i = startIndex; i < endIndex; i++) {
     const hotel = hotels[i];
+
     let realImages = [];
 
     // 1. CLEANUP: Remove any existing Unsplash images
@@ -204,49 +330,59 @@ async function processHotelsBatch(startIndex, batchSize) {
       continue;
     }
 
-    // 2. STRATEGY A: TripAdvisor
-    if (hotel.tripadvisorUrl) {
-      try {
-        process.stdout.write(`[${i + 1}/${hotels.length}] ${hotel.name}: Checking TripAdvisor... `);
-        const html = await fetchWebpage(hotel.tripadvisorUrl);
-        realImages = extractImagesFromTripAdvisor(html, hotel.name);
-      } catch (error) {
-        process.stdout.write(`Failed (${error.message}). `);
+    // 2. STRATEGY: Bing + Google Images (Combined sources)
+    try {
+      process.stdout.write(`[${i + 1}/${hotels.length}] ${hotel.name}: Checking Bing... `);
+      // Add delay before request
+      await new Promise(resolve => setTimeout(resolve, 100)); // Reduced from 300ms
+      const bingImages = await searchBingImages(hotel.name, hotel.location);
+      if (bingImages.length > 0) {
+        realImages = [...realImages, ...bingImages];
       }
+    } catch (error) {
+      process.stdout.write(`Bing failed. `);
     }
 
-    // 3. STRATEGY B: Bing Images (Fallback if no images found)
-    if (realImages.length === 0) {
-      try {
-        process.stdout.write(`Checking Bing... `);
-        // Add delay before request
-        await new Promise(resolve => setTimeout(resolve, 300)); // Reduced from 1500ms
-        const bingImages = await searchBingImages(hotel.name, hotel.location);
-        if (bingImages.length > 0) {
-          realImages = bingImages;
-        }
-      } catch (error) {
-        process.stdout.write(`Bing failed. `);
+    // 3. STRATEGY: Google Images (Additional source)
+    try {
+      process.stdout.write(`Google... `);
+      // Add delay before request
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const googleImages = await searchGoogleImages(hotel.name, hotel.location);
+      if (googleImages.length > 0) {
+        realImages = [...realImages, ...googleImages];
       }
+    } catch (error) {
+      process.stdout.write(`Google failed. `);
     }
 
-    // 4. UPDATE HOTEL DATA
+    // Remove duplicates from combined results
+    realImages = [...new Set(realImages)];
+
+    // 4. VALIDATE IMAGES
+    if (realImages.length > 0) {
+      console.log(`Validating ${realImages.length} images for ${hotel.name}...`);
+      realImages = await validateImageUrls(realImages);
+      console.log(`✅ ${realImages.length} valid images after validation.`);
+    }
+
+    // 5. UPDATE HOTEL DATA
     if (realImages.length > 0) {
       // Keep existing non-unsplash images if any
       const existingImages = (hotel.images || []).filter(url => !url.includes('unsplash.com'));
-      
+
       // Combine and deduplicate
       const allImages = [...new Set([...existingImages, ...realImages])];
-      
+
       hotel.image = allImages[0];
       hotel.images = allImages;
-      console.log(`✅ Found ${realImages.length} new images.`);
+      console.log(`✅ Found ${realImages.length} new valid images.`);
     } else {
-      console.log(`❌ No images found.`);
+      console.log(`❌ No valid images found.`);
     }
 
     // Respectful delay between hotels
-    await new Promise(resolve => setTimeout(resolve, 100)); // Reduced from 1000ms
+    await new Promise(resolve => setTimeout(resolve, 50)); // Reduced from 100ms
   }
 
   return endIndex;
@@ -278,15 +414,15 @@ async function updateAllHotelsWithRealImages() {
       
       // Delay between batches
       if (currentIndex < maxHotels) {
-        console.log('Waiting 1 second before next batch...');
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Reduced from 3000ms
+        console.log('Waiting 0.5 seconds before next batch...');
+        await new Promise(resolve => setTimeout(resolve, 500)); // Reduced from 1000ms
       }
     } catch (error) {
       console.log(`❌ Critical Batch Error: ${error.message}`);
       // Save what we have so far
       saveProgress(hotels);
       // Wait a bit longer then try to continue
-      await new Promise(resolve => setTimeout(resolve, 10000));
+      await new Promise(resolve => setTimeout(resolve, 5000));
     }
   }
 

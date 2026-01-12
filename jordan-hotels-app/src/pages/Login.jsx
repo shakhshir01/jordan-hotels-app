@@ -33,8 +33,11 @@ const Login = () => {
     setErrors({});
 
     try {
-      await login(email, password);
-      navigate('/');
+      const result = await login(email, password);
+      if (result.success) {
+        navigate('/');
+      }
+      // If mfaRequired, the modal will show
     } catch (err) {
       setErrors({ submit: err.message || 'pages.login.invalidCredentials' });
     } finally {

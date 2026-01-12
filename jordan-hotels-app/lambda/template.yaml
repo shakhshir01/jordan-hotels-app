@@ -16,13 +16,19 @@ Parameters:
     Type: String
     Description: "ARN or name of the Secrets Manager secret containing OPENAI_API_KEY (SecretString key: OPENAI_API_KEY). Leave empty to set at deploy time."
     Default: ""
+  StripeSecretArn:
+    Type: String
+    Description: "ARN of an existing Stripe Secrets Manager secret. Leave empty to create a new secret."
+    Default: ""
 
+Conditions:
+  CreateStripeSecret: !Equals [ !Ref StripeSecretArn, "" ]
 Resources:
 
   Api:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Stage
+      StageName: prod
       EndpointConfiguration: REGIONAL
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
@@ -180,6 +186,11 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
       BucketEncryption:
@@ -222,12 +233,12 @@ Resources:
           Value: !Ref AWS::StackName
 
   StripeSecret:
+    Condition: CreateStripeSecret
     Type: AWS::SecretsManager::Secret
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
       Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
-      KmsKeyId: alias/aws/secretsmanager
       Tags:
         - Key: App
           Value: VisitJo
@@ -235,6 +246,8 @@ Resources:
           Value: SAM
         - Key: Stack
           Value: !Ref AWS::StackName
+
+
 
   LambdaRolePolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -464,7 +477,7 @@ Resources:
         - !Ref LambdaRolePolicy
       Environment:
         Variables:
-          STRIPE_SECRET_ARN: !Ref StripeSecret
+          STRIPE_SECRET_ARN: !If [CreateStripeSecret, !Ref StripeSecret, !Ref StripeSecretArn]
           PAYMENTS_ENABLED: "true"
           ALLOW_LIVE_PAYMENTS: "false"
       Events:
@@ -489,7 +502,7 @@ Resources:
         - !Ref LambdaRolePolicy
       Environment:
         Variables:
-          STRIPE_SECRET_ARN: !Ref StripeSecret
+          STRIPE_SECRET_ARN: !If [CreateStripeSecret, !Ref StripeSecret, !Ref StripeSecretArn]
           PAYMENTS_ENABLED: "true"
           ALLOW_LIVE_PAYMENTS: "false"
       Events:
@@ -636,7 +649,7 @@ Resources:
 Outputs:
   ApiUrl:
     Description: "Base URL for API"
-    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Stage"
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod"
     Export:
       Name: !Sub "${AWS::StackName}-ApiUrl"
 

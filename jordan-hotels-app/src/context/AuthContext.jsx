@@ -156,7 +156,7 @@ export const AuthProvider = ({ children }) => {
           }
           setError(null);
           showSuccess(`Welcome back, ${email}!`);
-          resolve(session);
+          resolve({ success: true });
         },
         onFailure: (err) => {
           console.error = originalConsoleError; // Restore
@@ -168,26 +168,32 @@ export const AuthProvider = ({ children }) => {
         mfaRequired: (challengeName, challengeParameters) => {
           console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'SMS_MFA', challengeName, challengeParameters });
+          resolve({ mfaRequired: true });
         },
         selectMFAType: (challengeName, challengeParameters) => {
           console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'SELECT_MFA_TYPE', challengeName, challengeParameters });
+          resolve({ mfaRequired: true });
         },
         mfaSetup: (challengeName, challengeParameters) => {
           console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'MFA_SETUP', challengeName, challengeParameters });
+          resolve({ mfaRequired: true });
         },
         totpRequired: (challengeName, challengeParameters) => {
           console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA', challengeName, challengeParameters });
+          resolve({ mfaRequired: true });
         },
         customChallenge: (challengeParameters) => {
           console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'CUSTOM_CHALLENGE', challengeParameters });
+          resolve({ mfaRequired: true });
         },
         newPasswordRequired: (userAttributes, requiredAttributes) => {
           console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'NEW_PASSWORD_REQUIRED', userAttributes, requiredAttributes });
+          resolve({ mfaRequired: true });
         },
       });
     });
@@ -209,6 +215,22 @@ export const AuthProvider = ({ children }) => {
       if (email) localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
     } catch (_e) { console.warn('Ignored during logout cleanup', _e); }
     showSuccess('Logged out successfully');
+  };
+
+  const completeMfa = (session) => {
+    const email = cognitoUserRef.current?.getUsername();
+    if (email) {
+      setUserAndProfileFromEmail(email);
+    }
+    try {
+      const idToken = session.getIdToken().getJwtToken();
+      setAuthToken(idToken);
+    } catch (e) {
+      console.warn('Failed to set auth token on MFA', e);
+    }
+    setError(null);
+    showSuccess(`Welcome back!`);
+    clearMfaChallenge();
   };
 
   const clearMfaChallenge = () => {
@@ -522,11 +544,13 @@ export const AuthProvider = ({ children }) => {
     setupTotp,
     verifyTotp,
     clearMfaChallenge,
+    completeMfa,
     openEmailSetup,
     mfaEnabled,
     setupEmailMfa,
     verifyEmailMfa,
     disableMfa,
+    cognitoUserRef,
     isAuthenticated: !!user,
   };
 

@@ -515,5 +515,22 @@
       { "type": "Standard Room", "price": 155, "capacity": 2 },
       { "type": "Superior Room", "price": 195, "capacity": 3 }
     ]
-  }
-]
+  },
+  {
+    "id": "h56",
+    "name": "Radisson Blu Hotel, Amman Galleria Mall",
+    "city": "Amman",
+    "location": "Al Madinah Al Munawwarah Street, Amman",
+    "rating": 4.2,
+    "price": 220,
+    "images": [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200",
+      "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1200"
+    ],
+    "description": "Modern hotel connected to Galleria Mall in central Amman, offering comfortable rooms, fitness center, and convenient access to shopping and dining. Perfect for business and leisure travelers.",
+    "amenities": ["Fitness Center", "Restaurant", "Bar", "Business Center", "Free WiFi", "Room Service", "Concierge", "Valet Parking"],
+    "coordinates": { "lat": 31.9712, "lng": 35.8378 },
+    "stars": 4,
+    "reviewCount": 1234,
+    "checkIn": "15:00",

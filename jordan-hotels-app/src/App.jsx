@@ -10,6 +10,7 @@ import AppLayout from './layouts/AppLayout.jsx';
 // Components
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ChatBot from './components/ChatBot.jsx';
+import MfaModal from './components/MfaModal.jsx';
 
 // Pages
 const Home = React.lazy(() => import('./pages/home.jsx'));
@@ -131,6 +132,7 @@ function App() {
           }
         >
           <AppRoutes />
+          <MfaModal />
         </Suspense>
         <ToastContainer
           position="top-right"
