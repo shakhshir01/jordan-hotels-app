@@ -162,69 +162,11 @@ const extractDestination = (text) => {
   return null;
 };
 
-const getGeminiKey = () => {
-  if (typeof window !== 'undefined' && window.__VISITJO_RUNTIME_CONFIG__ && window.__VISITJO_RUNTIME_CONFIG__.VITE_GEMINI_API_KEY) {
-    return window.__VISITJO_RUNTIME_CONFIG__.VITE_GEMINI_API_KEY;
-  }
-  return import.meta.env.VITE_GEMINI_API_KEY;
-};
-
-async function callGemini(systemPrompt, history, message, apiKey, model = 'gemini-1.0-pro') {
-  try {
-    const contents = history
-      .filter(m => m.text && m.text.trim()) // Filter empty messages
-      .map(m => ({
-        role: m.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: m.text }]
-      }));
-
-    contents.push({
-      role: 'user',
-      parts: [{ text: message }]
-    });
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        contents,
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500
-        }
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Gemini API Error (${model}):`, response.status, errorText);
-      
-      // Fallback to gemini-1.5-pro-002 if flash fails
-      if (response.status === 404 && model.includes('flash')) {
-        console.log("Falling back to gemini-1.0-pro...");
-        return callGemini(systemPrompt, history, message, apiKey, 'gemini-1.0-pro');
-      }
-      return null;
-    }
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
-  } catch (error) {
-    console.error("Gemini Chat Error:", error);
-    return null;
-  }
-}
-
 async function gatherContextData(message) {
   const data = {
     hotels: [],
     deals: [],
     experiences: [],
-    blogPosts: [],
     destination: null,
     intent: 'chat'
   };
@@ -251,7 +193,7 @@ async function gatherContextData(message) {
         // If asking for hotels generally, show top rated
         data.hotels = allHotels.sort((a, b) => b.rating - a.rating).slice(0, 3);
       }
-    } catch (e) { console.error("Error fetching hotels for chat:", e); }
+    } catch (e) { /* Error fetching hotels for chat */ }
   }
 
   if (isDeal) {
@@ -259,10 +201,10 @@ async function gatherContextData(message) {
     try {
       data.deals = await hotelAPI.getDeals();
       // If we have deals, maybe grab the hotels associated with them if possible, or just generic deals
-    } catch (e) { console.error("Error fetching deals for chat:", e); }
+    } catch (e) { /* Error fetching deals for chat */ }
   }
 
-  // Always fetch experiences and blogs to provide rich context/insights
+  // Always fetch experiences to provide rich context
   try {
     const allExperiences = await hotelAPI.getExperiences();
     if (data.destination) {
@@ -272,81 +214,17 @@ async function gatherContextData(message) {
     } else if (isExperience) {
       data.experiences = allExperiences.slice(0, 3);
     }
-  } catch (e) { console.error("Error fetching experiences for chat:", e); }
-
-  try {
-    // Fetch blog posts for "insights" and "trends"
-    const blogs = await hotelAPI.getBlogPosts();
-    const blogArray = Array.isArray(blogs) ? blogs : [];
-    data.blogPosts = blogArray.slice(0, 2);
-  } catch (e) { console.error("Error fetching blogs for chat:", e); }
+  } catch (e) { /* Error fetching experiences for chat */ }
 
   return data;
 }
 
 export const generateChatResponse = async (message, history = [], userProfile = {}) => {
   const userName = userProfile?.displayName || userProfile?.name || 'Friend';
-  const apiKey = getGeminiKey();
   const contextData = await gatherContextData(message);
-  
-  let responseText = '';
-  
-  if (apiKey) {
-    // AI Path
-    const systemPrompt = `You are Nashmi, a witty, charming, and hyper-knowledgeable Jordanian travel guide.
 
-## Your Persona
-- Your name is Nashmi.
-- You are funny, warm, and charismatic.
-- You use Jordanian slang like "Yalla", "Habibi/Habibti", and "Ahlan wa Sahlan".
-- Your goal is to make planning a trip to Jordan as fun as the trip itself.
-
-## User Information
-- User's Name: ${userName}
-
-## Your Knowledge
-- You have a deep knowledge base about Jordan. Use it to answer questions about cities, culture, food, etc.
-- KNOWLEDGE_BASE: \`\`\`json
-${JSON.stringify(JORDAN_KNOWLEDGE)}
-\`\`\`
-
-## Real-time Data
-- My system has detected the following information based on the user's message.
-- CONTEXT_DATA: \`\`\`json
-${JSON.stringify({
-  detected_intent: contextData.intent,
-  detected_destination: contextData.destination,
-  hotels: contextData.hotels.map(h => ({ name: h.name, location: h.location, price: h.price, rating: h.rating, id: h.id })),
-  deals: contextData.deals.map(d => ({ title: d.title, description: d.description, price: d.price })),
-  experiences: contextData.experiences.map(e => ({ title: e.title, price: e.price, duration: e.duration, id: e.id })),
-  insights_and_blogs: contextData.blogPosts.map(b => ({ title: b.title, excerpt: b.excerpt, image: b.image })),
-  user_profile: userProfile
-})}
-\`\`\`
-
-## Your Instructions
-1.  **Greet the user:** Always greet ${userName} by name in your first message. Use their name naturally in subsequent conversation.
-2.  **Use your persona:** Be witty and charming. Make jokes.
-3.  **Answer questions:** Use the KNOWLEDGE_BASE to answer questions about Jordan.
-4.  **Handle requests for hotels/deals:**
-    - If \`CONTEXT_DATA.hotels\` is NOT empty, it means I found relevant hotels. Mention them enthusiastically. Tell the user you have found some options for them. You can mention specific hotel names.
-    - If \`CONTEXT_DATA.hotels\` IS empty but the user is asking for hotels, tell them you couldn't find anything for that specific request but you can search for hotels in major cities. Suggest some cities (e.g., "I couldn't find hotels in that specific area. Would you like to see options in Amman or Aqaba?").
-    - Do the same for deals.
-5.  **Be concise:** Keep your answers engaging and to the point (usually 2-3 sentences).
-6.  **Handle unknowns:** If you don't know the answer to something, use a witty remark. Never say "I don't know". Example: "That's a tricky one! Are you sure you're not a secret agent? While I ponder that, have you seen the treasury at Petra? It's breathtaking."
-7.  **Be conversational:** Ask follow-up questions to keep the conversation going.
-`;
-    
-    const aiText = await callGemini(systemPrompt, history, message, apiKey);
-    if (aiText) {
-      responseText = aiText;
-    }
-  }
-  
-  if (!responseText) {
-    // Fallback Path (Local Logic)
-    responseText = generateLocalResponse(message, userName, contextData);
-  }
+  // Always use local response
+  const responseText = generateLocalResponse(message, userName, contextData);
 
   // Construct final response object
   return {
@@ -355,8 +233,7 @@ ${JSON.stringify({
     offers: contextData.deals || [],
     // Only show images if we found specific hotels, otherwise keep chat clean
     images: [
-      ...(contextData.hotels.length > 0 ? contextData.hotels.map(h => ({ url: h.image, alt: h.name })) : []),
-      ...(contextData.blogPosts.map(b => ({ url: b.image, alt: b.title })))
+      ...(contextData.hotels.length > 0 ? contextData.hotels.map(h => ({ url: h.image, alt: h.name })) : [])
     ].filter(i => i.url),
     suggestions: getSmartSuggestions(contextData.hotels.map(h => h.id))
   };
