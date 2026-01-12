@@ -334,8 +334,8 @@ const normalizeHotel = (rawHotel) => {
   // Prefer images array, fallback to image string
   let images = [];
   if (Array.isArray(rawHotel.images) && rawHotel.images.length > 0) {
-    images = rawHotel.images.filter((img) => typeof img === "string" && img.trim());
-  } else if (typeof rawHotel.image === "string" && rawHotel.image.trim()) {
+    images = rawHotel.images.filter((img) => typeof img === "string" && img.trim() && !img.includes('caption.jpg'));
+  } else if (typeof rawHotel.image === "string" && rawHotel.image.trim() && !rawHotel.image.includes('caption.jpg')) {
     images = [rawHotel.image.trim()];
   }
   const sanitized = sanitizeHotelImageUrls(images, key);
@@ -1009,7 +1009,8 @@ const normalizeHotelsForUi = (hotels) => {
   const usedNonFallback = new Set();
 
   return (hotels || []).map((h) => {
-    const rawImages = [h?.image, ...(Array.isArray(h?.images) ? h.images : [])];
+    const rawImages = [h?.image, ...(Array.isArray(h?.images) ? h.images : [])]
+      .filter(url => typeof url === 'string' && !url.includes('caption.jpg'));
     const sanitizedInput = sanitizeHotelImageUrls(rawImages, h?.id || h?.name || "");
     const unique = [];
 
