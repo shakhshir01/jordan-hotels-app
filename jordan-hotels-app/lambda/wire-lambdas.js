@@ -17,15 +17,18 @@ import {
 
 const apiId = process.argv[2];
 const region = process.argv[3] || 'us-east-1';
+const rawAccountId = process.argv[4];
+const accountId = rawAccountId ? rawAccountId.replace(/[^0-9]/g, '') : null;
 
-if (!apiId) {
-  console.error('❌ Error: API ID is required');
-  console.error('Usage: node wire-lambdas.js <API_ID> <REGION>');
-  console.error('Example: node wire-lambdas.js ny5ohksmc3 us-east-1');
+if (!apiId || !accountId) {
+  console.error('❌ Error: API ID and AWS Account ID are required.');
+  console.error('Usage: node wire-lambdas.js <API_ID> <REGION> <ACCOUNT_ID>');
+  console.error('Example: node wire-lambdas.js ny5ohksmc3 us-east-1 123456789012');
   process.exit(1);
 }
 
 const client = new APIGatewayClient({ region });
+console.log(`Configured for API: ${apiId}, Region: ${region}, Account: ${accountId}`);
 
 // Map of resource paths to Lambda integrations
 const INTEGRATIONS = [
@@ -66,8 +69,7 @@ const INTEGRATIONS = [
   
   // Blog (NEW)
   { path: '/blog', method: 'GET', lambda: 'blog' },
-  { path: '/blog/{slug}', method: 'GET', lambda: 'blog' }
-];
+  { path: '/blog/{slug}', method: 'GET', lambda: 'blog' }];
 
 async function main() {
   try {
@@ -103,12 +105,12 @@ async function main() {
           restApiId: apiId,
           resourceId: resourceId,
           httpMethod: integration.method,
-          authorizationType: 'NONE', // Change to AWS_IAM if using auth
+          authorizationType: integration.auth || 'NONE',
           requestParameters: {}
         }));
 
         // Create integration with Lambda
-        const lambdaUri = `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:ACCOUNT_ID:function:${integration.lambda}/invocations`;
+        const lambdaUri = `arn:aws:apigateway:${region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${region}:${accountId}:function:${integration.lambda}/invocations`;
         
         await client.send(new PutIntegrationCommand({
           restApiId: apiId,
@@ -135,9 +137,8 @@ async function main() {
     console.log(`   ✅ Created: ${created}`);
     console.log(`   ℹ️  Skipped/Existing: ${skipped}`);
     console.log(`\n⚠️  IMPORTANT:`);
-    console.log(`   1. Replace ACCOUNT_ID in Lambda ARNs with your AWS Account ID`);
-    console.log(`   2. Grant API Gateway permission to invoke Lambda functions`);
-    console.log(`   3. Deploy the API: aws apigateway create-deployment --rest-api-id ${apiId} --stage-name prod`);
+    console.log(`   1. Ensure API Gateway has permission to invoke your Lambda functions.`);
+    console.log(`   2. Deploy the API after running this script: aws apigateway create-deployment --rest-api-id ${apiId} --stage-name prod`);
     console.log(`\n`);
 
   } catch (error) {

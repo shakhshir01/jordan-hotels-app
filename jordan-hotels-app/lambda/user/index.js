@@ -92,6 +92,27 @@ async function handler(event) {
       return await getUserBookings(userId, event);
     }
 
+    // GET /blog
+    if (path === '/blog' && method === 'GET') {
+      return {
+        statusCode: 200,
+        headers: defaultHeaders,
+        body: JSON.stringify([
+          {
+            id: "blog-welcome-visitjo",
+            title: "Welcome to VisitJo - Your Jordan Travel Companion",
+            slug: "welcome-to-visitjo",
+            excerpt: "Discover the best of Jordan with our comprehensive travel platform",
+            content: "Welcome to VisitJo, your ultimate guide to exploring the wonders of Jordan...",
+            author: "VisitJo Team",
+            publishedAt: new Date().toISOString(),
+            tags: ["welcome", "travel", "jordan"],
+            image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=1200",
+          }
+        ])
+      };
+    }
+
     return {
       statusCode: 404,
       headers: defaultHeaders,

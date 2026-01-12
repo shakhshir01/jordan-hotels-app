@@ -6,7 +6,7 @@ import { sanitizeHotelImageUrls, GENERIC_HOTEL_FALLBACK_IMAGES, getGenericHotelF
 // 1) runtime config (public/runtime-config.js) - works in Amplify without env vars
 // 2) Vite env var (works locally)
 // Avoid old API IDs that are known to be stale.
-const STALE_API_IDS = ["ny5ohksmc3", "g7itqnbol9", "b47h3h8tnb"];
+const STALE_API_IDS = ["ny5ohksmc3", "g7itqnbol9", "b47h3h8tnb", "4yj6ft3108"];
 
 const normalizeBaseUrl = (value) => String(value || "").trim().replace(/\/$/, "");
 
@@ -84,6 +84,11 @@ function getApiBaseUrl(path) {
   if (/^\/hotels/.test(path) || /^\/deals/.test(path) || /^\/destinations/.test(path) || /^\/experiences/.test(path) || /^\/search/.test(path)) {
     return PUBLIC_API_BASE_URL;
   }
+  
+  // If we have a valid public API URL, use it directly. 
+  // This avoids "ENOTFOUND" errors from the Vite proxy if the local .env is stale.
+  if (PUBLIC_API_BASE_URL) return PUBLIC_API_BASE_URL;
+
   // In local dev, force Vite proxy for user/profile endpoints to avoid CORS
   if (isLocalDevHost && (/^\/user/.test(path) || /^\/profile/.test(path) || /^\/bookings/.test(path) || /^\/uploads/.test(path) || /^\/payments/.test(path))) {
     return "/api";

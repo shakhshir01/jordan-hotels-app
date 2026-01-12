@@ -169,7 +169,7 @@ const getGeminiKey = () => {
   return import.meta.env.VITE_GEMINI_API_KEY;
 };
 
-async function callGemini(systemPrompt, history, message, apiKey, model = 'gemini-1.5-flash-latest') {
+async function callGemini(systemPrompt, history, message, apiKey, model = 'gemini-1.0-pro') {
   try {
     const contents = history
       .filter(m => m.text && m.text.trim()) // Filter empty messages
@@ -204,10 +204,10 @@ async function callGemini(systemPrompt, history, message, apiKey, model = 'gemin
       const errorText = await response.text();
       console.error(`Gemini API Error (${model}):`, response.status, errorText);
       
-      // Fallback to gemini-1.5-pro-latest if flash fails
+      // Fallback to gemini-1.5-pro-002 if flash fails
       if (response.status === 404 && model.includes('flash')) {
-        console.log("Falling back to gemini-1.5-pro-latest...");
-        return callGemini(systemPrompt, history, message, apiKey, 'gemini-1.5-pro-latest');
+        console.log("Falling back to gemini-1.0-pro...");
+        return callGemini(systemPrompt, history, message, apiKey, 'gemini-1.0-pro');
       }
       return null;
     }
