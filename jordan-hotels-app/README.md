@@ -58,6 +58,7 @@ src/
    VITE_COGNITO_USER_POOL_ID=your_pool_id_here
    VITE_COGNITO_CLIENT_ID=your_client_id_here
    VITE_API_GATEWAY_URL=your_api_gateway_url_here
+   VITE_GEMINI_API_KEY=your_gemini_api_key_here
    ```
 
    Use `.env.example` as a reference.
@@ -68,6 +69,21 @@ src/
    ```
 
    Open http://localhost:5173 in your browser.
+
+### 🤖 AI Chatbot - Nashmi
+
+This project includes an AI-powered chatbot named "Nashmi" to assist users with their travel planning. Nashmi is powered by Google's Gemini Pro model.
+
+To enable the chatbot, you must provide a Google Gemini API key in your environment variables.
+
+1.  **Get a Gemini API Key**: Visit [Google AI Studio](https://makersuite.google.com/app/apikey) to create an API key.
+2.  **Set the Environment Variable**: Add the API key to your `.env.local` file:
+
+    ```env
+    VITE_GEMINI_API_KEY=your_gemini_api_key_here
+    ```
+
+    The backend API will use this key to authenticate with the Gemini API.
 
 ### Available Scripts
 
@@ -239,4 +255,3 @@ MIT
 ## Contact
 
 For questions or support, please open an issue on the repository.
-

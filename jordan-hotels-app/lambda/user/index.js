@@ -26,6 +26,7 @@ const defaultHeaders = {
 const parseJwtClaims = (event) => {
   const auth = event?.headers?.authorization || event?.headers?.Authorization || '';
   const token = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length).trim() : '';
+  console.log('Auth header:', auth.substring(0, 50) + '...');
   const parts = token.split('.');
   if (parts.length < 2) return null;
   try {
@@ -33,7 +34,8 @@ const parseJwtClaims = (event) => {
     const padded = payload + '='.repeat((4 - (payload.length % 4)) % 4);
     const json = Buffer.from(padded, 'base64').toString('utf8');
     return JSON.parse(json);
-  } catch {
+  } catch (e) {
+    console.log('JWT parse error:', e.message);
     return null;
   }
 };
@@ -107,13 +109,18 @@ async function handler(event) {
 
 async function getUserProfile(userId, event) {
   try {
+    let result = null;
     if (USERS_TABLE) {
-      const result = await docClient.send(
-        new GetCommand({
-          TableName: USERS_TABLE,
-          Key: { userId },
-        })
-      );
+      try {
+        result = await docClient.send(
+          new GetCommand({
+            TableName: USERS_TABLE,
+            Key: { userId },
+          })
+        );
+      } catch (dbError) {
+        console.warn("Database error in getUserProfile (falling back to claims):", dbError.message);
+      }
 
       if (result && result.Item) {
         return {

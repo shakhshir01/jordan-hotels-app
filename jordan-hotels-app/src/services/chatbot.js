@@ -90,6 +90,12 @@ const JORDAN_KNOWLEDGE = {
     visa: "Visa on arrival for most nationalities",
     safety: "Very safe country, but stay aware in crowded areas",
     tipping: "10-15% at restaurants, small amounts for helpful service"
+  },
+
+  policies: {
+    cancellation: "Most hotels offer free cancellation up to 48 hours before check-in. Check specific hotel details for 'Non-Refundable' vs 'Flexible' rates.",
+    booking: "You need a valid credit card to secure your booking. Payment is processed securely via Stripe.",
+    checkin: "Standard check-in is 3:00 PM, check-out is 12:00 PM. Early check-in is subject to availability."
   }
 };
 
@@ -156,34 +162,59 @@ const extractDestination = (text) => {
   return null;
 };
 
-const getOpenAIKey = () => {
-  if (typeof window !== 'undefined' && window.__VISITJO_RUNTIME_CONFIG__ && window.__VISITJO_RUNTIME_CONFIG__.OPENAI_API_KEY) {
-    return window.__VISITJO_RUNTIME_CONFIG__.OPENAI_API_KEY;
+const getGeminiKey = () => {
+  if (typeof window !== 'undefined' && window.__VISITJO_RUNTIME_CONFIG__ && window.__VISITJO_RUNTIME_CONFIG__.VITE_GEMINI_API_KEY) {
+    return window.__VISITJO_RUNTIME_CONFIG__.VITE_GEMINI_API_KEY;
   }
-  return import.meta.env.VITE_OPENAI_API_KEY;
+  return import.meta.env.VITE_GEMINI_API_KEY;
 };
 
-async function callOpenAI(messages, apiKey) {
+async function callGemini(systemPrompt, history, message, apiKey, model = 'gemini-1.5-flash-latest') {
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const contents = history
+      .filter(m => m.text && m.text.trim()) // Filter empty messages
+      .map(m => ({
+        role: m.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: m.text }]
+      }));
+
+    contents.push({
+      role: 'user',
+      parts: [{ text: message }]
+    });
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 300
+        contents,
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 500
+        }
       })
     });
 
-    if (!response.ok) return null;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Gemini API Error (${model}):`, response.status, errorText);
+      
+      // Fallback to gemini-1.5-pro-latest if flash fails
+      if (response.status === 404 && model.includes('flash')) {
+        console.log("Falling back to gemini-1.5-pro-latest...");
+        return callGemini(systemPrompt, history, message, apiKey, 'gemini-1.5-pro-latest');
+      }
+      return null;
+    }
     const data = await response.json();
-    return data.choices?.[0]?.message?.content || null;
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
   } catch (error) {
-    console.error("AI Chat Error:", error);
+    console.error("Gemini Chat Error:", error);
     return null;
   }
 }
@@ -192,6 +223,8 @@ async function gatherContextData(message) {
   const data = {
     hotels: [],
     deals: [],
+    experiences: [],
+    blogPosts: [],
     destination: null,
     intent: 'chat'
   };
@@ -202,6 +235,7 @@ async function gatherContextData(message) {
   // Detect intent & fetch data
   const isBooking = fuzzyIncludes(message, 'hotel') || fuzzyIncludes(message, 'book') || fuzzyIncludes(message, 'stay') || fuzzyIncludes(message, 'room');
   const isDeal = fuzzyIncludes(message, 'deal') || fuzzyIncludes(message, 'offer') || fuzzyIncludes(message, 'price') || fuzzyIncludes(message, 'cheap');
+  const isExperience = fuzzyIncludes(message, 'tour') || fuzzyIncludes(message, 'activity') || fuzzyIncludes(message, 'experience') || fuzzyIncludes(message, 'guide');
 
   if (isBooking || data.destination) {
     data.intent = 'booking';
@@ -228,12 +262,31 @@ async function gatherContextData(message) {
     } catch (e) { console.error("Error fetching deals for chat:", e); }
   }
 
+  // Always fetch experiences and blogs to provide rich context/insights
+  try {
+    const allExperiences = await hotelAPI.getExperiences();
+    if (data.destination) {
+      data.experiences = allExperiences.filter(e => 
+        fuzzyIncludes(e.title, data.destination) || fuzzyIncludes(e.description, data.destination)
+      ).slice(0, 3);
+    } else if (isExperience) {
+      data.experiences = allExperiences.slice(0, 3);
+    }
+  } catch (e) { console.error("Error fetching experiences for chat:", e); }
+
+  try {
+    // Fetch blog posts for "insights" and "trends"
+    const blogs = await hotelAPI.getBlogPosts();
+    const blogArray = Array.isArray(blogs) ? blogs : [];
+    data.blogPosts = blogArray.slice(0, 2);
+  } catch (e) { console.error("Error fetching blogs for chat:", e); }
+
   return data;
 }
 
 export const generateChatResponse = async (message, history = [], userProfile = {}) => {
   const userName = userProfile?.displayName || userProfile?.name || 'Friend';
-  const apiKey = getOpenAIKey();
+  const apiKey = getGeminiKey();
   const contextData = await gatherContextData(message);
   
   let responseText = '';
@@ -263,8 +316,11 @@ ${JSON.stringify(JORDAN_KNOWLEDGE)}
 ${JSON.stringify({
   detected_intent: contextData.intent,
   detected_destination: contextData.destination,
-  hotels: contextData.hotels.map(h => ({ name: h.name, location: h.location, price: h.price, rating: h.rating })),
-  deals: contextData.deals.map(d => ({ title: d.title, description: d.description }))
+  hotels: contextData.hotels.map(h => ({ name: h.name, location: h.location, price: h.price, rating: h.rating, id: h.id })),
+  deals: contextData.deals.map(d => ({ title: d.title, description: d.description, price: d.price })),
+  experiences: contextData.experiences.map(e => ({ title: e.title, price: e.price, duration: e.duration, id: e.id })),
+  insights_and_blogs: contextData.blogPosts.map(b => ({ title: b.title, excerpt: b.excerpt, image: b.image })),
+  user_profile: userProfile
 })}
 \`\`\`
 
@@ -273,7 +329,7 @@ ${JSON.stringify({
 2.  **Use your persona:** Be witty and charming. Make jokes.
 3.  **Answer questions:** Use the KNOWLEDGE_BASE to answer questions about Jordan.
 4.  **Handle requests for hotels/deals:**
-    - If \`CONTEXT_DATA.hotels\` is NOT empty, it means I found relevant hotels. Mention them enthusiastically. Tell the user you have found some options for them.
+    - If \`CONTEXT_DATA.hotels\` is NOT empty, it means I found relevant hotels. Mention them enthusiastically. Tell the user you have found some options for them. You can mention specific hotel names.
     - If \`CONTEXT_DATA.hotels\` IS empty but the user is asking for hotels, tell them you couldn't find anything for that specific request but you can search for hotels in major cities. Suggest some cities (e.g., "I couldn't find hotels in that specific area. Would you like to see options in Amman or Aqaba?").
     - Do the same for deals.
 5.  **Be concise:** Keep your answers engaging and to the point (usually 2-3 sentences).
@@ -281,13 +337,7 @@ ${JSON.stringify({
 7.  **Be conversational:** Ask follow-up questions to keep the conversation going.
 `;
     
-    const messages = [
-      { role: "system", content: systemPrompt },
-      ...history.map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text })),
-      { role: "user", content: message }
-    ];
-    
-    const aiText = await callOpenAI(messages, apiKey);
+    const aiText = await callGemini(systemPrompt, history, message, apiKey);
     if (aiText) {
       responseText = aiText;
     }
@@ -304,7 +354,10 @@ ${JSON.stringify({
     hotels: contextData.hotels || [],
     offers: contextData.deals || [],
     // Only show images if we found specific hotels, otherwise keep chat clean
-    images: contextData.hotels.length > 0 ? contextData.hotels.map(h => ({ url: h.image, alt: h.name })).filter(i => i.url) : [],
+    images: [
+      ...(contextData.hotels.length > 0 ? contextData.hotels.map(h => ({ url: h.image, alt: h.name })) : []),
+      ...(contextData.blogPosts.map(b => ({ url: b.image, alt: b.title })))
+    ].filter(i => i.url),
     suggestions: getSmartSuggestions(contextData.hotels.map(h => h.id))
   };
 };

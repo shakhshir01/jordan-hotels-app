@@ -4,7 +4,7 @@ Description: VisitJo SAM template — API, Lambdas, DynamoDB, S3, Secrets Manage
 
 Globals:
   Function:
-    Runtime: nodejs22.x
+    Runtime: nodejs20.x
     Timeout: 10
     MemorySize: 512
     Environment:

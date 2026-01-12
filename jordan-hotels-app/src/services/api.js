@@ -849,8 +849,8 @@ export const hotelAPI = {
       const res = await apiClient.get("/blog");
       return normalizeLambdaResponse(res.data) || mockBlogPosts;
     } catch (error) {
-      if (lastAuthError) return mockBlogPosts;
-      throw error;
+      console.warn("Failed to fetch blog posts, using mock data:", error.message);
+      return mockBlogPosts;
     }
   },
 };
