@@ -591,6 +591,12 @@ Resources:
             Path: /auth/email-mfa/request
             Method: POST
             RestApiId: !Ref Api
+        ApiAuthEmailMfaVerifyLogin:
+          Type: Api
+          Properties:
+            Path: /auth/email-mfa/verify-login
+            Method: POST
+            RestApiId: !Ref Api
         ApiUserMfaDisable:
           Type: Api
           Properties:

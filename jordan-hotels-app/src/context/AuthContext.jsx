@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [mfaChallenge, setMfaChallenge] = useState(null);
   const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [mfaMethod, setMfaMethod] = useState(null);
   const [pendingSecondaryEmail, setPendingSecondaryEmail] = useState(null);
   const cognitoUserRef = React.useRef(null);
 
@@ -51,6 +52,7 @@ export const AuthProvider = ({ children }) => {
       }
       const cognitoUser = UserPool.getCurrentUser();
       if (cognitoUser) {
+        cognitoUserRef.current = cognitoUser; // Set the ref for MFA operations
         cognitoUser.getSession((err, session) => {
           if (err) {
             setError(err.message);
@@ -65,12 +67,65 @@ export const AuthProvider = ({ children }) => {
                 const emailAttr = attributes?.find(attr => attr.Name === 'email');
                 const email = emailAttr?.Value || cognitoUser.getUsername();
                     setUserAndProfileFromEmail(email);
-                    try {
-                      const stored = localStorage.getItem(`visitjo.mfaEnabled.${email}`);
-                      if (stored === '1') setMfaEnabled(true);
-                    } catch (_e) {
-                      console.warn('Failed reading stored MFA flag', _e);
-                    }
+                    
+                    // Load MFA status from database and localStorage
+                    (async () => {
+                      try {
+                        // First check localStorage for immediate UI update
+                        const stored = localStorage.getItem(`visitjo.mfaEnabled.${email}`);
+                        if (stored === '1') {
+                          setMfaEnabled(true);
+                          setMfaMethod('TOTP'); // Assume TOTP if we don't know
+                        }
+                        
+                        // Then check database for authoritative status
+                        const profile = await hotelAPI.getUserProfile();
+                        if (profile?.mfaEnabled) {
+                          setMfaEnabled(true);
+                          setMfaMethod(profile.mfaMethod || 'TOTP');
+                          // Update localStorage to match database
+                          localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+
+                          // Require MFA verification on session restoration
+                          setUserAndProfileFromEmail(email);
+                          try {
+                            const idToken = session.getIdToken().getJwtToken();
+                            setAuthToken(idToken);
+                          } catch (e) {
+                            console.warn('Failed to set auth token from session', e);
+                          }
+
+                          // Set MFA challenge based on method
+                          if (profile.mfaMethod === 'EMAIL') {
+                            setMfaChallenge({ type: 'CUSTOM_CHALLENGE' });
+                          } else if (profile.mfaMethod === 'TOTP') {
+                            setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA' });
+                          } else {
+                            // Default to TOTP if method not specified
+                            setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA' });
+                          }
+
+                          // Don't set loading to false yet - let MFA modal handle completion
+                          return;
+                        } else if (stored === '1' && !profile?.mfaEnabled) {
+                          // Database says disabled, update localStorage
+                          localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
+                          setMfaEnabled(false);
+                          setMfaMethod(null);
+                        }
+                      } catch (_e) {
+                        console.warn('Failed reading MFA status', _e);
+                        // Fallback to localStorage only
+                        const stored = localStorage.getItem(`visitjo.mfaEnabled.${email}`);
+                        if (stored === '1') {
+                          setMfaEnabled(true);
+                          setMfaMethod('TOTP'); // Assume TOTP if we don't know
+                        } else {
+                          setMfaEnabled(false);
+                          setMfaMethod(null);
+                        }
+                      }
+                    })();
               }
               try {
                 const idToken = session.getIdToken().getJwtToken();
@@ -145,18 +200,61 @@ export const AuthProvider = ({ children }) => {
       console.error = () => {}; // Suppress errors
 
       cognitoUser.authenticateUser(authDetails, {
-        onSuccess: (session) => {
+        onSuccess: async (session) => {
           console.error = originalConsoleError; // Restore
-          setUserAndProfileFromEmail(email);
+          
+          // Load user profile to check MFA status
+          let profile = null;
           try {
-            const idToken = session.getIdToken().getJwtToken();
-            setAuthToken(idToken);
-          } catch (e) {
-            console.warn('Failed to set auth token on login', e);
+            profile = await hotelAPI.getUserProfile();
+          } catch (_e) {
+            console.warn('Failed to load profile on login', _e);
           }
-          setError(null);
-          showSuccess(`Welcome back, ${email}!`);
-          resolve({ success: true });
+          
+          const mfaEnabled = profile?.mfaEnabled;
+          const mfaMethod = profile?.mfaMethod;
+          
+          if (mfaEnabled) {
+            // MFA is enabled, require challenge
+            setUserAndProfileFromEmail(email);
+            try {
+              const idToken = session.getIdToken().getJwtToken();
+              setAuthToken(idToken);
+            } catch (e) {
+              console.warn('Failed to set auth token on login', e);
+            }
+            
+            // Set MFA challenge based on method
+            if (mfaMethod === 'EMAIL') {
+              setMfaChallenge({ type: 'CUSTOM_CHALLENGE' });
+            } else if (mfaMethod === 'TOTP') {
+              setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA' });
+            } else {
+              // Default to TOTP if method not specified
+              setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA' });
+            }
+            
+            setMfaEnabled(true);
+            setMfaMethod(mfaMethod || 'TOTP');
+            localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+            resolve({ mfaRequired: true });
+          } else {
+            // No MFA, complete login
+            setUserAndProfileFromEmail(email);
+            try {
+              const idToken = session.getIdToken().getJwtToken();
+              setAuthToken(idToken);
+            } catch (e) {
+              console.warn('Failed to set auth token on login', e);
+            }
+            
+            setMfaEnabled(false);
+            setMfaMethod(null);
+            localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
+            setError(null);
+            showSuccess(`Welcome back, ${email}!`);
+            resolve({ success: true });
+          }
         },
         onFailure: (err) => {
           console.error = originalConsoleError; // Restore
@@ -199,13 +297,16 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const logout = () => {
-    if (UserPool) {
-      const cognitoUser = UserPool.getCurrentUser();
-      if (cognitoUser) {
-        cognitoUser.signOut();
+  const performLogout = () => {
+    try {
+      if (UserPool) {
+        const cognitoUser = UserPool.getCurrentUser();
+        if (cognitoUser) cognitoUser.signOut();
       }
+    } catch (e) {
+      console.warn('Error during Cognito signOut', e);
     }
+
     setUser(null);
     setUserProfile(null);
     setAuthToken(null);
@@ -213,8 +314,34 @@ export const AuthProvider = ({ children }) => {
     try {
       const email = cognitoUserRef.current?.getUsername?.() || null;
       if (email) localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
-    } catch (_e) { console.warn('Ignored during logout cleanup', _e); }
+    } catch (_e) {
+      console.warn('Ignored during logout cleanup', _e);
+    }
+    cognitoUserRef.current = null;
     showSuccess('Logged out successfully');
+  };
+
+  // Logout entrypoint: if MFA is enabled, trigger a verification flow instead
+  // of immediately signing the user out. Returns an object when MFA is required.
+  const logout = async () => {
+    if (mfaEnabled) {
+      // Kick off the appropriate verification flow
+      if (mfaMethod === 'EMAIL') {
+        try {
+          await hotelAPI.requestEmailMfaChallenge();
+        } catch (e) {
+          console.warn('Failed to request email MFA challenge before logout', e);
+        }
+        setMfaChallenge({ type: 'EMAIL_LOGIN_CHALLENGE', pendingLogout: true });
+      } else {
+        // TOTP or other software token. Ask UI to show TOTP prompt.
+        setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA', pendingLogout: true });
+      }
+      return { mfaRequired: true };
+    }
+
+    performLogout();
+    return { success: true };
   };
 
   const completeMfa = (session) => {
@@ -231,6 +358,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     showSuccess(`Welcome back!`);
     clearMfaChallenge();
+    setLoading(false); // Complete loading when MFA is verified
   };
 
   const clearMfaChallenge = () => {
@@ -257,12 +385,24 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
           } catch (_e) { console.warn('Ignored during login token set', _e); }
           setMfaEnabled(true);
+          setMfaMethod('TOTP');
           // persist server-side if possible
           try {
             hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' }).catch(() => {});
           } catch (_e) { console.warn('Ignored during session refresh', _e); }
           clearMfaChallenge();
           showSuccess('MFA verified');
+          // If this MFA verification was requested as part of a logout flow,
+          // complete the logout after verification.
+          if (mfaChallenge?.pendingLogout) {
+            try {
+              clearMfaChallenge();
+              performLogout();
+            } catch (_e) { console.warn('performLogout failed after MFA', _e); }
+            resolve({ loggedOut: true });
+            return;
+          }
+
           resolve(session);
         },
         onFailure: (err) => {
@@ -287,12 +427,15 @@ export const AuthProvider = ({ children }) => {
         }
 
         const proceedWithAssociate = () => {
+          console.log('Starting TOTP association...');
           cognitoUser.associateSoftwareToken({
             associateSecretCode: (secretCode) => {
+              console.log('TOTP secret received:', secretCode);
               setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
               resolve(secretCode);
             },
             onFailure: (e) => {
+              console.error('TOTP association failed:', e);
               setError(e.message || String(e));
               reject(e);
             },
@@ -337,25 +480,45 @@ export const AuthProvider = ({ children }) => {
 
   const verifyTotp = (userCode, friendlyName = 'My device') => {
     const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
+    console.log('verifyTotp called with userCode:', userCode, 'cognitoUser:', cognitoUser);
     if (!cognitoUser) return Promise.reject(new Error('No active user to verify TOTP'));
     return new Promise((resolve, reject) => {
       cognitoUser.verifySoftwareToken(userCode, friendlyName, {
-        onSuccess: (res) => {
+        onSuccess: async (res) => {
+          console.log('TOTP verification successful');
           showSuccess('Two-factor authentication enabled');
           try {
             const email = cognitoUser.getUsername();
             localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
           } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
           setMfaEnabled(true);
-          // persist server-side (best-effort)
+          setMfaMethod('TOTP');
+          // persist server-side
           try {
-            hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' }).catch(() => {});
-          } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
+            await hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' });
+            console.log('MFA status saved to database');
+          } catch (e) {
+            console.error('Failed to save MFA status to database:', e);
+            // Don't fail the TOTP setup if database save fails
+            showError('2FA enabled but failed to save status. Please try again.');
+          }
           clearMfaChallenge();
           resolve(res);
         },
         onFailure: (err) => {
-          setError(err.message || String(err));
+          console.error('TOTP verification failed:', err);
+          let userFriendlyMessage = 'Failed to verify TOTP code';
+
+          // Provide specific guidance for common errors
+          if (err.code === 'EnableSoftwareTokenMFAException' || err.message?.includes('Code mismatch')) {
+            userFriendlyMessage = 'Code mismatch. Please check that:\n• Your device time is correct\n• You entered the code correctly\n• You scanned the QR code properly\n• Try generating a new code if the previous one expired';
+          } else if (err.message?.includes('InvalidParameterException')) {
+            userFriendlyMessage = 'Invalid code format. Please enter a 6-digit number.';
+          } else if (err.message?.includes('NotAuthorizedException')) {
+            userFriendlyMessage = 'Session expired. Please sign in again to setup 2FA.';
+          }
+
+          setError(userFriendlyMessage);
           reject(err);
         },
       });
@@ -395,10 +558,15 @@ export const AuthProvider = ({ children }) => {
         if (email) localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
       } catch (_e) { console.warn('Ignored while persisting local MFA flag', _e); }
       setMfaEnabled(true);
+      setMfaMethod('EMAIL');
       // persist server-side profile with method and secondary email
       try {
         await hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'EMAIL', mfaSecondaryEmail: pendingSecondaryEmail });
-      } catch (_e) { console.warn('Ignored while persisting MFA profile', _e); }
+        console.log('Email MFA status saved to database');
+      } catch (e) {
+        console.error('Failed to save email MFA status to database:', e);
+        showError('Email MFA enabled but failed to save status. Please try again.');
+      }
       showSuccess('Email MFA enabled');
       return res;
     } catch (e) {
@@ -410,16 +578,68 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const verifyLoginEmailMfa = async (code) => {
+    try {
+      const res = await hotelAPI.verifyLoginEmailMfa(code);
+      showSuccess('Login verified');
+      // If this was a logout-initiated verification, perform logout now
+      if (mfaChallenge?.pendingLogout) {
+        try {
+          clearMfaChallenge();
+          performLogout();
+        } catch (_e) { console.warn('performLogout failed after email login verification', _e); }
+        return { loggedOut: true };
+      }
+      return res;
+    } catch (e) {
+      setError(e?.message || String(e));
+      showError(e?.message || 'Failed to verify login code');
+      throw e;
+    }
+  };
+
+  const requestEmailMfaChallenge = async () => {
+    try {
+      return await hotelAPI.requestEmailMfaChallenge();
+    } catch (e) {
+      setError(e?.message || String(e));
+      throw e;
+    }
+  };
+
   const disableMfa = async () => {
     try {
+      const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
+      if (!cognitoUser) {
+        throw new Error('No active user session to disable MFA');
+      }
+
+      // First disable MFA in Cognito
+      await new Promise((resolve, reject) => {
+        cognitoUser.setUserMfaPreference(null, null, (err, result) => {
+          if (err) {
+            console.error('Failed to disable MFA in Cognito:', err);
+            reject(new Error('Failed to disable MFA in Cognito: ' + err.message));
+          } else {
+            console.log('MFA disabled in Cognito successfully');
+            resolve(result);
+          }
+        });
+      });
+
+      // Then update the database
       await hotelAPI.disableMfa();
-      const email = cognitoUserRef.current?.getUsername?.() || user?.email;
+
+      // Update local state
+      const email = cognitoUser.getUsername?.() || user?.email;
       if (email) {
         localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
       }
       setMfaEnabled(false);
+      setMfaMethod(null);
       showSuccess('MFA disabled');
     } catch (e) {
+      console.error('disableMfa error:', e);
       showError(e?.message || 'Failed to disable MFA');
       throw e;
     }
@@ -547,8 +767,11 @@ export const AuthProvider = ({ children }) => {
     completeMfa,
     openEmailSetup,
     mfaEnabled,
+    mfaMethod,
     setupEmailMfa,
     verifyEmailMfa,
+    requestEmailMfaChallenge,
+    verifyLoginEmailMfa,
     disableMfa,
     cognitoUserRef,
     isAuthenticated: !!user,

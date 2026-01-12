@@ -5,7 +5,7 @@ import { showError, showSuccess } from '../services/toastService';
 import QRCode from 'qrcode';
 
 export default function MfaModal() {
-  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupEmailMfa, verifyEmailMfa } = useAuth();
+  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode } = useAuth();
   const { t } = useTranslation();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,6 +17,7 @@ export default function MfaModal() {
   // When Cognito returns a secret for TOTP setup, render QR code
   useEffect(() => {
     let mounted = true;
+    console.log('MfaModal useEffect triggered, challenge:', mfaChallenge);
     if (mfaChallenge?.type === 'MFA_SETUP_TOTP' && mfaChallenge.secretCode) {
       const secretCode = mfaChallenge.secretCode;
       setSecret(secretCode);
@@ -24,9 +25,13 @@ export default function MfaModal() {
       const label = encodeURIComponent(`${username}`);
       const issuer = encodeURIComponent('VisitJo');
       const otpauth = `otpauth://totp/${label}?secret=${secretCode}&issuer=${issuer}`;
+      console.log('Generating QR code for:', otpauth);
       QRCode.toDataURL(otpauth)
         .then((url) => {
-          if (mounted) setQrDataUrl(url);
+          if (mounted) {
+            console.log('QR code generated successfully');
+            setQrDataUrl(url);
+          }
         })
         .catch((err) => {
           console.error('Failed to generate QR code', err);
@@ -36,7 +41,31 @@ export default function MfaModal() {
     return () => { mounted = false; };
   }, [mfaChallenge, cognitoUserRef]);
 
-  if (!mfaChallenge) return null;
+  // When CUSTOM_CHALLENGE is set, request email MFA code
+  useEffect(() => {
+    if (mfaChallenge?.type === 'CUSTOM_CHALLENGE') {
+      console.log('Requesting email MFA code for login');
+      setLoading(true);
+      requestEmailMfaChallenge()
+        .then(() => {
+          showSuccess('Verification code sent to your email');
+        })
+        .catch((err) => {
+          showError('Failed to send verification code');
+          console.error('Failed to request email MFA', err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [mfaChallenge]);
+
+  if (!mfaChallenge) {
+    console.log('MfaModal: No challenge, not rendering');
+    return null;
+  }
+
+  console.log('MfaModal: Rendering with challenge:', mfaChallenge);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,23 +73,39 @@ export default function MfaModal() {
 
     setLoading(true);
     try {
-      const cognitoUser = cognitoUserRef.current;
-      if (!cognitoUser) {
-        throw new Error('No user session');
-      }
-
-      // Send MFA code
-      cognitoUser.sendMFACode(code, {
-        onSuccess: (session) => {
-          // MFA successful, complete login
-          completeMfa(session);
+      if (mfaChallenge.type === 'CUSTOM_CHALLENGE') {
+        // Email MFA verification (could be login or logout verification)
+        const res = await verifyLoginEmailMfa(code);
+        // If verifyLoginEmailMfa performed logout, stop here
+        if (res && res.loggedOut) {
+          clearMfaChallenge();
           setCode('');
-        },
-        onFailure: (err) => {
+          return;
+        }
+        // Login completed via backend
+        clearMfaChallenge();
+        setCode('');
+        showSuccess('Login successful!');
+      } else {
+        // TOTP or other Cognito MFA: use submitMfaCode wrapper to honor pendingLogout
+        try {
+          const result = await submitMfaCode(code);
+          if (result && result.loggedOut) {
+            // logout already performed by context
+            clearMfaChallenge();
+            setCode('');
+            return;
+          }
+          // If result is a Cognito session, finalize login
+          if (result && result.getIdToken) {
+            completeMfa(result);
+          }
+          setCode('');
+        } catch (err) {
           showError('Invalid MFA code');
           setCode('');
         }
-      });
+      }
     } catch (err) {
       showError('MFA verification failed');
       setCode('');
@@ -71,7 +116,7 @@ export default function MfaModal() {
 
   const handleVerifyTotp = async (e) => {
     e?.preventDefault();
-    if (!code || code.length < 6) return showError('Enter the 6-digit code');
+    if (!code || !/^\d{6}$/.test(code)) return showError('Enter a valid 6-digit code from your authenticator app');
     setLoading(true);
     try {
       await verifyTotp(code);
@@ -79,6 +124,19 @@ export default function MfaModal() {
       showSuccess('TOTP enabled');
     } catch (err) {
       showError(err?.message || 'Failed to verify TOTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegenerateTotp = async () => {
+    setLoading(true);
+    try {
+      await setupTotp();
+      setCode('');
+      showSuccess('New QR code generated');
+    } catch (err) {
+      showError(err?.message || 'Failed to regenerate QR code');
     } finally {
       setLoading(false);
     }
@@ -122,6 +180,8 @@ export default function MfaModal() {
         return t('mfa.totpTitle', 'Enter TOTP Code');
       case 'SMS_MFA':
         return t('mfa.smsTitle', 'Enter SMS Code');
+      case 'CUSTOM_CHALLENGE':
+        return t('mfa.emailTitle', 'Enter Email Code');
       case 'MFA_SETUP_TOTP':
         return t('mfa.setupTotpTitle', 'Setup Authenticator App');
       case 'EMAIL_SETUP':
@@ -137,6 +197,8 @@ export default function MfaModal() {
         return t('mfa.totpDescription', 'Enter the 6-digit code from your authenticator app');
       case 'SMS_MFA':
         return t('mfa.smsDescription', 'Enter the 6-digit code sent to your phone');
+      case 'CUSTOM_CHALLENGE':
+        return t('mfa.emailDescription', 'Enter the 6-digit code sent to your email');
       case 'MFA_SETUP_TOTP':
         return t('mfa.setupTotpDescription', 'Scan the QR code or enter the secret into your authenticator app, then verify the generated code');
       case 'EMAIL_SETUP':
@@ -202,6 +264,14 @@ export default function MfaModal() {
                 disabled={loading}
               >
                 Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleRegenerateTotp}
+                className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:opacity-50"
+                disabled={loading}
+              >
+                {loading ? 'Generating...' : 'New QR Code'}
               </button>
               <button
                 type="submit"

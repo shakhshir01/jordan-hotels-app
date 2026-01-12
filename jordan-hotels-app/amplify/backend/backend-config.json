@@ -9,7 +9,7 @@
     "jordanhotelsapp": {
       "dependsOn": [],
       "frontendAuthConfig": {
-        "mfaTypes": [],
+        "mfaTypes": ["TOTP", "SMS"],
         "passwordProtectionSettings": {
           "passwordPolicyCharacters": []
         },

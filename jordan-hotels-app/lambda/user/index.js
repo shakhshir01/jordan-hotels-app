@@ -82,6 +82,11 @@ async function handler(event) {
       return await requestEmailMfaChallenge(userId, event);
     }
 
+    // POST /auth/email-mfa/verify-login
+    if (path === '/auth/email-mfa/verify-login' && method === 'POST') {
+      return await verifyLoginEmailMfa(userId, event);
+    }
+
     // POST /user/mfa/disable
     if (path === '/user/mfa/disable' && method === 'POST') {
       return await disableMfa(userId, event);
@@ -203,33 +208,56 @@ async function getUserProfile(userId, event) {
 async function updateUserProfile(userId, event) {
   try {
     const body = event.body ? JSON.parse(event.body) : {};
+    const bodyFirst = body.firstName || body.given_name || '';
+    const bodyLast = body.lastName || body.family_name || '';
+    const bodyEmail = body.email;
+    const bodyPhone = body.phone;
 
-    const firstName = body.firstName || body.given_name || body.name?.split(' ')[0] || 'Guest';
-    const lastName = body.lastName || body.family_name || body.name?.split(' ').slice(1).join(' ') || '';
-    const email = body.email || '';
-    const phone = body.phone || '';
+    // Fetch existing item so we can merge instead of overwrite
+    let existing = {};
+    if (USERS_TABLE) {
+      try {
+        const got = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+        existing = got?.Item || { userId };
+      } catch (getErr) {
+        console.warn('Failed to read existing user item before update:', getErr.message || getErr);
+        existing = { userId };
+      }
+    }
 
-    const item = {
+    const merged = {
       userId,
-      firstName,
-      lastName,
-      name: `${firstName} ${lastName}`.trim(),
-      email,
-      phone,
-      location: body.location || '',
-      joinedDate: body.joinedDate || '',
-      membershipTier: body.membershipTier || '',
-      // preserve MFA fields if provided
-      mfaEnabled: body.mfaEnabled === undefined ? (body.mfaEnabled) : body.mfaEnabled,
-      mfaMethod: body.mfaMethod || undefined,
-      mfaSecondaryEmail: body.mfaSecondaryEmail || undefined,
+      // prefer provided body values, fall back to existing or derived
+      firstName: bodyFirst !== undefined && bodyFirst !== '' ? bodyFirst : (existing.firstName || ''),
+      lastName: bodyLast !== undefined && bodyLast !== '' ? bodyLast : (existing.lastName || ''),
+      name: ((bodyFirst || existing.firstName || '') + ' ' + (bodyLast || existing.lastName || '')).trim() || existing.name || '',
+      email: bodyEmail !== undefined ? bodyEmail : existing.email || '',
+      phone: bodyPhone !== undefined ? bodyPhone : existing.phone || '',
+      location: body.location !== undefined ? body.location : existing.location || '',
+      joinedDate: body.joinedDate !== undefined ? body.joinedDate : existing.joinedDate || '',
+      membershipTier: body.membershipTier !== undefined ? body.membershipTier : existing.membershipTier || '',
+      // Preserve MFA-related fields unless explicitly provided in the body
+      mfaEnabled: body.mfaEnabled !== undefined ? body.mfaEnabled : existing.mfaEnabled || false,
+      mfaMethod: body.mfaMethod !== undefined ? body.mfaMethod : existing.mfaMethod || null,
+      mfaSecondaryEmail: body.mfaSecondaryEmail !== undefined ? body.mfaSecondaryEmail : existing.mfaSecondaryEmail || null,
+      // Preserve any pending/challenge fields if they exist and are not part of the patch
+      mfaPendingEmail: body.mfaPendingEmail !== undefined ? body.mfaPendingEmail : existing.mfaPendingEmail || null,
+      mfaPendingCode: body.mfaPendingCode !== undefined ? body.mfaPendingCode : existing.mfaPendingCode || null,
+      mfaPendingExpires: body.mfaPendingExpires !== undefined ? body.mfaPendingExpires : existing.mfaPendingExpires || null,
+      mfaChallengeCode: body.mfaChallengeCode !== undefined ? body.mfaChallengeCode : existing.mfaChallengeCode || null,
+      mfaChallengeExpires: body.mfaChallengeExpires !== undefined ? body.mfaChallengeExpires : existing.mfaChallengeExpires || null,
     };
+
+    // Remove explicit nulls for cleaner storage (optional)
+    Object.keys(merged).forEach((k) => {
+      if (merged[k] === null) delete merged[k];
+    });
 
     if (USERS_TABLE) {
       await docClient.send(
         new PutCommand({
           TableName: USERS_TABLE,
-          Item: item,
+          Item: merged,
         })
       );
     }
@@ -237,7 +265,7 @@ async function updateUserProfile(userId, event) {
     return {
       statusCode: 200,
       headers: defaultHeaders,
-      body: JSON.stringify(item),
+      body: JSON.stringify(merged),
     };
   } catch (error) {
     console.error("Error updating user profile:", error);
@@ -429,16 +457,65 @@ async function requestEmailMfaChallenge(userId, event) {
   }
 }
 
+async function verifyLoginEmailMfa(userId, event) {
+  try {
+    const body = event.body ? JSON.parse(event.body) : {};
+    const code = String(body.code || body.token || '').trim();
+    if (!code) return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'code required' }) };
+
+    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
+
+    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+    const item = result?.Item || {};
+    const challengeCode = String(item.mfaChallengeCode || '');
+    const expires = Number(item.mfaChallengeExpires || 0);
+
+    if (!challengeCode || Date.now() > expires) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'No valid challenge code' }) };
+    }
+
+    if (challengeCode !== code) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Invalid code' }) };
+    }
+
+    // Clear the challenge codes
+    delete item.mfaChallengeCode;
+    delete item.mfaChallengeExpires;
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
+
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ verified: true }) };
+  } catch (error) {
+    console.error('verifyLoginEmailMfa error', error);
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to verify code' }) };
+  }
+}
+
 async function disableMfa(userId, event) {
   try {
     if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
+
     const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
     const item = result?.Item || {};
-    item.mfaEnabled = false;
-    delete item.mfaMethod;
-    delete item.mfaSecondaryEmail;
-    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
-    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ success: true }) };
+
+    // Disable MFA and clear related fields
+    const updated = {
+      ...item,
+      mfaEnabled: false,
+      mfaMethod: null,
+      mfaSecondaryEmail: null,
+      // Clear any pending MFA setup fields
+      mfaPendingEmail: null,
+      mfaPendingCode: null,
+      mfaPendingExpires: null,
+      mfaMethodPending: null,
+      // Clear any challenge fields
+      mfaChallengeCode: null,
+      mfaChallengeExpires: null,
+    };
+
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
+
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ disabled: true }) };
   } catch (error) {
     console.error('disableMfa error', error);
     return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to disable MFA' }) };

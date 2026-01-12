@@ -71,7 +71,7 @@ const normalizeBooking = (booking, index = 0) => {
 };
 
 const Profile = () => {
-  const { user, userProfile, updateUserProfileName, logout, setupTotp, mfaEnabled, openEmailSetup } = useAuth();
+  const { user, userProfile, updateUserProfileName, logout, setupTotp, mfaEnabled, openEmailSetup, disableMfa, mfaMethod } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -125,14 +125,6 @@ const Profile = () => {
         phone,
       });
 
-      // If backend profile provides an explicit name, sync it to the auth profile
-      // so the navbar shows "FirstName LastName". If the backend provides no name,
-      // keep the email-derived fallback behavior.
-      const apiHasName = Boolean(apiProfile?.firstName || apiProfile?.lastName || apiProfile?.name);
-      if (apiHasName && !(userProfile?.hasCustomName)) {
-        updateUserProfileName?.({ firstName, lastName });
-      }
-
       const userBookings = await hotelAPI.getUserBookings();
       const normalized = Array.isArray(userBookings)
         ? userBookings.map((b, index) => normalizeBooking(b, index)).filter(Boolean)
@@ -144,7 +136,7 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  }, [updateUserProfileName, user, userProfile?.hasCustomName, userProfile?.firstName, userProfile?.lastName]);
+  }, [user]);
 
   useEffect(() => {
     if (!user) {
@@ -152,7 +144,14 @@ const Profile = () => {
       return;
     }
     loadUserProfile();
-  }, [user, navigate, loadUserProfile]);
+  }, [user, navigate]);
+
+  // Reload profile when MFA status changes
+  useEffect(() => {
+    if (user) {
+      loadUserProfile();
+    }
+  }, [mfaEnabled, user]);
 
   const handleUpdateProfile = async () => {
     try {
@@ -180,9 +179,18 @@ const Profile = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      const res = await logout();
+      // If MFA was required, the MFA modal will be shown by global state.
+      if (!res?.mfaRequired) {
+        navigate('/');
+      }
+    } catch (e) {
+      console.error('Logout error:', e);
+      // Fallback to immediate navigation after attempt
+      navigate('/');
+    }
   };
 
   const handleCancelBooking = async (bookingId) => {
@@ -202,9 +210,13 @@ const Profile = () => {
   function Enable2FaChooser({ setupTotp }) {
     const [loading, setLoading] = React.useState(false);
     const startTotp = async () => {
+      console.log('Starting TOTP setup from Profile...');
       try {
         setLoading(true);
         await setupTotp();
+        console.log('TOTP setup completed successfully');
+        // Reload profile to get updated MFA status
+        await loadUserProfile();
         showSuccess('Follow the modal instructions to finish setting up your authenticator app.');
       } catch (err) {
         console.error('TOTP setup error', err);
@@ -288,9 +300,28 @@ const Profile = () => {
                     </button>
 
                     {mfaEnabled ? (
-                      <div className="flex items-center gap-2 px-4 py-2 border border-green-200 bg-green-50 text-green-800 rounded-lg">
-                        <Check size={16} />
-                        Enabled
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 px-4 py-2 border border-green-200 bg-green-50 text-green-800 rounded-lg">
+                          <Check size={16} />
+                          Enabled {mfaMethod && `(${mfaMethod})`}
+                        </div>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
+                              try {
+                                await disableMfa();
+                                // Reload profile to ensure UI is updated
+                                await loadUserProfile();
+                                showSuccess('Two-factor authentication disabled');
+                              } catch (error) {
+                                showError('Failed to disable MFA');
+                              }
+                            }
+                          }}
+                          className="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                        >
+                          Disable
+                        </button>
                       </div>
                     ) : (
                       <Enable2FaChooser setupTotp={setupTotp} />
@@ -380,6 +411,52 @@ const Profile = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* MFA Section */}
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-8 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Two-Factor Authentication</h2>
+            {!mfaEnabled && (
+              <button
+                onClick={openEmailSetup}
+                className="px-4 py-2 bg-blue-900 dark:bg-slate-800 text-white rounded-lg hover:bg-black dark:hover:bg-slate-700 transition"
+              >
+                Enable 2FA
+              </button>
+            )}
+          </div>
+
+          {mfaEnabled ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-slate-900 dark:text-slate-100 font-semibold">2FA is enabled</span>
+                <span className="text-slate-600 dark:text-slate-400">
+                  ({mfaMethod === 'EMAIL' ? 'Email verification' : mfaMethod === 'TOTP' ? 'Authenticator app' : 'Unknown method'})
+                </span>
+              </div>
+              <button
+                onClick={async () => {
+                  if (window.confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
+                    try {
+                      await disableMfa();
+                      showSuccess('2FA disabled');
+                    } catch (error) {
+                      showError('Failed to disable 2FA');
+                    }
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                Disable 2FA
+              </button>
+            </div>
+          ) : (
+            <p className="text-slate-600 dark:text-slate-400">
+              Add an extra layer of security to your account by enabling two-factor authentication.
+            </p>
+          )}
         </div>
 
         {/* Bookings Section */}

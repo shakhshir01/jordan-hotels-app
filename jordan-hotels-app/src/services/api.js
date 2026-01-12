@@ -680,6 +680,17 @@ export const hotelAPI = {
     }
   },
 
+  verifyLoginEmailMfa: async (code) => {
+    if (getUseMocks()) return { verified: true };
+    try {
+      const response = await apiClient.post("/auth/email-mfa/verify-login", { code });
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { verified: true };
+      throw error;
+    }
+  },
+
   disableMfa: async () => {
     if (getUseMocks()) return { success: true };
     try {

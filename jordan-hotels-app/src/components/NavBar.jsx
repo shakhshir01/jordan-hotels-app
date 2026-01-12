@@ -22,10 +22,17 @@ const Navbar = () => {
     return isUUID ? t("nav.account") : email.split("@")[0];
   }, [t, user, userProfile?.displayName]);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-    setMobileOpen(false);
+  const handleLogout = async () => {
+    try {
+      const res = await logout();
+      setMobileOpen(false);
+      if (!res?.mfaRequired) {
+        navigate("/");
+      }
+    } catch (e) {
+      console.error('Logout error:', e);
+      navigate('/');
+    }
   };
 
   const closeMobile = () => setMobileOpen(false);

@@ -133,10 +133,10 @@ After deployment, test a simple endpoint:
 
 ```bash
 # Test GET /hotels
-curl https://6tgi7dy2ic.execute-api.us-east-1.amazonaws.com/prod/hotels
+curl https://plnlaspdy5.execute-api.us-east-1.amazonaws.com/prod/hotels
 
 # Test GET /blog
-curl https://6tgi7dy2ic.execute-api.us-east-1.amazonaws.com/prod/blog
+curl https://plnlaspdy5.execute-api.us-east-1.amazonaws.com/prod/blog
 ```
 
 ## 📝 Notes
