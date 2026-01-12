@@ -333,6 +333,21 @@ export const errorHandler = new ErrorHandler(logger);
 export const setupErrorListeners = () => {
   // Global error handler
   window.addEventListener('error', (event) => {
+    // Handle chunk load errors (lazy loading failures after deployment)
+    const msg = event.message || '';
+    if (/Loading chunk [\d]+ failed/.test(msg) || /Failed to fetch dynamically imported module/.test(msg)) {
+      const key = 'chunk_load_error_reload';
+      const lastReload = sessionStorage.getItem(key);
+      const now = Date.now();
+
+      // Reload once every 10 seconds max to prevent infinite loops
+      if (!lastReload || now - Number(lastReload) > 10000) {
+        sessionStorage.setItem(key, now.toString());
+        window.location.reload();
+        return;
+      }
+    }
+
     errorHandler.handleError(event.error, {
       message: 'Uncaught error',
       filename: event.filename,

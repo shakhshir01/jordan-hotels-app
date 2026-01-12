@@ -81,7 +81,7 @@ if (typeof window !== "undefined" && window.__VISITJO_RUNTIME_CONFIG__ && window
 
 function getApiBaseUrl(path) {
   // Always use public API for hotels, deals, destinations, experiences, search
-  if (/^\/hotels/.test(path) || /^\/deals/.test(path) || /^\/destinations/.test(path) || /^\/experiences/.test(path) || /^\/search/.test(path)) {
+  if (/^\/hotels/.test(path) || /^\/deals/.test(path) || /^\/destinations/.test(path) || /^\/experiences/.test(path) || /^\/search/.test(path) || /^\/blog/.test(path)) {
     return PUBLIC_API_BASE_URL;
   }
   
@@ -462,8 +462,6 @@ export const hotelAPI = {
   },
 
   getAllHotels: async (location = "") => {
-    console.log("API: Using Xotelo hotel data only");
-
     const allHotels = Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [];
 
     // No deduplication needed since we only use one dataset
@@ -489,7 +487,6 @@ export const hotelAPI = {
     const allHotels = Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [];
     const staticHotel = allHotels.find((h) => h.id === id);
     if (staticHotel) {
-      console.log('Found hotel in static data:', id);
       return normalizeHotel(staticHotel);
     }
 

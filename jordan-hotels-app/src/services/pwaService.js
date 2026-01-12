@@ -10,7 +10,6 @@ export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service Worker registered successfully:', registration);
       return registration;
     } catch (error) {
       console.error('Service Worker registration failed:', error);
@@ -59,7 +58,6 @@ export const setupInstallPrompt = () => {
 
 export const requestInstallPWA = async () => {
   if (!deferredPrompt) {
-    console.log('Install prompt not available');
     return false;
   }
 
@@ -83,7 +81,6 @@ export const cacheManager = {
     try {
       const cache = await caches.open(cacheName);
       await cache.addAll(assets);
-      console.log(`Cached ${assets.length} assets`);
     } catch (error) {
       console.error('Failed to cache assets:', error);
     }
@@ -95,7 +92,6 @@ export const cacheManager = {
   deleteCache: async (cacheName) => {
     try {
       const deleted = await caches.delete(cacheName);
-      console.log(`Cache ${cacheName} deleted:`, deleted);
       return deleted;
     } catch (error) {
       console.error('Failed to delete cache:', error);

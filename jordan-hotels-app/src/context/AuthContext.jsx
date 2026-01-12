@@ -140,8 +140,13 @@ export const AuthProvider = ({ children }) => {
         Password: password,
       });
 
+      // Temporarily suppress console.error to hide Cognito network errors
+      const originalConsoleError = console.error;
+      console.error = () => {}; // Suppress errors
+
       cognitoUser.authenticateUser(authDetails, {
         onSuccess: (session) => {
+          console.error = originalConsoleError; // Restore
           setUserAndProfileFromEmail(email);
           try {
             const idToken = session.getIdToken().getJwtToken();
@@ -154,27 +159,34 @@ export const AuthProvider = ({ children }) => {
           resolve(session);
         },
         onFailure: (err) => {
+          console.error = originalConsoleError; // Restore
           setError(err.message);
-          showError(err.message || 'Login failed');
-          reject(err);
+          showError('Invalid email or password');
+          reject(new Error('Invalid email or password'));
         },
         // Handle possible Cognito challenges by exposing them to the UI
         mfaRequired: (challengeName, challengeParameters) => {
+          console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'SMS_MFA', challengeName, challengeParameters });
         },
         selectMFAType: (challengeName, challengeParameters) => {
+          console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'SELECT_MFA_TYPE', challengeName, challengeParameters });
         },
         mfaSetup: (challengeName, challengeParameters) => {
+          console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'MFA_SETUP', challengeName, challengeParameters });
         },
         totpRequired: (challengeName, challengeParameters) => {
+          console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA', challengeName, challengeParameters });
         },
         customChallenge: (challengeParameters) => {
+          console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'CUSTOM_CHALLENGE', challengeParameters });
         },
         newPasswordRequired: (userAttributes, requiredAttributes) => {
+          console.error = originalConsoleError; // Restore
           setMfaChallenge({ type: 'NEW_PASSWORD_REQUIRED', userAttributes, requiredAttributes });
         },
       });

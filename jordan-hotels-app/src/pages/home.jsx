@@ -14,6 +14,7 @@ import { getHotelDisplayName } from "../utils/hotelLocalization";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import hotelsService from "../services/hotelsService";
 import { haversineKm } from "../utils/geo";
+import OptimizedImage from "../components/OptimizedImage";
 
 const JORDAN_PLACES = [
   { name: "Amman", lat: 31.9539, lon: 35.9106 },
@@ -145,10 +146,12 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
   return (
     <article className="hotel-card group">
       <div className="cover">
-        <img
+        <OptimizedImage
           src={hotel.image || FALLBACK_IMG}
           onError={onImgError}
           alt={hotelName}
+          width={400}
+          height={300}
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"

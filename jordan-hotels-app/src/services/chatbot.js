@@ -193,7 +193,7 @@ async function gatherContextData(message) {
         // If asking for hotels generally, show top rated
         data.hotels = allHotels.sort((a, b) => b.rating - a.rating).slice(0, 3);
       }
-    } catch (e) { /* Error fetching hotels for chat */ }
+    } catch (e) { console.error('Error fetching hotels for chat:', e); }
   }
 
   if (isDeal) {
@@ -201,7 +201,7 @@ async function gatherContextData(message) {
     try {
       data.deals = await hotelAPI.getDeals();
       // If we have deals, maybe grab the hotels associated with them if possible, or just generic deals
-    } catch (e) { /* Error fetching deals for chat */ }
+    } catch (e) { console.error('Error fetching deals for chat:', e); }
   }
 
   // Always fetch experiences to provide rich context
@@ -214,7 +214,7 @@ async function gatherContextData(message) {
     } else if (isExperience) {
       data.experiences = allExperiences.slice(0, 3);
     }
-  } catch (e) { /* Error fetching experiences for chat */ }
+  } catch (e) { console.error('Error fetching experiences for chat:', e); }
 
   return data;
 }
