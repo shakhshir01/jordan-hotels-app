@@ -81,32 +81,12 @@ export const AuthProvider = ({ children }) => {
                         // Then check database for authoritative status
                         const profile = await hotelAPI.getUserProfile();
                         if (profile?.mfaEnabled) {
+                          // Persist MFA status for UI, but DO NOT force a verification
+                          // flow on page refresh. Only require MFA at login or when
+                          // explicitly triggered (logout flow, new session, etc.).
                           setMfaEnabled(true);
                           setMfaMethod(profile.mfaMethod || 'TOTP');
-                          // Update localStorage to match database
                           localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
-
-                          // Require MFA verification on session restoration
-                          setUserAndProfileFromEmail(email);
-                          try {
-                            const idToken = session.getIdToken().getJwtToken();
-                            setAuthToken(idToken);
-                          } catch (e) {
-                            console.warn('Failed to set auth token from session', e);
-                          }
-
-                          // Set MFA challenge based on method
-                          if (profile.mfaMethod === 'EMAIL') {
-                            setMfaChallenge({ type: 'CUSTOM_CHALLENGE' });
-                          } else if (profile.mfaMethod === 'TOTP') {
-                            setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA' });
-                          } else {
-                            // Default to TOTP if method not specified
-                            setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA' });
-                          }
-
-                          // Don't set loading to false yet - let MFA modal handle completion
-                          return;
                         } else if (stored === '1' && !profile?.mfaEnabled) {
                           // Database says disabled, update localStorage
                           localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
@@ -324,22 +304,8 @@ export const AuthProvider = ({ children }) => {
   // Logout entrypoint: if MFA is enabled, trigger a verification flow instead
   // of immediately signing the user out. Returns an object when MFA is required.
   const logout = async () => {
-    if (mfaEnabled) {
-      // Kick off the appropriate verification flow
-      if (mfaMethod === 'EMAIL') {
-        try {
-          await hotelAPI.requestEmailMfaChallenge();
-        } catch (e) {
-          console.warn('Failed to request email MFA challenge before logout', e);
-        }
-        setMfaChallenge({ type: 'EMAIL_LOGIN_CHALLENGE', pendingLogout: true });
-      } else {
-        // TOTP or other software token. Ask UI to show TOTP prompt.
-        setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA', pendingLogout: true });
-      }
-      return { mfaRequired: true };
-    }
-
+    // Do not require MFA to sign out — immediately perform logout.
+    // MFA will be required on subsequent sign-in (login flow handles it).
     performLogout();
     return { success: true };
   };
@@ -485,33 +451,64 @@ export const AuthProvider = ({ children }) => {
     return new Promise((resolve, reject) => {
       cognitoUser.verifySoftwareToken(userCode, friendlyName, {
         onSuccess: async (res) => {
-          console.log('TOTP verification successful');
-          showSuccess('Two-factor authentication enabled');
           try {
-            const email = cognitoUser.getUsername();
-            localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
-          } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
-          setMfaEnabled(true);
-          setMfaMethod('TOTP');
-          // persist server-side
-          try {
-            await hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' });
-            console.log('MFA status saved to database');
+            // After successful verification, explicitly enable software-token MFA in Cognito
+            cognitoUser.setUserMfaPreference(null, { PreferredMfa: true, Enabled: true }, async (mfaErr, mfaResult) => {
+              if (mfaErr) {
+                console.warn('Failed to set user MFA preference after TOTP verify:', mfaErr);
+              } else {
+                console.log('User MFA preference updated:', mfaResult);
+              }
+
+              showSuccess('Two-factor authentication enabled');
+              try {
+                const email = cognitoUser.getUsername();
+                localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+              } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
+              setMfaEnabled(true);
+              setMfaMethod('TOTP');
+
+              // persist server-side
+              try {
+                await hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' });
+                console.log('MFA status saved to database');
+              } catch (e) {
+                console.error('Failed to save MFA status to database:', e);
+                showError('2FA enabled but failed to save status. Please try again.');
+              }
+
+              clearMfaChallenge();
+              resolve(res);
+            });
           } catch (e) {
-            console.error('Failed to save MFA status to database:', e);
-            // Don't fail the TOTP setup if database save fails
-            showError('2FA enabled but failed to save status. Please try again.');
+            console.error('Unexpected error after TOTP verify:', e);
+            clearMfaChallenge();
+            reject(e);
           }
-          clearMfaChallenge();
-          resolve(res);
         },
-        onFailure: (err) => {
+        onFailure: async (err) => {
           console.error('TOTP verification failed:', err);
           let userFriendlyMessage = 'Failed to verify TOTP code';
 
           // Provide specific guidance for common errors
           if (err.code === 'EnableSoftwareTokenMFAException' || err.message?.includes('Code mismatch')) {
             userFriendlyMessage = 'Code mismatch. Please check that:\n• Your device time is correct\n• You entered the code correctly\n• You scanned the QR code properly\n• Try generating a new code if the previous one expired';
+
+            // Try to re-associate a new secret so user can re-scan the QR code
+            try {
+              cognitoUser.associateSoftwareToken({
+                associateSecretCode: (secretCode) => {
+                  console.log('Re-associated TOTP secret for retry:', secretCode);
+                  setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
+                  showError('TOTP code mismatch — a new QR/secret was generated. Please re-scan and try again.');
+                },
+                onFailure: (assocErr) => {
+                  console.error('Failed to re-associate TOTP secret:', assocErr);
+                },
+              });
+            } catch (_e) {
+              console.warn('Failed to initiate re-association after TOTP failure', _e);
+            }
           } else if (err.message?.includes('InvalidParameterException')) {
             userFriendlyMessage = 'Invalid code format. Please enter a 6-digit number.';
           } else if (err.message?.includes('NotAuthorizedException')) {

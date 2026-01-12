@@ -41,10 +41,10 @@ export default function MfaModal() {
     return () => { mounted = false; };
   }, [mfaChallenge, cognitoUserRef]);
 
-  // When CUSTOM_CHALLENGE is set, request email MFA code
+  // When an email login challenge is set, request email MFA code
   useEffect(() => {
-    if (mfaChallenge?.type === 'CUSTOM_CHALLENGE') {
-      console.log('Requesting email MFA code for login');
+    if (mfaChallenge?.type === 'CUSTOM_CHALLENGE' || mfaChallenge?.type === 'EMAIL_LOGIN_CHALLENGE') {
+      console.log('Requesting email MFA code for login/logout flow');
       setLoading(true);
       requestEmailMfaChallenge()
         .then(() => {
@@ -73,7 +73,7 @@ export default function MfaModal() {
 
     setLoading(true);
     try {
-      if (mfaChallenge.type === 'CUSTOM_CHALLENGE') {
+      if (mfaChallenge.type === 'CUSTOM_CHALLENGE' || mfaChallenge.type === 'EMAIL_LOGIN_CHALLENGE') {
         // Email MFA verification (could be login or logout verification)
         const res = await verifyLoginEmailMfa(code);
         // If verifyLoginEmailMfa performed logout, stop here
@@ -181,6 +181,7 @@ export default function MfaModal() {
       case 'SMS_MFA':
         return t('mfa.smsTitle', 'Enter SMS Code');
       case 'CUSTOM_CHALLENGE':
+      case 'EMAIL_LOGIN_CHALLENGE':
         return t('mfa.emailTitle', 'Enter Email Code');
       case 'MFA_SETUP_TOTP':
         return t('mfa.setupTotpTitle', 'Setup Authenticator App');
@@ -198,6 +199,7 @@ export default function MfaModal() {
       case 'SMS_MFA':
         return t('mfa.smsDescription', 'Enter the 6-digit code sent to your phone');
       case 'CUSTOM_CHALLENGE':
+      case 'EMAIL_LOGIN_CHALLENGE':
         return t('mfa.emailDescription', 'Enter the 6-digit code sent to your email');
       case 'MFA_SETUP_TOTP':
         return t('mfa.setupTotpDescription', 'Scan the QR code or enter the secret into your authenticator app, then verify the generated code');

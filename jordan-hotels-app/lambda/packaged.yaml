@@ -1,25 +1,42 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: "VisitJo SAM template \xE2\u20AC\u201D API, Lambdas, DynamoDB, S3, Secrets\
-  \ Manager"
+Description: "VisitJo SAM template \u2014 API, Lambdas, DynamoDB, S3, Secrets Manager\
+  \ (updated)"
 Globals:
   Function:
-    Runtime: nodejs22.x
+    Runtime: nodejs20.x
     Timeout: 10
     MemorySize: 512
     Environment:
       Variables:
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1'
+Parameters:
+  OpenAISecretArn:
+    Type: String
+    Description: 'ARN or name of the Secrets Manager secret containing OPENAI_API_KEY
+      (SecretString key: OPENAI_API_KEY). Leave empty to set at deploy time.'
+    Default: ''
+  StripeSecretArn:
+    Type: String
+    Description: ARN of an existing Stripe Secrets Manager secret. Leave empty to
+      create a new secret.
+    Default: ''
+Conditions:
+  CreateStripeSecret:
+    Fn::Equals:
+    - Ref: StripeSecretArn
+    - ''
 Resources:
   Api:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod
-      Cors:
-        AllowOrigin: '''*'''
-        AllowMethods: '''GET,POST,PUT,DELETE,OPTIONS'''
-        AllowHeaders: '''*'''
       EndpointConfiguration: REGIONAL
+      Cors:
+        AllowMethods: '''GET,POST,PUT,DELETE,OPTIONS'''
+        AllowHeaders: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        AllowOrigin: '''*'''
+        AllowCredentials: false
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -185,6 +202,11 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
       BucketEncryption:
@@ -232,12 +254,12 @@ Resources:
     Metadata:
       SamResourceId: UploadsBucket
   StripeSecret:
+    Condition: CreateStripeSecret
     Type: AWS::SecretsManager::Secret
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
       Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
-      KmsKeyId: alias/aws/secretsmanager
       Tags:
       - Key: App
         Value: VisitJo
@@ -271,6 +293,11 @@ Resources:
             Fn::Sub: arn:aws:s3:::${UploadsBucket}/*
         - Effect: Allow
           Action:
+          - ses:SendEmail
+          - ses:SendRawEmail
+          Resource: '*'
+        - Effect: Allow
+          Action:
           - secretsmanager:GetSecretValue
           Resource:
             Fn::Sub: arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*stripe*
@@ -280,6 +307,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getHotels/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/263ed8ee93eecfce568356ad597e3354
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -300,13 +328,13 @@ Resources:
             Method: GET
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: GetHotelsFunction
   GetHotelByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getHotelById/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/c1069cbd632bb46b8b0c5ea07e9038b5
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -327,13 +355,13 @@ Resources:
             Method: GET
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: GetHotelByIdFunction
   SearchFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: search/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/3bc298ffa1372d4412285856a55526c0
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -360,14 +388,13 @@ Resources:
             Method: GET
             RestApiId:
               Ref: Api
-        
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: SearchFunction
   DestinationsFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: destinations/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/8030dc6335f38f9d80927c276cbff694
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -395,13 +422,13 @@ Resources:
             Method: GET
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: DestinationsFunction
   DealsFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: deals/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/81cdac210cdc18ea06656dd98f50f057
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -429,13 +456,13 @@ Resources:
             Method: GET
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: DealsFunction
   ExperiencesFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: experiences/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/43e31f05b7b5e1a5a105423ddf9ac178
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -463,13 +490,13 @@ Resources:
             Method: GET
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: ExperiencesFunction
   BookingsFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: bookings/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/a61ffc980495367b08412f751b32caa7
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -490,13 +517,13 @@ Resources:
             Method: ANY
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: BookingsFunction
   CreateCheckoutSessionFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: createCheckoutSession/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/2bf7b98443dea116ef69e8666f9bbdc6
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -508,7 +535,10 @@ Resources:
       Environment:
         Variables:
           STRIPE_SECRET_ARN:
-            Ref: StripeSecret
+            Fn::If:
+            - CreateStripeSecret
+            - Ref: StripeSecret
+            - Ref: StripeSecretArn
           PAYMENTS_ENABLED: 'true'
           ALLOW_LIVE_PAYMENTS: 'false'
       Events:
@@ -519,13 +549,13 @@ Resources:
             Method: POST
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: CreateCheckoutSessionFunction
   CreatePaymentIntentFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: createPaymentIntent/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/a0a1bcc65d73baec424b28454b7c4210
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -537,7 +567,10 @@ Resources:
       Environment:
         Variables:
           STRIPE_SECRET_ARN:
-            Ref: StripeSecret
+            Fn::If:
+            - CreateStripeSecret
+            - Ref: StripeSecret
+            - Ref: StripeSecretArn
           PAYMENTS_ENABLED: 'true'
           ALLOW_LIVE_PAYMENTS: 'false'
       Events:
@@ -548,13 +581,13 @@ Resources:
             Method: POST
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: CreatePaymentIntentFunction
   GetSignedUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getSignedUrl/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/5c606c4e560fd259a4d228d7a84180e9
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -575,13 +608,13 @@ Resources:
             Method: POST
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: GetSignedUrlFunction
   UserFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: user/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/eb87117907615fe6fd0a350347bf03f3
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -596,6 +629,8 @@ Resources:
             Ref: BookingsTable
           USERS_TABLE:
             Ref: UsersTable
+          SES_EMAIL_FROM: no-reply@verificationemail.com
+          SES_FROM_EMAIL: no-reply@verificationemail.com
       Events:
         ApiUserProfileGet:
           Type: Api
@@ -611,7 +646,6 @@ Resources:
             Method: PUT
             RestApiId:
               Ref: Api
-        
         ApiUserBookings:
           Type: Api
           Properties:
@@ -619,14 +653,48 @@ Resources:
             Method: GET
             RestApiId:
               Ref: Api
-        
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
+        ApiUserMfaEmailSetup:
+          Type: Api
+          Properties:
+            Path: /user/mfa/email/setup
+            Method: POST
+            RestApiId:
+              Ref: Api
+        ApiUserMfaEmailVerify:
+          Type: Api
+          Properties:
+            Path: /user/mfa/email/verify
+            Method: POST
+            RestApiId:
+              Ref: Api
+        ApiAuthEmailMfaRequest:
+          Type: Api
+          Properties:
+            Path: /auth/email-mfa/request
+            Method: POST
+            RestApiId:
+              Ref: Api
+        ApiAuthEmailMfaVerifyLogin:
+          Type: Api
+          Properties:
+            Path: /auth/email-mfa/verify-login
+            Method: POST
+            RestApiId:
+              Ref: Api
+        ApiUserMfaDisable:
+          Type: Api
+          Properties:
+            Path: /user/mfa/disable
+            Method: POST
+            RestApiId:
+              Ref: Api
     Metadata:
       SamResourceId: UserFunction
   SendBookingEmailFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: sendBookingEmail/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/ab208fb5ace751507d4cf34d574b555e
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -647,9 +715,34 @@ Resources:
             Method: POST
             RestApiId:
               Ref: Api
-      CodeUri: s3://visitjo-sam-artifacts-20260109-001/5beb877aa671104e13be982795fb58dc
     Metadata:
       SamResourceId: SendBookingEmailFunction
+  ChatFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: chat/index.handler
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/58a606ec9d5446fa67c708e892ae23b0
+      Tags:
+        App: VisitJo
+        ManagedBy: SAM
+        Stack:
+          Ref: AWS::StackName
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Ref: LambdaRolePolicy
+      Environment:
+        Variables:
+          OPENAI_API_KEY: ''
+      Events:
+        ApiChat:
+          Type: Api
+          Properties:
+            Path: /chat
+            Method: POST
+            RestApiId:
+              Ref: Api
+    Metadata:
+      SamResourceId: ChatFunction
 Outputs:
   ApiUrl:
     Description: Base URL for API

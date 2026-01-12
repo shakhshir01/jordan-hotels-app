@@ -290,43 +290,23 @@ const Profile = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Profile Information</h2>
               {!editing && (
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setEditing(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-900 dark:bg-slate-800 text-white rounded-lg hover:bg-black dark:hover:bg-slate-700 transition"
-                    >
-                      <Edit2 size={18} />
-                      Edit Profile
-                    </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-900 dark:bg-slate-800 text-white rounded-lg hover:bg-black dark:hover:bg-slate-700 transition"
+                  >
+                    <Edit2 size={18} />
+                    Edit Profile
+                  </button>
 
-                    {mfaEnabled ? (
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2 px-4 py-2 border border-green-200 bg-green-50 text-green-800 rounded-lg">
-                          <Check size={16} />
-                          Enabled {mfaMethod && `(${mfaMethod})`}
-                        </div>
-                        <button
-                          onClick={async () => {
-                            if (window.confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
-                              try {
-                                await disableMfa();
-                                // Reload profile to ensure UI is updated
-                                await loadUserProfile();
-                                showSuccess('Two-factor authentication disabled');
-                              } catch (error) {
-                                showError('Failed to disable MFA');
-                              }
-                            }
-                          }}
-                          className="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                        >
-                          Disable
-                        </button>
-                      </div>
-                    ) : (
-                      <Enable2FaChooser setupTotp={setupTotp} />
-                    )}
-                  </div>
+                  {/* Small MFA badge only — main enable/disable actions live in the MFA section below */}
+                  {mfaEnabled && (
+                    <div className="flex items-center gap-2 px-3 py-2 border border-green-200 bg-green-50 text-green-800 rounded-lg">
+                      <Check size={16} />
+                      <span>Enabled {mfaMethod && `(${mfaMethod})`}</span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
