@@ -182,7 +182,7 @@ export const AuthProvider = ({ children }) => {
       cognitoUser.authenticateUser(authDetails, {
         onSuccess: async (session) => {
           console.error = originalConsoleError; // Restore
-          
+
           // Load user profile to check MFA status
           let profile = null;
           try {
@@ -190,12 +190,13 @@ export const AuthProvider = ({ children }) => {
           } catch (_e) {
             console.warn('Failed to load profile on login', _e);
           }
-          
+
           const mfaEnabled = profile?.mfaEnabled;
           const mfaMethod = profile?.mfaMethod;
-          
+
           if (mfaEnabled) {
-            // MFA is enabled, require challenge
+            // MFA is enabled, but let Cognito handle the challenge
+            // Store the session temporarily and wait for MFA challenge
             setUserAndProfileFromEmail(email);
             try {
               const idToken = session.getIdToken().getJwtToken();
@@ -203,20 +204,13 @@ export const AuthProvider = ({ children }) => {
             } catch (e) {
               console.warn('Failed to set auth token on login', e);
             }
-            
-            // Set MFA challenge based on method
-            if (mfaMethod === 'EMAIL') {
-              setMfaChallenge({ type: 'CUSTOM_CHALLENGE' });
-            } else if (mfaMethod === 'TOTP') {
-              setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA' });
-            } else {
-              // Default to TOTP if method not specified
-              setMfaChallenge({ type: 'SOFTWARE_TOKEN_MFA' });
-            }
-            
+
             setMfaEnabled(true);
             setMfaMethod(mfaMethod || 'TOTP');
             localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+
+            // Instead of setting challenge here, let Cognito send the proper challenge
+            // The totpRequired or mfaRequired callback will be called
             resolve({ mfaRequired: true });
           } else {
             // No MFA, complete login
@@ -227,7 +221,7 @@ export const AuthProvider = ({ children }) => {
             } catch (e) {
               console.warn('Failed to set auth token on login', e);
             }
-            
+
             setMfaEnabled(false);
             setMfaMethod(null);
             localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
@@ -351,10 +345,12 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
           } catch (_e) { console.warn('Ignored during login token set', _e); }
           setMfaEnabled(true);
-          setMfaMethod('TOTP');
+          // Set the correct MFA method based on the type used
+          const method = mfaType === 'SOFTWARE_TOKEN_MFA' ? 'TOTP' : mfaType === 'SMS_MFA' ? 'SMS' : 'TOTP';
+          setMfaMethod(method);
           // persist server-side if possible
           try {
-            hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' }).catch(() => {});
+            hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: method }).catch(() => {});
           } catch (_e) { console.warn('Ignored during session refresh', _e); }
           clearMfaChallenge();
           showSuccess('MFA verified');

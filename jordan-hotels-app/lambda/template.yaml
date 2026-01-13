@@ -554,6 +554,8 @@ Resources:
           USERS_TABLE: !Ref UsersTable
           SES_EMAIL_FROM: no-reply@visit-jo.com
           SES_FROM_EMAIL: no-reply@visit-jo.com
+          DOMAIN: visit-jo.com
+          AWS_REGION: !Ref AWS::Region
       Events:
         ApiUserProfileGet:
           Type: Api

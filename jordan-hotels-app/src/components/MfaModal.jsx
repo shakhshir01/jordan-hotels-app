@@ -89,8 +89,14 @@ export default function MfaModal() {
         showSuccess('Login successful!');
       } else {
         // TOTP or other Cognito MFA: use submitMfaCode wrapper to honor pendingLogout
+        let mfaType;
+        if (mfaChallenge.type === 'SOFTWARE_TOKEN_MFA') {
+          mfaType = 'SOFTWARE_TOKEN_MFA';
+        } else if (mfaChallenge.type === 'SMS_MFA') {
+          mfaType = 'SMS_MFA';
+        }
         try {
-          const result = await submitMfaCode(code);
+          const result = await submitMfaCode(code, mfaType);
           if (result && result.loggedOut) {
             // logout already performed by context
             clearMfaChallenge();
