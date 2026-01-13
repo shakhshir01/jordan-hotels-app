@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { hotelAPI } from "../services/api";
-import { Loader2, Search, MapPin, Star, Percent } from "lucide-react";
+import { Loader2, Search, Star, Percent, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import { useTranslation } from "react-i18next";
@@ -19,7 +19,7 @@ const Trends = () => {
 
   const [query, setQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState(defaultQueries[0].q);
-  const [results, setResults] = useState({ hotels: [], experiences: [], deals: [], destinations: [] });
+  const [results, setResults] = useState({ hotels: [], experiences: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -28,12 +28,53 @@ const Trends = () => {
     setError("");
     try {
       const data = await hotelAPI.searchAll(q);
-      setResults({
-        hotels: data?.hotels || [],
-        experiences: data?.experiences || [],
-        deals: data?.deals || [],
-        destinations: data?.destinations || [],
-      });
+
+      // Filter and sort results to show only the best items
+      const filteredResults = {
+        hotels: (data?.hotels || [])
+          .filter(hotel => {
+            const rating = hotel.rating && typeof hotel.rating === 'number' ? hotel.rating : 0;
+            const reviews = hotel.reviews && typeof hotel.reviews === 'number' ? hotel.reviews : 0;
+            const price = hotel.price && typeof hotel.price === 'number' ? hotel.price : 0;
+            // Require high rating, good reviews, and reasonable price
+            return rating >= 4.5 && reviews >= 100 && price > 0 && price <= 500;
+          })
+          .sort((a, b) => {
+            // Sort by rating desc, then reviews desc, then price asc
+            const aRating = a.rating || 0;
+            const bRating = b.rating || 0;
+            if (aRating !== bRating) return bRating - aRating;
+            const aReviews = a.reviews || 0;
+            const bReviews = b.reviews || 0;
+            if (aReviews !== bReviews) return bReviews - aReviews;
+            return (a.price || 0) - (b.price || 0);
+          })
+          .slice(0, 12), // Top 12 highly-rated, well-reviewed hotels
+
+        experiences: (data?.experiences || [])
+          .filter(exp => {
+            const rating = exp.rating && typeof exp.rating === 'number' ? exp.rating : 0;
+            const reviews = exp.reviews && typeof exp.reviews === 'number' ? exp.reviews : 0;
+            const price = exp.price && typeof exp.price === 'number' ? exp.price : 0;
+            // Require high rating, some reviews, and reasonable price
+            return rating >= 4.5 && reviews >= 50 && price > 0 && price <= 200;
+          })
+          .sort((a, b) => {
+            // Sort by rating desc, then reviews desc, then price asc
+            const aRating = a.rating || 0;
+            const bRating = b.rating || 0;
+            if (aRating !== bRating) return bRating - aRating;
+            const aReviews = a.reviews || 0;
+            const bReviews = b.reviews || 0;
+            if (aReviews !== bReviews) return bReviews - aReviews;
+            return (a.price || 0) - (b.price || 0);
+          })
+          .slice(0, 8), // Top 8 highly-rated, well-reviewed experiences
+
+
+      };
+
+      setResults(filteredResults);
       setActiveQuery(q || "");
     } catch (err) {
       console.error("Search failed", err);
@@ -44,7 +85,7 @@ const Trends = () => {
           ? "Search is taking longer than expected right now. Please try again in a moment."
           : msg || "Search failed"
       );
-      setResults({ hotels: [], experiences: [], deals: [], destinations: [] });
+      setResults({ hotels: [], experiences: [] });
     } finally {
       setLoading(false);
     }
@@ -72,20 +113,20 @@ const Trends = () => {
             {t('pages.trends.hero.title', 'What Everyone is Talking About')}
           </h1>
           <p className="text-base md:text-lg opacity-95 leading-relaxed max-w-3xl mx-auto">
-            {t('pages.trends.hero.subtitle', 'Discover the hottest destinations, top-rated stays, and experiences that travelers are falling in love with right now.')}
+            {t('pages.trends.hero.subtitle', 'Discover the top-rated stays and experiences that travelers are falling in love with right now.')}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 max-w-xl mx-auto flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 rounded-full px-3 py-2 shadow-2xl border border-white/30 dark:border-slate-700/60">
             <Search className="text-slate-400" size={18} />
             <input
               className="flex-1 bg-transparent outline-none text-sm md:text-base text-slate-900 dark:text-slate-50 placeholder-slate-400 dark:placeholder-slate-500"
-              placeholder={t('pages.trends.searchPlaceholder')}
+              placeholder={t('pages.trends.searchPlaceholder', 'Search across hotels and experiences')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
             <button
               type="submit"
-              className="px-4 py-2 rounded-full bg-jordan-blue text-white text-xs md:text-sm font-semibold hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700 transition-colors"
             >
               {t('pages.trends.explore')}
             </button>
@@ -113,7 +154,7 @@ const Trends = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 space-y-12">
         {loading && (
           <div className="flex justify-center py-16">
-            <Loader2 className="animate-spin text-jordan-blue" size={40} />
+            <Loader2 className="animate-spin text-blue-600" size={40} />
           </div>
         )}
 
@@ -125,29 +166,7 @@ const Trends = () => {
 
         {!loading && !error && (
           <>
-            {/* Destinations row */}
-            {results.destinations.length > 0 && (
-              <section>
-                <h2 className="text-xl md:text-2xl font-bold mb-3 text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                  <MapPin size={18} className="text-emerald-500" />
-                  {t('pages.trends.destinationsMatching', { query: activeQuery || t('pages.trends.all') })}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  {results.destinations.map((d) => (
-                    <Link
-                      key={d.id}
-                      to={d.id ? `/destinations/${d.id}` : "/destinations"}
-                      className="glass-card rounded-2xl p-4 flex flex-col gap-1 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
-                    >
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{d.name}</p>
-                      {d.description && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{d.description}</p>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
+
 
             {/* Hotels row */}
             {results.hotels.length > 0 && (
@@ -188,16 +207,22 @@ const Trends = () => {
                           )}
                           {h.price && (
                             <span className="text-slate-700 dark:text-slate-200 font-semibold">
-                              {h.price} JOD <span className="text-[11px] text-slate-500">{t('hotels.perNight')}</span>
+                              {h.price} JOD <span className="text-[11px] text-slate-500 dark:text-slate-400">{t('hotels.perNight')}</span>
                             </span>
                           )}
                         </div>
-                        <div className="mt-3">
+                        <div className="mt-3 flex gap-2">
                           <Link
                             to={`/hotels/${h.id}`}
-                            className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-jordan-blue dark:hover:bg-jordan-blue transition-colors duration-200 inline-block"
+                            className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200 inline-block"
                           >
                             {t('common.view')}
+                          </Link>
+                          <Link
+                            to={`/hotels/${h.id}?book=true`}
+                            className="px-3 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 inline-block"
+                          >
+                            📅 Book
                           </Link>
                         </div>
                       </div>
@@ -227,42 +252,24 @@ const Trends = () => {
                       {e.price && (
                         <p className="text-xs text-slate-700 dark:text-slate-200 mt-1">{t('pages.trends.fromPrice', { price: e.price })}</p>
                       )}
+                      <div className="mt-3">
+                        <Link
+                          to={`/experiences/${e.id}`}
+                          className="px-3 py-2 rounded-xl text-xs font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-colors duration-200 inline-block"
+                        >
+                          📅 Book Now
+                        </Link>
+                      </div>
                     </article>
                   ))}
                 </div>
               </section>
             )}
 
-            {/* Deals row */}
-            {results.deals.length > 0 && (
-              <section>
-                <h2 className="text-xl md:text-2xl font-bold mb-3 text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                  <Percent size={18} className="text-emerald-500" />
-                  {t('nav.deals')}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {results.deals.slice(0, 6).map((d) => (
-                    <article
-                      key={d.id}
-                      className="glass-card rounded-2xl p-4 flex flex-col gap-1 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
-                    >
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{d.title}</p>
-                      {d.meta && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{d.meta}</p>
-                      )}
-                      {d.price && (
-                        <p className="text-xs text-slate-700 dark:text-slate-200 mt-1">{d.price}</p>
-                      )}
-                    </article>
-                  ))}
-                </div>
-              </section>
-            )}
+
 
             {results.hotels.length === 0 &&
-              results.experiences.length === 0 &&
-              results.deals.length === 0 &&
-              results.destinations.length === 0 && (
+              results.experiences.length === 0 && (
                 <div className="text-center py-16 text-slate-500 dark:text-slate-400 text-sm">
                   {t('pages.trends.noResults')}
                 </div>

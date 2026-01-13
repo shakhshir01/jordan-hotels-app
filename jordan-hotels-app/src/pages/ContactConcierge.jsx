@@ -29,7 +29,7 @@ export default function ContactConcierge() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-2">Concierge Service</h1>
-      <p className="text-gray-600 mb-8">Get personalized assistance for your Jordan trip</p>
+      <p className="text-gray-600 dark:text-gray-300 mb-8">Get personalized assistance for your Jordan trip</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
@@ -40,21 +40,21 @@ export default function ContactConcierge() {
                 <span className="text-2xl mr-3">📞</span>
                 <div>
                   <p className="font-bold">Call Us</p>
-                  <p className="text-gray-600">+962 6 465 1234</p>
+                  <p className="text-gray-600 dark:text-gray-300">+962 6 465 1234</p>
                 </div>
               </div>
               <div className="flex items-start">
                 <span className="text-2xl mr-3">✉️</span>
                 <div>
                   <p className="font-bold">Email</p>
-                  <p className="text-gray-600">concierge@visitjo.com</p>
+                  <p className="text-gray-600 dark:text-gray-300">concierge@visitjo.com</p>
                 </div>
               </div>
               <div className="flex items-start">
                 <span className="text-2xl mr-3">💬</span>
                 <div>
                   <p className="font-bold">WhatsApp</p>
-                  <p className="text-gray-600">+962 79 5555 1234</p>
+                  <p className="text-gray-600 dark:text-gray-300">+962 79 5555 1234</p>
                 </div>
               </div>
             </div>

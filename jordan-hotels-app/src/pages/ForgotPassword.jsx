@@ -9,6 +9,14 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [cooldown, setCooldown] = useState(0);
+    React.useEffect(() => {
+      if (!cooldown) return;
+      const timer = setInterval(() => {
+        setCooldown(prev => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+      return () => clearInterval(timer);
+    }, [cooldown]);
   const navigate = useNavigate();
   const { forgotPassword } = useAuth();
   const { t } = useTranslation();
@@ -25,6 +33,9 @@ const ForgotPassword = () => {
       navigate('/reset-password', { state: { email } });
     } catch (err) {
       setError(err.message || t('pages.forgotPassword.failed'));
+      if (err.message && err.message.toLowerCase().includes('attempt limit exceeded')) {
+        setCooldown(60); // 60 seconds cooldown
+      }
     } finally {
       setLoading(false);
     }
@@ -60,10 +71,14 @@ const ForgotPassword = () => {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || cooldown > 0}
           className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-blue-800 transition-all disabled:opacity-50"
         >
-          {loading ? t('pages.forgotPassword.sending') : t('auth.sendCode')}
+          {cooldown > 0
+            ? t('auth.resendIn', { seconds: cooldown })
+            : loading
+              ? t('pages.forgotPassword.sending')
+              : t('auth.sendCode')}
         </button>
       </form>
     </div>

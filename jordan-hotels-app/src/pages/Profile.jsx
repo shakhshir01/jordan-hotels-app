@@ -258,17 +258,17 @@ const Profile = () => {
   const totalSpent = bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-12">
+    <div className="min-h-screen gradient-hero py-12">
       <div className="max-w-4xl mx-auto px-4">
         {/* Profile Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-8 mb-8">
+        <div className="glass-card card-modern p-8 mb-8 animate-fade-in">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 bg-blue-900 dark:bg-slate-800 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-glow-purple animate-pulse-glow">
                 {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
               </div>
               <div>
-                <h1 className="text-3xl font-black text-slate-900 dark:text-slate-50">
+                <h1 className="text-3xl font-black gradient-text animate-gradient">
                   {profile?.firstName} {profile?.lastName}
                 </h1>
                 <p className="text-slate-600 dark:text-slate-300 flex items-center gap-2 mt-1">
@@ -278,7 +278,7 @@ const Profile = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              className="btn-secondary flex items-center gap-2 px-4 py-2 hover:scale-105 transition-all duration-300"
             >
               <LogOut size={18} />
               Logout
@@ -288,12 +288,12 @@ const Profile = () => {
           {/* Profile Form */}
           <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Profile Information</h2>
+              <h2 className="text-xl font-bold gradient-text">Profile Information</h2>
               {!editing && (
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setEditing(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-900 dark:bg-slate-800 text-white rounded-lg hover:bg-black dark:hover:bg-slate-700 transition"
+                    className="btn-primary flex items-center gap-2 px-4 py-2 hover:scale-105 transition-all duration-300"
                   >
                     <Edit2 size={18} />
                     Edit Profile
@@ -301,7 +301,7 @@ const Profile = () => {
 
                   {/* Small MFA badge only — main enable/disable actions live in the MFA section below */}
                   {mfaEnabled && (
-                    <div className="flex items-center gap-2 px-3 py-2 border border-green-200 bg-green-50 text-green-800 rounded-lg">
+                    <div className="flex items-center gap-2 px-3 py-2 glass-card border border-green-200 bg-green-50 text-green-800 rounded-lg shadow-glow">
                       <Check size={16} />
                       <span>2FA Enabled{mfaMethod && ` (${mfaMethod === 'EMAIL' ? 'Email' : mfaMethod === 'TOTP' ? 'App' : mfaMethod})`}</span>
                     </div>
@@ -321,7 +321,7 @@ const Profile = () => {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                      className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900"
+                      className="w-full px-4 py-3 glass-card border border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900 transition-all duration-300 hover:shadow-glow"
                     />
                   </div>
                   <div>
@@ -330,7 +330,7 @@ const Profile = () => {
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                      className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900"
+                      className="w-full px-4 py-3 glass-card border border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900 transition-all duration-300 hover:shadow-glow"
                     />
                   </div>
                   <div>
@@ -339,7 +339,7 @@ const Profile = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900"
+                      className="w-full px-4 py-3 glass-card border border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900 transition-all duration-300 hover:shadow-glow"
                     />
                   </div>
                   <div>
@@ -348,7 +348,7 @@ const Profile = () => {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900"
+                      className="w-full px-4 py-3 glass-card border border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900 transition-all duration-300 hover:shadow-glow"
                     />
                   </div>
                 </div>
@@ -356,14 +356,14 @@ const Profile = () => {
                 <div className="flex gap-2 pt-4">
                   <button
                     onClick={handleUpdateProfile}
-                    className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                    className="btn-primary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300"
                   >
                     <Check size={18} />
                     Save Changes
                   </button>
                   <button
                     onClick={() => setEditing(false)}
-                    className="flex items-center gap-2 px-6 py-2 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition"
+                    className="btn-secondary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300"
                   >
                     <X size={18} />
                     Cancel
@@ -394,13 +394,13 @@ const Profile = () => {
         </div>
 
         {/* MFA Section */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-8 mb-8">
+        <div className="glass-card card-modern p-8 mb-8 animate-fade-in">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Two-Factor Authentication</h2>
+            <h2 className="text-xl font-bold gradient-text">Two-Factor Authentication</h2>
             {!mfaEnabled && !showEnableOptions && (
               <button
                 onClick={() => setShowEnableOptions(true)}
-                className="px-4 py-2 bg-blue-900 dark:bg-slate-800 text-white rounded-lg hover:bg-black dark:hover:bg-slate-700 transition"
+                className="btn-primary px-4 py-2 hover:scale-105 transition-all duration-300"
               >
                 Enable 2FA
               </button>
@@ -408,15 +408,15 @@ const Profile = () => {
           </div>
 
           {!mfaEnabled && showEnableOptions && (
-            <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">Choose your 2FA method:</h3>
+            <div className="mb-6 p-4 glass-card rounded-lg border border-purple-200/50">
+              <h3 className="text-lg font-semibold gradient-text mb-4">Choose your 2FA method:</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
                   onClick={openEmailSetup}
-                  className="p-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition text-left"
+                  className="p-4 glass-card border border-slate-300 dark:border-slate-600 rounded-lg hover:shadow-glow hover:scale-105 transition-all duration-300 text-left group"
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-blue-600 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <span className="font-semibold text-slate-900 dark:text-slate-100">Email Verification</span>
@@ -435,10 +435,10 @@ const Profile = () => {
                       showError(err?.message || 'Failed to start TOTP setup');
                     }
                   }}
-                  className="p-4 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition text-left"
+                  className="p-4 glass-card border border-slate-300 dark:border-slate-600 rounded-lg hover:shadow-glow hover:scale-105 transition-all duration-300 text-left group"
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-green-600 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                     <span className="font-semibold text-slate-900 dark:text-slate-100">Authenticator App</span>
@@ -451,7 +451,7 @@ const Profile = () => {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={() => setShowEnableOptions(false)}
-                  className="px-3 py-1 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                  className="btn-secondary px-3 py-1 text-sm hover:scale-105 transition-all duration-300"
                 >
                   Cancel
                 </button>
@@ -462,7 +462,7 @@ const Profile = () => {
           {mfaEnabled ? (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-slate-900 dark:text-slate-100 font-semibold">2FA is enabled</span>
                 <span className="text-slate-600 dark:text-slate-400">
                   ({mfaMethod === 'EMAIL' ? 'Email verification' : mfaMethod === 'TOTP' ? 'Authenticator app' : 'Unknown method'})
@@ -479,7 +479,7 @@ const Profile = () => {
                     }
                   }
                 }}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                className="btn-secondary px-4 py-2 hover:scale-105 transition-all duration-300"
               >
                 Disable 2FA
               </button>
@@ -492,17 +492,17 @@ const Profile = () => {
         </div>
 
         {/* Bookings Section */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-8">
+        <div className="glass-card card-modern p-8 animate-fade-in">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50">My Bookings</h2>
+            <h2 className="text-2xl font-black gradient-text">My Bookings</h2>
             <div className="flex gap-4 text-xs text-slate-600 dark:text-slate-300">
-              <div>
-                <p className="font-semibold">Nights</p>
-                <p className="text-slate-900 dark:text-slate-100">{totalNights}</p>
+              <div className="glass-card px-3 py-2 rounded-lg">
+                <p className="font-semibold text-slate-900 dark:text-slate-100">Nights</p>
+                <p className="text-lg font-bold gradient-text">{totalNights}</p>
               </div>
-              <div>
-                <p className="font-semibold">Total spend</p>
-                <p className="text-slate-900 dark:text-slate-100">JOD {totalSpent}</p>
+              <div className="glass-card px-3 py-2 rounded-lg">
+                <p className="font-semibold text-slate-900 dark:text-slate-100">Total spend</p>
+                <p className="text-lg font-bold gradient-text">JOD {totalSpent}</p>
               </div>
             </div>
           </div>
@@ -512,7 +512,7 @@ const Profile = () => {
               <p className="text-slate-600 dark:text-slate-300 mb-4">No bookings yet</p>
               <button
                 onClick={() => navigate('/')}
-                className="px-6 py-2 bg-blue-900 dark:bg-slate-800 text-white rounded-lg hover:bg-black dark:hover:bg-slate-700 transition"
+                className="btn-primary px-6 py-2 hover:scale-105 transition-all duration-300"
               >
                 Start Browsing Hotels
               </button>
@@ -520,19 +520,19 @@ const Profile = () => {
           ) : (
             <div className="space-y-4">
               {bookings.map((booking) => (
-                <div key={booking.id} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition bg-white dark:bg-slate-900">
+                <div key={booking.id} className="glass-card border border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-glow hover:scale-[1.02] transition-all duration-300 bg-white dark:bg-slate-900">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{booking.hotelName}</h3>
+                      <h3 className="text-lg font-bold gradient-text">{booking.hotelName}</h3>
                       <p className="text-sm text-slate-600 dark:text-slate-400">ID: {booking.id}</p>
                     </div>
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                      className={`px-3 py-1 rounded-full text-sm font-semibold shadow-glow ${
                         (booking.status || '').toLowerCase() === 'confirmed'
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-green-100 text-green-700 border border-green-300'
                           : (booking.status || '').toLowerCase() === 'cancelled'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-yellow-100 text-yellow-700'
+                          ? 'bg-red-100 text-red-700 border border-red-300'
+                          : 'bg-yellow-100 text-yellow-700 border border-yellow-300'
                       }`}
                     >
                       {(booking.status || 'pending').toUpperCase()}
@@ -541,36 +541,36 @@ const Profile = () => {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div className="flex items-start gap-2">
-                      <Calendar size={16} className="text-slate-400 mt-0.5" />
+                      <Calendar size={16} className="text-purple-500 mt-0.5" />
                       <div>
                         <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">CHECK-IN</p>
-                        <p className="text-slate-900 dark:text-slate-100">{new Date(booking.checkIn).toLocaleDateString()}</p>
+                        <p className="text-slate-900 dark:text-slate-100 font-medium">{new Date(booking.checkIn).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
-                      <Calendar size={16} className="text-slate-400 mt-0.5" />
+                      <Calendar size={16} className="text-purple-500 mt-0.5" />
                       <div>
                         <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">CHECK-OUT</p>
-                        <p className="text-slate-900 dark:text-slate-100">{new Date(booking.checkOut).toLocaleDateString()}</p>
+                        <p className="text-slate-900 dark:text-slate-100 font-medium">{new Date(booking.checkOut).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
-                      <Users size={16} className="text-slate-400 mt-0.5" />
+                      <Users size={16} className="text-purple-500 mt-0.5" />
                       <div>
                         <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">GUESTS</p>
-                        <p className="text-slate-900 dark:text-slate-100">{booking.guests}</p>
+                        <p className="text-slate-900 dark:text-slate-100 font-medium">{booking.guests}</p>
                       </div>
                     </div>
                     <div>
                       <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold">TOTAL</p>
-                      <p className="text-lg font-bold text-blue-900 dark:text-blue-300">JOD {booking.totalPrice}</p>
+                      <p className="text-lg font-bold gradient-text">JOD {booking.totalPrice}</p>
                     </div>
                   </div>
 
                   {booking.status !== 'cancelled' && (
                     <button
                       onClick={() => handleCancelBooking(booking.id)}
-                      className="text-red-600 hover:text-red-700 font-semibold text-sm"
+                      className="text-red-600 hover:text-red-700 font-semibold text-sm hover:scale-105 transition-all duration-300"
                     >
                       Cancel Booking
                     </button>

@@ -129,7 +129,7 @@ const Insights = () => {
         {/* Loading / Error */}
         {loading && (
           <div className="flex justify-center py-16">
-            <Loader2 className="animate-spin text-jordan-blue" size={40} />
+            <Loader2 className="animate-spin text-blue-600" size={40} />
           </div>
         )}
         {!loading && error && (
@@ -154,7 +154,7 @@ const Insights = () => {
                     <span className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       TOTAL HOTELS
                     </span>
-                    <TrendingUp className="text-jordan-blue" size={18} />
+                    <TrendingUp className="text-blue-600 dark:text-blue-400" size={18} />
                   </div>
                   <p className="text-3xl font-black text-slate-900 dark:text-slate-50">
                     {totalHotels}
@@ -296,7 +296,7 @@ const Insights = () => {
                       </div>
                       <a
                         href={`/hotels/${h.id}`}
-                        className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-jordan-blue dark:hover:bg-jordan-blue transition-colors duration-200"
+                        className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200"
                       >
                         View details
                       </a>

@@ -188,7 +188,7 @@ export default function HotelsMap() {
                     <LeafletComponents.Popup>
                       <div className="min-w-0 max-w-[16rem]">
                         <div className="font-bold text-sm break-words">{hotelName}</div>
-                        <div className="text-xs text-gray-600 break-words">{hotel.location}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300 break-words">{hotel.location}</div>
                         <div className="text-xs font-bold text-blue-900 mt-1">{hotel.price} JOD/night</div>
                       </div>
                     </LeafletComponents.Popup>
@@ -218,7 +218,7 @@ export default function HotelsMap() {
                 }`}
               >
                 <p className="font-bold text-sm">{hotelName}</p>
-                <p className="text-xs text-gray-600">{hotel.location}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300">{hotel.location}</p>
                 <p className="text-sm font-semibold text-blue-600">{hotel.price} JOD</p>
               </div>
                 );
@@ -253,11 +253,11 @@ export default function HotelsMap() {
             </div>
             <div>
               <h2 className="text-3xl font-bold mb-2">{selectedName}</h2>
-              <p className="text-gray-600 mb-4">{selectedHotel.description}</p>
-              <p className="text-gray-700 mb-2">
+              <p className="text-gray-600 dark:text-gray-300 mb-4">{selectedHotel.description}</p>
+              <p className="text-gray-700 dark:text-gray-200 mb-2">
                 <strong>Phone:</strong> {selectedHotel.phone}
               </p>
-              <p className="text-gray-700 mb-4">
+              <p className="text-gray-700 dark:text-gray-200 mb-4">
                 <strong>Email:</strong> {selectedHotel.email}
               </p>
               <p className="text-2xl font-bold text-blue-600">{selectedHotel.price} JOD / night</p>

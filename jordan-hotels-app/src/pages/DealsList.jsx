@@ -19,9 +19,25 @@ export default function DealsList() {
 
   useEffect(() => {
     const loadHotels = async () => {
-      const data = await hotelsService.getFeaturedHotels();
-      setHotels(data);
-      setLoading(false);
+      try {
+        const data = await hotelsService.getFeaturedHotels();
+
+        // Filter for best deals: price between 40-120 JOD, sort by rating, limit to 20
+        const filteredDeals = (data || [])
+          .filter(hotel => {
+            const price = hotel.price && typeof hotel.price === 'number' ? hotel.price : 0;
+            return price >= 40 && price <= 120;
+          })
+          .sort((a, b) => (b.rating || 0) - (a.rating || 0)) // Sort by rating descending
+          .slice(0, 20); // Limit to 20 deals
+
+        setHotels(filteredDeals);
+      } catch (error) {
+        console.error('Error loading deals:', error);
+        setHotels([]);
+      } finally {
+        setLoading(false);
+      }
     };
     loadHotels();
   }, []);

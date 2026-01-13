@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
+import { MapPin, Camera, Tag, TrendingUp, BarChart3, MessageSquare, Image, HelpCircle } from "lucide-react";
 
 const Navbar = () => {
   const { user, userProfile, logout } = useAuth();
@@ -38,237 +39,249 @@ const Navbar = () => {
   const closeMobile = () => setMobileOpen(false);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-slate-200/50 dark:bg-slate-900/80 dark:border-slate-700/50 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-        <div className="flex items-center justify-between gap-3">
-          {/* Brand */}
+    <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-jordan-sand/20 dark:border-slate-700/50 shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
           <Link
             to="/"
-            className="text-2xl font-black font-display tracking-tighter bg-gradient-to-r from-jordan-blue to-jordan-teal bg-clip-text text-transparent hover:scale-105 transition-transform duration-300"
+            className="text-2xl font-bold bg-gradient-to-r from-jordan-blue to-jordan-teal bg-clip-text text-transparent hover:from-jordan-teal hover:to-jordan-blue transition-all duration-300 tracking-wide"
           >
-            VISITJO
+            <span className="capitalize">Visit</span>
+            <span className="ml-1">Jo</span>
           </Link>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-10">
             <Link
               to="/destinations"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue font-medium transition-all duration-300 text-sm hover:scale-105"
             >
+              <MapPin size={16} />
               {t("nav.destinations")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link
-              to="/trends"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
-            >
-              {t("nav.trends")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link
-              to="/insights"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
-            >
-              {t("nav.insights")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/experiences"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-rose font-medium transition-all duration-300 text-sm hover:scale-105"
             >
+              <Camera size={16} />
               {t("nav.experiences")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
               to="/deals"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-gold font-medium transition-all duration-300 text-sm hover:scale-105"
             >
+              <Tag size={16} />
               {t("nav.deals")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
             </Link>
             <Link
-              to="/blog"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+              to="/trends"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue font-medium transition-all duration-300 text-sm hover:scale-105"
             >
-              {t("nav.blog")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+              <TrendingUp size={16} />
+              {t("nav.trends", "Trends")}
+            </Link>
+            <Link
+              to="/insights"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-teal font-medium transition-all duration-300 text-sm hover:scale-105"
+            >
+              <BarChart3 size={16} />
+              {t("nav.insights", "Insights")}
             </Link>
             <Link
               to="/reviews"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-rose font-medium transition-all duration-300 text-sm hover:scale-105"
             >
-              {t("nav.reviews")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+              <MessageSquare size={16} />
+              {t("nav.reviews", "Reviews")}
+            </Link>
+            <Link
+              to="/blog"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-gold font-medium transition-all duration-300 text-sm hover:scale-105"
+            >
+              <Image size={16} />
+              {t("nav.blog", "Blog")}
+            </Link>
+            <Link
+              to="/gallery"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue font-medium transition-all duration-300 text-sm hover:scale-105"
+            >
+              <Image size={16} />
+              {t("nav.gallery", "Gallery")}
             </Link>
             <Link
               to="/support"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-teal font-medium transition-all duration-300 text-sm hover:scale-105"
             >
-              {t("nav.support")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
-            </Link>
-
-            {/* New Nav Items */}
-            <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" />
-            
-            <Link
-              to="/gallery"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
-            >
-              {t("nav.gallery")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link
-              to="/special-offers"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
-            >
-              {t("nav.offers")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link
-              to="/concierge"
-              className="text-sm font-medium text-slate-600 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 relative group"
-            >
-              {t("nav.concierge")}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-jordan-blue group-hover:w-full transition-all duration-300" />
+              <HelpCircle size={16} />
+              {t("nav.support", "Support")}
             </Link>
           </div>
 
-          {/* Actions (desktop) */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <ThemeToggle />
+            <LanguageSwitcher />
+            
             {user ? (
-              <>
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-300 max-w-[14rem] truncate">
+              <div className="flex items-center space-x-4">
+                <span className="text-slate-700 dark:text-slate-200 font-medium">
                   {displayName}
                 </span>
                 <Link
                   to="/profile"
-                  className="text-sm font-medium text-slate-700 hover:text-jordan-blue dark:text-slate-300 transition-colors duration-200"
+                  className="text-slate-700 dark:text-slate-200 hover:text-jordan-blue font-medium transition-colors duration-300"
                 >
                   {t("nav.profile")}
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="bg-gradient-to-r from-jordan-blue to-jordan-teal hover:from-jordan-teal hover:to-jordan-blue text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   {t("nav.logout")}
                 </button>
-              </>
+              </div>
             ) : (
-              <>
+              <div className="flex items-center space-x-4">
                 <Link
                   to="/login"
-                  className="text-sm font-medium text-slate-700 hover:text-jordan-blue dark:text-slate-300 transition-colors duration-200"
+                  className="text-slate-700 dark:text-slate-200 hover:text-jordan-blue font-medium transition-colors duration-300"
                 >
                   {t("nav.login")}
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-6 py-2.5 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white text-sm font-semibold rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+                  className="bg-gradient-to-r from-jordan-rose to-jordan-gold hover:from-jordan-gold hover:to-jordan-rose text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   {t("nav.signup")}
                 </Link>
-              </>
+              </div>
             )}
-            <ThemeToggle />
-            <LanguageSwitcher />
           </div>
 
-          {/* Actions (mobile) */}
-          <div className="md:hidden flex items-center gap-2">
-            <LanguageSwitcher />
+          {/* Mobile menu button */}
+          <div className="lg:hidden flex items-center space-x-2">
             <ThemeToggle />
+            <LanguageSwitcher />
             <button
-              type="button"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-expanded={mobileOpen}
-              aria-controls="mobile-nav"
-              className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:bg-white dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="p-2 rounded-md text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 transition-colors duration-300"
             >
-              {mobileOpen ? t("nav.close") : t("nav.menu")}
+              {mobileOpen ? (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu panel */}
+        {/* Mobile Navigation */}
         {mobileOpen && (
-          <div
-            id="mobile-nav"
-            className="md:hidden mt-3 rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-xl shadow-xl dark:border-slate-700/50 dark:bg-slate-900/70 overflow-y-auto max-h-[70vh]"
-          >
-            <div className="p-4 flex flex-col gap-2">
-              <Link to="/destinations" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+          <div className="lg:hidden border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link
+                to="/destinations"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-md font-medium transition-colors duration-300"
+              >
                 {t("nav.destinations")}
               </Link>
-              <Link to="/trends" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {t("nav.trends")}
-              </Link>
-              <Link to="/insights" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {t("nav.insights")}
-              </Link>
-              <Link to="/experiences" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+              <Link
+                to="/experiences"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-rose hover:bg-jordan-rose/5 rounded-md font-medium transition-colors duration-300"
+              >
                 {t("nav.experiences")}
               </Link>
-              <Link to="/deals" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+              <Link
+                to="/deals"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-gold hover:bg-jordan-gold/5 rounded-md font-medium transition-colors duration-300"
+              >
                 {t("nav.deals")}
               </Link>
-              <Link to="/blog" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {t("nav.blog")}
+              <Link
+                to="/trends"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-md font-medium transition-colors duration-300"
+              >
+                {t("nav.trends", "Trends")}
               </Link>
-              <Link to="/reviews" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {t("nav.reviews")}
+              <Link
+                to="/insights"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-teal hover:bg-jordan-teal/5 rounded-md font-medium transition-colors duration-300"
+              >
+                {t("nav.insights", "Insights")}
               </Link>
-              <Link to="/support" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {t("nav.support")}
+              <Link
+                to="/reviews"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-rose hover:bg-jordan-rose/5 rounded-md font-medium transition-colors duration-300"
+              >
+                {t("nav.reviews", "Reviews")}
+              </Link>
+              <Link
+                to="/blog"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-gold hover:bg-jordan-gold/5 rounded-md font-medium transition-colors duration-300"
+              >
+                {t("nav.blog", "Blog")}
+              </Link>
+              <Link
+                to="/gallery"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-md font-medium transition-colors duration-300"
+              >
+                {t("nav.gallery", "Gallery")}
+              </Link>
+              <Link
+                to="/support"
+                onClick={closeMobile}
+                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-teal hover:bg-jordan-teal/5 rounded-md font-medium transition-colors duration-300"
+              >
+                {t("nav.support", "Support")}
               </Link>
 
-              <div className="my-2 h-px w-full bg-slate-200/70 dark:bg-slate-700/60" />
-
-              <Link to="/gallery" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {t("nav.gallery")}
-              </Link>
-              <Link to="/special-offers" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {t("nav.offers")}
-              </Link>
-              <Link to="/concierge" onClick={closeMobile} className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {t("nav.concierge")}
-              </Link>
-
-              <div className="my-2 h-px w-full bg-slate-200/70 dark:bg-slate-700/60" />
+              <div className="border-t border-gray-200 my-3"></div>
 
               {user ? (
-                <>
-                  <div className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
+                <div className="space-y-1">
+                  <div className="px-3 py-2 text-gray-900 dark:text-white font-medium">
                     {displayName}
                   </div>
                   <Link
                     to="/profile"
                     onClick={closeMobile}
-                    className="py-2 text-sm font-semibold text-slate-700 dark:text-slate-200"
+                    className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-md font-medium transition-colors duration-300"
                   >
                     {t("nav.profile")}
                   </Link>
                   <button
-                    type="button"
                     onClick={handleLogout}
-                    className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl shadow-md transition-colors"
+                    className="block w-full text-left px-3 py-2 bg-gradient-to-r from-jordan-blue to-jordan-teal hover:from-jordan-teal hover:to-jordan-blue text-white rounded-md font-medium transition-all duration-300"
                   >
                     {t("nav.logout")}
                   </button>
-                </>
+                </div>
               ) : (
-                <div className="grid grid-cols-1 gap-2">
+                <div className="space-y-1">
                   <Link
                     to="/login"
                     onClick={closeMobile}
-                    className="w-full text-center px-4 py-2 bg-white text-slate-800 text-sm font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700"
+                    className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md font-medium transition-colors"
                   >
                     {t("nav.login")}
                   </Link>
                   <Link
                     to="/signup"
                     onClick={closeMobile}
-                    className="w-full text-center px-4 py-2 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white text-sm font-semibold rounded-xl shadow-md"
+                    className="block px-3 py-2 bg-gray-900 hover:bg-black text-white rounded-md font-medium text-center transition-colors"
                   >
                     {t("nav.signup")}
                   </Link>

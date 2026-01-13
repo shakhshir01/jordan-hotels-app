@@ -21,7 +21,7 @@ export default function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:text-jordan-blue dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
+        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
@@ -46,7 +46,7 @@ export default function LanguageSwitcher() {
                 onClick={() => handleLanguageChange(language.code)}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 ${
                   i18n.language === language.code
-                    ? 'bg-jordan-blue/10 text-jordan-blue dark:bg-jordan-blue/20 dark:text-blue-400'
+                    ? 'bg-blue-600/10 text-blue-600 dark:bg-blue-600/20 dark:text-blue-400'
                     : 'text-slate-700 dark:text-slate-300'
                 }`}
               >

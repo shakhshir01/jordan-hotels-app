@@ -49,7 +49,7 @@ const SavedSearches = () => {
             </p>
             <Link
               to="/search"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-jordan-blue text-white text-sm font-semibold shadow-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold shadow-lg hover:bg-blue-700 transition-colors"
             >
               <Search size={18} />
               Start exploring
@@ -75,7 +75,7 @@ const SavedSearches = () => {
                 <div className="flex items-center gap-2">
                   <Link
                     to={`/search?q=${encodeURIComponent(s.term)}`}
-                    className="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-jordan-blue dark:hover:bg-jordan-blue transition-colors duration-200"
+                    className="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200"
                   >
                     Open
                   </Link>

@@ -52,7 +52,42 @@ const HotelDetails = () => {
   const [guests, setGuests] = useState('1');
   const [selectedRoomType, setSelectedRoomType] = useState('');
   const [bookingLoading, setBookingLoading] = useState(false);
+  // Booking fees and policies
+  const bookingFees = {
+    serviceFee: 15, // JOD
+    taxRate: 0.16, // 16% VAT
+    cleaningFee: 25, // JOD
+  };
 
+  const cancellationPolicy = {
+    free: 'Cancel up to 24 hours before check-in for full refund',
+    partial: 'Cancel within 24 hours: 50% refund',
+    noRefund: 'No refund for cancellations within 6 hours of check-in',
+  };
+
+  // Calculate detailed price breakdown
+  const calculatePriceBreakdown = () => {
+    const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
+    const basePrice = selectedRoom ? selectedRoom.price : hotel.price;
+    const nights = Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)));
+    
+    const subtotal = basePrice * nights;
+    const serviceFee = bookingFees.serviceFee;
+    const cleaningFee = bookingFees.cleaningFee;
+    const subtotalWithFees = subtotal + serviceFee + cleaningFee;
+    const tax = Math.round(subtotalWithFees * bookingFees.taxRate);
+    const total = subtotalWithFees + tax;
+
+    return {
+      basePrice,
+      nights,
+      subtotal,
+      serviceFee,
+      cleaningFee,
+      tax,
+      total,
+    };
+  };
   useEffect(() => {
     const fetchHotel = async () => {
       setLoading(true);
@@ -75,6 +110,28 @@ const HotelDetails = () => {
 
     fetchHotel();
   }, [id]);
+
+  // Handle booking intent from URL query parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('book') === 'true' && hotel) {
+      // Scroll to booking form after hotel loads
+      setTimeout(() => {
+        const bookingForm = document.querySelector('form');
+        if (bookingForm) {
+          bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Set default check-in date to tomorrow
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          setCheckInDate(tomorrow.toISOString().split('T')[0]);
+          // Set default check-out date to day after tomorrow
+          const dayAfterTomorrow = new Date();
+          dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+          setCheckOutDate(dayAfterTomorrow.toISOString().split('T')[0]);
+        }
+      }, 500);
+    }
+  }, [hotel, location.search]);
 
   const handleBooking = async (e) => {
     e.preventDefault();
@@ -100,6 +157,8 @@ const HotelDetails = () => {
       const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
       const roomPrice = selectedRoom ? selectedRoom.price : hotel.price;
       
+      const breakdown = calculatePriceBreakdown();
+      
       const bookingData = {
         checkInDate,
         checkOutDate,
@@ -107,7 +166,9 @@ const HotelDetails = () => {
         guests: parseInt(guests, 10),
         roomType: selectedRoomType || 'Standard Room',
         roomPrice,
-        totalPrice: roomPrice * nights,
+        breakdown,
+        cancellationPolicy,
+        totalPrice: breakdown.total,
       };
       // Navigate to checkout with hotel and booking data
       navigate('/checkout', { state: { hotelId: id, bookingData, hotel } });
@@ -121,7 +182,7 @@ const HotelDetails = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-24">
-        <Loader2 className="animate-spin text-jordan-blue" size={48} />
+        <Loader2 className="animate-spin text-blue-600" size={48} />
       </div>
     );
   }
@@ -200,208 +261,275 @@ const HotelDetails = () => {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-section">
       <Seo
         title={`${hotelName} | VisitJo`}
         description={descriptionText}
         canonicalUrl={canonicalUrl}
         jsonLd={jsonLdGraph}
       />
-      {/* Breadcrumbs */}
-      <nav className="text-sm text-gray-500">
-        <Link to="/" className="hover:text-jordan-blue transition">{t('nav.home')}</Link>
-        {' / '}
-        <span>{hotel.location}</span>
-        {' / '}
-        <span className="text-slate-900 dark:text-slate-100 font-semibold">{hotelName}</span>
+
+      {/* Modern Breadcrumbs */}
+      <nav className="glass-card rounded-2xl p-4 mb-8 shadow-glow">
+        <div className="flex items-center gap-2 text-sm">
+          <Link to="/" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium">
+            {t('nav.home')}
+          </Link>
+          <span className="text-slate-400">/</span>
+          <span className="text-slate-600 dark:text-slate-300">{hotel.location}</span>
+          <span className="text-slate-400">/</span>
+          <span className="gradient-text font-semibold">{hotelName}</span>
+        </div>
       </nav>
 
-      {/* Gallery with all hotel images */}
-      <section className="surface p-5 sm:p-8">
-        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-slate-900 dark:text-slate-100">{t('hotelDetails.gallery.title')}</h2>
-        <HotelGallery images={hotel.images} hotelName={hotelName} />
+      {/* Gallery with modern design */}
+      <section className="card-modern mb-12 overflow-hidden">
+        <div className="p-6 sm:p-8 lg:p-10">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-8 gradient-text">{t('hotelDetails.gallery.title')}</h2>
+          <HotelGallery images={hotel.images} hotelName={hotelName} />
+        </div>
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
         {/* Left Column: Info */}
-        <div className="md:col-span-2 space-y-8">
-          <div className="flex justify-between items-start gap-4">
-            <div>
-              <h1 className="page-title gradient-text">{hotelName}</h1>
-              <p className="page-subtitle mt-2 flex items-center gap-2">
-                <MapPin className="w-5 h-5" /> {hotel.location}, {t('hotelDetails.location.country')}
+        <div className="lg:col-span-2 space-y-10">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
+            <div className="flex-1">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 gradient-text leading-tight">{hotelName}</h1>
+              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 flex items-center gap-3 mb-6">
+                <MapPin className="w-6 h-6 text-blue-500 flex-shrink-0" />
+                <span className="font-medium">{hotel.location}, {t('hotelDetails.location.country')}</span>
               </p>
             </div>
-            <WishlistButton item={hotel} />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-200 font-semibold">
-              <Star size={18} fill="currentColor" className="text-amber-500" />
-              <span>{hotel.rating}</span>
+            <div className="flex-shrink-0">
+              <WishlistButton item={hotel} />
             </div>
-            <span className="text-sm text-slate-500 dark:text-slate-400">(124 {t('hotels.reviews')})</span>
           </div>
 
-          <section className="surface p-6 sm:p-8">
-            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-slate-900 dark:text-slate-100">{t('hotelDetails.offers.title')}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="flex items-center gap-4">
-                <div className="bg-blue-50 dark:bg-slate-800 p-3 rounded-2xl">
-                  <Wifi className="text-jordan-blue" size={24} />
+          <div className="flex items-center gap-4 mb-8">
+            <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-glow animate-pulse-glow">
+              <Star size={20} fill="currentColor" />
+              <span className="text-lg">{hotel.rating}</span>
+            </div>
+            <span className="text-base text-slate-500 dark:text-slate-400 font-medium">(124 {t('hotels.reviews')})</span>
+          </div>
+
+          <section className="card-modern">
+            <div className="p-6 sm:p-8 lg:p-10">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-8 gradient-text">{t('hotelDetails.offers.title')}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-glow transition-all duration-300 group">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300">
+                    <Wifi className="text-white" size={28} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-lg">{t('hotelDetails.offers.wifi.title')}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.wifi.subtitle')}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-slate-100">{t('hotelDetails.offers.wifi.title')}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{t('hotelDetails.offers.wifi.subtitle')}</p>
+                <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-glow transition-all duration-300 group">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300">
+                    <Coffee className="text-white" size={28} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-lg">{t('hotelDetails.offers.breakfast.title')}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.breakfast.subtitle')}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-blue-50 dark:bg-slate-800 p-3 rounded-2xl">
-                  <Coffee className="text-jordan-blue" size={24} />
+                <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 hover:shadow-glow transition-all duration-300 group">
+                  <div className="bg-gradient-to-r from-purple-500 to-violet-600 p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300">
+                    <Car className="text-white" size={28} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-lg">{t('hotelDetails.offers.parking.title')}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.parking.subtitle')}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-slate-100">{t('hotelDetails.offers.breakfast.title')}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{t('hotelDetails.offers.breakfast.subtitle')}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-blue-50 dark:bg-slate-800 p-3 rounded-2xl">
-                  <Car className="text-jordan-blue" size={24} />
-                </div>
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-slate-100">{t('hotelDetails.offers.parking.title')}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{t('hotelDetails.offers.parking.subtitle')}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-blue-50 dark:bg-slate-800 p-3 rounded-2xl">
-                  <CheckCircle className="text-jordan-blue" size={24} />
-                </div>
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-slate-100">{t('hotelDetails.offers.frontDesk.title')}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{t('hotelDetails.offers.frontDesk.subtitle')}</p>
+                <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 hover:shadow-glow transition-all duration-300 group">
+                  <div className="bg-gradient-to-r from-pink-500 to-rose-600 p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300">
+                    <CheckCircle className="text-white" size={28} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-lg">{t('hotelDetails.offers.frontDesk.title')}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.frontDesk.subtitle')}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="surface p-6 sm:p-8">
-            <h3 className="text-xl sm:text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">{t('hotelDetails.about.title')}</h3>
-            <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-base sm:text-lg mb-4">
-              {hotel.description || t('hotelDetails.about.fallbackDescription')}
-            </p>
-            <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-base sm:text-lg">
-              {t('hotelDetails.about.extra')}
-            </p>
+          <section className="card-modern">
+            <div className="p-6 sm:p-8 lg:p-10">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-6 gradient-text">{t('hotelDetails.about.title')}</h3>
+              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg mb-6">
+                  {hotel.description || t('hotelDetails.about.fallbackDescription')}
+                </p>
+                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg">
+                  {t('hotelDetails.about.extra')}
+                </p>
+              </div>
+            </div>
           </section>
         </div>
 
         {/* Right Column: Booking Sidebar */}
-        <aside className="surface p-6 sm:p-8 md:sticky md:top-24 h-fit">
-          <div className="mb-6">
-            <div className="flex justify-between items-end mb-2 gap-3">
-              <span className="text-3xl font-black text-slate-900 dark:text-slate-50">{hotel.price} JOD</span>
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">/{t('hotels.perNight')}</span>
-            </div>
-            <p className="text-sm text-slate-600 dark:text-slate-300">{t('hotelDetails.booking.averagePrice')}</p>
-          </div>
-
-          <form onSubmit={handleBooking} className="space-y-6">
-            {/* Check-in Date */}
-            <div>
-              <label className="label-premium">{t('hotelDetails.booking.checkIn')}</label>
-              <input
-                type="date"
-                value={checkInDate}
-                onChange={(e) => setCheckInDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-                className="input-premium"
-                required
-              />
+        <aside className="card-modern lg:sticky lg:top-24 h-fit">
+          <div className="p-6 sm:p-8 lg:p-10">
+            <div className="mb-8">
+              <div className="flex justify-between items-end mb-3 gap-3">
+                <span className="text-5xl lg:text-6xl font-black gradient-text">{hotel.price}</span>
+                <span className="text-base font-semibold text-slate-500 dark:text-slate-400">JOD</span>
+              </div>
+              <p className="text-base text-slate-600 dark:text-slate-300 font-medium">/{t('hotels.perNight')}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{t('hotelDetails.booking.averagePrice')}</p>
             </div>
 
-            {/* Check-out Date */}
-            <div>
-              <label className="label-premium">{t('hotelDetails.booking.checkOut')}</label>
-              <input
-                type="date"
-                value={checkOutDate}
-                onChange={(e) => setCheckOutDate(e.target.value)}
-                min={checkInDate || new Date().toISOString().split('T')[0]}
-                className="input-premium"
-                required
-              />
-            </div>
-
-            {/* Number of Guests */}
-            <div>
-              <label className="label-premium">{t('hotelDetails.booking.guests')}</label>
-              <select
-                value={guests}
-                onChange={(e) => setGuests(e.target.value)}
-                className="input-premium"
-              >
-                <option value="1">{t('hotelDetails.booking.guestCount', { count: 1 })}</option>
-                <option value="2">{t('hotelDetails.booking.guestCount', { count: 2 })}</option>
-                <option value="3">{t('hotelDetails.booking.guestCount', { count: 3 })}</option>
-                <option value="4">{t('hotelDetails.booking.guestCount', { count: 4 })}</option>
-                <option value="5">{t('hotelDetails.booking.guestCountPlus')}</option>
-              </select>
-            </div>
-
-            {/* Room Type Selection */}
-            {hotel.roomTypes && hotel.roomTypes.length > 0 && (
+            <form onSubmit={handleBooking} className="space-y-8">
+              {/* Check-in Date */}
               <div>
-                <label className="label-premium">{t('hotelDetails.booking.roomType')}</label>
+                <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                  {t('hotelDetails.booking.checkIn')}
+                </label>
+                <input
+                  type="date"
+                  value={checkInDate}
+                  onChange={(e) => setCheckInDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium"
+                  required
+                />
+              </div>
+
+              {/* Check-out Date */}
+              <div>
+                <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                  {t('hotelDetails.booking.checkOut')}
+                </label>
+                <input
+                  type="date"
+                  value={checkOutDate}
+                  onChange={(e) => setCheckOutDate(e.target.value)}
+                  min={checkInDate || new Date().toISOString().split('T')[0]}
+                  className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium"
+                  required
+                />
+              </div>
+
+              {/* Number of Guests */}
+              <div>
+                <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                  {t('hotelDetails.booking.guests')}
+                </label>
                 <select
-                  value={selectedRoomType}
-                  onChange={(e) => setSelectedRoomType(e.target.value)}
-                  className="input-premium"
+                  value={guests}
+                  onChange={(e) => setGuests(e.target.value)}
+                  className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium"
                 >
-                  <option value="">{t('hotelDetails.booking.selectRoomType')}</option>
-                  {hotel.roomTypes.map((roomType, index) => (
-                    <option key={index} value={roomType.name}>
-                      {roomType.name} - {roomType.price} JOD ({t('hotelDetails.booking.capacity')}: {roomType.capacity})
-                    </option>
-                  ))}
+                  <option value="1">{t('hotelDetails.booking.guestCount', { count: 1 })}</option>
+                  <option value="2">{t('hotelDetails.booking.guestCount', { count: 2 })}</option>
+                  <option value="3">{t('hotelDetails.booking.guestCount', { count: 3 })}</option>
+                  <option value="4">{t('hotelDetails.booking.guestCount', { count: 4 })}</option>
+                  <option value="5">{t('hotelDetails.booking.guestCountPlus')}</option>
                 </select>
               </div>
-            )}
 
-            {/* Total Price */}
-            <div className="border-t border-slate-200/70 dark:border-slate-700/60 pt-6">
-              <div className="flex justify-between items-center mb-4 gap-4">
-                <span className="text-sm text-slate-700 dark:text-slate-200">
-                  {(() => {
-                    const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
-                    const price = selectedRoom ? selectedRoom.price : hotel.price;
-                    const nights = Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)));
-                    return `${price} JOD × ${nights} ${t('hotelDetails.booking.nights', { count: nights })}`;
-                  })()}
-                </span>
-                <span className="font-bold text-lg text-slate-900 dark:text-slate-50">
-                  {(() => {
-                    const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
-                    const price = selectedRoom ? selectedRoom.price : hotel.price;
-                    const nights = Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)));
-                    return `${(price * nights).toLocaleString()} JOD`;
-                  })()}
-                </span>
+              {/* Room Type Selection */}
+              {hotel.roomTypes && hotel.roomTypes.length > 0 && (
+                <div>
+                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                    {t('hotelDetails.booking.roomType')}
+                  </label>
+                  <select
+                    value={selectedRoomType}
+                    onChange={(e) => setSelectedRoomType(e.target.value)}
+                    className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium"
+                  >
+                    <option value="">{t('hotelDetails.booking.selectRoomType')}</option>
+                    {hotel.roomTypes.map((roomType, index) => (
+                      <option key={index} value={roomType.name}>
+                        {roomType.name} - {roomType.price} JOD ({t('hotelDetails.booking.capacity')}: {roomType.capacity})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Price Breakdown */}
+              <div className="glass-card rounded-2xl p-6 border border-white/20">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-6 text-lg">💰 Price Breakdown</h3>
+
+                {(() => {
+                  const breakdown = calculatePriceBreakdown();
+                  return (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-slate-700 dark:text-slate-300">{breakdown.basePrice} JOD × {breakdown.nights} nights</span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">{breakdown.subtotal.toLocaleString()} JOD</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
+                        <span>Service fee</span>
+                        <span>{breakdown.serviceFee} JOD</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
+                        <span>Cleaning fee</span>
+                        <span>{breakdown.cleaningFee} JOD</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
+                        <span>Taxes (16% VAT)</span>
+                        <span>{breakdown.tax} JOD</span>
+                      </div>
+                      <div className="border-t border-slate-200/70 dark:border-slate-700/60 pt-4 mt-4 flex justify-between items-center">
+                        <span className="font-black text-slate-900 dark:text-slate-100 text-xl">Total</span>
+                        <span className="font-black gradient-text text-2xl">{breakdown.total.toLocaleString()} JOD</span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={bookingLoading || !checkInDate}
-              className="btn-primary w-full disabled:opacity-50"
-            >
-              {bookingLoading ? t('hotelDetails.booking.bookingLoading') : t('hotelDetails.booking.reserveNow')}
-            </button>
+              {/* Cancellation Policy */}
+              <div className="glass-card rounded-2xl p-6 border border-white/20">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-3">
+                  <AlertCircle size={20} className="text-amber-500" />
+                  Cancellation Policy
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-green-50 dark:bg-green-900/20">
+                    <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">{cancellationPolicy.free}</span>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-yellow-50 dark:bg-yellow-900/20">
+                    <AlertCircle size={16} className="text-yellow-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">{cancellationPolicy.partial}</span>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-red-50 dark:bg-red-900/20">
+                    <AlertCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">{cancellationPolicy.noRefund}</span>
+                  </div>
+                </div>
+              </div>
 
-            <p className="text-center text-slate-500 dark:text-slate-400 text-xs">
-              {t('hotelDetails.booking.noChargeYet')}
-            </p>
-          </form>
+              <button
+                type="submit"
+                disabled={bookingLoading || !checkInDate}
+                className="btn-primary w-full py-5 text-lg font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover-lift touch-manipulation"
+              >
+                {bookingLoading ? (
+                  <div className="flex items-center justify-center gap-3">
+                    <Loader2 size={20} className="animate-spin" />
+                    {t('hotelDetails.booking.bookingLoading')}
+                  </div>
+                ) : (
+                  <span>{t('hotelDetails.booking.reserveNow')}</span>
+                )}
+              </button>
+
+              <p className="text-center text-slate-500 dark:text-slate-400 text-sm font-medium">
+                🔒 {t('hotelDetails.booking.noChargeYet')}
+              </p>
+            </form>
+          </div>
         </aside>
       </div>
     </div>

@@ -27,8 +27,6 @@ export default function ExperiencesListing() {
     loadExperiences();
   }, []);
 
-  console.log('ExperiencesListing - loading:', loading, 'error:', error, 'items:', items);
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

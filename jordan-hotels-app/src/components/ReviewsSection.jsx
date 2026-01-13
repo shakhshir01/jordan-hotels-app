@@ -3,6 +3,8 @@ import { Star, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
+  // Add sorting and credibility
+  const [sortBy, setSortBy] = useState('date'); // 'date' or 'rating'
   const { t } = useTranslation();
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [submitting, setSubmitting] = useState(false);
@@ -30,6 +32,13 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : 0;
 
+  // Sort reviews
+  const sortedReviews = [...reviews].sort((a, b) => {
+    if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+    // Default: newest first
+    return new Date(b.timestamp) - new Date(a.timestamp);
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -50,6 +59,25 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
           </div>
         )}
       </div>
+
+      {/* Sorting Controls */}
+      {reviews.length > 1 && (
+        <div className="flex gap-2 items-center mb-2">
+          <span className="text-sm text-slate-600">Sort by:</span>
+          <button
+            className={`px-2 py-1 rounded ${sortBy === 'date' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}
+            onClick={() => setSortBy('date')}
+          >
+            {t('reviews.sortNewest', 'Newest')}
+          </button>
+          <button
+            className={`px-2 py-1 rounded ${sortBy === 'rating' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}
+            onClick={() => setSortBy('rating')}
+          >
+            {t('reviews.sortRating', 'Highest Rated')}
+          </button>
+        </div>
+      )}
 
       {/* Add Review Form */}
       <form onSubmit={handleSubmit} className="surface p-6 space-y-4">
@@ -107,12 +135,12 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
 
       {/* Reviews List */}
       <div className="space-y-4">
-        {reviews.length === 0 ? (
+        {sortedReviews.length === 0 ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             {t('reviews.noReviews', 'No reviews yet. Be the first to share your experience!')}
           </div>
         ) : (
-          reviews.map((review, index) => (
+          sortedReviews.map((review, index) => (
             <div key={index} className="surface p-4">
               <div className="flex items-center gap-2 mb-2">
                 <div className="flex gap-1">
@@ -130,6 +158,12 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
                 <span className="text-sm text-slate-600 dark:text-slate-400">
                   {new Date(review.timestamp).toLocaleDateString()}
                 </span>
+                {/* Verified Stay badge if review.verified === true */}
+                {review.verified && (
+                  <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                    {t('reviews.verifiedStay', 'Verified Stay')}
+                  </span>
+                )}
               </div>
               <p className="text-slate-700 dark:text-slate-300">{review.comment}</p>
             </div>

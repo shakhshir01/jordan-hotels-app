@@ -98,6 +98,9 @@
     "resetPassword": "Reset Password",
     "verificationCodeSent": "Verification code sent to your email",
     "checkEmail": "Check your email for the verification code",
+    "resendCode": "Resend Code",
+    "resend": "Resend",
+    "resendIn": "Resend ({{seconds}}s)",
     "validation": {
       "fullNameRequired": "Full name is required",
       "emailRequired": "Email is required",
@@ -107,8 +110,17 @@
       "passwordUppercase": "Password must contain an uppercase letter",
       "passwordNumber": "Password must contain a number",
       "passwordsDontMatch": "Passwords do not match"
-    }
-  },
+        ,
+        "passwordTooWeak": "Password is too weak"
+      },
+      "strength": {
+        "veryWeak": "Very weak",
+        "weak": "Weak",
+        "medium": "Medium",
+        "strong": "Strong",
+        "veryStrong": "Very strong"
+        }
+      },
   "messages": {
     "success": "Success",
     "error": "Error",
@@ -309,7 +321,8 @@
         "title": "Blog",
         "subtitle": "Travel tips, destinations, and stories from Jordan."
       },
-      "read": "Read"
+      "read": "Read",
+      "backToBlog": "Back to Blog"
     },
     "reviews": {
       "hero": {
@@ -523,7 +536,7 @@
       "hero": {
         "kicker": "TRAVEL INTELLIGENCE",
         "title": "What’s trending",
-        "subtitle": "Search across hotels, experiences, deals, and destinations."
+        "subtitle": "Search across hotels and destinations."
       },
       "searchPlaceholder": "Search Petra, Dead Sea, Amman...",
       "explore": "Explore",

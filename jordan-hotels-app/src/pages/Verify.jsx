@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showError, showSuccess } from '../services/toastService';
 
 const Verify = () => {
   const location = useLocation();
@@ -10,9 +11,6 @@ const Verify = () => {
   const email = location.state?.email || '';
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [verified, setVerified] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
   const { verifyEmail, resendConfirmation } = useAuth();
   const { t } = useTranslation();
@@ -45,47 +43,34 @@ const Verify = () => {
     e.preventDefault();
 
     if (!code.trim()) {
-      setError(t('pages.verify.codeRequired'));
+      showError(t('pages.verify.codeRequired'));
       return;
     }
 
     setLoading(true);
-    setError('');
 
     try {
       await verifyEmail(email, code);
-      setVerified(true);
-      setTimeout(() => navigate('/login'), 2000);
+      showSuccess(t('pages.verify.verifiedTitle'));
+      navigate('/login');
     } catch (err) {
-      setError(err.message || t('pages.verify.invalidCode'));
+      showError(err.message || t('pages.verify.invalidCode'));
     } finally {
       setLoading(false);
     }
   };
 
-  if (verified) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
-          <CheckCircle className="mx-auto text-green-600 mb-4" size={48} />
-          <h2 className="text-2xl font-black mb-2">{t('pages.verify.verifiedTitle')}</h2>
-          <p className="text-slate-600 mb-6">{t('pages.verify.verifiedBody')}</p>
-          <p className="text-sm text-slate-500">{t('pages.verify.redirecting')}</p>
-        </div>
-      </div>
-    );
-  }
-
   const handleResend = async () => {
-    if (!email) return setError(t('pages.verify.missingEmail'));
+    if (!email) {
+      showError(t('pages.verify.missingEmail'));
+      return;
+    }
     try {
-      setError('');
-      setSuccessMsg('');
       await resendConfirmation(email);
-      setSuccessMsg(t('pages.verify.resent'));
+      showSuccess(t('pages.verify.resent'));
       setResendCooldown(60); // 60-second cooldown
     } catch (err) {
-      setError(err.message || t('pages.verify.resendFailed'));
+      showError(err.message || t('pages.verify.resendFailed'));
     }
   };
 

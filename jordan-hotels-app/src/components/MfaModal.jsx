@@ -20,7 +20,6 @@ export default function MfaModal() {
   // When challenge has QR code or secret for TOTP setup, render QR code
   useEffect(() => {
     let mounted = true;
-    console.log('MfaModal useEffect triggered, challenge:', mfaChallenge);
     if ((mfaChallenge?.type === 'MFA_SETUP_TOTP' && mfaChallenge.secretCode) || (mfaChallenge?.type === 'TOTP_SETUP' && mfaChallenge.qrCode)) {
       if (mfaChallenge.type === 'MFA_SETUP_TOTP') {
         const secretCode = mfaChallenge.secretCode;
@@ -29,11 +28,9 @@ export default function MfaModal() {
         const label = encodeURIComponent(`${username}`);
         const issuer = encodeURIComponent('VisitJo');
         const otpauth = `otpauth://totp/${label}?secret=${secretCode}&issuer=${issuer}`;
-        console.log('Generating QR code for:', otpauth);
         QRCode.toDataURL(otpauth)
           .then((url) => {
             if (mounted) {
-              console.log('QR code generated successfully');
               setQrDataUrl(url);
             }
           })
@@ -52,7 +49,6 @@ export default function MfaModal() {
   // When an email login challenge is set, request email MFA code
   useEffect(() => {
     if (mfaChallenge?.type === 'CUSTOM_CHALLENGE' || mfaChallenge?.type === 'EMAIL_LOGIN_CHALLENGE') {
-      console.log('Requesting email MFA code for login/logout flow');
       setLoading(true);
       requestEmailMfaChallenge()
         .then(() => {
@@ -69,11 +65,8 @@ export default function MfaModal() {
   }, [mfaChallenge, requestEmailMfaChallenge]);
 
   if (!mfaChallenge) {
-    console.log('MfaModal: No challenge, not rendering');
     return null;
   }
-
-  console.log('MfaModal: Rendering with challenge:', mfaChallenge);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -23,7 +23,7 @@ export default function FeaturedHotels() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-2">Featured Hotels</h1>
-      <p className="text-gray-600 mb-8">Jordan's most highly rated accommodations</p>
+      <p className="text-gray-600 dark:text-gray-300 mb-8">Jordan's most highly rated accommodations</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {hotels.map((hotel) => (
@@ -45,23 +45,23 @@ export default function FeaturedHotels() {
 
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2">{hotelName}</h3>
-              <p className="text-gray-600 text-sm mb-3">{hotel.location}</p>
-              <p className="text-gray-700 text-sm mb-4 line-clamp-2">{hotel.description}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">{hotel.location}</p>
+              <p className="text-gray-700 dark:text-gray-200 text-sm mb-4 line-clamp-2">{hotel.description}</p>
 
               <div className="mb-4 space-y-2">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   <strong>Address:</strong> {hotel.address}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   <strong>Rooms:</strong> {hotel.rooms}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   <strong>Check-in:</strong> {hotel.checkIn} | <strong>Check-out:</strong> {hotel.checkOut}
                 </p>
               </div>
 
               <div className="mb-4">
-                <p className="text-sm font-bold text-gray-700 mb-2">Amenities:</p>
+                <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">Amenities:</p>
                 <div className="flex flex-wrap gap-2">
                   {Array.isArray(hotel.amenities) && hotel.amenities.length > 0 ? (
                     <>
@@ -80,11 +80,16 @@ export default function FeaturedHotels() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <p className="text-2xl font-bold text-blue-600">{hotel.price} JOD</p>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                  View Details
-                </button>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{hotel.price} JOD</p>
+                <div className="flex gap-2">
+                  <Link to={`/hotels/${hotel.id}`} className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition text-sm font-medium">
+                    View Details
+                  </Link>
+                  <Link to={`/hotels/${hotel.id}?book=true`} className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+                    📅 Book Now
+                  </Link>
+                </div>
               </div>
 
               <div className="mt-4 text-xs text-gray-600">

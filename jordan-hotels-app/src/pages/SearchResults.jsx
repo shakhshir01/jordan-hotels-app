@@ -10,6 +10,7 @@ export default function SearchResults() {
   const [params, setParams] = useSearchParams();
   const q = params.get("q") || "";
   const destination = params.get("destination") || "";
+  const topRated = params.get("topRated") === "true";
   const term = destination || q;
 
   const [hotels, setHotels] = useState([]);
@@ -79,7 +80,16 @@ export default function SearchResults() {
     try {
       const first = await hotelAPI.searchHotelsPage({ q: term, limit: 30, signal: ac.signal });
       if (requestIdRef.current !== rid) return;
-      const items = Array.isArray(first?.hotels) ? first.hotels : [];
+      let items = Array.isArray(first?.hotels) ? first.hotels : [];
+
+      // Filter for top-rated hotels if requested
+      if (topRated) {
+        items = items
+          .filter(hotel => hotel.rating && typeof hotel.rating === 'number' && hotel.rating >= 4.5)
+          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+          .slice(0, 10); // Only top 10 highly-rated hotels
+      }
+
       setHotels(items);
       setNextCursor(first?.nextCursor || null);
     } catch (e) {
@@ -104,7 +114,16 @@ export default function SearchResults() {
     try {
       const page = await hotelAPI.searchHotelsPage({ q: term, cursor: nextCursor, limit: 30 });
       if (requestIdRef.current !== rid) return;
-      const items = Array.isArray(page?.hotels) ? page.hotels : [];
+      let items = Array.isArray(page?.hotels) ? page.hotels : [];
+
+      // Filter for top-rated hotels if requested
+      if (topRated) {
+        items = items
+          .filter(hotel => hotel.rating && typeof hotel.rating === 'number' && hotel.rating >= 4.5)
+          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+          .slice(0, 10 - hotels.length); // Don't exceed 10 total
+      }
+
       setHotels((prev) => {
         const seen = new Set(prev.map((h) => h?.id).filter(Boolean));
         const merged = [...prev];
@@ -273,16 +292,22 @@ export default function SearchResults() {
                         )}
                         {h.price && (
                           <span className="text-slate-700 dark:text-slate-200 font-semibold">
-                            {h.price} JOD <span className="text-[11px] text-slate-500">/ night</span>
+                            {h.price} JOD <span className="text-[11px] text-slate-500 dark:text-slate-400">/ night</span>
                           </span>
                         )}
                       </div>
-                      <div className="mt-3">
+                      <div className="mt-3 flex gap-2">
                         <Link
                           to={`/hotels/${h.id}`}
-                          className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-jordan-blue dark:hover:bg-jordan-blue transition-colors duration-200 inline-block"
+                          className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200 inline-block"
                         >
                           View details
+                        </Link>
+                        <Link
+                          to={`/hotels/${h.id}?book=true`}
+                          className="px-3 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 inline-block"
+                        >
+                          📅 Book Now
                         </Link>
                       </div>
                     </div>

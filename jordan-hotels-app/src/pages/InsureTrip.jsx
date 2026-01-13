@@ -34,7 +34,7 @@ export default function InsureTrip() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-2">Travel Insurance</h1>
-      <p className="text-gray-600 mb-12">Protect your Jordan trip with comprehensive coverage</p>
+      <p className="text-gray-600 dark:text-gray-300 mb-12">Protect your Jordan trip with comprehensive coverage</p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => (
@@ -58,7 +58,7 @@ export default function InsureTrip() {
             <button className={`w-full py-2 rounded-lg transition ${
               selected === plan.id
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}>
               Select
             </button>

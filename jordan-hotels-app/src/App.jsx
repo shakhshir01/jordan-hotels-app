@@ -46,7 +46,6 @@ const CarsSearch = React.lazy(() => import('./pages/CarsSearch.jsx'));
 const ExperiencesListing = React.lazy(() => import('./pages/ExperiencesListing.jsx'));
 const ExperienceBooking = React.lazy(() => import('./pages/ExperienceBooking.jsx'));
 const Gallery = React.lazy(() => import('./pages/Gallery.jsx'));
-const SpecialOffers = React.lazy(() => import('./pages/SpecialOffers.jsx'));
 const InsureTrip = React.lazy(() => import('./pages/InsureTrip.jsx'));
 const HotelsMap = React.lazy(() => import('./pages/HotelsMap.jsx'));
 const FeaturedHotels = React.lazy(() => import('./pages/FeaturedHotels.jsx'));
@@ -107,7 +106,7 @@ function AppRoutes() {
         <Route path="/cars" element={<CarsSearch />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/gallery" element={<Gallery />} />
-        <Route path="/special-offers" element={<SpecialOffers />} />
+        <Route path="/special-offers" element={<Navigate to="/deals" replace />} />
         <Route path="/insure-trip" element={<InsureTrip />} />
         <Route path="/hotels-map" element={<HotelsMap />} />
         <Route path="/featured-hotels" element={<FeaturedHotels />} />

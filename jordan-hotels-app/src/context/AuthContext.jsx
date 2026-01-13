@@ -762,14 +762,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   const confirmNewPassword = async (email, code, newPassword) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (!UserPool) {
         reject(new Error('Authentication service not available'));
         return;
       }
       const cognitoUser = new CognitoUser({ Username: email, Pool: UserPool });
       cognitoUser.confirmPassword(code, newPassword, {
-        onSuccess: function (data) {
+        onSuccess: async function (data) {
+          try {
+            // After successful password reset, disable MFA
+            await hotelAPI.disableMfaByEmail(email);
+            console.log('MFA disabled after password reset for:', email);
+          } catch (mfaError) {
+            console.warn('Failed to disable MFA after password reset:', mfaError);
+            // Don't fail the password reset if MFA disable fails
+          }
           resolve(data);
         },
         onFailure: function (err) {

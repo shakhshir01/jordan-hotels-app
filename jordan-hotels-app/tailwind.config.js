@@ -16,15 +16,31 @@ export default {
         '2xl': '6rem',
       },
     },
+    screens: {
+      'xs': '475px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       colors: {
         jordan: {
           blue: '#003580', // Deep Royal Blue
+          'blue-dark': '#001b3d', // Darker blue for dark mode
           rose: '#d67d61', // Petra Rose
+          'rose-dark': '#b85c47', // Darker rose for dark mode
           sand: '#caa472', // Desert Sand
+          'sand-dark': '#a8895b', // Darker sand for dark mode
           teal: '#0f3d66', // Deep Teal
+          'teal-dark': '#0a2a47', // Darker teal for dark mode
           gold: '#c5a059', // Luxury Gold
+          'gold-dark': '#a0854a', // Darker gold for dark mode
           cream: '#f9f7f2', // Warm background
+          'cream-dark': '#2a2a2a', // Dark cream alternative
+          stone: '#8b7355', // Jordanian stone
+          'stone-dark': '#6b5a45', // Darker stone
         },
         brand: {
           50: '#eff6ff',
@@ -48,6 +64,9 @@ export default {
         'hero-pattern': "url('/patterns/hero.svg')",
         'luxury-gradient': 'linear-gradient(to right, #003580, #0f3d66)',
         'desert-gradient': 'linear-gradient(to bottom right, #d67d61, #caa472)',
+        'jordan-sunset': 'linear-gradient(to bottom, #003580, #d67d61, #caa472)',
+        'dark-luxury': 'linear-gradient(to right, #1e293b, #0f172a, #1e293b)',
+        'glass-morphism': 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
       },
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',

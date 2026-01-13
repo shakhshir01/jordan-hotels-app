@@ -79,12 +79,12 @@ export default function Wishlist() {
                 
                 <div className="mb-6 space-y-1">
                   {item.price && (
-                    <p className="text-2xl font-bold text-jordan-blue">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {item.price} JOD{item.type === 'experience' ? '' : ` ${t('hotels.perNight')}`}
                     </p>
                   )}
                   {item.addedAt && (
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {t('pages.wishlist.savedOn', { date: new Date(item.addedAt).toLocaleDateString() })}
                     </p>
                   )}

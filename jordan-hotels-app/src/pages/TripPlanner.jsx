@@ -111,7 +111,7 @@ export default function TripPlanner() {
           <button
             type="button"
             onClick={handleAddDay}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-jordan-blue text-white text-xs font-semibold shadow-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold shadow-lg hover:bg-blue-700 transition-colors"
           >
             <Plus size={16} /> {t('pages.tripPlanner.addDay')}
           </button>

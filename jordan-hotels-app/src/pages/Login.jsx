@@ -4,6 +4,7 @@ import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { validateLogin } from '../utils/validators';
 import { useTranslation } from 'react-i18next';
+import { showError } from '../services/toastService';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -39,7 +40,7 @@ const Login = () => {
       }
       // If mfaRequired, the modal will show
     } catch (err) {
-      setErrors({ submit: err.message || 'pages.login.invalidCredentials' });
+      showError(err.message || t('pages.login.invalidCredentials'));
     } finally {
       setLoading(false);
     }
@@ -112,14 +113,14 @@ const Login = () => {
           {loading ? t('pages.login.signingIn') : t('auth.login')}
         </button>
 
-        <p className="text-center text-slate-600 mt-6">
+        <p className="text-center text-slate-600 dark:text-slate-300 mt-6">
           {t('auth.dontHaveAccount')}{' '}
-          <Link to="/signup" className="text-jordan-blue font-bold hover:underline">
+          <Link to="/signup" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
             {t('auth.signup')}
           </Link>
         </p>
-        <p className="text-center text-slate-600 mt-2">
-          <Link to="/forgot-password" className="text-sm text-jordan-blue hover:underline">
+        <p className="text-center text-slate-600 dark:text-slate-300 mt-2">
+          <Link to="/forgot-password" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
             {t('auth.forgotPassword')}
           </Link>
         </p>

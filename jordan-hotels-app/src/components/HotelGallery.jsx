@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, Grid } from 'lucide-react';
+import OptimizedImage from './OptimizedImage';
+import { staticHotelPrices } from '../data/staticHotelPrices';
 
 const HotelGallery = ({ images = [], hotelName }) => {
   const [showLightbox, setShowLightbox] = useState(false);
@@ -11,26 +13,29 @@ const HotelGallery = ({ images = [], hotelName }) => {
   const sideImages = displayImages.slice(1, 5);
   const remainingCount = Math.max(0, displayImages.length - 5);
 
-  const openLightbox = (index) => {
+  // Find price for this hotel
+  const hotelPriceObj = staticHotelPrices.find(h => h.name === hotelName);
+
+  const openLightbox = useCallback((index) => {
     setCurrentIndex(index);
     setShowLightbox(true);
     document.body.style.overflow = 'hidden';
-  };
+  }, []);
 
-  const closeLightbox = () => {
+  const closeLightbox = useCallback(() => {
     setShowLightbox(false);
     document.body.style.overflow = 'auto';
-  };
+  }, []);
 
-  const nextImage = (e) => {
+  const nextImage = useCallback((e) => {
     e?.stopPropagation();
     setCurrentIndex((prev) => (prev + 1) % displayImages.length);
-  };
+  }, [displayImages.length]);
 
-  const prevImage = (e) => {
+  const prevImage = useCallback((e) => {
     e?.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
-  };
+  }, [displayImages.length]);
 
   useEffect(() => {
     if (!showLightbox) return;
@@ -39,19 +44,28 @@ const HotelGallery = ({ images = [], hotelName }) => {
       if (e.key === 'ArrowRight') nextImage();
       if (e.key === 'Escape') closeLightbox();
     };
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown, { passive: true });
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showLightbox, displayImages.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [showLightbox, prevImage, nextImage, closeLightbox]);
 
   return (
     <div className="relative">
+      {/* Show price below hotel name if available */}
+      <div className="mb-2">
+        <span className="text-xl font-bold">{hotelName}</span>
+        {hotelPriceObj && (
+          <span className="ml-4 text-lg text-green-700 font-semibold">
+            {hotelPriceObj.price} {hotelPriceObj.currency} / night
+          </span>
+        )}
+      </div>
       {/* Desktop Grid Layout */}
       <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-2 h-[400px] rounded-xl overflow-hidden">
         <div 
           className="col-span-2 row-span-2 relative cursor-pointer group"
           onClick={() => openLightbox(0)}
         >
-          <img 
+          <OptimizedImage 
             src={mainImage} 
             alt={`${hotelName} Main`} 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -65,7 +79,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
             className="relative cursor-pointer group"
             onClick={() => openLightbox(idx + 1)}
           >
-            <img 
+            <OptimizedImage 
               src={img} 
               alt={`${hotelName} ${idx + 2}`} 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -88,7 +102,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
 
       {/* Mobile Carousel Layout */}
       <div className="md:hidden relative h-[300px] -mx-4 sm:mx-0">
-        <img 
+        <OptimizedImage 
           src={displayImages[currentIndex]} 
           alt={hotelName} 
           className="w-full h-full object-cover"
@@ -136,7 +150,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
             <ChevronLeft className="w-10 h-10" />
           </button>
 
-          <img 
+          <OptimizedImage 
             src={displayImages[currentIndex]} 
             alt={`${hotelName} Fullscreen`} 
             className="max-h-[90vh] max-w-[90vw] object-contain shadow-2xl"

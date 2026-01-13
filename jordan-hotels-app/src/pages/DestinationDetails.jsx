@@ -21,7 +21,7 @@ export default function DestinationDetails() {
           <p className="text-slate-500 mb-4">Try exploring all destinations from the main page.</p>
           <Link
             to="/destinations"
-            className="px-5 py-2 rounded-full bg-jordan-blue text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
+            className="px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
           >
             Back to destinations
           </Link>
@@ -65,7 +65,7 @@ export default function DestinationDetails() {
                     <div className="mt-3">
                       <Link
                         to={`/hotels/${h.id}`}
-                        className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-jordan-blue dark:hover:bg-jordan-blue transition-colors duration-200 inline-block"
+                        className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200 inline-block"
                       >
                         View
                       </Link>

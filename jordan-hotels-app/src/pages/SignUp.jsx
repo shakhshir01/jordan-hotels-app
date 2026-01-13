@@ -49,7 +49,6 @@ const SignUp = () => {
     } catch (err) {
       const errorMsg = err.message || t('pages.signup.failed');
       showError(errorMsg);
-      setErrors({ submit: errorMsg });
     } finally {
       setLoading(false);
     }
@@ -180,9 +179,9 @@ const SignUp = () => {
           {loading ? t('pages.signup.creatingAccount') : t('auth.signup')}
         </button>
 
-        <p className="text-center text-slate-600 mt-6">
+        <p className="text-center text-slate-600 dark:text-slate-300 mt-6">
           {t('auth.haveAccount')}{' '}
-          <Link to="/login" className="text-jordan-blue font-bold hover:underline">
+          <Link to="/login" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
             {t('auth.login')}
           </Link>
         </p>

@@ -95,12 +95,24 @@ const Checkout = () => {
   }, []);
 
   const calculateTotal = () => {
+    // Use detailed breakdown if available from booking data
+    if (resolvedBookingData.breakdown) {
+      return resolvedBookingData.breakdown.subtotal;
+    }
+    
+    // Fallback to old calculation
     if (!hotel) return 0;
     const nights = resolvedBookingData.nights || 1;
     return hotel.price * nights;
   };
 
   const calculateTotalWithTax = () => {
+    // Use detailed breakdown if available
+    if (resolvedBookingData.breakdown) {
+      return resolvedBookingData.breakdown.total - appliedDiscount;
+    }
+    
+    // Fallback to old calculation
     const subtotal = calculateTotal();
     const total = Number(((subtotal - appliedDiscount) * 1.1).toFixed(2));
     return Number.isFinite(total) ? total : 0;
@@ -306,7 +318,7 @@ const Checkout = () => {
       <div className="page-section">
         <h1 className="page-title mb-4">Checkout</h1>
         <div className="surface p-6">
-          <p className="text-gray-700 mb-4">Choose a hotel to start booking.</p>
+          <p className="text-gray-700 dark:text-gray-200 mb-4">Choose a hotel to start booking.</p>
           <button
             onClick={() => navigate('/search')}
             className="btn-primary"
@@ -377,11 +389,48 @@ const Checkout = () => {
               </div>
             )}
 
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-bold">{calculateTotal()} JOD</span>
+            {resolvedBookingData.cancellationPolicy && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                  <Check size={16} />
+                  Cancellation Policy
+                </h3>
+                <div className="space-y-1 text-sm text-amber-700">
+                  <div>• {resolvedBookingData.cancellationPolicy.free}</div>
+                  <div>• {resolvedBookingData.cancellationPolicy.partial}</div>
+                  <div>• {resolvedBookingData.cancellationPolicy.noRefund}</div>
+                </div>
               </div>
+            )}
+
+            <div className="space-y-3">
+              {resolvedBookingData.breakdown ? (
+                // Detailed breakdown from booking data
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">{resolvedBookingData.breakdown.basePrice} JOD × {resolvedBookingData.breakdown.nights} nights</span>
+                    <span className="font-bold">{resolvedBookingData.breakdown.subtotal} JOD</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Service fee</span>
+                    <span className="font-bold">{resolvedBookingData.breakdown.serviceFee} JOD</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Cleaning fee</span>
+                    <span className="font-bold">{resolvedBookingData.breakdown.cleaningFee} JOD</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Taxes (16% VAT)</span>
+                    <span className="font-bold">{resolvedBookingData.breakdown.tax} JOD</span>
+                  </div>
+                </>
+              ) : (
+                // Fallback to simple subtotal
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="font-bold">{calculateTotal()} JOD</span>
+                </div>
+              )}
               
               {/* Promo Code Section */}
               <div className="bg-blue-50 rounded-lg p-4 -mx-6 px-6">
@@ -419,13 +468,16 @@ const Checkout = () => {
                 </div>
               )}
               
-              <div className="flex justify-between">
-                <span className="text-gray-600">Taxes & Fees</span>
-                <span className="font-bold">{((calculateTotal() - appliedDiscount) * 0.1).toFixed(2)} JOD</span>
-              </div>
+              {!resolvedBookingData.breakdown && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Taxes & Fees</span>
+                  <span className="font-bold">{((calculateTotal() - appliedDiscount) * 0.1).toFixed(2)} JOD</span>
+                </div>
+              )}
+              
               <div className="border-t pt-3 flex justify-between text-lg">
                 <span className="font-bold">Total</span>
-                <span className="font-bold text-blue-600">{((calculateTotal() - appliedDiscount) * 1.1).toFixed(2)} JOD</span>
+                <span className="font-bold text-blue-600">{calculateTotalWithTax().toFixed(2)} JOD</span>
               </div>
             </div>
           </div>

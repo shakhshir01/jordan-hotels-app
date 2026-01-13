@@ -380,6 +380,11 @@ const normalizeHotel = (rawHotel) => {
   };
 };
 
+// Names / ids to exclude from searches (quick blacklist)
+const EXCLUDED_HOTEL_NAMES = new Set([
+  'namla bedouin camp'
+]);
+
 // Helper function to get hotels from static data with filtering and pagination
 const getHotelsFromStatic = ({ q = "", cursor = "", limit = 30 } = {}) => {
   const allHotels = Array.isArray(XOTELO_JORDAN_HOTELS) ? XOTELO_JORDAN_HOTELS : [];
@@ -387,8 +392,14 @@ const getHotelsFromStatic = ({ q = "", cursor = "", limit = 30 } = {}) => {
   // No deduplication needed since we only use one dataset
   const uniqueHotels = allHotels;
 
-  // Normalize hotels
-  const normalizedHotels = uniqueHotels.map(normalizeHotel);
+  // Normalize hotels (and filter out any blacklisted names/ids)
+  const normalizedHotels = uniqueHotels.map(normalizeHotel).filter(h => {
+    const name = String(h.name || "").toLowerCase();
+    const id = String(h.id || "").toLowerCase();
+    if (EXCLUDED_HOTEL_NAMES.has(name)) return false;
+    if (EXCLUDED_HOTEL_NAMES.has(id)) return false;
+    return true;
+  });
 
   // Filter by query if provided
   let filteredHotels = normalizedHotels;
@@ -460,7 +471,15 @@ const fetchXoteloFallback = async (limit = 100) => {
         createdAt: new Date().toISOString(),
       };
     });
-    return hotels;
+    // apply exclusion blacklist to fallback results as well
+    const filtered = hotels.filter(h => {
+      const name = String(h.name || "").toLowerCase();
+      const id = String(h.id || "").toLowerCase();
+      if (EXCLUDED_HOTEL_NAMES.has(name)) return false;
+      if (EXCLUDED_HOTEL_NAMES.has(id)) return false;
+      return true;
+    });
+    return filtered;
   } catch (error) {
     console.warn("Failed to fetch from Xotelo API:", error.message);
     // Fallback to static Xotelo data
@@ -719,6 +738,17 @@ export const hotelAPI = {
     }
   },
 
+  disableMfaByEmail: async (email) => {
+    if (getUseMocks()) return { success: true };
+    try {
+      const response = await apiClient.post("/user/mfa/disable-by-email", { email });
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { success: true };
+      throw error;
+    }
+  },
+
   // TOTP MFA management
   setupTotpMfa: async () => {
     if (getUseMocks()) return { secret: 'mock-secret', qrCode: 'mock-qr', otpauthUrl: 'mock-url' };
@@ -930,9 +960,9 @@ const mockDestinations = [
 ];
 
 const mockDeals = [
-  { id: "deal-weekend-escape", title: "Weekend Escape", meta: "City stays • Limited time", price: "From 99 JOD", createdAt: new Date().toISOString() },
-  { id: "deal-desert-combo", title: "Desert + Petra Combo", meta: "Curated itinerary • Best value", price: "From 299 JOD", createdAt: new Date().toISOString() },
-  { id: "deal-family-discount", title: "Family Stay Discount", meta: "Up to 4 people • Valid all year", price: "Save 20%", createdAt: new Date().toISOString() },
+  { id: "deal-weekend-escape", title: "Weekend Escape", meta: "City stays • Limited time", price: 99, discount: 25, rating: 4.5, createdAt: new Date().toISOString() },
+  { id: "deal-desert-combo", title: "Desert + Petra Combo", meta: "Curated itinerary • Best value", price: 299, discount: 30, rating: 4.7, createdAt: new Date().toISOString() },
+  { id: "deal-family-discount", title: "Family Stay Discount", meta: "Up to 4 people • Valid all year", price: 150, discount: 20, rating: 4.3, createdAt: new Date().toISOString() },
 ];
 
 const mockExperiences = [
@@ -941,6 +971,8 @@ const mockExperiences = [
     title: "Dana to Petra Trek + Wadi Rum & the Dead Sea",
     meta: "Trek • Adventure • 9 days",
     price: 120,
+    rating: 4.8,
+    reviews: 85,
     description: "Join a small group on the Dana to Petra Trek, then continue to Wadi Rum and the Dead Sea. 9 days, challenging adventure. Includes guided hikes, all meals, accommodation, and transfers.",
     duration: "9 days",
     difficulty: "Challenging",
@@ -954,6 +986,8 @@ const mockExperiences = [
     title: "Jordan 2-Day Tour (Petra, Wadi Rum & the Dead Sea)",
     meta: "Guided • Easy • 2 days",
     price: 55,
+    rating: 4.6,
+    reviews: 120,
     description: "Guided Petra tour, overnight in Bedouin camp in Wadi Rum, Dead Sea resort visit & lunch. Includes transport, guide, meals, and entrance fees.",
     duration: "2 days",
     difficulty: "Easy",
@@ -967,6 +1001,8 @@ const mockExperiences = [
     title: "Jordan Hiking Adventure",
     meta: "Hiking • Adventure • 8 days",
     price: 95,
+    rating: 4.7,
+    reviews: 95,
     description: "Unique hiking adventure in the best parts of Jordan. 8 days, challenging adventure. Includes guided hikes, meals, and accommodation.",
     duration: "8 days",
     difficulty: "Challenging",
@@ -980,6 +1016,8 @@ const mockExperiences = [
     title: "Petra to Wadi Rum Trek",
     meta: "Trek • Tough • 6 days",
     price: 80,
+    rating: 4.9,
+    reviews: 75,
     description: "After Dana to Petra, continue trekking from Petra to Wadi Rum. 6 days, tough adventure. Includes guide, meals, and camp stays.",
     duration: "6 days",
     difficulty: "Tough",
@@ -993,6 +1031,8 @@ const mockExperiences = [
     title: "Jordan Active Adventure (Hike & Bike)",
     meta: "Hike & Bike • Adventure • 8 days",
     price: 110,
+    rating: 4.5,
+    reviews: 110,
     description: "Combine hiking and biking to experience Jordan’s most beautiful sights. 8 days, challenging adventure. Includes guide, bike rental, meals, and accommodation.",
     duration: "8 days",
     difficulty: "Challenging",
@@ -1006,6 +1046,8 @@ const mockExperiences = [
     title: "Summer Adventure in Jordan",
     meta: "Summer • Moderate • 6 days",
     price: 60,
+    rating: 4.4,
+    reviews: 140,
     description: "Adventurous hikes, stunning landscapes, and outstanding hospitality. 6 days, moderate adventure. Includes guide, meals, and accommodation.",
     duration: "6 days",
     difficulty: "Moderate",
