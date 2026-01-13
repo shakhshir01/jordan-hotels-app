@@ -82,21 +82,32 @@ export default function ExperiencesListing() {
                   className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
                   onClick={() => navigate(`/experiences/${experience.id}`)}
                 >
-                  {/* Experience Image/Placeholder */}
-                  <div className="h-48 bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                    <div className="text-white text-center">
-                      <div className="text-4xl mb-2">
-                        {experience.id === 'e-petra-night' && '🏛️'}
-                        {experience.id === 'e-wadi-rum-safari' && '🏜️'}
-                        {experience.id === 'e-dead-sea-spa' && '🧖'}
-                        {experience.id === 'e-amman-food-tour' && '🍽️'}
-                        {experience.id === 'e-coral-reef-diving' && '🤿'}
-                        {experience.id === 'e-jeep-adventure' && '🚙'}
-                        {!['e-petra-night', 'e-wadi-rum-safari', 'e-dead-sea-spa', 'e-amman-food-tour', 'e-coral-reef-diving', 'e-jeep-adventure'].includes(experience.id) && '✨'}
+                  {/* Experience Image */}
+                  <div className="h-48 w-full overflow-hidden relative group">
+                    {experience.imageUrl ? (
+                      <img
+                        src={experience.imageUrl}
+                        alt={experience.title}
+                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        style={{ background: 'linear-gradient(to bottom right, #a78bfa, #f472b6, #fb923c)' }}
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                        <span className="text-4xl">✨</span>
                       </div>
-                      <div className="text-sm font-medium bg-black/20 px-3 py-1 rounded-full inline-block">
-                        {experience.price} JOD
-                      </div>
+                    )}
+                    <div className="absolute top-2 left-2 text-4xl drop-shadow-lg">
+                      {/* Optionally show emoji for legacy experiences */}
+                      {experience.id === 'e-petra-night' && '🏛️'}
+                      {experience.id === 'e-wadi-rum-safari' && '🏜️'}
+                      {experience.id === 'e-dead-sea-spa' && '🧖'}
+                      {experience.id === 'e-amman-food-tour' && '🍽️'}
+                      {experience.id === 'e-coral-reef-diving' && '🤿'}
+                      {experience.id === 'e-jeep-adventure' && '🚙'}
+                    </div>
+                    <div className="absolute bottom-2 right-2 text-sm font-medium bg-black/40 text-white px-3 py-1 rounded-full">
+                      {experience.price} JOD
                     </div>
                   </div>
 

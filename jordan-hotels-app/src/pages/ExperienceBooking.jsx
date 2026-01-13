@@ -95,7 +95,7 @@ const ExperienceBooking = () => {
 
   const resolvedBookingData = initialBookingData || {
     date: new Date().toISOString().split('T')[0],
-    participants: 2,
+    participants: 1,
     time: '09:00'
   };
 
@@ -110,19 +110,19 @@ const ExperienceBooking = () => {
     deluxe: {
       name: 'Deluxe Experience',
       description: 'Enhanced experience with premium amenities',
-      priceMultiplier: 1.3,
+      priceMultiplier: 1.15,
       inclusions: ['Guided tour', 'Private transportation', 'Entry fees', 'Refreshments', 'Photo session']
     },
     premium: {
       name: 'Premium Experience',
       description: 'Luxury experience with VIP treatment',
-      priceMultiplier: 1.8,
+      priceMultiplier: 1.35,
       inclusions: ['Private guide', 'Luxury transportation', 'VIP entry', 'Gourmet meals', 'Professional photography', 'Souvenirs']
     },
     vip: {
       name: 'VIP Experience',
       description: 'Ultimate luxury experience with exclusive access',
-      priceMultiplier: 2.5,
+      priceMultiplier: 1.6,
       inclusions: ['Personal guide', 'Private luxury vehicle', 'VIP access', 'Fine dining', 'Professional videography', 'Luxury souvenirs', '24/7 concierge']
     }
   };

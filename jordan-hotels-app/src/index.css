@@ -179,9 +179,18 @@
   
   /* Hotel Card */
   .hotel-card {
-    @apply bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100;
-    @apply hover:shadow-2xl hover:-translate-y-2 transition-all duration-500;
-    @apply dark:bg-slate-800 dark:border-slate-700;
+    @apply bg-white/95 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg border border-slate-100/50;
+    @apply hover:shadow-2xl hover:-translate-y-3 hover:bg-white transition-all duration-500;
+    @apply dark:bg-slate-800/95 dark:border-slate-700/50;
+    min-height: 450px; /* Increased for amenities */
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%), 
+                radial-gradient(circle at 20% 80%, rgba(120,119,198,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,119,198,0.1) 0%, transparent 50%);
+  }
+  .dark .hotel-card {
+    background: linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.95) 100%), 
+                radial-gradient(circle at 20% 80%, rgba(120,119,198,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,119,198,0.15) 0%, transparent 50%);
   }
   
   /* Search Bar */

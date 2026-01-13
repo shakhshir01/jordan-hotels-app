@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MapPin, Search, Star, AlertCircle, Loader2 } from "lucide-react";
+import { MapPin, Search, Star, AlertCircle, Loader2, Eye, Wifi, Car, Utensils } from "lucide-react";
 import { hotelAPI } from "../services/api";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import { useTranslation } from "react-i18next";
@@ -39,22 +39,24 @@ const getNearestJordanPlace = ({ lat, lon }) => {
   return best;
 };
 
-const getUserRecommendedHotels = async () => {
-  // Prefer truly-close hotels when geo is available; fall back to a small first page.
-  const geo = await new Promise((resolve) => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) return resolve(null);
-    navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        resolve({
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-        }),
-      () => resolve(null),
-      { enableHighAccuracy: false, timeout: 2500, maximumAge: 5 * 60 * 1000 }
-    );
-  });
+const HotelCardSkeleton = () => (
+  <div className="hotel-card animate-pulse">
+    <div className="cover bg-slate-200 dark:bg-slate-700"></div>
+    <div className="p-4">
+      <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded mb-2"></div>
+      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded mb-4 w-3/4"></div>
+      <div className="flex justify-between items-center pt-4 border-t border-slate-200 dark:border-slate-600">
+        <div>
+          <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded mb-1"></div>
+          <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+        </div>
+        <div className="h-9 bg-slate-200 dark:bg-slate-700 rounded-xl w-20"></div>
+      </div>
+    </div>
+  </div>
+);
 
-    if (geo) {
+const getUserRecommendedHotels = async () => {
     try {
       // Increase nearby results so desktop shows more recommendations
       const nearby = await hotelsService.getNearbyHotelsByGeo({
@@ -86,18 +88,15 @@ const getUserRecommendedHotels = async () => {
     } catch {
       // If geo-based recommendations fail (timeouts, API down), show a small first page instead.
       // Fall through to best hotels
+      const featured = await hotelsService.getFeaturedHotels();
+      if (featured && featured.length > 0) {
+        return { hotels: featured.slice(0, 12), isLocationBased: false };
+      }
+
+      const page = await hotelAPI.getHotelsPage({ limit: 12 });
+      const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
+      return { hotels: hotels.slice(0, 12), isLocationBased: false };
     }
-  }
-
-  // Fallback: Get best rated hotels if location is not available
-  const featured = await hotelsService.getFeaturedHotels();
-  if (featured && featured.length > 0) {
-    return { hotels: featured.slice(0, 12), isLocationBased: false };
-  }
-
-  const page = await hotelAPI.getHotelsPage({ limit: 12 });
-  const hotels = Array.isArray(page?.hotels) ? page.hotels : [];
-  return { hotels: hotels.slice(0, 12), isLocationBased: false };
 };
 
 const FALLBACK_IMG =
@@ -150,37 +149,62 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
           onError={onImgError}
           alt={hotelName}
           width={400}
-          height={300}
+          height={250}
+          quality={90}
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
+          className="transition-all duration-500 hover:scale-110 hover:brightness-110"
         />
-        <div className="absolute top-4 right-4 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg flex items-center gap-1.5">
-          <Star size={14} className="text-amber-500" fill="currentColor" />
-          <span className="text-sm font-bold text-slate-900">{hotel.rating}</span>
+        <div className="absolute top-4 left-4">
+          {hotel.rating >= 4.5 && (
+            <div className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse">
+              Popular
+            </div>
+          )}
+        </div>
+        <div className="absolute top-4 right-4 px-3 py-1.5 bg-white/90 backdrop-blur-md text-slate-900 rounded-full shadow-lg border border-white/20 flex items-center gap-1.5 font-bold text-sm">
+          <Star size={14} fill="currentColor" className="text-amber-500" />
+          {hotel.rating}
         </div>
       </div>
 
       <div className="p-4">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 leading-snug">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 leading-snug line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300">
           {hotelName}
         </h3>
-        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-4">
-          <MapPin size={14} />
-          {hotel.location}
+        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 mb-4 hover:text-slate-800 dark:hover:text-slate-200 transition-colors duration-300">
+          <MapPin size={16} className="text-blue-500 flex-shrink-0" />
+          <span className="font-medium truncate">{hotel.location}</span>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-2 py-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 cursor-default">
+            <Wifi size={14} />
+            <span>WiFi</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-2 py-1 rounded-full hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300 cursor-default">
+            <Car size={14} />
+            <span>Parking</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-2 py-1 rounded-full hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-300 cursor-default">
+            <Utensils size={14} />
+            <span>Restaurant</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-600">
           <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              {hotel.price} {hotel.currency || "JOD"}
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              From {hotel.price} {hotel.currency || "JOD"}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">/night</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">per night</div>
           </div>
           <Link
             to={`/hotels/${hotel.id}`}
-            className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-semibold text-sm rounded-lg hover:bg-jordan-blue hover:text-white dark:hover:bg-jordan-blue transition-all duration-300"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
+            <Eye size={16} />
             {viewLabel}
           </Link>
         </div>

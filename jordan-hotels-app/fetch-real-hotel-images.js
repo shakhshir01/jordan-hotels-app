@@ -110,18 +110,70 @@ function isHighQualityImage(url) {
     'avatar', 'icon', 'logo', 'map', 'sprite', 'blank', 'spacer', 'user_image', 'pixel',
     'floorplan', 'floor_plan', 'layout', 'brochure', 'menu', 'qrcode', 'barcode',
     'banner', 'promo', 'offer', 'advert', 'tripadvisor_logo', 'ta_logo', 'overlay',
-    'review', 'rating', 'stars', 'thumb', 'thumbnail', 'tiny', 'small', 'widget'
+    'review', 'rating', 'stars', 'thumb', 'thumbnail', 'tiny', 'small', 'widget',
+    'button', 'link', 'nav', 'header', 'footer', 'sidebar', 'popup', 'modal',
+    'watermark', 'copyright', 'placeholder', 'loading', 'spinner', 'gif',
+    'interior', 'room', 'bathroom', 'bed', 'toilet', 'kitchen', 'lobby', 'reception',
+    'pool', 'spa', 'gym', 'restaurant', 'bar', 'cafe', 'menu', 'food', 'drink'
   ];
   if (junkTerms.some(term => lower.includes(term))) return false;
   
   // Filter out known low-res patterns
-  if (lower.includes('w=50') || lower.includes('w=100')) return false;
+  if (lower.includes('w=50') || lower.includes('w=100') || lower.includes('w=150') || lower.includes('w=200') || lower.includes('w=250')) return false;
   
   // Filter out dimensions in filenames that look small (e.g. 100x100, 320x240)
   // Matches patterns like: image_100x100.jpg, photo-320x240.png
-  if (lower.match(/[-_](?:50|60|80|100|120|140|150|160|180|200|240|300|320)x(?:50|60|80|100|120|140|150|160|180|200|240|300|320)\./)) return false;
+  if (lower.match(/[-_](?:50|60|80|100|120|140|150|160|180|200|240|300|320|400|450|500)x(?:50|60|80|100|120|140|150|160|180|200|240|300|320|400|450|500)\./)) return false;
+  
+  // Prefer high-res indicators
+  if (lower.includes('w=800') || lower.includes('w=1000') || lower.includes('w=1200') || lower.includes('w=1600') || lower.includes('h=800') || lower.includes('h=1000') || lower.includes('h=1200')) return true;
   
   return true;
+}
+
+function scoreImage(url) {
+  if (!url) return -100;
+  let score = 0;
+  const lower = url.toLowerCase();
+  
+  // Prefer exterior/front views (highest priority)
+  if (lower.includes('exterior')) score += 25;
+  if (lower.includes('front')) score += 23;
+  if (lower.includes('entrance')) score += 23;
+  if (lower.includes('facade')) score += 21;
+  if (lower.includes('building')) score += 20;
+  if (lower.includes('outside')) score += 19;
+  if (lower.includes('outdoor')) score += 17;
+  if (lower.includes('aerial')) score += 15;
+  if (lower.includes('view')) score += 12;
+  if (lower.includes('panorama')) score += 10;
+  
+  // Good interior but lower priority
+  if (lower.includes('lobby')) score += 8;
+  if (lower.includes('reception')) score += 6;
+  if (lower.includes('hall')) score += 4;
+  
+  // Amenities (low priority)
+  if (lower.includes('pool')) score += 3;
+  if (lower.includes('spa')) score += 2;
+  if (lower.includes('garden')) score += 2;
+  
+  // Penalize room/bathroom heavily
+  if (lower.includes('room')) score -= 20;
+  if (lower.includes('bathroom')) score -= 25;
+  if (lower.includes('bed')) score -= 15;
+  if (lower.includes('interior')) score -= 10;
+  if (lower.includes('inside')) score -= 8;
+  
+  // Prefer high-res sources
+  if (lower.includes('tripadvisor.com')) score += 8;
+  if (lower.includes('w=1200') || lower.includes('h=1200') || lower.includes('w=1600')) score += 5;
+  if (lower.includes('w=800') || lower.includes('h=800') || lower.includes('w=1000')) score += 3;
+  
+  // Prefer reputable sources
+  if (lower.includes('booking.com') || lower.includes('agoda.com')) score += 4;
+  
+  return score;
 }
 
 function enhanceImageUrl(url) {
@@ -143,8 +195,8 @@ function enhanceImageUrl(url) {
 
 // Function to search Bing Images (More reliable fallback)
 function searchBingImages(hotelName, location) {
-  const query = encodeURIComponent(`${hotelName} ${location} hotel exterior`);
-  const url = `https://www.bing.com/images/search?q=${query}&first=1`;
+  const query = encodeURIComponent(`${hotelName} ${location} hotel exterior front view building facade`);
+  const url = `https://www.bing.com/images/search?q=${query}&first=1&filters=size:large`;
 
   return new Promise((resolve, reject) => {
     const req = https.get(url, {
@@ -163,7 +215,7 @@ function searchBingImages(hotelName, location) {
 
         while ((match = murlRegex.exec(data)) !== null) {
           const imgUrl = match[1];
-          if (imgUrl.match(/\.(jpg|jpeg|png|webp)(\?|$)/i) && !imgUrl.includes('bing.com/th') && isHighQualityImage(imgUrl)) {
+          if (imgUrl.match(/\.(jpg|jpeg|png|webp)(\?|$)/i) && !imgUrl.includes('bing.com/th') && !imgUrl.includes('bing.com/images') && isHighQualityImage(imgUrl)) {
             images.push(imgUrl);
           }
         }
@@ -190,8 +242,8 @@ function searchBingImages(hotelName, location) {
 
 // Function to search Google Images
 function searchGoogleImages(hotelName, location) {
-  const query = encodeURIComponent(`${hotelName} ${location} hotel exterior`);
-  const url = `https://www.google.com/search?q=${query}&tbm=isch&source=hp`;
+  const query = encodeURIComponent(`${hotelName} ${location} hotel exterior front view building facade`);
+  const url = `https://www.google.com/search?q=${query}&tbm=isch&source=hp&tbs=isz:l`;
 
   return new Promise((resolve, reject) => {
     const req = https.get(url, {
@@ -297,13 +349,12 @@ function extractImagesFromTripAdvisor(html, hotelName) {
 }
 
 // Process hotels in batches
-async function processHotelsBatch(startIndex, batchSize) {
+async function processHotelsBatch(startIndex, batchSize, assignedImages) {
   const endIndex = Math.min(startIndex + batchSize, hotels.length);
   console.log(`\n--- Processing Batch: ${startIndex + 1} to ${endIndex} ---`);
 
   for (let i = startIndex; i < endIndex; i++) {
     const hotel = hotels[i];
-
     let realImages = [];
 
     // 1. CLEANUP: Remove any existing Unsplash images
@@ -315,7 +366,10 @@ async function processHotelsBatch(startIndex, batchSize) {
     // 1.5 ENHANCE: Upgrade existing real images
     if (hotel.images && hotel.images.length > 0) {
       hotel.images = hotel.images.map(enhanceImageUrl).filter(isHighQualityImage);
+      hotel.images = hotel.images.filter(url => !assignedImages.has(url)); // Remove images already assigned elsewhere
       hotel.images = [...new Set(hotel.images)];
+      hotel.images.sort((a, b) => scoreImage(b) - scoreImage(a));
+      hotel.images = hotel.images.slice(0, 50); // Limit to 50 images per hotel
       if (hotel.images.length > 0) {
         hotel.image = hotel.images[0];
       } else {
@@ -326,15 +380,15 @@ async function processHotelsBatch(startIndex, batchSize) {
 
     // SKIP if already processed (has sufficient real images)
     const existingRealImages = (hotel.images || []);
-    if (existingRealImages.length >= 40) {
+    if (existingRealImages.length >= 50) {
+      existingRealImages.forEach(url => assignedImages.add(url));
       continue;
     }
 
     // 2. STRATEGY: Bing + Google Images (Combined sources)
     try {
       process.stdout.write(`[${i + 1}/${hotels.length}] ${hotel.name}: Checking Bing... `);
-      // Add delay before request
-      await new Promise(resolve => setTimeout(resolve, 100)); // Reduced from 300ms
+      await new Promise(resolve => setTimeout(resolve, 100));
       const bingImages = await searchBingImages(hotel.name, hotel.location);
       if (bingImages.length > 0) {
         realImages = [...realImages, ...bingImages];
@@ -343,10 +397,8 @@ async function processHotelsBatch(startIndex, batchSize) {
       process.stdout.write(`Bing failed. `);
     }
 
-    // 3. STRATEGY: Google Images (Additional source)
     try {
       process.stdout.write(`Google... `);
-      // Add delay before request
       await new Promise(resolve => setTimeout(resolve, 100));
       const googleImages = await searchGoogleImages(hotel.name, hotel.location);
       if (googleImages.length > 0) {
@@ -358,6 +410,8 @@ async function processHotelsBatch(startIndex, batchSize) {
 
     // Remove duplicates from combined results
     realImages = [...new Set(realImages)];
+    // Remove images already assigned to other hotels
+    realImages = realImages.filter(url => !assignedImages.has(url));
 
     // 4. VALIDATE IMAGES
     if (realImages.length > 0) {
@@ -368,23 +422,24 @@ async function processHotelsBatch(startIndex, batchSize) {
 
     // 5. UPDATE HOTEL DATA
     if (realImages.length > 0) {
-      // Keep existing non-unsplash images if any
       const existingImages = (hotel.images || []).filter(url => !url.includes('unsplash.com'));
-
-      // Combine and deduplicate
-      const allImages = [...new Set([...existingImages, ...realImages])];
-
+      let allImages = [...existingImages, ...realImages];
+      allImages = allImages.filter(url => !assignedImages.has(url)); // Remove images already assigned elsewhere
+      allImages = [...new Set(allImages)];
+      allImages.sort((a, b) => scoreImage(b) - scoreImage(a));
+      allImages = allImages.slice(0, 50); // Limit to 50 images per hotel
       hotel.image = allImages[0];
       hotel.images = allImages;
-      console.log(`✅ Found ${realImages.length} new valid images.`);
+      allImages.forEach(url => assignedImages.add(url));
+      console.log(`✅ Found ${realImages.length} new valid images. Best profile image set.`);
     } else {
-      console.log(`❌ No valid images found.`);
+      hotel.image = '';
+      hotel.images = [];
+      console.log(`❌ No valid images found. Profile image cleared.`);
     }
 
-    // Respectful delay between hotels
-    await new Promise(resolve => setTimeout(resolve, 50)); // Reduced from 100ms
+    await new Promise(resolve => setTimeout(resolve, 50));
   }
-
   return endIndex;
 }
 
@@ -407,27 +462,26 @@ async function updateAllHotelsWithRealImages() {
   let currentIndex = 0;
   const maxHotels = hotels.length; // Process ALL hotels
 
+  // Track all assigned images globally to prevent duplicates across hotels
+  const assignedImages = new Set();
   while (currentIndex < maxHotels) {
     try {
-      currentIndex = await processHotelsBatch(currentIndex, batchSize);
+      currentIndex = await processHotelsBatch(currentIndex, batchSize, assignedImages);
       saveProgress(hotels);
-      
-      // Delay between batches
       if (currentIndex < maxHotels) {
         console.log('Waiting 0.5 seconds before next batch...');
-        await new Promise(resolve => setTimeout(resolve, 500)); // Reduced from 1000ms
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     } catch (error) {
       console.log(`❌ Critical Batch Error: ${error.message}`);
-      // Save what we have so far
       saveProgress(hotels);
-      // Wait a bit longer then try to continue
       await new Promise(resolve => setTimeout(resolve, 5000));
     }
   }
-
   console.log('🎉 Finished processing ALL hotels!');
 }
 
 // Run the update
+// Reset all hotel images and image arrays to empty, then save
+// resetHotelImages(hotels); // Commented out to avoid resetting existing images
 updateAllHotelsWithRealImages().catch(console.error);

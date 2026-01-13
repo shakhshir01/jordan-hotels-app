@@ -1,0 +1,15 @@
+// Fetches images for each destination using provided URLs
+// Usage: node fetch-destination-images.js
+
+const fs = require('fs');
+
+const destinationImages = {
+  'Amman': 'https://media.cntravellerme.com/photos/668fee60dcacbe26a0b80ab2/16:9/w_2560%2Cc_limit/1358542312',
+  'Petra': 'https://i.natgeofe.com/n/69e2cf60-ad59-4d20-bdd1-dc96f40ab4e8/petra-world-heritage-jordan_16x9.jpg?w=1200',
+  'Wadi Rum': 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/616919459.jpg?k=3e08f612768ace8f5d4113f4874fac66520b82956fc0b727be34c5abafddfa9e&o=',
+  'Dead Sea': 'https://www.touristisrael.com/wp-content/uploads/2020/05/Dead-Sea-Beaches-scaled-e1589809735923.jpg',
+  'Aqaba': 'https://www.ayla.com.jo/wp-content/uploads/2025/06/Ayla-marina-Village-2.webp',
+};
+
+fs.writeFileSync('destination-images.json', JSON.stringify(destinationImages, null, 2));
+console.log('Done! Results saved to destination-images.json');

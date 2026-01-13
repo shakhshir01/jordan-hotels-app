@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { hotelAPI } from "../services/api";
+import destinationImages from '../data/destination-images.json';
 
 const DESTINATION_INFO = {
   'Dead Sea': {
@@ -110,8 +111,14 @@ export default function Destinations() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {destinations.map((d) => (
               <article key={d.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group">
-                <div className="h-48 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center group-hover:scale-110 transition">
-                  <div className="text-white text-center">
+                <div className="h-48 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center group-hover:scale-110 transition relative">
+                  {destinationImages[d.query] && (
+                    <img
+                      src={destinationImages[d.query]}
+                      alt={d.name}
+                      className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-300" />
+                  )}
+                  <div className="text-white text-center relative z-10">
                     <div className="text-6xl">{d.emoji}</div>
                     <div className="text-sm font-medium mt-2 bg-black/20 px-3 py-1 rounded-full inline-block">{t('pages.destinations.hotelsCount', { count: d.count })}</div>
                   </div>
