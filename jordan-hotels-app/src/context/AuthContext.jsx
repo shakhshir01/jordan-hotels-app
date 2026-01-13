@@ -381,19 +381,30 @@ export const AuthProvider = ({ children }) => {
 
   const setupTotp = () => {
     const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
+    console.log('setupTotp: cognitoUser =', cognitoUser);
     if (!cognitoUser) return Promise.reject(new Error('No active user to setup TOTP'));
 
     return new Promise((resolve, reject) => {
-      // Ensure we have a valid session before attempting TOTP association
+      // Check if user has a valid session
       cognitoUser.getSession((err, session) => {
         if (err) {
-          setError('Session error. Please sign in again.');
+          console.error('No valid session for TOTP setup:', err);
+          setError('Please sign in again to setup 2FA');
           reject(new Error('Session error'));
           return;
         }
 
-        const proceedWithAssociate = () => {
-          console.log('Starting TOTP association...');
+        console.log('Session valid, enabling TOTP MFA first...');
+        // First enable TOTP MFA for the user
+        cognitoUser.setUserMfaPreference(null, { Enabled: true }, (mfaErr, mfaResult) => {
+          if (mfaErr) {
+            console.error('Failed to enable TOTP MFA:', mfaErr);
+            setError('Failed to enable TOTP MFA');
+            reject(mfaErr);
+            return;
+          }
+
+          console.log('TOTP MFA enabled, now associating software token...');
           cognitoUser.associateSoftwareToken({
             associateSecretCode: (secretCode) => {
               console.log('TOTP secret received:', secretCode);
@@ -406,40 +417,7 @@ export const AuthProvider = ({ children }) => {
               reject(e);
             },
           });
-        };
-
-        if (session && session.isValid && session.isValid()) {
-          proceedWithAssociate();
-          return;
-        }
-
-        // Try to refresh session if a refresh token exists
-        try {
-          const refreshToken = session && session.getRefreshToken && session.getRefreshToken();
-          if (refreshToken) {
-            cognitoUser.refreshSession(refreshToken, (rErr, newSession) => {
-              if (rErr) {
-                setError('Session refresh failed. Please sign in again.');
-                reject(new Error('Session refresh failed'));
-                return;
-              }
-              try {
-                const idToken = newSession.getIdToken().getJwtToken();
-                setAuthToken(idToken);
-                  } catch (_e) {
-                    console.warn('Failed to set auth token from refreshed session', _e);
-                  }
-              proceedWithAssociate();
-            });
-            return;
-          }
-        } catch (_e) {
-          console.warn('Session refresh check failed', _e);
-          // continue to reject below
-        }
-
-        setError('Session expired. Please sign in again to setup 2FA.');
-        reject(new Error('Session expired'));
+        });
       });
     });
   };
@@ -452,21 +430,13 @@ export const AuthProvider = ({ children }) => {
       cognitoUser.verifySoftwareToken(userCode, friendlyName, {
         onSuccess: async (res) => {
           try {
-            // After successful verification, explicitly enable software-token MFA in Cognito
-            cognitoUser.setUserMfaPreference(null, { PreferredMfa: true, Enabled: true }, async (mfaErr, mfaResult) => {
-              if (mfaErr) {
-                console.warn('Failed to set user MFA preference after TOTP verify:', mfaErr);
-              } else {
-                console.log('User MFA preference updated:', mfaResult);
-              }
-
-              showSuccess('Two-factor authentication enabled');
-              try {
-                const email = cognitoUser.getUsername();
-                localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
-              } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
-              setMfaEnabled(true);
-              setMfaMethod('TOTP');
+            showSuccess('Two-factor authentication enabled');
+            try {
+              const email = cognitoUser.getUsername();
+              localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+            } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
+            setMfaEnabled(true);
+            setMfaMethod('TOTP');
 
               // persist server-side
               try {
@@ -479,7 +449,6 @@ export const AuthProvider = ({ children }) => {
 
               clearMfaChallenge();
               resolve(res);
-            });
           } catch (e) {
             console.error('Unexpected error after TOTP verify:', e);
             clearMfaChallenge();

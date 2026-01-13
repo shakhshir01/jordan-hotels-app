@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { showError, showSuccess } from '../services/toastService';
 import QRCode from 'qrcode';
+import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function MfaModal() {
   const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode } = useAuth();
@@ -177,7 +178,7 @@ export default function MfaModal() {
   const getTitle = () => {
     switch (mfaChallenge.type) {
       case 'SOFTWARE_TOKEN_MFA':
-        return t('mfa.totpTitle', 'Enter TOTP Code');
+        return t('mfa.totpTitle', 'Enter Authenticator Code');
       case 'SMS_MFA':
         return t('mfa.smsTitle', 'Enter SMS Code');
       case 'CUSTOM_CHALLENGE':
@@ -186,7 +187,7 @@ export default function MfaModal() {
       case 'MFA_SETUP_TOTP':
         return t('mfa.setupTotpTitle', 'Setup Authenticator App');
       case 'EMAIL_SETUP':
-        return t('mfa.emailSetupTitle', 'Setup Secondary Email');
+        return t('mfa.emailSetupTitle', 'Setup Email Verification');
       default:
         return t('mfa.title', 'Two-Factor Authentication');
     }
@@ -202,7 +203,7 @@ export default function MfaModal() {
       case 'EMAIL_LOGIN_CHALLENGE':
         return t('mfa.emailDescription', 'Enter the 6-digit code sent to your email');
       case 'MFA_SETUP_TOTP':
-        return t('mfa.setupTotpDescription', 'Scan the QR code or enter the secret into your authenticator app, then verify the generated code');
+        return t('mfa.setupTotpDescription', 'Scan the QR code with your authenticator app, then enter the verification code');
       case 'EMAIL_SETUP':
         return t('mfa.emailSetupDescription', 'Enter a secondary email to receive verification codes');
       default:
@@ -210,166 +211,301 @@ export default function MfaModal() {
     }
   };
 
+  const getIcon = () => {
+    switch (mfaChallenge.type) {
+      case 'SOFTWARE_TOKEN_MFA':
+      case 'MFA_SETUP_TOTP':
+        return <Smartphone className="w-8 h-8 text-blue-600" />;
+      case 'CUSTOM_CHALLENGE':
+      case 'EMAIL_LOGIN_CHALLENGE':
+      case 'EMAIL_SETUP':
+        return <Mail className="w-8 h-8 text-green-600" />;
+      default:
+        return <Shield className="w-8 h-8 text-purple-600" />;
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-md w-full p-6">
-        <div className="text-center mb-6">
-          <div className="mx-auto w-12 h-12 bg-jordan-blue/10 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-6 h-6 text-jordan-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="surface max-w-lg w-full mx-4 animate-in fade-in-0 zoom-in-95 duration-300">
+        {/* Header */}
+        <div className="relative p-8 pb-6">
+          <button
+            onClick={() => {
+              clearMfaChallenge();
+              setCode('');
+              setQrDataUrl(null);
+              setSecret('');
+              setEmail('');
+              setEmailStep('entry');
+            }}
+            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <div className="text-center mb-6">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+              {getIcon()}
+            </div>
+            <h2 className="page-title text-center text-slate-900 dark:text-slate-50 mb-2">
+              {getTitle()}
+            </h2>
+            <p className="page-subtitle text-center">
+              {getDescription()}
+            </p>
           </div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
-            {getTitle()}
-          </h2>
-          <p className="text-slate-600 dark:text-slate-400">
-            {getDescription()}
-          </p>
         </div>
 
-        {mfaChallenge.type === 'MFA_SETUP_TOTP' ? (
-          <form onSubmit={handleVerifyTotp}>
-            <div className="mb-4">
-              {qrDataUrl ? (
-                <div className="flex flex-col items-center gap-3">
-                  <img src={qrDataUrl} alt="TOTP QR" className="w-48 h-48 bg-white p-2 rounded-md" />
-                  <div className="text-xs text-slate-500 break-words">Secret: <strong className="font-mono">{secret}</strong></div>
-                </div>
+        {/* Content */}
+        <div className="px-8 pb-8">
+          {mfaChallenge.type === 'MFA_SETUP_TOTP' ? (
+            <form onSubmit={handleVerifyTotp} className="space-y-6">
+              {/* QR Code Section */}
+              <div className="text-center">
+                {qrDataUrl ? (
+                  <div className="inline-block p-4 bg-white rounded-2xl shadow-lg border border-slate-200 dark:bg-slate-800 dark:border-slate-700">
+                    <img
+                      src={qrDataUrl}
+                      alt="TOTP QR Code"
+                      className="w-48 h-48 mx-auto"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-48 h-48 mx-auto bg-slate-100 dark:bg-slate-700 rounded-2xl flex items-center justify-center">
+                    <RefreshCw className="w-8 h-8 text-slate-400 animate-spin" />
+                  </div>
+                )}
+
+                {secret && (
+                  <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Manual entry code:</p>
+                    <p className="font-mono text-sm text-slate-900 dark:text-slate-100 break-all">{secret}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Code Input */}
+              <div>
+                <label className="label-premium">Verification Code</label>
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  className="input-premium text-center text-2xl font-mono tracking-widest"
+                  maxLength={6}
+                  required
+                  disabled={loading}
+                />
+                <p className="helper-text mt-2">Enter the 6-digit code from your authenticator app</p>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearMfaChallenge();
+                    setCode('');
+                    setQrDataUrl(null);
+                    setSecret('');
+                  }}
+                  className="btn-secondary flex-1"
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRegenerateTotp}
+                  className="px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-2xl transition-all duration-300 disabled:opacity-50"
+                  disabled={loading}
+                >
+                  <RefreshCw className="w-5 h-5" />
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary flex-1"
+                  disabled={loading || code.length !== 6}
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <RefreshCw className="w-5 h-5 animate-spin" />
+                      Verifying...
+                    </div>
+                  ) : (
+                    'Enable 2FA'
+                  )}
+                </button>
+              </div>
+            </form>
+          ) : mfaChallenge.type === 'EMAIL_SETUP' ? (
+            <form onSubmit={emailStep === 'entry' ? handleSetupEmail : handleVerifyEmail} className="space-y-6">
+              {emailStep === 'entry' ? (
+                <>
+                  <div>
+                    <label className="label-premium">Secondary Email Address</label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="backup@example.com"
+                      className="input-premium"
+                      required
+                      disabled={loading}
+                    />
+                    <p className="helper-text mt-2">We'll send verification codes to this email</p>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearMfaChallenge();
+                        setEmail('');
+                        setEmailStep('entry');
+                      }}
+                      className="btn-secondary flex-1"
+                      disabled={loading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn-primary flex-1"
+                      disabled={loading || !email}
+                    >
+                      {loading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <RefreshCw className="w-5 h-5 animate-spin" />
+                          Sending...
+                        </div>
+                      ) : (
+                        'Send Code'
+                      )}
+                    </button>
+                  </div>
+                </>
               ) : (
-                <div className="text-sm text-slate-600">Scan the secret in your authenticator app</div>
+                <>
+                  <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-2xl border border-green-200 dark:border-green-800">
+                    <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                    <p className="text-sm text-green-800 dark:text-green-200">
+                      Verification code sent to <strong>{email}</strong>
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="label-premium">Verification Code</label>
+                    <input
+                      type="text"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                      placeholder="Enter code"
+                      className="input-premium text-center text-xl font-mono tracking-widest"
+                      required
+                      disabled={loading}
+                    />
+                    <p className="helper-text mt-2">Enter the code from your email</p>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmailStep('entry');
+                        setCode('');
+                      }}
+                      className="btn-secondary"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn-primary flex-1"
+                      disabled={loading || !code}
+                    >
+                      {loading ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <RefreshCw className="w-5 h-5 animate-spin" />
+                          Verifying...
+                        </div>
+                      ) : (
+                        'Enable Email 2FA'
+                      )}
+                    </button>
+                  </div>
+                </>
               )}
-            </div>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Status Indicator */}
+              <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
+                <AlertCircle className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA'
+                    ? 'Enter your authenticator app code to continue'
+                    : 'Check your email for the verification code'
+                  }
+                </p>
+              </div>
 
-            <div className="mb-6">
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="000000"
-                className="w-full text-center text-2xl font-mono tracking-widest px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-jordan-blue dark:bg-slate-700 dark:text-slate-100"
-                maxLength={6}
-                required
-                disabled={loading}
-              />
-            </div>
+              {/* Code Input */}
+              <div>
+                <label className="label-premium">
+                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA' ? 'Authenticator Code' : 'Email Code'}
+                </label>
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  className="input-premium text-center text-2xl font-mono tracking-widest"
+                  maxLength={6}
+                  required
+                  disabled={loading}
+                />
+                <p className="helper-text mt-2">
+                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA'
+                    ? 'Enter the 6-digit code from your authenticator app'
+                    : 'Enter the 6-digit code sent to your email'
+                  }
+                </p>
+              </div>
 
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  clearMfaChallenge();
-                  setCode('');
-                  setQrDataUrl(null);
-                  setSecret('');
-                }}
-                className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleRegenerateTotp}
-                className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:opacity-50"
-                disabled={loading}
-              >
-                {loading ? 'Generating...' : 'New QR Code'}
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-jordan-blue text-white rounded-lg hover:bg-jordan-blue/90 disabled:opacity-50"
-                disabled={loading || code.length !== 6}
-              >
-                {loading ? 'Verifying...' : 'Verify'}
-              </button>
-            </div>
-          </form>
-        ) : mfaChallenge.type === 'EMAIL_SETUP' ? (
-          <form onSubmit={emailStep === 'entry' ? handleSetupEmail : handleVerifyEmail}>
-            {emailStep === 'entry' ? (
-              <>
-                <div className="mb-4">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="secondary@example.com"
-                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => { clearMfaChallenge(); setEmail(''); setEmailStep('entry'); }}
-                    className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300"
-                    disabled={loading}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="flex-1 px-4 py-2 bg-jordan-blue text-white rounded-lg" disabled={loading}>
-                    {loading ? 'Sending...' : 'Send verification'}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="mb-4">
-                  <input
-                    type="text"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
-                    placeholder="Enter code"
-                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <button type="button" onClick={() => { setEmailStep('entry'); setCode(''); }} className="flex-1 px-4 py-2 bg-slate-200 rounded-lg">Back</button>
-                  <button type="submit" className="flex-1 px-4 py-2 bg-jordan-blue text-white rounded-lg" disabled={loading || !code}>Verify</button>
-                </div>
-              </>
-            )}
-          </form>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="000000"
-                className="w-full text-center text-2xl font-mono tracking-widest px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-jordan-blue dark:bg-slate-700 dark:text-slate-100"
-                maxLength={6}
-                required
-                disabled={loading}
-              />
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  clearMfaChallenge();
-                  setCode('');
-                }}
-                className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-jordan-blue text-white rounded-lg hover:bg-jordan-blue/90 disabled:opacity-50"
-                disabled={loading || code.length !== 6}
-              >
-                {loading ? 'Verifying...' : 'Verify'}
-              </button>
-            </div>
-          </form>
-        )}
+              {/* Buttons */}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearMfaChallenge();
+                    setCode('');
+                  }}
+                  className="btn-secondary flex-1"
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary flex-1"
+                  disabled={loading || code.length !== 6}
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <RefreshCw className="w-5 h-5 animate-spin" />
+                      Verifying...
+                    </div>
+                  ) : (
+                    'Verify & Continue'
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
