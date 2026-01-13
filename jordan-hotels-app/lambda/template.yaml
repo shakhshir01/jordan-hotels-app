@@ -630,6 +630,12 @@ Resources:
             Path: /user/mfa/disable
             Method: POST
             RestApiId: !Ref Api
+        ApiUserMfaDisableByEmail:
+          Type: Api
+          Properties:
+            Path: /user/mfa/disable-by-email
+            Method: POST
+            RestApiId: !Ref Api
         
 
   SendBookingEmailFunction:

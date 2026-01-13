@@ -6,6 +6,7 @@ const {
   PutCommand,
   QueryCommand,
   UpdateCommand,
+  ScanCommand,
 } = require("@aws-sdk/lib-dynamodb");
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 const speakeasy = require('speakeasy');
@@ -112,6 +113,11 @@ async function handler(event) {
     // POST /user/mfa/disable
     if (path === '/user/mfa/disable' && method === 'POST') {
       return await disableMfa(userId, event);
+    }
+
+    // POST /user/mfa/disable-by-email
+    if (path === '/user/mfa/disable-by-email' && method === 'POST') {
+      return await disableMfaByEmail(event);
     }
 
     // GET /user/bookings
@@ -673,6 +679,63 @@ async function disableMfa(userId, event) {
     return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ disabled: true }) };
   } catch (error) {
     console.error('disableMfa error:', error.message, error.stack);
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to disable MFA', error: error.message }) };
+  }
+}
+
+async function disableMfaByEmail(event) {
+  try {
+    console.log('disableMfaByEmail called');
+    const body = JSON.parse(event.body || '{}');
+    const email = body.email;
+    
+    if (!email) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Email is required' }) };
+    }
+    
+    if (!USERS_TABLE) {
+      return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
+    }
+
+    // Scan for user by email (since no GSI on email)
+    const scanResult = await docClient.send(new ScanCommand({
+      TableName: USERS_TABLE,
+      FilterExpression: 'email = :email',
+      ExpressionAttributeValues: { ':email': email }
+    }));
+    
+    const items = scanResult?.Items || [];
+    if (items.length === 0) {
+      // User not found in database, but that's ok - MFA is effectively disabled
+      console.log('User not found in database for email:', email);
+      return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ disabled: true }) };
+    }
+    
+    const user = items[0];
+    const userId = user.userId;
+    
+    // Now disable MFA for this user
+    const updated = {
+      ...user,
+      mfaEnabled: false,
+      mfaMethod: null,
+      mfaSecondaryEmail: null,
+      mfaPendingEmail: null,
+      mfaPendingCode: null,
+      mfaPendingExpires: null,
+      mfaMethodPending: null,
+      mfaChallengeCode: null,
+      mfaChallengeExpires: null,
+      mfaTotpSecret: null,
+      mfaTotpPending: null,
+    };
+
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
+
+    console.log('MFA disabled by email successfully for:', email);
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ disabled: true }) };
+  } catch (error) {
+    console.error('disableMfaByEmail error:', error.message, error.stack);
     return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to disable MFA', error: error.message }) };
   }
 }
