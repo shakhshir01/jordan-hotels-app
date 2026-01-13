@@ -6,7 +6,7 @@ import QRCode from 'qrcode';
 import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function MfaModal() {
-  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode } = useAuth();
+  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa } = useAuth();
   const { t } = useTranslation();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,29 +15,34 @@ export default function MfaModal() {
   const [email, setEmail] = useState('');
   const [emailStep, setEmailStep] = useState('entry'); // 'entry' | 'verify'
 
-  // When Cognito returns a secret for TOTP setup, render QR code
+  // When challenge has QR code or secret for TOTP setup, render QR code
   useEffect(() => {
     let mounted = true;
     console.log('MfaModal useEffect triggered, challenge:', mfaChallenge);
-    if (mfaChallenge?.type === 'MFA_SETUP_TOTP' && mfaChallenge.secretCode) {
-      const secretCode = mfaChallenge.secretCode;
-      setSecret(secretCode);
-      const username = cognitoUserRef.current?.getUsername?.() || 'user';
-      const label = encodeURIComponent(`${username}`);
-      const issuer = encodeURIComponent('VisitJo');
-      const otpauth = `otpauth://totp/${label}?secret=${secretCode}&issuer=${issuer}`;
-      console.log('Generating QR code for:', otpauth);
-      QRCode.toDataURL(otpauth)
-        .then((url) => {
-          if (mounted) {
-            console.log('QR code generated successfully');
-            setQrDataUrl(url);
-          }
-        })
-        .catch((err) => {
-          console.error('Failed to generate QR code', err);
-          setQrDataUrl(null);
-        });
+    if ((mfaChallenge?.type === 'MFA_SETUP_TOTP' && mfaChallenge.secretCode) || (mfaChallenge?.type === 'TOTP_SETUP' && mfaChallenge.qrCode)) {
+      if (mfaChallenge.type === 'MFA_SETUP_TOTP') {
+        const secretCode = mfaChallenge.secretCode;
+        setSecret(secretCode);
+        const username = cognitoUserRef.current?.getUsername?.() || 'user';
+        const label = encodeURIComponent(`${username}`);
+        const issuer = encodeURIComponent('VisitJo');
+        const otpauth = `otpauth://totp/${label}?secret=${secretCode}&issuer=${issuer}`;
+        console.log('Generating QR code for:', otpauth);
+        QRCode.toDataURL(otpauth)
+          .then((url) => {
+            if (mounted) {
+              console.log('QR code generated successfully');
+              setQrDataUrl(url);
+            }
+          })
+          .catch((err) => {
+            console.error('Failed to generate QR code', err);
+            setQrDataUrl(null);
+          });
+      } else if (mfaChallenge.type === 'TOTP_SETUP') {
+        setQrDataUrl(mfaChallenge.qrCode);
+        setSecret(mfaChallenge.secret || '');
+      }
     }
     return () => { mounted = false; };
   }, [mfaChallenge, cognitoUserRef]);
@@ -74,10 +79,23 @@ export default function MfaModal() {
 
     setLoading(true);
     try {
-      if (mfaChallenge.type === 'CUSTOM_CHALLENGE' || mfaChallenge.type === 'EMAIL_LOGIN_CHALLENGE') {
+      if (mfaChallenge.type === 'CUSTOM_CHALLENGE' || mfaChallenge.type === 'EMAIL_LOGIN_CHALLENGE' || mfaChallenge.type === 'EMAIL_MFA') {
         // Email MFA verification (could be login or logout verification)
         const res = await verifyLoginEmailMfa(code);
         // If verifyLoginEmailMfa performed logout, stop here
+        if (res && res.loggedOut) {
+          clearMfaChallenge();
+          setCode('');
+          return;
+        }
+        // Login completed via backend
+        clearMfaChallenge();
+        setCode('');
+        showSuccess('Login successful!');
+      } else if (mfaChallenge.type === 'TOTP_MFA') {
+        // TOTP MFA verification for login
+        const res = await verifyLoginTotpMfa(code);
+        // If verifyLoginTotpMfa performed logout, stop here
         if (res && res.loggedOut) {
           clearMfaChallenge();
           setCode('');
@@ -126,7 +144,11 @@ export default function MfaModal() {
     if (!code || !/^\d{6}$/.test(code)) return showError('Enter a valid 6-digit code from your authenticator app');
     setLoading(true);
     try {
-      await verifyTotp(code);
+      if (mfaChallenge.type === 'TOTP_SETUP') {
+        await verifyTotpMfa(code);
+      } else {
+        await verifyTotp(code);
+      }
       setCode('');
       showSuccess('TOTP enabled');
     } catch (err) {
@@ -139,7 +161,11 @@ export default function MfaModal() {
   const handleRegenerateTotp = async () => {
     setLoading(true);
     try {
-      await setupTotp();
+      if (mfaChallenge.type === 'TOTP_SETUP') {
+        await setupTotpMfa();
+      } else {
+        await setupTotp();
+      }
       setCode('');
       showSuccess('New QR code generated');
     } catch (err) {
@@ -184,13 +210,16 @@ export default function MfaModal() {
   const getTitle = () => {
     switch (mfaChallenge.type) {
       case 'SOFTWARE_TOKEN_MFA':
+      case 'TOTP_MFA':
         return t('mfa.totpTitle', 'Enter Authenticator Code');
       case 'SMS_MFA':
         return t('mfa.smsTitle', 'Enter SMS Code');
       case 'CUSTOM_CHALLENGE':
       case 'EMAIL_LOGIN_CHALLENGE':
+      case 'EMAIL_MFA':
         return t('mfa.emailTitle', 'Enter Email Code');
       case 'MFA_SETUP_TOTP':
+      case 'TOTP_SETUP':
         return t('mfa.setupTotpTitle', 'Setup Authenticator App');
       case 'EMAIL_SETUP':
         return t('mfa.emailSetupTitle', 'Setup Email Verification');
@@ -202,13 +231,16 @@ export default function MfaModal() {
   const getDescription = () => {
     switch (mfaChallenge.type) {
       case 'SOFTWARE_TOKEN_MFA':
+      case 'TOTP_MFA':
         return t('mfa.totpDescription', 'Enter the 6-digit code from your authenticator app');
       case 'SMS_MFA':
         return t('mfa.smsDescription', 'Enter the 6-digit code sent to your phone');
       case 'CUSTOM_CHALLENGE':
       case 'EMAIL_LOGIN_CHALLENGE':
+      case 'EMAIL_MFA':
         return t('mfa.emailDescription', 'Enter the 6-digit code sent to your email');
       case 'MFA_SETUP_TOTP':
+      case 'TOTP_SETUP':
         return t('mfa.setupTotpDescription', 'Scan the QR code with your authenticator app, then enter the verification code');
       case 'EMAIL_SETUP':
         return t('mfa.emailSetupDescription', 'Enter a secondary email to receive verification codes');
@@ -221,10 +253,13 @@ export default function MfaModal() {
     switch (mfaChallenge.type) {
       case 'SOFTWARE_TOKEN_MFA':
       case 'MFA_SETUP_TOTP':
+      case 'TOTP_MFA':
+      case 'TOTP_SETUP':
         return <Smartphone className="w-8 h-8 text-blue-600" />;
       case 'CUSTOM_CHALLENGE':
       case 'EMAIL_LOGIN_CHALLENGE':
       case 'EMAIL_SETUP':
+      case 'EMAIL_MFA':
         return <Mail className="w-8 h-8 text-green-600" />;
       default:
         return <Shield className="w-8 h-8 text-purple-600" />;
@@ -265,7 +300,7 @@ export default function MfaModal() {
 
         {/* Content */}
         <div className="px-8 pb-8">
-          {mfaChallenge.type === 'MFA_SETUP_TOTP' ? (
+          {mfaChallenge.type === 'MFA_SETUP_TOTP' || mfaChallenge.type === 'TOTP_SETUP' ? (
             <form onSubmit={handleVerifyTotp} className="space-y-6">
               {/* QR Code Section */}
               <div className="text-center">
@@ -451,7 +486,7 @@ export default function MfaModal() {
               <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
                 <AlertCircle className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA'
+                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA' || mfaChallenge.type === 'TOTP_MFA'
                     ? 'Enter your authenticator app code to continue'
                     : 'Check your email for the verification code'
                   }
@@ -461,7 +496,7 @@ export default function MfaModal() {
               {/* Code Input */}
               <div>
                 <label className="label-premium">
-                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA' ? 'Authenticator Code' : 'Email Code'}
+                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA' || mfaChallenge.type === 'TOTP_MFA' ? 'Authenticator Code' : 'Email Code'}
                 </label>
                 <input
                   type="text"
@@ -474,7 +509,7 @@ export default function MfaModal() {
                   disabled={loading}
                 />
                 <p className="helper-text mt-2">
-                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA'
+                  {mfaChallenge.type === 'SOFTWARE_TOKEN_MFA' || mfaChallenge.type === 'TOTP_MFA'
                     ? 'Enter the 6-digit code from your authenticator app'
                     : 'Enter the 6-digit code sent to your email'
                   }

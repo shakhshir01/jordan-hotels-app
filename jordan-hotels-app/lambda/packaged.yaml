@@ -614,7 +614,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: user/index.handler
-      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/eb87117907615fe6fd0a350347bf03f3
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/aba26f03f0150035356cb09df7e1b300
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -629,8 +629,9 @@ Resources:
             Ref: BookingsTable
           USERS_TABLE:
             Ref: UsersTable
-          SES_EMAIL_FROM: no-reply@verificationemail.com
-          SES_FROM_EMAIL: no-reply@verificationemail.com
+          SES_EMAIL_FROM: no-reply@visit-jo.com
+          SES_FROM_EMAIL: no-reply@visit-jo.com
+          DOMAIN: visit-jo.com
       Events:
         ApiUserProfileGet:
           Type: Api
@@ -671,6 +672,13 @@ Resources:
           Type: Api
           Properties:
             Path: /auth/email-mfa/request
+            Method: POST
+            RestApiId:
+              Ref: Api
+        ApiAuthEmailMfaSetup:
+          Type: Api
+          Properties:
+            Path: /auth/email-mfa/setup
             Method: POST
             RestApiId:
               Ref: Api

@@ -1,12 +1,11 @@
 version = 0.1
 
 [default.deploy.parameters]
-stack_name = "sam-app2"
-resolve_s3 = true
-s3_prefix = "sam-app2"
-confirm_changeset = true
-capabilities = "CAPABILITY_IAM"
-parameter_overrides = "OpenAISecretArn=\"\""
+stack_name = "visitjo-backend-2"
+s3_bucket = "visitjo-sam-deploy-1768258668990-9051"
+confirm_changeset = false
+capabilities = "CAPABILITY_NAMED_IAM"
+parameter_overrides = "OpenAISecretArn=\"\" StripeSecretArn=\"\""
 image_repositories = []
 disable_rollback = true
 

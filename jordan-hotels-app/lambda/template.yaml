@@ -555,7 +555,6 @@ Resources:
           SES_EMAIL_FROM: no-reply@visit-jo.com
           SES_FROM_EMAIL: no-reply@visit-jo.com
           DOMAIN: visit-jo.com
-          AWS_REGION: !Ref AWS::Region
       Events:
         ApiUserProfileGet:
           Type: Api
@@ -588,16 +587,40 @@ Resources:
             Path: /user/mfa/email/verify
             Method: POST
             RestApiId: !Ref Api
+        ApiUserMfaTotpSetup:
+          Type: Api
+          Properties:
+            Path: /user/mfa/totp/setup
+            Method: POST
+            RestApiId: !Ref Api
+        ApiUserMfaTotpVerify:
+          Type: Api
+          Properties:
+            Path: /user/mfa/totp/verify
+            Method: POST
+            RestApiId: !Ref Api
         ApiAuthEmailMfaRequest:
           Type: Api
           Properties:
             Path: /auth/email-mfa/request
             Method: POST
             RestApiId: !Ref Api
+        ApiAuthEmailMfaSetup:
+          Type: Api
+          Properties:
+            Path: /auth/email-mfa/setup
+            Method: POST
+            RestApiId: !Ref Api
         ApiAuthEmailMfaVerifyLogin:
           Type: Api
           Properties:
             Path: /auth/email-mfa/verify-login
+            Method: POST
+            RestApiId: !Ref Api
+        ApiAuthTotpVerifyLogin:
+          Type: Api
+          Properties:
+            Path: /auth/totp/verify-login
             Method: POST
             RestApiId: !Ref Api
         ApiUserMfaDisable:

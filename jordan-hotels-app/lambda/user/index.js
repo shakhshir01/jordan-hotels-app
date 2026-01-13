@@ -8,6 +8,8 @@ const {
   UpdateCommand,
 } = require("@aws-sdk/lib-dynamodb");
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
+const speakeasy = require('speakeasy');
+const qrcode = require('qrcode');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" });
 const docClient = DynamoDBDocumentClient.from(client);
@@ -77,6 +79,21 @@ async function handler(event) {
       return await verifyEmailMfa(userId, event);
     }
 
+    // POST /user/mfa/totp/setup
+    if (path === '/user/mfa/totp/setup' && method === 'POST') {
+      return await setupTotpMfa(userId, event);
+    }
+
+    // POST /user/mfa/totp/verify
+    if (path === '/user/mfa/totp/verify' && method === 'POST') {
+      return await verifyTotpMfa(userId, event);
+    }
+
+    // POST /auth/email-mfa/setup
+    if (path === '/auth/email-mfa/setup' && method === 'POST') {
+      return await setupEmailMfa(userId, event);
+    }
+
     // POST /auth/email-mfa/request
     if (path === '/auth/email-mfa/request' && method === 'POST') {
       return await requestEmailMfaChallenge(userId, event);
@@ -85,6 +102,11 @@ async function handler(event) {
     // POST /auth/email-mfa/verify-login
     if (path === '/auth/email-mfa/verify-login' && method === 'POST') {
       return await verifyLoginEmailMfa(userId, event);
+    }
+
+    // POST /auth/totp/verify-login
+    if (path === '/auth/totp/verify-login' && method === 'POST') {
+      return await verifyLoginTotpMfa(userId, event);
     }
 
     // POST /user/mfa/disable
@@ -427,6 +449,95 @@ async function verifyEmailMfa(userId, event) {
   }
 }
 
+async function setupTotpMfa(userId, event) {
+  try {
+    // Generate TOTP secret
+    const secret = speakeasy.generateSecret({
+      name: 'VisitJo',
+      issuer: 'VisitJo',
+      length: 32
+    });
+
+    // Generate QR code
+    const otpauthUrl = speakeasy.otpauthURL({
+      secret: secret.ascii,
+      label: 'VisitJo',
+      issuer: 'VisitJo',
+      encoding: 'ascii'
+    });
+
+    const qrCodeDataUrl = await qrcode.toDataURL(otpauthUrl);
+
+    // Store the secret temporarily
+    if (USERS_TABLE) {
+      const existing = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+      const item = existing?.Item || { userId };
+      item.mfaTotpSecret = secret.base32;
+      item.mfaTotpPending = true;
+      await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
+    }
+
+    return { 
+      statusCode: 200, 
+      headers: defaultHeaders, 
+      body: JSON.stringify({ 
+        secret: secret.base32, 
+        qrCode: qrCodeDataUrl,
+        otpauthUrl 
+      }) 
+    };
+  } catch (error) {
+    console.error('setupTotpMfa error', error);
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to setup TOTP MFA' }) };
+  }
+}
+
+async function verifyTotpMfa(userId, event) {
+  try {
+    const body = event.body ? JSON.parse(event.body) : {};
+    const code = String(body.code || body.token || '').trim();
+    if (!code) return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'code required' }) };
+
+    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
+
+    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+    const item = result?.Item || {};
+    const secret = item.mfaTotpSecret;
+
+    if (!secret || !item.mfaTotpPending) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'No pending TOTP setup' }) };
+    }
+
+    // Verify the code
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: code,
+      window: 2 // Allow 2 time steps (30 seconds each)
+    });
+
+    if (!verified) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Invalid code' }) };
+    }
+
+    // Mark MFA enabled
+    const updated = { 
+      ...(item || {}), 
+      mfaEnabled: true, 
+      mfaMethod: 'TOTP', 
+      mfaTotpSecret: secret 
+    };
+    delete updated.mfaTotpPending;
+
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
+
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ verified: true }) };
+  } catch (error) {
+    console.error('verifyTotpMfa error', error);
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to verify TOTP code' }) };
+  }
+}
+
 async function requestEmailMfaChallenge(userId, event) {
   try {
     if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
@@ -490,12 +601,51 @@ async function verifyLoginEmailMfa(userId, event) {
   }
 }
 
-async function disableMfa(userId, event) {
+async function verifyLoginTotpMfa(userId, event) {
   try {
+    const body = event.body ? JSON.parse(event.body) : {};
+    const code = String(body.code || body.token || '').trim();
+    if (!code) return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'code required' }) };
+
     if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
 
     const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
     const item = result?.Item || {};
+    const secret = item.mfaTotpSecret;
+
+    if (!secret || !item.mfaEnabled || item.mfaMethod !== 'TOTP') {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'TOTP MFA not enabled' }) };
+    }
+
+    // Verify the code
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: code,
+      window: 2 // Allow 2 time steps (30 seconds each)
+    });
+
+    if (!verified) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Invalid code' }) };
+    }
+
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ verified: true }) };
+  } catch (error) {
+    console.error('verifyLoginTotpMfa error', error);
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to verify TOTP code' }) };
+  }
+}
+
+async function disableMfa(userId, event) {
+  try {
+    console.log('disableMfa called for userId:', userId);
+    console.log('USERS_TABLE:', USERS_TABLE);
+    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
+
+    console.log('Fetching user from DynamoDB...');
+    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+    const item = result?.Item || {};
+    console.log('User item fetched:', !!item);
 
     // Disable MFA and clear related fields
     const updated = {
@@ -511,14 +661,19 @@ async function disableMfa(userId, event) {
       // Clear any challenge fields
       mfaChallengeCode: null,
       mfaChallengeExpires: null,
+      // Clear TOTP fields
+      mfaTotpSecret: null,
+      mfaTotpPending: null,
     };
 
+    console.log('Updating user in DynamoDB...');
     await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
 
+    console.log('MFA disabled successfully');
     return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ disabled: true }) };
   } catch (error) {
-    console.error('disableMfa error', error);
-    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to disable MFA' }) };
+    console.error('disableMfa error:', error.message, error.stack);
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to disable MFA', error: error.message }) };
   }
 }
 

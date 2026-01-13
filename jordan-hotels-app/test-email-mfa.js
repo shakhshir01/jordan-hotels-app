@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const testEmailMFA = async () => {
-  const apiUrl = 'https://plnlaspdy5.execute-api.us-east-1.amazonaws.com/prod';
+  const apiUrl = 'https://lk8nfjc7m1.execute-api.us-east-1.amazonaws.com/prod';
 
   console.log('🔍 Testing Email MFA functionality...');
   console.log(`API URL: ${apiUrl}`);

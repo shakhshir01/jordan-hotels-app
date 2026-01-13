@@ -697,6 +697,40 @@ export const hotelAPI = {
     }
   },
 
+  // TOTP MFA management
+  setupTotpMfa: async () => {
+    if (getUseMocks()) return { secret: 'mock-secret', qrCode: 'mock-qr', otpauthUrl: 'mock-url' };
+    try {
+      const response = await apiClient.post("/user/mfa/totp/setup");
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { secret: 'mock-secret', qrCode: 'mock-qr', otpauthUrl: 'mock-url' };
+      throw error;
+    }
+  },
+
+  verifyTotpMfa: async (code) => {
+    if (getUseMocks()) return { verified: true };
+    try {
+      const response = await apiClient.post("/user/mfa/totp/verify", { code });
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { verified: true };
+      throw error;
+    }
+  },
+
+  verifyLoginTotpMfa: async (code) => {
+    if (getUseMocks()) return { verified: true };
+    try {
+      const response = await apiClient.post("/auth/totp/verify-login", { code });
+      return normalizeLambdaResponse(response.data);
+    } catch (error) {
+      if (lastAuthError) return { verified: true };
+      throw error;
+    }
+  },
+
   getUserBookings: async () => {
     if (getUseMocks()) return [];
     try {

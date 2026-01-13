@@ -195,8 +195,7 @@ export const AuthProvider = ({ children }) => {
           const mfaMethod = profile?.mfaMethod;
 
           if (mfaEnabled) {
-            // MFA is enabled, but let Cognito handle the challenge
-            // Store the session temporarily and wait for MFA challenge
+            // MFA is enabled, request MFA challenge
             setUserAndProfileFromEmail(email);
             try {
               const idToken = session.getIdToken().getJwtToken();
@@ -209,8 +208,21 @@ export const AuthProvider = ({ children }) => {
             setMfaMethod(mfaMethod || 'TOTP');
             localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
 
-            // Instead of setting challenge here, let Cognito send the proper challenge
-            // The totpRequired or mfaRequired callback will be called
+            // Request MFA challenge based on method
+            try {
+              if (mfaMethod === 'EMAIL') {
+                await hotelAPI.requestEmailMfaChallenge();
+                setMfaChallenge({ type: 'EMAIL_MFA', message: 'Check your email for the verification code' });
+              } else if (mfaMethod === 'TOTP') {
+                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code' });
+              } else {
+                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code' }); // Default to TOTP
+              }
+            } catch (challengeErr) {
+              console.error('Failed to request MFA challenge', challengeErr);
+              setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code' }); // Fallback
+            }
+
             resolve({ mfaRequired: true });
           } else {
             // No MFA, complete login
@@ -510,6 +522,47 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const setupTotpMfa = async () => {
+    try {
+      const res = await hotelAPI.setupTotpMfa();
+      // Set up the challenge for TOTP setup
+      setMfaChallenge({ type: 'TOTP_SETUP', secret: res.secret, qrCode: res.qrCode, otpauthUrl: res.otpauthUrl });
+      return res;
+    } catch (e) {
+      setError(e?.message || String(e));
+      showError(e?.message || 'Failed to setup TOTP MFA');
+      throw e;
+    }
+  };
+
+  const verifyTotpMfa = async (code) => {
+    try {
+      const res = await hotelAPI.verifyTotpMfa(code);
+      // on success, persist state
+      const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
+      try {
+        const email = cognitoUser?.getUsername?.() || user?.email;
+        if (email) localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+      } catch (_e) { console.warn('Ignored while persisting local MFA flag', _e); }
+      setMfaEnabled(true);
+      setMfaMethod('TOTP');
+      // persist server-side profile with method
+      try {
+        await hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' });
+        console.log('TOTP MFA status saved to database');
+      } catch (e) {
+        console.error('Failed to save TOTP MFA status to database:', e);
+        showError('TOTP MFA enabled but failed to save status. Please try again.');
+      }
+      showSuccess('TOTP MFA enabled');
+      return res;
+    } catch (e) {
+      setError(e?.message || String(e));
+      showError(e?.message || 'Failed to verify TOTP code');
+      throw e;
+    }
+  };
+
   const verifyEmailMfa = async (code) => {
     try {
       const res = await hotelAPI.verifyEmailMfa(code);
@@ -556,6 +609,26 @@ export const AuthProvider = ({ children }) => {
     } catch (e) {
       setError(e?.message || String(e));
       showError(e?.message || 'Failed to verify login code');
+      throw e;
+    }
+  };
+
+  const verifyLoginTotpMfa = async (code) => {
+    try {
+      const res = await hotelAPI.verifyLoginTotpMfa(code);
+      showSuccess('Login verified');
+      // If this was a logout-initiated verification, perform logout now
+      if (mfaChallenge?.pendingLogout) {
+        try {
+          clearMfaChallenge();
+          performLogout();
+        } catch (_e) { console.warn('performLogout failed after TOTP login verification', _e); }
+        return { loggedOut: true };
+      }
+      return res;
+    } catch (e) {
+      setError(e?.message || String(e));
+      showError(e?.message || 'Failed to verify TOTP code');
       throw e;
     }
   };
@@ -732,8 +805,11 @@ export const AuthProvider = ({ children }) => {
     mfaMethod,
     setupEmailMfa,
     verifyEmailMfa,
+    setupTotpMfa,
+    verifyTotpMfa,
     requestEmailMfaChallenge,
     verifyLoginEmailMfa,
+    verifyLoginTotpMfa,
     disableMfa,
     cognitoUserRef,
     isAuthenticated: !!user,
