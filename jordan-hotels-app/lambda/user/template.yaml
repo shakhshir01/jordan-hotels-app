@@ -15,8 +15,8 @@ Resources:
         Variables:
           BOOKINGS_TABLE: "Bookings"
           USERS_TABLE: "Users"
-          SES_EMAIL_FROM: no-reply@verificationemail.com
-          SES_FROM_EMAIL: no-reply@verificationemail.com
+          SES_EMAIL_FROM: no-reply@visit-jo.com
+          SES_FROM_EMAIL: no-reply@visit-jo.com
       Policies:
         - AWSLambdaBasicExecutionRole
         - Statement:
