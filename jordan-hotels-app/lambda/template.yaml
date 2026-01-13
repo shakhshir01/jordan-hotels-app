@@ -1,5 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
+Transform:
+  - AWS::Serverless-2016-10-31
+  - AWS::SecretsManager-2020-07-23
 Description: VisitJo SAM template — API, Lambdas, DynamoDB, S3, Secrets Manager (updated)
 
 Globals:
@@ -239,6 +241,7 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
+      KmsKeyId: alias/aws/secretsmanager
       Tags:
         - Key: App
           Value: VisitJo
@@ -247,7 +250,13 @@ Resources:
         - Key: Stack
           Value: !Ref AWS::StackName
 
-
+  StripeSecretRotationSchedule:
+    Condition: CreateStripeSecret
+    Type: AWS::SecretsManager::RotationSchedule
+    Properties:
+      SecretId: !Ref StripeSecret
+      RotationRules:
+        AutomaticallyAfterDays: 30
 
   LambdaRolePolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -645,7 +654,8 @@ Resources:
         - !Ref LambdaRolePolicy
       Environment:
         Variables:
-          SES_EMAIL_FROM: noreply@visitjo.com
+          SES_EMAIL_FROM: no-reply@visit-jo.com
+          SES_FROM_EMAIL: no-reply@visit-jo.com
           FRONTEND_URL: https://main.d1ewsonl19kjj7.amplifyapp.com
       Events:
         ApiSendBookingEmail:

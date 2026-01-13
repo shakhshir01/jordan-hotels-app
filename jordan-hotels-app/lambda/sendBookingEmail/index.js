@@ -79,7 +79,7 @@ const bookingConfirmationTemplate = (data) => `
 
 const sendEmail = async (email, subject, htmlContent) => {
   const params = {
-    Source: process.env.SES_EMAIL_FROM || 'noreply@visitjo.com',
+    Source: process.env.SES_EMAIL_FROM || 'no-reply@visit-jo.com',
     Destination: {
       ToAddresses: [email],
     },
