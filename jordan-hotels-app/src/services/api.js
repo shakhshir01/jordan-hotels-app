@@ -324,6 +324,27 @@ const generateDefaultRoomTypes = (hotel) => {
   return roomTypes;
 };
 
+// Function to select the best available image for hotel profile/main display
+const selectBestHotelImage = (sanitizedImages, key) => {
+  if (!Array.isArray(sanitizedImages) || sanitizedImages.length === 0) {
+    return getGenericHotelFallbackImage(key);
+  }
+
+  // Prioritize images that are not generic fallbacks
+  // Generic fallbacks are from GENERIC_HOTEL_FALLBACK_IMAGES array
+  const genericFallbacks = new Set(GENERIC_HOTEL_FALLBACK_IMAGES);
+
+  // First, try to find a non-generic image
+  for (const img of sanitizedImages) {
+    if (img && !genericFallbacks.has(img)) {
+      return img;
+    }
+  }
+
+  // If all images are generic fallbacks, return the first one
+  return sanitizedImages[0];
+};
+
 const normalizeHotel = (rawHotel) => {
   if (!rawHotel || typeof rawHotel !== "object") return rawHotel;
 
@@ -337,7 +358,8 @@ const normalizeHotel = (rawHotel) => {
   }
   const sanitized = sanitizeHotelImageUrls(images, key);
 
-  const image = sanitized[0] || "";
+  // Select the best available image for the main profile image
+  const image = selectBestHotelImage(sanitized, key);
 
   // Add default room types if not present
   const roomTypes = rawHotel.roomTypes || generateDefaultRoomTypes(rawHotel);

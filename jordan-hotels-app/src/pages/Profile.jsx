@@ -303,7 +303,7 @@ const Profile = () => {
                   {mfaEnabled && (
                     <div className="flex items-center gap-2 px-3 py-2 border border-green-200 bg-green-50 text-green-800 rounded-lg">
                       <Check size={16} />
-                      <span>Enabled {mfaMethod && `(${mfaMethod})`}</span>
+                      <span>2FA Enabled{mfaMethod && ` (${mfaMethod === 'EMAIL' ? 'Email' : mfaMethod === 'TOTP' ? 'App' : mfaMethod})`}</span>
                     </div>
                   )}
                 </div>
