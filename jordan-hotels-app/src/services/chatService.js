@@ -6,7 +6,9 @@ const getExternalChatUrl = () => {
     // runtime-config is injected to window before app boot
     const cfg = typeof window !== 'undefined' && window.__VISITJO_RUNTIME_CONFIG__;
     if (cfg && cfg.VITE_CHAT_API_URL) return cfg.VITE_CHAT_API_URL;
-  } catch (_) {}
+  } catch (_) {
+    // ignore runtime config errors
+  }
   // fallback to undefined
   return undefined;
 };

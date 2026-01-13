@@ -7,7 +7,6 @@
  * that makes planning your trip as enjoyable as the journey itself.
  */
 
-import i18n from '../i18n/i18n.js';
 import { hotelAPI } from './api';
 
 // Nashmi's personality constants
@@ -219,7 +218,7 @@ async function gatherContextData(message) {
   return data;
 }
 
-export const generateChatResponse = async (message, history = [], userProfile = {}) => {
+export const generateChatResponse = async (message, _history = [], userProfile = {}) => {
   const userName = userProfile?.displayName || userProfile?.name || 'Friend';
   const contextData = await gatherContextData(message);
 

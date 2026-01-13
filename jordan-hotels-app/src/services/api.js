@@ -59,11 +59,6 @@ const isLocalDevHost =
   typeof window !== "undefined" &&
   (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
-const hasRuntimeApiUrl = Boolean(rawRuntimeApiUrl && !isStaleApiUrl(rawRuntimeApiUrl));
-const hasEnvApiUrl = Boolean(rawEnvApiUrl && !isStaleApiUrl(rawEnvApiUrl));
-
-const shouldUseDevProxy = isLocalDevHost && (hasRuntimeApiUrl || hasEnvApiUrl);
-
 // In local dev always use the Vite dev proxy path `/api` so requests are proxied
 // to the configured `VITE_API_GATEWAY_URL`. This avoids CORS / 403 problems
 // when the frontend and local API gateway are on different ports.
@@ -717,7 +712,7 @@ export const hotelAPI = {
   },
 
   // new dynamic endpoints: search / destinations / deals / experiences / blog
-  searchHotelsPage: async ({ q = "", cursor = "", limit = 30, signal } = {}) => {
+  searchHotelsPage: async ({ q = "", cursor = "", limit = 30, _signal } = {}) => {
     // Always use combined Xotelo + real hotel data for search
     const result = getHotelsFromStatic({ q, cursor, limit });
     if (!result.hotels || result.hotels.length === 0) {
@@ -799,7 +794,7 @@ export const hotelAPI = {
       const res = await apiClient.get("/destinations");
       const apiDest = normalizeLambdaResponse(res.data);
       if (Array.isArray(apiDest) && apiDest.length > 0) return apiDest;
-    } catch (error) {
+    } catch (_error) {
       // ignore, fallback below
     }
     if (getUseMocks() && Array.isArray(mockDestinations) && mockDestinations.length > 0) return mockDestinations;
@@ -975,7 +970,6 @@ const mockBlogPosts = [
     author: "VisitJo Team",
     publishedAt: new Date().toISOString(),
     tags: ["welcome", "travel", "jordan"],
-    image: "https://media-cdn.tripadvisor.com/media/photo-o/15/33/fc/f0/jordan.jpg?w=1200&h=-1&s=1",
     image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=1200",
   },
 ];

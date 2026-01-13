@@ -613,7 +613,7 @@ export const AuthProvider = ({ children }) => {
 
       // First disable MFA in Cognito
       await new Promise((resolve, reject) => {
-        cognitoUser.setUserMfaPreference(null, null, (err, result) => {
+        cognitoUser.setUserMfaPreference({ Enabled: false }, { Enabled: false }, (err, result) => {
           if (err) {
             console.error('Failed to disable MFA in Cognito:', err);
             reject(new Error('Failed to disable MFA in Cognito: ' + err.message));

@@ -41,7 +41,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showLightbox, displayImages.length]);
+  }, [showLightbox, displayImages.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative">

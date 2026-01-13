@@ -71,25 +71,6 @@ export default function ChatBot() {
     }
   };
 
-  const getBotResponse = (userInput) => {
-    const input = userInput.toLowerCase();
-
-    if (input.includes('hotel') || input.includes('booking')) {
-      return t('chatbot.hotel_help', 'I can help you find and book the perfect hotel in Jordan! What type of accommodation are you looking for?');
-    }
-    if (input.includes('price') || input.includes('cost')) {
-      return t('chatbot.price_help', 'Hotel prices in Jordan vary by location and season. Petra and Aqaba tend to be more expensive. Would you like me to show you current deals?');
-    }
-    if (input.includes('location') || input.includes('where')) {
-      return t('chatbot.location_help', 'Popular destinations include Amman, Petra, Aqaba, and the Dead Sea. Each offers unique experiences!');
-    }
-    if (input.includes('help') || input.includes('support')) {
-      return t('chatbot.support_help', 'I can assist with hotel bookings, destination information, and travel tips. What would you like to know?');
-    }
-
-    return t('chatbot.default', 'I\'m here to help with your Jordan travel plans! Feel free to ask about hotels, destinations, or booking assistance.');
-  };
-
   return (
     <>
       {/* Chat Button */}

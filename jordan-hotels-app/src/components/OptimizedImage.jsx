@@ -28,8 +28,6 @@ const OptimizedImage = ({
   }
 
   // Generate URLs for different formats
-  const webpUrl = getOptimizedImageUrl(src, { width, height, quality, format: 'webp' });
-  const avifUrl = getOptimizedImageUrl(src, { width, height, quality, format: 'avif' });
   const fallbackUrl = getOptimizedImageUrl(src, { width, height, quality, format: 'jpg' });
 
   // Responsive srcset

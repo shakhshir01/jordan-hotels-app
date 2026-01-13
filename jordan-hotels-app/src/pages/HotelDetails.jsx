@@ -6,7 +6,6 @@ import WishlistButton from '../components/WishlistButton';
 import HotelGallery from '../components/HotelGallery';
 import Seo from '../components/Seo.jsx';
 import {
-  createHotelImageOnErrorHandler,
 } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';

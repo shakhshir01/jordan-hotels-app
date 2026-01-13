@@ -82,7 +82,6 @@ const getUserRecommendedHotels = async () => {
         if (bBoost !== aBoost) return bBoost - aBoost;
         return (b?.rating || 0) - (a?.rating || 0);
       });
-      return sorted.slice(0, 12);
       return { hotels: sorted.slice(0, 12), isLocationBased: true };
     } catch {
       // If geo-based recommendations fail (timeouts, API down), show a small first page instead.

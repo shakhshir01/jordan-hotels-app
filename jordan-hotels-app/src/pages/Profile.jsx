@@ -71,7 +71,7 @@ const normalizeBooking = (booking, index = 0) => {
 };
 
 const Profile = () => {
-  const { user, userProfile, updateUserProfileName, logout, setupTotp, mfaEnabled, openEmailSetup, disableMfa, mfaMethod } = useAuth();
+  const { user, userProfile, updateUserProfileName, logout, mfaEnabled, openEmailSetup, disableMfa, mfaMethod } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -136,7 +136,7 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, userProfile?.firstName, userProfile?.hasCustomName, userProfile?.lastName]);
 
   useEffect(() => {
     if (!user) {
@@ -144,14 +144,14 @@ const Profile = () => {
       return;
     }
     loadUserProfile();
-  }, [user, navigate]);
+  }, [user, navigate, loadUserProfile]);
 
   // Reload profile when MFA status changes
   useEffect(() => {
     if (user) {
       loadUserProfile();
     }
-  }, [mfaEnabled, user]);
+  }, [mfaEnabled, user, loadUserProfile]);
 
   const handleUpdateProfile = async () => {
     try {
@@ -422,7 +422,7 @@ const Profile = () => {
                     try {
                       await disableMfa();
                       showSuccess('2FA disabled');
-                    } catch (error) {
+                    } catch (_error) {
                       showError('Failed to disable 2FA');
                     }
                   }

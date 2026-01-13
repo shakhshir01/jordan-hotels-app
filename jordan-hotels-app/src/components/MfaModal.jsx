@@ -58,7 +58,7 @@ export default function MfaModal() {
           setLoading(false);
         });
     }
-  }, [mfaChallenge]);
+  }, [mfaChallenge, requestEmailMfaChallenge]);
 
   if (!mfaChallenge) {
     console.log('MfaModal: No challenge, not rendering');
@@ -101,12 +101,12 @@ export default function MfaModal() {
             completeMfa(result);
           }
           setCode('');
-        } catch (err) {
+        } catch (_err) {
           showError('Invalid MFA code');
           setCode('');
         }
       }
-    } catch (err) {
+    } catch (_err) {
       showError('MFA verification failed');
       setCode('');
     } finally {
