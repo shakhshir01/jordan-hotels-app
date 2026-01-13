@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { showError, showSuccess } from '../services/toastService';
 import QRCode from 'qrcode';
 import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
@@ -8,6 +9,7 @@ import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from
 export default function MfaModal() {
   const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState(null);
@@ -151,6 +153,7 @@ export default function MfaModal() {
       }
       setCode('');
       showSuccess('TOTP enabled');
+      navigate('/');
     } catch (err) {
       showError(err?.message || 'Failed to verify TOTP');
     } finally {
@@ -200,6 +203,7 @@ export default function MfaModal() {
       setEmail('');
       setEmailStep('entry');
       showSuccess('Email MFA enabled');
+      navigate('/');
     } catch (err) {
       showError(err?.message || 'Failed to verify code');
     } finally {

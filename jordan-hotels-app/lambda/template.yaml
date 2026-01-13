@@ -1,7 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform:
-  - AWS::Serverless-2016-10-31
-  - AWS::SecretsManager-2020-07-23
+Transform: AWS::Serverless-2016-10-31
 Description: VisitJo SAM template — API, Lambdas, DynamoDB, S3, Secrets Manager (updated)
 
 Globals:
@@ -250,13 +248,7 @@ Resources:
         - Key: Stack
           Value: !Ref AWS::StackName
 
-  StripeSecretRotationSchedule:
-    Condition: CreateStripeSecret
-    Type: AWS::SecretsManager::RotationSchedule
-    Properties:
-      SecretId: !Ref StripeSecret
-      RotationRules:
-        AutomaticallyAfterDays: 30
+
 
   LambdaRolePolicy:
     Type: AWS::IAM::ManagedPolicy
