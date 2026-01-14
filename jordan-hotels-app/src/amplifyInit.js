@@ -1,5 +1,5 @@
 import { Amplify } from "aws-amplify";
-import { record } from "aws-amplify/analytics";
+import { Analytics } from "@aws-amplify/analytics";
 
 let didInit = false;
 
@@ -21,15 +21,29 @@ export async function initAmplify() {
 
     if (cfg) {
       Amplify.configure(cfg);
+
+      // Configure analytics to allow unauthenticated users
+      Analytics.configure({
+        AWSPinpoint: {
+          ...cfg.Analytics?.AWSPinpoint,
+          // Allow guest/unauthenticated users to send analytics
+          allowGuestUsers: true
+        }
+      });
     }
   } catch {
     // Non-fatal: app should still boot even if Amplify isn't fully configured yet.
   }
 
   // Optional test event (safe to ignore if Analytics isn't configured yet)
-  try {
-    record({ name: "appOpened" });
-  } catch {
-    // ignore
-  }
+  // Temporarily disabled to prevent credential errors in development
+  /*
+  setTimeout(() => {
+    try {
+      Analytics.record({ name: "appOpened" });
+    } catch {
+      // ignore
+    }
+  }, 2000);
+  */
 }

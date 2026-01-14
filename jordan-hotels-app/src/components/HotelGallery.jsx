@@ -60,11 +60,8 @@ const HotelGallery = ({ images = [], hotelName }) => {
         )}
       </div>
       {/* Desktop Grid Layout */}
-      <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-2 h-[400px] rounded-xl overflow-hidden">
-        <div 
-          className="col-span-2 row-span-2 relative cursor-pointer group"
-          onClick={() => openLightbox(0)}
-        >
+      {sideImages.length === 0 ? (
+        <div className="hidden md:block h-[400px] rounded-xl overflow-hidden relative cursor-pointer group" onClick={() => openLightbox(0)}>
           <OptimizedImage 
             src={mainImage} 
             alt={`${hotelName} Main`} 
@@ -72,33 +69,47 @@ const HotelGallery = ({ images = [], hotelName }) => {
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
-        
-        {sideImages.map((img, idx) => (
+      ) : (
+        <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-2 h-[400px] rounded-xl overflow-hidden">
           <div 
-            key={idx} 
-            className="relative cursor-pointer group"
-            onClick={() => openLightbox(idx + 1)}
+            className="col-span-2 row-span-2 relative cursor-pointer group"
+            onClick={() => openLightbox(0)}
           >
             <OptimizedImage 
-              src={img} 
-              alt={`${hotelName} ${idx + 2}`} 
+              src={mainImage} 
+              alt={`${hotelName} Main`} 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-            
-            {/* "View All" Overlay on the last image if there are more */}
-            {idx === 3 && remainingCount > 0 && (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); openLightbox(idx + 1); }}
-                className="absolute inset-0 w-full h-full bg-black/50 flex items-center justify-center text-white font-medium text-lg backdrop-blur-[2px] group-hover:bg-black/60 transition-colors z-10 cursor-pointer"
-              >
-                +{remainingCount} Photos
-              </button>
-            )}
           </div>
-        ))}
-      </div>
+          
+          {sideImages.map((img, idx) => (
+            <div 
+              key={idx} 
+              className="relative cursor-pointer group"
+              onClick={() => openLightbox(idx + 1)}
+            >
+              <OptimizedImage 
+                src={img} 
+                alt={`${hotelName} ${idx + 2}`} 
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+              
+              {/* "View All" Overlay on the last image if there are more */}
+              {idx === 3 && remainingCount > 0 && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); openLightbox(idx + 1); }}
+                  className="absolute inset-0 w-full h-full bg-black/50 flex items-center justify-center text-white font-medium text-lg backdrop-blur-[2px] group-hover:bg-black/60 transition-colors z-10 cursor-pointer"
+                >
+                  +{remainingCount} Photos
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Mobile Carousel Layout */}
       <div className="md:hidden relative h-[300px] -mx-4 sm:mx-0">
@@ -153,7 +164,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
           <OptimizedImage 
             src={displayImages[currentIndex]} 
             alt={`${hotelName} Fullscreen`} 
-            className="max-h-[90vh] max-w-[90vw] object-contain shadow-2xl"
+            className="max-h-[90vh] max-w-[90vw] object-cover shadow-2xl"
           />
 
           <button 

@@ -106,7 +106,7 @@ apiClient.interceptors.request.use((config) => {
     const baseUrl = getApiBaseUrl(config.url);
     config.baseURL = baseUrl;
   }
-  return config;
+  return config;h
 });
 
 // Export function to set auth token (used by AuthContext)
@@ -744,6 +744,11 @@ export const hotelAPI = {
       const response = await apiClient.post("/user/mfa/disable-by-email", { email });
       return normalizeLambdaResponse(response.data);
     } catch (error) {
+      // Handle CORS errors during password reset - MFA disable is not critical
+      if (error.message?.includes('CORS') || error.code === 'ERR_NETWORK' || error.response?.status === 0) {
+        console.warn('CORS error disabling MFA after password reset - continuing anyway:', error.message);
+        return { success: true, warning: 'MFA disable failed due to CORS but password reset succeeded' };
+      }
       if (lastAuthError) return { success: true };
       throw error;
     }

@@ -56,7 +56,7 @@ function validateImageUrl(url) {
 // Function to validate an array of image URLs (with concurrency limit)
 async function validateImageUrls(urls) {
   const validUrls = [];
-  const concurrencyLimit = 5; // Process 5 URLs at a time instead of 1
+  const concurrencyLimit = 20; // Increased from 5 to 20 for faster validation
 
   for (let i = 0; i < urls.length; i += concurrencyLimit) {
     const batch = urls.slice(i, i + concurrencyLimit);
@@ -166,12 +166,13 @@ function scoreImage(url) {
   if (lower.includes('inside')) score -= 8;
   
   // Prefer high-res sources
-  if (lower.includes('tripadvisor.com')) score += 8;
+  if (lower.includes('tripadvisor.com')) score += 10; // Increased from 8
   if (lower.includes('w=1200') || lower.includes('h=1200') || lower.includes('w=1600')) score += 5;
   if (lower.includes('w=800') || lower.includes('h=800') || lower.includes('w=1000')) score += 3;
   
   // Prefer reputable sources
-  if (lower.includes('booking.com') || lower.includes('agoda.com')) score += 4;
+  if (lower.includes('booking.com') || lower.includes('bstatic.com')) score += 6; // Increased from 4
+  if (lower.includes('agoda.com')) score += 4;
   
   return score;
 }
@@ -301,6 +302,141 @@ function searchGoogleImages(hotelName, location) {
   });
 }
 
+// Function to search TripAdvisor Images
+function searchTripAdvisorImages(hotelName, location) {
+  const query = encodeURIComponent(`${hotelName} ${location}`);
+  const url = `https://www.tripadvisor.com/Search?q=${query}&geo=1&ssrc=h&searchNearby=false&searchSessionId=&blockRedirect=true`;
+
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        const images = [];
+
+        // Look for TripAdvisor hotel pages and extract images
+        const hotelPageRegex = /href="(\/Hotel_Review-[^"]+)"/g;
+        let match;
+        const hotelPages = [];
+        while ((match = hotelPageRegex.exec(data)) !== null) {
+          hotelPages.push(`https://www.tripadvisor.com${match[1]}`);
+        }
+
+        // For now, just extract any images from the search page
+        const imgRegex = /(https:\/\/[a-zA-Z0-9-]+\.tripadvisor\.com\/media\/photo-[^"'\s\\]+)/g;
+        while ((match = imgRegex.exec(data)) !== null) {
+          let url = match[1];
+          url = url.replace(/\\u002F/g, '/');
+          url = enhanceImageUrl(url);
+          if (isHighQualityImage(url)) {
+            images.push(url);
+          }
+        }
+
+        resolve([...new Set(images)].slice(0, 30));
+      });
+    }).on('error', (err) => {
+      resolve([]);
+    });
+    req.setTimeout(10000, () => {
+      req.destroy();
+      resolve([]);
+    });
+  });
+}
+
+// Function to search Booking.com Images
+function searchBookingImages(hotelName, location) {
+  const query = encodeURIComponent(`${hotelName} ${location}`);
+  const url = `https://www.booking.com/search.html?ss=${query}&checkin=&checkout=&group_adults=1&no_rooms=1&group_children=0`;
+
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        const images = [];
+
+        // Booking.com images are often in data-src or src attributes
+        const imgRegex = /data-src="([^"]+\.(jpg|jpeg|png|webp)[^"]*)"/g;
+        let match;
+        while ((match = imgRegex.exec(data)) !== null) {
+          const imgUrl = match[1];
+          if (imgUrl.includes('cf.bstatic.com') && isHighQualityImage(imgUrl)) {
+            images.push(imgUrl);
+          }
+        }
+
+        // Also check regular src
+        const srcRegex = /src="([^"]+\.(jpg|jpeg|png|webp)[^"]*)"/g;
+        while ((match = srcRegex.exec(data)) !== null) {
+          const imgUrl = match[1];
+          if (imgUrl.includes('cf.bstatic.com') && !images.includes(imgUrl) && isHighQualityImage(imgUrl)) {
+            images.push(imgUrl);
+          }
+        }
+
+        resolve([...new Set(images)].slice(0, 30));
+      });
+    }).on('error', (err) => {
+      resolve([]);
+    });
+    req.setTimeout(10000, () => {
+      req.destroy();
+      resolve([]);
+    });
+  });
+}
+
+// Function to search Unsplash for hotel images (filtered better)
+function searchUnsplashImages(hotelName, location) {
+  const query = encodeURIComponent(`${hotelName} ${location} hotel exterior building facade`);
+  const url = `https://unsplash.com/s/photos/${query}?orientation=landscape`;
+
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        const images = [];
+
+        // Unsplash images in srcset or src
+        const imgRegex = /srcSet="([^"]+)"/g;
+        let match;
+        while ((match = imgRegex.exec(data)) !== null) {
+          const srcset = match[1];
+          // Get the highest resolution URL
+          const urls = srcset.split(',').map(s => s.trim().split(' ')[0]);
+          const bestUrl = urls[urls.length - 1]; // Last one is usually highest res
+          if (bestUrl && bestUrl.includes('images.unsplash.com') && isHighQualityImage(bestUrl)) {
+            images.push(bestUrl);
+          }
+        }
+
+        resolve([...new Set(images)].slice(0, 20));
+      });
+    }).on('error', (err) => {
+      resolve([]);
+    });
+    req.setTimeout(10000, () => {
+      req.destroy();
+      resolve([]);
+    });
+  });
+}
+
 // Function to extract image URLs from TripAdvisor HTML
 function extractImagesFromTripAdvisor(html, hotelName) {
   const images = [];
@@ -385,27 +521,31 @@ async function processHotelsBatch(startIndex, batchSize, assignedImages) {
       continue;
     }
 
-    // 2. STRATEGY: Bing + Google Images (Combined sources)
+    // 2. STRATEGY: Search multiple sources in parallel for speed
     try {
-      process.stdout.write(`[${i + 1}/${hotels.length}] ${hotel.name}: Checking Bing... `);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const bingImages = await searchBingImages(hotel.name, hotel.location);
-      if (bingImages.length > 0) {
-        realImages = [...realImages, ...bingImages];
-      }
-    } catch (error) {
-      process.stdout.write(`Bing failed. `);
-    }
+      process.stdout.write(`[${i + 1}/${hotels.length}] ${hotel.name}: Searching sources... `);
+      
+      // Search all sources in parallel
+      const searchPromises = [
+        searchBingImages(hotel.name, hotel.location),
+        searchGoogleImages(hotel.name, hotel.location),
+        searchTripAdvisorImages(hotel.name, hotel.location),
+        searchBookingImages(hotel.name, hotel.location),
+        searchUnsplashImages(hotel.name, hotel.location)
+      ];
 
-    try {
-      process.stdout.write(`Google... `);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const googleImages = await searchGoogleImages(hotel.name, hotel.location);
-      if (googleImages.length > 0) {
-        realImages = [...realImages, ...googleImages];
-      }
+      const results = await Promise.allSettled(searchPromises);
+      
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value.length > 0) {
+          realImages = [...realImages, ...result.value];
+        }
+      });
+
+      console.log(`Found ${realImages.length} potential images from ${results.filter(r => r.status === 'fulfilled' && r.value.length > 0).length} sources.`);
+
     } catch (error) {
-      process.stdout.write(`Google failed. `);
+      console.log(`❌ Search error: ${error.message}`);
     }
 
     // Remove duplicates from combined results
@@ -438,7 +578,7 @@ async function processHotelsBatch(startIndex, batchSize, assignedImages) {
       console.log(`❌ No valid images found. Profile image cleared.`);
     }
 
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise(resolve => setTimeout(resolve, 20)); // Reduced delay
   }
   return endIndex;
 }
@@ -458,7 +598,7 @@ function saveProgress(currentHotels) {
 
 // Main processing function
 async function updateAllHotelsWithRealImages() {
-  const batchSize = 10; 
+  const batchSize = 25; // Increased from 10 to 25 for faster processing
   let currentIndex = 0;
   const maxHotels = hotels.length; // Process ALL hotels
 
@@ -469,13 +609,13 @@ async function updateAllHotelsWithRealImages() {
       currentIndex = await processHotelsBatch(currentIndex, batchSize, assignedImages);
       saveProgress(hotels);
       if (currentIndex < maxHotels) {
-        console.log('Waiting 0.5 seconds before next batch...');
-        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('Waiting 0.2 seconds before next batch...');
+        await new Promise(resolve => setTimeout(resolve, 200)); // Reduced from 500ms to 200ms
       }
     } catch (error) {
       console.log(`❌ Critical Batch Error: ${error.message}`);
       saveProgress(hotels);
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Reduced error delay
     }
   }
   console.log('🎉 Finished processing ALL hotels!');
@@ -483,5 +623,5 @@ async function updateAllHotelsWithRealImages() {
 
 // Run the update
 // Reset all hotel images and image arrays to empty, then save
-// resetHotelImages(hotels); // Commented out to avoid resetting existing images
+ resetHotelImages(hotels); // Commented out to avoid resetting existing images
 updateAllHotelsWithRealImages().catch(console.error);

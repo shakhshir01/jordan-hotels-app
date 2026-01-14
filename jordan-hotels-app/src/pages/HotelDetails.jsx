@@ -283,7 +283,7 @@ const HotelDetails = () => {
       </nav>
 
       {/* Gallery with modern design */}
-      <section className="card-modern mb-12 overflow-hidden">
+      <section className="card-modern mb-6 overflow-hidden">
         <div className="p-6 sm:p-8 lg:p-10">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-8 gradient-text">{t('hotelDetails.gallery.title')}</h2>
           <HotelGallery images={hotel.images} hotelName={hotelName} />

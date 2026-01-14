@@ -164,6 +164,26 @@ export const AuthProvider = ({ children }) => {
         reject(new Error('Authentication service not available'));
         return;
       }
+
+      // Check localStorage for MFA status first
+      const storedMfaEnabled = localStorage.getItem(`visitjo.mfaEnabled.${email}`) === '1';
+
+      if (storedMfaEnabled) {
+        // MFA is enabled according to localStorage, show challenge first
+        setMfaEnabled(true);
+        setMfaMethod(localStorage.getItem(`visitjo.mfaMethod.${email}`) || 'EMAIL');
+        setMfaChallenge({
+          type: 'EMAIL_MFA',
+          message: 'Enter the 6-digit code sent to your email',
+          preAuth: true,
+          email,
+          password
+        });
+        resolve({ mfaRequired: true, preAuth: true });
+        return;
+      }
+
+      // No MFA in localStorage, proceed with normal authentication
       const cognitoUser = new CognitoUser({
         Username: email,
         Pool: UserPool,
@@ -183,6 +203,14 @@ export const AuthProvider = ({ children }) => {
         onSuccess: async (session) => {
           console.error = originalConsoleError; // Restore
 
+          // Set auth token first so we can fetch user profile
+          try {
+            const idToken = session.getIdToken().getJwtToken();
+            setAuthToken(idToken);
+          } catch (e) {
+            console.warn('Failed to set auth token on login', e);
+          }
+
           // Load user profile to check MFA status
           let profile = null;
           try {
@@ -197,16 +225,11 @@ export const AuthProvider = ({ children }) => {
           if (mfaEnabled) {
             // MFA is enabled, request MFA challenge
             setUserAndProfileFromEmail(email);
-            try {
-              const idToken = session.getIdToken().getJwtToken();
-              setAuthToken(idToken);
-            } catch (e) {
-              console.warn('Failed to set auth token on login', e);
-            }
 
             setMfaEnabled(true);
             setMfaMethod(mfaMethod || 'TOTP');
             localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+            localStorage.setItem(`visitjo.mfaMethod.${email}`, mfaMethod || 'EMAIL');
 
             // Request MFA challenge based on method
             try {
@@ -227,16 +250,11 @@ export const AuthProvider = ({ children }) => {
           } else {
             // No MFA, complete login
             setUserAndProfileFromEmail(email);
-            try {
-              const idToken = session.getIdToken().getJwtToken();
-              setAuthToken(idToken);
-            } catch (e) {
-              console.warn('Failed to set auth token on login', e);
-            }
 
             setMfaEnabled(false);
             setMfaMethod(null);
             localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
+            localStorage.removeItem(`visitjo.mfaMethod.${email}`);
             setError(null);
             showSuccess(`Welcome back, ${email}!`);
             resolve({ success: true });
@@ -314,6 +332,16 @@ export const AuthProvider = ({ children }) => {
     // MFA will be required on subsequent sign-in (login flow handles it).
     performLogout();
     return { success: true };
+  };
+
+  const completePreAuthLogin = (email) => {
+    setUserAndProfileFromEmail(email);
+    setMfaEnabled(true);
+    setMfaMethod('EMAIL');
+    localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+    localStorage.setItem(`visitjo.mfaMethod.${email}`, 'EMAIL');
+    setError(null);
+    showSuccess(`Welcome back, ${email}!`);
   };
 
   const completeMfa = (session) => {
@@ -394,7 +422,7 @@ export const AuthProvider = ({ children }) => {
 
     return new Promise((resolve, reject) => {
       // Check if user has a valid session
-      cognitoUser.getSession((err, session) => {
+      cognitoUser.getSession((err, _session) => {
         if (err) {
           console.error('No valid session for TOTP setup:', err);
           setError('Please sign in again to setup 2FA');
@@ -404,7 +432,7 @@ export const AuthProvider = ({ children }) => {
 
         console.log('Session valid, enabling TOTP MFA first...');
         // First enable TOTP MFA for the user
-        cognitoUser.setUserMfaPreference(null, { Enabled: true }, (mfaErr, mfaResult) => {
+        cognitoUser.setUserMfaPreference(null, { Enabled: true }, (mfaErr, _mfaResult) => {
           if (mfaErr) {
             console.error('Failed to enable TOTP MFA:', mfaErr);
             setError('Failed to enable TOTP MFA');
@@ -762,7 +790,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const confirmNewPassword = async (email, code, newPassword) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (!UserPool) {
         reject(new Error('Authentication service not available'));
         return;
@@ -808,6 +836,7 @@ export const AuthProvider = ({ children }) => {
     verifyTotp,
     clearMfaChallenge,
     completeMfa,
+    completePreAuthLogin,
     openEmailSetup,
     mfaEnabled,
     mfaMethod,

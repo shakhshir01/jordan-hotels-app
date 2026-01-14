@@ -7,7 +7,7 @@ import QRCode from 'qrcode';
 import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function MfaModal() {
-  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa } = useAuth();
+  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa, verifyLoginTotpMfa, login, completePreAuthLogin } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [code, setCode] = useState('');
@@ -75,18 +75,39 @@ export default function MfaModal() {
     setLoading(true);
     try {
       if (mfaChallenge.type === 'CUSTOM_CHALLENGE' || mfaChallenge.type === 'EMAIL_LOGIN_CHALLENGE' || mfaChallenge.type === 'EMAIL_MFA') {
-        // Email MFA verification (could be login or logout verification)
-        const res = await verifyLoginEmailMfa(code);
-        // If verifyLoginEmailMfa performed logout, stop here
-        if (res && res.loggedOut) {
+        if (mfaChallenge.preAuth) {
+          // Pre-auth MFA: try to authenticate normally first
+          try {
+            const result = await login(mfaChallenge.email, mfaChallenge.password);
+            if (result.success) {
+              // Login succeeded without MFA
+              clearMfaChallenge();
+              setCode('');
+              showSuccess('Login successful!');
+            } else if (result.mfaRequired && !result.preAuth) {
+              // MFA is actually required, the modal will show again with proper MFA challenge
+              clearMfaChallenge();
+              setCode('');
+            }
+          } catch (loginErr) {
+            showError('Login failed. Please check your credentials.');
+            clearMfaChallenge();
+            setCode('');
+          }
+        } else {
+          // Post-auth MFA: verify code for already authenticated user
+          const res = await verifyLoginEmailMfa(code);
+          // If verifyLoginEmailMfa performed logout, stop here
+          if (res && res.loggedOut) {
+            clearMfaChallenge();
+            setCode('');
+            return;
+          }
+          // Login completed via backend
           clearMfaChallenge();
           setCode('');
-          return;
+          showSuccess('Login successful!');
         }
-        // Login completed via backend
-        clearMfaChallenge();
-        setCode('');
-        showSuccess('Login successful!');
       } else if (mfaChallenge.type === 'TOTP_MFA') {
         // TOTP MFA verification for login
         const res = await verifyLoginTotpMfa(code);
