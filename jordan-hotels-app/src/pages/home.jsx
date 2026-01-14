@@ -486,9 +486,9 @@ const Home = () => {
             >
               <SlidersHorizontal size={18} />
               <span>Filters</span>
-              {(priceRange[0] > 0 || priceRange[1] < 1000 || minRating > 0 || selectedAmenities.length > 0) && (
+              {(priceRange[0] > 0 || priceRange[1] < 500 || minRating > 0 || selectedAmenities.length > 0) && (
                 <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse-glow">
-                  {(priceRange[0] > 0 ? 1 : 0) + (priceRange[1] < 1000 ? 1 : 0) + (minRating > 0 ? 1 : 0) + selectedAmenities.length}
+                  {(priceRange[0] > 0 ? 1 : 0) + (priceRange[1] < 500 ? 1 : 0) + (minRating > 0 ? 1 : 0) + selectedAmenities.length}
                 </span>
               )}
             </button>
@@ -505,7 +505,7 @@ const Home = () => {
             </select>
           </div>
 
-          {(priceRange[0] > 0 || priceRange[1] < 1000 || minRating > 0 || selectedAmenities.length > 0) && (
+          {(priceRange[0] > 0 || priceRange[1] < 500 || minRating > 0 || selectedAmenities.length > 0) && (
             <button
               onClick={clearFilters}
               className="btn-secondary inline-flex items-center gap-2 px-5 py-3 rounded-2xl hover-lift font-semibold"
@@ -525,13 +525,33 @@ const Home = () => {
                   Price per night (JOD)
                 </label>
                 <div className="space-y-2">
-                  <input
-                    type="range"
-                    min="0"
-                    max="500"
-                    value={priceRange[0]}
-                  />
-                  {/* ...existing code... */}
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="number"
+                      min="0"
+                      max="500"
+                      value={priceRange[0]}
+                      onChange={(e) => {
+                        const newMin = Math.max(0, Math.min(Number(e.target.value), priceRange[1]));
+                        setPriceRange([newMin, priceRange[1]]);
+                      }}
+                      className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Min"
+                    />
+                    <span className="text-slate-500">-</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="500"
+                      value={priceRange[1]}
+                      onChange={(e) => {
+                        const newMax = Math.max(priceRange[0], Math.min(Number(e.target.value), 500));
+                        setPriceRange([priceRange[0], newMax]);
+                      }}
+                      className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Max"
+                    />
+                  </div>
                 </div>
               </div>
               {/* Smoking filter removed */}

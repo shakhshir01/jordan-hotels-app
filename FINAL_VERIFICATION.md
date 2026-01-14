@@ -300,6 +300,7 @@ Frontend Environment Variables:
   ✅ VITE_COGNITO_CLIENT_ID (public-safe)
   ✅ VITE_COGNITO_DOMAIN (public-safe)
   ✅ VITE_API_GATEWAY_URL (public endpoint)
+  ✅ VITE_GEMINI_API_KEY (should be kept secret)
 
 Backend Secrets:
   ✅ AWS Credentials: IAM roles (no keys in code)

@@ -75,7 +75,7 @@ Your **VisitJo** hotel booking application is fully built and ready for deployme
 - API client is configured and ready
 
 ✅ **API Gateway**
-- URL: https://g7itqnbol9.execute-api.us-east-1.amazonaws.com/stage
+- URL: https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod
 - All 5 endpoints responding with proper JSON
 - CORS headers configured
 - Test: GET /hotels returns 3 hotels

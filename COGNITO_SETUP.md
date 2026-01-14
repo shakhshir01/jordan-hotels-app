@@ -27,6 +27,7 @@ VITE_COGNITO_USER_POOL_ID=us-east-1_T5vYoBi0N
 VITE_COGNITO_CLIENT_ID=1v5kg2qprjtsnvia0hikm1blvd
 VITE_COGNITO_DOMAIN=us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com
 VITE_API_GATEWAY_URL=https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
+VITE_GEMINI_API_KEY=AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM
 ```
 
 ### How Auth Works

@@ -107,19 +107,22 @@ Your .env.local (NOT in git):
   VITE_COGNITO_USER_POOL_ID=us-east-1_T5vYoBi0N
   VITE_COGNITO_CLIENT_ID=1v5kg2qprjtsnvia0hikm1blvd
   VITE_COGNITO_DOMAIN=us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com
-  VITE_API_GATEWAY_URL=https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
+    VITE_API_GATEWAY_URL=https://lk8nfjc7m1.execute-api.us-east-1.amazonaws.com/prod
+  VITE_GEMINI_API_KEY=AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM
 
 Your .env.example (IN git - safe):
   VITE_COGNITO_USER_POOL_ID=us-east-1_T5vYoBi0N
   VITE_COGNITO_CLIENT_ID=1v5kg2qprjtsnvia0hikm1blvd
   VITE_COGNITO_DOMAIN=us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com
-  VITE_API_GATEWAY_URL=https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
+    VITE_API_GATEWAY_URL=https://lk8nfjc7m1.execute-api.us-east-1.amazonaws.com/prod
+  VITE_GEMINI_API_KEY=your_gemini_api_key_here
 
 Amplify Environment Variables (Added in Console):
   VITE_COGNITO_USER_POOL_ID=us-east-1_T5vYoBi0N
   VITE_COGNITO_CLIENT_ID=1v5kg2qprjtsnvia0hikm1blvd
   VITE_COGNITO_DOMAIN=us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com
-  VITE_API_GATEWAY_URL=https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
+    VITE_API_GATEWAY_URL=https://lk8nfjc7m1.execute-api.us-east-1.amazonaws.com/prod
+  VITE_GEMINI_API_KEY=AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM
 ```
 
 ✅ **Result**: Perfect! All secure ✅
@@ -166,7 +169,7 @@ git push origin main
    VITE_COGNITO_USER_POOL_ID = us-east-1_T5vYoBi0N
    VITE_COGNITO_CLIENT_ID = 1v5kg2qprjtsnvia0hikm1blvd
    VITE_COGNITO_DOMAIN = us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com
-   VITE_API_GATEWAY_URL = https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
+    VITE_API_GATEWAY_URL = https://lk8nfjc7m1.execute-api.us-east-1.amazonaws.com/prod
    ```
 3. Click "Save and deploy"
 

@@ -1,7 +1,8 @@
-- Update hotel prices in hotels-data.json to realistic current market rates
-  - Amman luxury hotels: $250-400
-  - Dead Sea resorts: $200-400
-  - Petra hotels: $150-250
-  - Aqaba resorts: $150-300
-  - Wadi Rum camps: $80-150
-- Adjust roomTypes prices proportionally for each hotel
+- [ ] Add PublicAccessBlockConfiguration to LogsBucket
+- [ ] Add StripeKmsKey resource
+- [ ] Update StripeSecret to use custom KMS key
+- [ ] Add StripeSecretRotation
+- [ ] Remove Cors from ApiUserMfaEmailSetup
+- [ ] Remove Cors from ApiUserMfaEmailVerify
+- [ ] Remove Cors from ApiAuthEmailMfaRequest
+- [ ] Remove Cors from ApiUserMfaDisable

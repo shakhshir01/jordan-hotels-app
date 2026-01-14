@@ -32,6 +32,7 @@
    VITE_COGNITO_CLIENT_ID=1v5kg2qprjtsnvia0hikm1blvd
    VITE_COGNITO_DOMAIN=us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com
    VITE_API_GATEWAY_URL=https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
+   VITE_GEMINI_API_KEY=AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM
 
 7. Click: Save and Deploy
 
@@ -48,7 +49,7 @@
 
 - [ ] Pushed to main branch
 - [ ] Connected GitHub to Amplify
-- [ ] Added 4 environment variables
+- [ ] Added 5 environment variables
 - [ ] Base directory = jordan-hotels-app
 - [ ] Deployment complete
 - [ ] Site loads at Amplify URL
@@ -107,6 +108,9 @@ VITE_COGNITO_DOMAIN
 
 VITE_API_GATEWAY_URL
 ├─ Value: https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
+
+VITE_GEMINI_API_KEY
+├─ Value: AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM
 ```
 
 ---
