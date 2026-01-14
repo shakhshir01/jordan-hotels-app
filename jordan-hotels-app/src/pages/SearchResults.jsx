@@ -263,14 +263,14 @@ export default function SearchResults() {
                 {hotels.map((h) => (
                   <article key={h.id} className="hotel-card group overflow-hidden flex flex-col">
                     {h.image && (
-                      <div className="relative aspect-[4/3] overflow-hidden">
+                      <div className="relative aspect-[3/2] md:aspect-[4/3] overflow-hidden">
                         <img
                           src={h.image}
                           alt={h.name}
                           loading="lazy"
                           decoding="async"
                           referrerPolicy="no-referrer"
-                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={createHotelImageOnErrorHandler(h.id)}
                         />
                       </div>

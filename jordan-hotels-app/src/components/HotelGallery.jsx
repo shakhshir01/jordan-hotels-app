@@ -112,7 +112,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
       )}
 
       {/* Mobile Carousel Layout */}
-      <div className="md:hidden relative h-[300px] -mx-4 sm:mx-0">
+      <div className="md:hidden relative h-[350px] sm:h-[400px] -mx-4 sm:mx-0">
         <OptimizedImage 
           src={displayImages[currentIndex]} 
           alt={hotelName} 
