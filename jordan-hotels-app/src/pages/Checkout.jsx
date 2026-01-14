@@ -7,6 +7,7 @@ import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { hotelAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
+import OptimizedImage from '../components/OptimizedImage';
 import LazyStripePaymentIntent from '../components/stripe/LazyStripePaymentIntent';
 import LazyPayPalButtons from '../components/paypal/LazyPayPalButtons';
 
@@ -32,6 +33,7 @@ const Checkout = () => {
   const [guestInfo, setGuestInfo] = useState({ fullName: '', email: '', phone: '' });
   const [createdBookingId, setCreatedBookingId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [acknowledgedRisk, setAcknowledgedRisk] = useState(false);
 
   useEffect(() => {
     const loadHotel = async () => {
@@ -189,6 +191,11 @@ const Checkout = () => {
   };
 
   const handlePayment = async () => {
+    if (!acknowledgedRisk) {
+      setError('Please acknowledge the booking/payment disclaimer before continuing');
+      return;
+    }
+
     setProcessing(true);
     setError('');
     try {
@@ -219,6 +226,11 @@ const Checkout = () => {
   };
 
   const handlePayPalApproved = async () => {
+    if (!acknowledgedRisk) {
+      setError('Please acknowledge the booking/payment disclaimer before continuing');
+      return;
+    }
+
     setProcessing(true);
     setError('');
     try {
@@ -264,6 +276,11 @@ const Checkout = () => {
   };
 
   const handleStripeSuccess = async (paymentIntent) => {
+    if (!acknowledgedRisk) {
+      setError('Please acknowledge the booking/payment disclaimer before continuing');
+      return;
+    }
+
     setProcessing(true);
     setError('');
     try {
@@ -351,14 +368,12 @@ const Checkout = () => {
                 return (
               <div className="mb-6 pb-6 border-b">
                 <div className="flex gap-4">
-                  <img
+                  <OptimizedImage
                     src={hotel.image}
                     alt={hotelName}
                     onError={createHotelImageOnErrorHandler(hotel.id)}
                     className="w-24 h-24 object-cover rounded-lg"
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
+                    sizes="96px"
                   />
                   <div className="flex-1">
                     <h3 className="font-bold text-lg">{hotelName}</h3>
@@ -501,6 +516,20 @@ const Checkout = () => {
             </div>
           )}
 
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 text-sm mb-6">
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={acknowledgedRisk}
+                onChange={(e) => setAcknowledgedRisk(e.target.checked)}
+                className="mt-1"
+              />
+              <span>
+                I understand that payments are made at my own risk and this booking does not create a real reservation with the hotel.
+              </span>
+            </label>
+          </div>
+
           <div className="space-y-4">
             <div>
               <label className="label-premium">Full Name *</label>
@@ -580,7 +609,7 @@ const Checkout = () => {
                           email: guestInfo.email,
                           phone: guestInfo.phone,
                         }}
-                        disabled={processing}
+                        disabled={processing || !acknowledgedRisk}
                         onProcessingChange={setProcessing}
                         onCreatePaymentIntent={handleCreateStripePaymentIntent}
                         onSuccess={handleStripeSuccess}
@@ -619,7 +648,7 @@ const Checkout = () => {
 
                         <button
                           onClick={handlePayment}
-                          disabled={processing}
+                          disabled={processing || !acknowledgedRisk}
                           className="w-full btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {processing ? 'Processing...' : `Pay ${calculateTotalWithTax().toFixed(2)} JOD`}
@@ -638,7 +667,7 @@ const Checkout = () => {
                     <LazyPayPalButtons
                       amount={Number(((calculateTotal() - appliedDiscount) * 1.1).toFixed(2))}
                       currency="USD"
-                      disabled={processing}
+                      disabled={processing || !acknowledgedRisk}
                       onApproved={handlePayPalApproved}
                       onError={(e) => setError(e?.message || 'PayPal failed')}
                     />

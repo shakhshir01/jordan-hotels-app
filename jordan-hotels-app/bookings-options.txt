@@ -1,0 +1,16 @@
+---- OPTIONS ----
+Status: 200
+Headers:
+  : keep-alive
+  : e09548e5-2b7f-4d41-973e-2459c43c1423
+  : *
+  : Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent
+  : XMj8RH5SoAMEBEg=
+  : GET,POST,PUT,DELETE,OPTIONS
+  : 3
+  : application/json
+  : Wed, 14 Jan 2026 22:34:15 GMT
+Body:
+{}
+
+

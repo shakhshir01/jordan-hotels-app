@@ -56,6 +56,18 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      // Optimize chunk size
+      chunkSizeWarningLimit: 1000,
+      // Enable source maps for better debugging
+      sourcemap: false,
+      // Minify for better performance
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
+      },
     },
     server: {
       port: 5175,

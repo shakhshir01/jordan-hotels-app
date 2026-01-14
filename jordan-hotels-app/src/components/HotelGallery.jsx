@@ -66,6 +66,8 @@ const HotelGallery = ({ images = [], hotelName }) => {
             src={mainImage} 
             alt={`${hotelName} Main`} 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            priority={true}
+            sizes="(min-width: 768px) 100vw"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
@@ -79,6 +81,8 @@ const HotelGallery = ({ images = [], hotelName }) => {
               src={mainImage} 
               alt={`${hotelName} Main`} 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              priority={true}
+              sizes="(min-width: 768px) 50vw"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
           </div>
@@ -93,6 +97,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
                 src={img} 
                 alt={`${hotelName} ${idx + 2}`} 
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="(min-width: 768px) 25vw"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
               
@@ -112,12 +117,20 @@ const HotelGallery = ({ images = [], hotelName }) => {
       )}
 
       {/* Mobile Carousel Layout */}
-      <div className="md:hidden relative h-[350px] sm:h-[400px] -mx-4 sm:mx-0">
-        <OptimizedImage 
-          src={displayImages[currentIndex]} 
-          alt={hotelName} 
-          className="w-full h-full object-cover"
-        />
+      <div className="md:hidden relative h-[350px] sm:h-[400px] -mx-4 sm:mx-0 overflow-hidden">
+        <div className="flex transition-transform duration-300 ease-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+          {displayImages.map((img, idx) => (
+            <div key={idx} className="flex-shrink-0 w-full h-full relative">
+              <OptimizedImage 
+                src={img} 
+                alt={`${hotelName} ${idx + 1}`} 
+                className="w-full h-full object-cover"
+                priority={idx === 0} // Only prioritize first image
+                sizes="100vw"
+              />
+            </div>
+          ))}
+        </div>
         <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
           {currentIndex + 1} / {displayImages.length}
         </div>
@@ -125,7 +138,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
           type="button"
           onClick={prevImage}
           aria-label="Previous photo"
-          className="absolute left-2 top-1/2 -translate-y-1/2 p-3 min-h-[44px] min-w-[44px] bg-white/80 rounded-full shadow-lg z-10"
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-3 min-h-[44px] min-w-[44px] bg-white/80 rounded-full shadow-lg z-10 active:scale-95 transition-transform"
         >
           <ChevronLeft className="w-5 h-5 text-gray-800" />
         </button>
@@ -133,7 +146,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
           type="button"
           onClick={nextImage}
           aria-label="Next photo"
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-3 min-h-[44px] min-w-[44px] bg-white/80 rounded-full shadow-lg z-10"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-3 min-h-[44px] min-w-[44px] bg-white/80 rounded-full shadow-lg z-10 active:scale-95 transition-transform"
         >
           <ChevronRight className="w-5 h-5 text-gray-800" />
         </button>

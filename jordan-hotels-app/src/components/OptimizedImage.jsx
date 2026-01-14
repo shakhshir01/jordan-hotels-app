@@ -1,70 +1,43 @@
 import React from 'react';
-import { getOptimizedImageUrl, getResponsiveImageSrcSet, getImageSizes } from '../services/imageOptimization';
 
-/**
- * OptimizedImage component with WebP/AVIF support, lazy loading, and responsive images
- */
-const OptimizedImage = ({
-  src,
-  alt,
-  className = '',
-  width,
-  height,
-  quality = 85,
-  sizes,
-  loading = 'lazy',
-  ...props
-}) => {
-  if (!src) {
-    return (
-      <img
-        src="/placeholder-image.jpg"
-        alt={alt || 'Placeholder'}
-        className={className}
-        loading={loading}
-        {...props}
-      />
-    );
-  }
+// Lightweight, production-ready image component focused on mobile perf
+// - Uses native lazy-loading + async decoding
+// - Reserves layout using an aspect-ratio wrapper to avoid CLS
+// - Ensures images always fill their container with object-fit:cover
+export default function OptimizedImage({ src, alt = '', className = '', ratio = '3/2', fallback, priority = false, loading, onError, ...rest }) {
+  const [errored, setErrored] = React.useState(false);
 
-  // Generate URLs for different formats
-  const fallbackUrl = getOptimizedImageUrl(src, { width, height, quality, format: 'jpg' });
+  // Provide a simple SVG fallback to avoid broken images and layout shifts
+  const FALLBACK_SVG =
+    fallback ||
+    'data:image/svg+xml;charset=UTF-8,' +
+      encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#e6edf3"/><text x="50%" y="50%" fill="#9aa7b7" font-family="Arial" font-size="36" text-anchor="middle" dominant-baseline="middle">Image unavailable</text></svg>`
+      );
 
-  // Responsive srcset
-  const webpSrcSet = getResponsiveImageSrcSet(src, [320, 640, 1024, 1920]);
-  const avifSrcSet = getResponsiveImageSrcSet(src, [320, 640, 1024, 1920], 'avif');
-  const fallbackSrcSet = getResponsiveImageSrcSet(src, [320, 640, 1024, 1920], 'jpg');
+  const imgSrc = errored ? FALLBACK_SVG : src;
 
-  const imageSizes = sizes || getImageSizes();
+  // Aspect class uses Tailwind-like syntax (e.g., "3/2" -> aspect-[3/2])
+  const aspectClass = `aspect-[${ratio}]`;
+
+  // Determine loading behaviour: explicit `loading` prop overrides `priority`
+  const effectiveLoading = loading ?? (priority ? 'eager' : 'lazy');
 
   return (
-    <picture className={className}>
-      {/* AVIF source */}
-      <source
-        srcSet={avifSrcSet}
-        sizes={imageSizes}
-        type="image/avif"
-      />
-      {/* WebP source */}
-      <source
-        srcSet={webpSrcSet}
-        sizes={imageSizes}
-        type="image/webp"
-      />
-      {/* Fallback */}
+    <div className={`relative ${aspectClass} bg-slate-200 overflow-hidden ${className}`}>
       <img
-        src={fallbackUrl}
-        srcSet={fallbackSrcSet}
-        sizes={imageSizes}
+        src={imgSrc}
         alt={alt}
-        loading={loading}
+        loading={effectiveLoading}
         decoding="async"
-        referrerPolicy="no-referrer"
-        className={className}
-        {...props}
+        fetchpriority={priority ? 'high' : 'low'}
+        className="w-full h-full object-cover block"
+        onError={(e) => {
+          setErrored(true);
+          if (typeof onError === 'function') onError(e);
+        }}
+        {...rest}
       />
-    </picture>
+    </div>
   );
-};
-
-export default OptimizedImage;
+}

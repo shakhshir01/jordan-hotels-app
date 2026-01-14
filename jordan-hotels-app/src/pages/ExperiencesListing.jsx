@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Loader2, MapPin, Clock, Star } from "lucide-react";
 import { hotelAPI } from "../services/api";
 import { useTranslation } from "react-i18next";
+import OptimizedImage from "../components/OptimizedImage";
 
 export default function ExperiencesListing() {
   const navigate = useNavigate();
@@ -83,11 +84,11 @@ export default function ExperiencesListing() {
                   {/* Experience Image */}
                   <div className="h-48 w-full overflow-hidden relative group">
                     {experience.imageUrl ? (
-                      <img
+                      <OptimizedImage
                         src={experience.imageUrl}
                         alt={experience.title}
                         className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
+                        sizes="100vw"
                         style={{ background: 'linear-gradient(to bottom right, #a78bfa, #f472b6, #fb923c)' }}
                       />
                     ) : (

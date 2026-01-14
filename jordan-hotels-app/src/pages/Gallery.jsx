@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import hotelsService from '../services/hotelsService';
 import { hotelAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+import OptimizedImage from '../components/OptimizedImage';
 
 const GallerySkeleton = () => {
   const skeletonCards = Array.from({ length: 3 });
@@ -71,6 +71,15 @@ export default function Gallery() {
     loadHotels();
   }, []);
 
+  // Virtualization setup
+  const rowVirtualizer = useWindowVirtualizer({
+    count: hotels.length,
+    estimateSize: () => 600, // Estimated height per hotel card
+    overscan: 3, // Render 3 extra items outside visible area
+  });
+
+  const virtualItems = rowVirtualizer.getVirtualItems();
+
   const FALLBACK_IMG =
     "data:image/svg+xml;charset=UTF-8," +
     encodeURIComponent(`
@@ -95,70 +104,76 @@ export default function Gallery() {
         {loading ? (
           <GallerySkeleton />
         ) : (
-          <div className="space-y-20">
-            {hotels.map((hotel) => (
-              (() => {
-                const hotelName = getHotelDisplayName(hotel, i18n.language);
-                return (
-              <div key={hotel.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
-                {/* Hotel Header */}
-                <div className="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-8">
-                  <h2 className="text-3xl font-bold mb-2">{hotelName}</h2>
-                  <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex gap-6">
-                      <span className="text-blue-100">📍 {hotel.location}</span>
-                      <span className="text-blue-100">💰 {hotel.price} JOD/night</span>
-                      <span className="text-blue-100">⭐ {hotel.rating}</span>
+          <div
+            className="relative"
+            style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
+          >
+            {virtualItems.map((virtualItem) => {
+              const hotel = hotels[virtualItem.index];
+              const hotelName = getHotelDisplayName(hotel, i18n.language);
+
+              return (
+                <div
+                  key={hotel.id}
+                  className="absolute left-0 top-0 w-full space-y-20"
+                  style={{
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                  ref={rowVirtualizer.measureElement}
+                  data-index={virtualItem.index}
+                >
+                  <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+                    {/* Hotel Header */}
+                    <div className="bg-gradient-to-r from-blue-900 to-blue-700 text-white p-8">
+                      <h2 className="text-3xl font-bold mb-2">{hotelName}</h2>
+                      <div className="flex items-center justify-between flex-wrap gap-4">
+                        <div className="flex gap-6">
+                          <span className="text-blue-100">📍 {hotel.location}</span>
+                          <span className="text-blue-100">💰 {hotel.price} JOD/night</span>
+                          <span className="text-blue-100">⭐ {hotel.rating}</span>
+                        </div>
+                        <Link 
+                          to={`/hotels/${hotel.id}`}
+                          aria-label={`View details for ${hotelName}`}
+                          className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition min-h-[44px] inline-flex items-center justify-center"
+                        >
+                          View Details
+                        </Link>
+                      </div>
                     </div>
-                    <Link 
-                      to={`/hotels/${hotel.id}`}
-                      aria-label={`View details for ${hotelName}`}
-                      className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition min-h-[44px] inline-flex items-center justify-center"
-                    >
-                      View Details
-                    </Link>
+
+                    {/* Images Grid */}
+                    <div className="p-8">
+                      <h3 className="text-xl font-bold text-slate-900 mb-6">Gallery Images</h3>
+                      {hotel.images && hotel.images.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                          {hotel.images.map((img, idx) => (
+                            <div key={idx} className="rounded-lg overflow-hidden shadow-md hover:shadow-xl transition group cursor-pointer">
+                              <div className="relative bg-slate-200 overflow-hidden">
+                                <OptimizedImage
+                                  src={img}
+                                  alt={`${hotelName} - Image ${idx + 1}`}
+                                  ratio="3/2"
+                                  className="sm:aspect-[4/3] group-hover:scale-110 transition duration-300"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition"></div>
+                              </div>
+                              <div className="bg-slate-50 p-2 text-center text-sm text-slate-600">
+                                Image {idx + 1}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                          No images available for this hotel
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                {/* Images Grid */}
-                <div className="p-8">
-                  <h3 className="text-xl font-bold text-slate-900 mb-6">Gallery Images</h3>
-                  {hotel.images && hotel.images.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {hotel.images.map((img, idx) => (
-                        <div key={idx} className="rounded-lg overflow-hidden shadow-md hover:shadow-xl transition group cursor-pointer">
-                          <div className="relative aspect-[3/2] sm:aspect-[4/3] bg-slate-200 overflow-hidden">
-                            <LazyLoadImage 
-                              src={img} 
-                              alt={`${hotelName} - Image ${idx + 1}`}
-                              className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
-                              decoding="async"
-                              effect="blur"
-                              threshold={300}
-                              onError={(e) => {
-                                e.currentTarget.src = FALLBACK_IMG;
-                              }}
-                              wrapperClassName="w-full h-full"
-                              referrerPolicy="no-referrer"
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition"></div>
-                          </div>
-                          <div className="bg-slate-50 p-2 text-center text-sm text-slate-600">
-                            Image {idx + 1}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      No images available for this hotel
-                    </div>
-                  )}
-                </div>
-              </div>
-                );
-              })()
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

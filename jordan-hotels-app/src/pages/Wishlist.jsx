@@ -4,6 +4,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
+import OptimizedImage from '../components/OptimizedImage';
 
 export default function Wishlist() {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -59,15 +60,13 @@ export default function Wishlist() {
           {wishlist.map((item) => (
             <article key={item.id} className="card-modern group overflow-hidden hover-lift">
               <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-t-2xl">
-                <img
-                    src={item.image}
-                    alt={item.type === 'experience' ? (item.name || '') : getHotelDisplayName(item, i18n.language)}
-                    onError={createHotelImageOnErrorHandler(item.id)}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                  />
+                <OptimizedImage
+                  src={item.image}
+                  alt={item.type === 'experience' ? (item.name || '') : getHotelDisplayName(item, i18n.language)}
+                  onError={createHotelImageOnErrorHandler(item.id)}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  sizes="100vw"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 <button

@@ -1,0 +1,16 @@
+---- GET ----
+Status: 200
+Headers:
+  : keep-alive
+  : 970f22f0-5a67-40a6-ba8d-faaa55b541ee
+  : *
+  : Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent
+  : XMj8TGswoAMEnBg=
+  : GET,POST,PUT,PATCH,DELETE,OPTIONS
+  : Root=1-696819e7-43597c1921792a083ecaa4c4;Parent=3fdbd5a9a802e9c1;Sampled=0;Lineage=1:044c528e:0
+  : 15
+  : application/json
+  : Wed, 14 Jan 2026 22:34:17 GMT
+Body:
+{"bookings":[]}
+

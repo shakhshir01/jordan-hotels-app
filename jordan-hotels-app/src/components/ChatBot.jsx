@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { generateChatResponse } from '../services/chatbot';
+import OptimizedImage from './OptimizedImage';
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -120,13 +121,15 @@ export default function ChatBot() {
                   {message.images && message.images.length > 0 && (
                     <div className="mt-2 space-y-2">
                       {message.images.map((img, idx) => (
-                        <img
-                          key={idx}
-                          src={img.url}
-                          alt={img.alt || 'Hotel image'}
-                          className="w-full h-24 sm:h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                          onClick={() => window.open(img.url, '_blank')}
-                        />
+                        <div key={idx} className="w-full">
+                          <OptimizedImage
+                            src={img.url}
+                            alt={img.alt || 'Hotel image'}
+                            className="w-full h-24 sm:h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => window.open(img.url, '_blank')}
+                            sizes="100vw"
+                          />
+                        </div>
                       ))}
                     </div>
                   )}
@@ -146,7 +149,7 @@ export default function ChatBot() {
                       {message.hotels.map((hotel, idx) => (
                         <div key={idx} className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm overflow-hidden">
                           {hotel.image && (
-                            <img src={hotel.image} alt={hotel.name} className="w-full h-24 sm:h-32 object-cover rounded-md mb-2" />
+                            <OptimizedImage src={hotel.image} alt={hotel.name} className="w-full h-24 sm:h-32 object-cover rounded-md mb-2" sizes="100vw" />
                           )}
                           <h4 className="font-bold text-sm text-slate-800 dark:text-white">{hotel.name}</h4>
                           <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 my-1">{hotel.description || hotel.location}</p>

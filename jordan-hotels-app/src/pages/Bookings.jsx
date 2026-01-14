@@ -3,6 +3,7 @@ import { Calendar, Users, MapPin } from 'lucide-react';
 import hotelsService from '../services/hotelsService';
 import { hotelAPI } from '../services/api';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import OptimizedImage from '../components/OptimizedImage';
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -119,17 +120,16 @@ const Bookings = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                   {/* Image */}
                   <div className="md:col-span-1">
-                        <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-lg">
-                      <img
-                        src={image}
-                        alt={name}
-                        onError={createHotelImageOnErrorHandler(`booking:${booking.id}`)}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          decoding="async"
-                          referrerPolicy="no-referrer"
-                      />
-                    </div>
+                    <OptimizedImage
+                      src={image}
+                      alt={name}
+                      ratio="3/2"
+                      className="sm:aspect-[4/3] rounded-lg"
+                      onError={createHotelImageOnErrorHandler(`booking:${booking.id}`)}
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
 
                   {/* Details */}

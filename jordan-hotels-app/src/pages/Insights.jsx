@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Loader2, MapPin, Star, TrendingUp, Award } from "lucide-react";
 import { hotelAPI } from "../services/api";
+import OptimizedImage from "../components/OptimizedImage";
 
 const Insights = () => {
   const [hotels, setHotels] = useState([]);
@@ -255,17 +256,18 @@ const Insights = () => {
                     className="hotel-card group overflow-hidden flex flex-col"
                   >
                     <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
-                        <img
+                        <OptimizedImage
                           src={h.image}
                           alt={h.name || 'Hotel image'}
-                          loading="lazy"
-                          decoding="async"
-                          referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450"><rect width="100%" height="100%" fill="%2320232a"/><text x="50%" y="50%" fill="%23ffffff" font-size="18" font-family="Arial,Helvetica" text-anchor="middle" dominant-baseline="middle">Image unavailable</text></svg>';
-                          }}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            // preserve existing fallback logic when image fails
+                            if (e?.currentTarget) {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450"><rect width="100%" height="100%" fill="%2320232a"/><text x="50%" y="50%" fill="%23ffffff" font-size="18" font-family="Arial,Helvetica" text-anchor="middle" dominant-baseline="middle">Image unavailable</text></svg>';
+                            }
+                          }}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-80" />
                       <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">

@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { hotelAPI } from "../services/api";
 import { MapPin, Star, Search } from "lucide-react";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
+import OptimizedImage from "../components/OptimizedImage";
 
 const STORAGE_KEY = "visitjo.savedSearches";
 
@@ -281,14 +282,12 @@ export default function SearchResults() {
                     <article key={h.id} className="card-modern group overflow-hidden flex flex-col hover-lift">
                       {h.image && (
                         <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-t-2xl">
-                          <img
+                          <OptimizedImage
                             src={h.image}
                             alt={h.name}
-                            loading="lazy"
-                            decoding="async"
-                            referrerPolicy="no-referrer"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             onError={createHotelImageOnErrorHandler(h.id)}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>

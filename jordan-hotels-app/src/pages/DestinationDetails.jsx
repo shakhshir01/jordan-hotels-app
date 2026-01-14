@@ -4,6 +4,7 @@ import useFetch from "../hooks/useFetch";
 import { hotelAPI } from "../services/api";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
+import OptimizedImage from "../components/OptimizedImage";
 
 export default function DestinationDetails() {
   const { id } = useParams();
@@ -47,13 +48,11 @@ export default function DestinationDetails() {
                 <div key={h.id} className="hotel-card overflow-hidden">
                   {h.image && (
                     <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
-                      <img
+                      <OptimizedImage
                         src={h.image}
                         alt={hotelName}
                         className="w-full h-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                        referrerPolicy="no-referrer"
+                        sizes="100vw"
                       />
                     </div>
                   )}

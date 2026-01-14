@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import hotelsService from '../services/hotelsService';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
+import OptimizedImage from '../components/OptimizedImage';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
 
@@ -33,14 +34,12 @@ export default function FeaturedHotels() {
             return (
           <div key={hotel.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition">
             <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
-              <img
+              <OptimizedImage
                 src={hotel.image}
                 alt={hotelName}
                 onError={createHotelImageOnErrorHandler(hotel.id)}
                 className="w-full h-full object-cover hover:scale-110 transition"
-                loading="lazy"
-                decoding="async"
-                referrerPolicy="no-referrer"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
               <div className="absolute top-4 left-4 bg-yellow-400 px-3 py-1 rounded-full">
                 ★ {hotel.rating}

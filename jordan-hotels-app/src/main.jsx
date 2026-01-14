@@ -13,6 +13,7 @@ import "./index.css";
 
 import { initCloudWatchRum } from "./rum/initRum.js";
 import { initAmplify } from "./amplifyInit.js";
+import { preloadCriticalImages } from "./hooks/useImagePreloader.js";
 
 async function cleanupStaleServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -54,11 +55,66 @@ if (import.meta.env.PROD) {
   cleanupStaleServiceWorker();
 }
 
+// Register service worker for caching
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+
 // CloudWatch RUM (safe no-op unless env vars are set)
 initCloudWatchRum();
 
 // Amplify (Analytics/Auth/etc) init
 initAmplify();
+
+// Preload critical images for better performance
+preloadCriticalImages();
+
+// Runtime image optimizer: ensure images without attributes get lazy loading
+function installImageRuntimeOptimizations() {
+  try {
+    const applyAttrs = (img) => {
+      if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+      if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+      if (!img.hasAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'low');
+    };
+
+    const processAll = () => {
+      document.querySelectorAll('img:not([loading])').forEach(applyAttrs);
+      document.querySelectorAll('img[loading="eager"]').forEach((i) => i.setAttribute('loading', 'eager'));
+    };
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      requestAnimationFrame(processAll);
+    } else {
+      window.addEventListener('DOMContentLoaded', processAll, { once: true });
+    }
+
+    // Catch images added later (e.g., dynamic content)
+    const mo = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        for (const n of m.addedNodes) {
+          if (n.nodeType === 1) {
+            if (n.tagName === 'IMG') applyAttrs(n);
+            n.querySelectorAll && n.querySelectorAll('img').forEach(applyAttrs);
+          }
+        }
+      }
+    });
+    mo.observe(document.documentElement || document, { childList: true, subtree: true });
+  } catch {
+    // Non-fatal — skip optimization if any browser quirk
+  }
+}
+
+installImageRuntimeOptimizations();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

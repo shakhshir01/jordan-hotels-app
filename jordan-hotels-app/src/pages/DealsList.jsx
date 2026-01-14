@@ -7,6 +7,7 @@ import WishlistButton from "../components/WishlistButton";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
+import OptimizedImage from "../components/OptimizedImage";
 
 const DISCOUNTS = [30, 25, 20, 35, 15, 22, 28, 18];
 
@@ -75,14 +76,12 @@ export default function DealsList() {
             return (
               <article key={hotel.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
                 <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
-                  <img
+                  <OptimizedImage
                     src={hotel.image}
                     alt={hotelName}
                     onError={createHotelImageOnErrorHandler(hotel.id)}
                     className="w-full h-full object-cover hover:scale-110 transition"
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full font-bold text-lg">
                     -{discount}%

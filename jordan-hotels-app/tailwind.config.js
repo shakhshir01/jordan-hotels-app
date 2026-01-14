@@ -88,6 +88,7 @@ export default {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'gradient-shift': 'gradient-shift 8s ease-in-out infinite',
         'gradient-flow': 'gradient-flow 3s ease-in-out infinite',
+        'smooth-scroll': 'smooth-scroll 0.3s ease-out',
       },
       keyframes: {
         'slide-up': {
@@ -117,6 +118,10 @@ export default {
         'gradient-flow': {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
+        },
+        'smooth-scroll': {
+          '0%': { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(-10px)' },
         },
       },
       backdropBlur: {

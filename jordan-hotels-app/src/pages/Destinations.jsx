@@ -4,6 +4,7 @@ import { Loader2, MapPin, Camera, Star, Clock, Users, Calendar, ArrowRight, Comp
 import { useTranslation } from "react-i18next";
 import { hotelAPI } from "../services/api";
 import destinationImages from '../data/destination-images.json';
+import OptimizedImage from '../components/OptimizedImage';
 
 const DESTINATION_DETAILS = {
   'Dead Sea': {
@@ -190,10 +191,12 @@ export default function Destinations() {
                     {/* Image Header */}
                     <div className="relative h-64 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center group-hover:scale-105 transition duration-300">
                       {destinationImages[d.query] && (
-                        <img
+                        <OptimizedImage
                           src={destinationImages[d.query]}
                           alt={d.name}
-                          className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-300" />
+                          className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-300"
+                          sizes="100vw"
+                        />
                       )}
                       <div className="absolute inset-0 bg-black/20" />
                       <div className="relative z-10 text-center text-white">

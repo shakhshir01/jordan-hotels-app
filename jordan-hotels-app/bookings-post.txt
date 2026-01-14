@@ -1,0 +1,16 @@
+---- POST ----
+Status: 201
+Headers:
+  : keep-alive
+  : f7a210b3-ee7d-4bdd-939c-b10fb4e15299
+  : *
+  : Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent
+  : XMj8oHAmIAMEpvw=
+  : GET,POST,PUT,PATCH,DELETE,OPTIONS
+  : Root=1-696819e9-5c0a08bd1298bce03f8a6532;Parent=69b893a0b040547f;Sampled=0;Lineage=1:044c528e:0
+  : 120
+  : application/json
+  : Wed, 14 Jan 2026 22:34:18 GMT
+Body:
+{"id":"b_1768430058023","hotelId":null,"userId":"anonymous","status":"confirmed","createdAt":"2026-01-14T22:34:18.023Z"}
+

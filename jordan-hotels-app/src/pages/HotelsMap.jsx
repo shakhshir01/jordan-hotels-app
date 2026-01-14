@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
 import { getHotelCoordinates } from '../utils/geo';
 import { InlineLoader } from '../components/LoadingSpinner';
+import OptimizedImage from '../components/OptimizedImage';
 
 const JORDAN_CENTER = [31.24, 36.51];
 
@@ -242,14 +243,12 @@ export default function HotelsMap() {
         <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-lg">
-              <img
+              <OptimizedImage
                 src={selectedHotel.image}
                 alt={selectedName}
                 onError={createHotelImageOnErrorHandler(selectedHotel.id)}
                 className="w-full h-full object-cover"
-                loading="lazy"
-                decoding="async"
-                referrerPolicy="no-referrer"
+                sizes="100vw"
               />
             </div>
             <div>

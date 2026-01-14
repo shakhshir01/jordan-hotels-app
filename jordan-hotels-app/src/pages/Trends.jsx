@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
+import OptimizedImage from "../components/OptimizedImage";
 
 const defaultQueries = [
   { id: "tr-petra", label: "Petra", labelAr: "البتراء", q: "Petra" },
@@ -181,14 +182,12 @@ const Trends = () => {
                     <article key={h.id} className="hotel-card group overflow-hidden flex flex-col">
                       {h.image && (
                         <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
-                          <img
+                          <OptimizedImage
                             src={h.image}
                             alt={getHotelDisplayName(h, i18n.language) || h.name}
-                            loading="lazy"
-                            referrerPolicy="no-referrer"
-                            decoding="async"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             onError={createHotelImageOnErrorHandler(h.id)}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
                         </div>
                       )}
