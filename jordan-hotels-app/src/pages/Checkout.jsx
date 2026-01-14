@@ -356,6 +356,9 @@ const Checkout = () => {
                     alt={hotelName}
                     onError={createHotelImageOnErrorHandler(hotel.id)}
                     className="w-24 h-24 object-cover rounded-lg"
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
                   />
                   <div className="flex-1">
                     <h3 className="font-bold text-lg">{hotelName}</h3>

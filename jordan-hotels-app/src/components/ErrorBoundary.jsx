@@ -31,7 +31,9 @@ class ErrorBoundary extends React.Component {
               We're sorry, but something unexpected happened. Please try refreshing the page.
             </p>
             <button
+              type="button"
               onClick={() => window.location.reload()}
+              aria-label="Refresh page"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             >
               Refresh Page

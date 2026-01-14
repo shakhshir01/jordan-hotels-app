@@ -112,7 +112,8 @@ export default function Gallery() {
                     </div>
                     <Link 
                       to={`/hotels/${hotel.id}`}
-                      className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition"
+                      aria-label={`View details for ${hotelName}`}
+                      className="bg-white text-blue-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition min-h-[44px] inline-flex items-center justify-center"
                     >
                       View Details
                     </Link>
@@ -131,6 +132,7 @@ export default function Gallery() {
                               src={img} 
                               alt={`${hotelName} - Image ${idx + 1}`}
                               className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                              decoding="async"
                               effect="blur"
                               threshold={300}
                               onError={(e) => {

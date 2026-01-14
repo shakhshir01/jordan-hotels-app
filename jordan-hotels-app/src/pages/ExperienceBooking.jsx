@@ -80,11 +80,12 @@ const ExperienceBooking = () => {
   if (error || !experience) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
+          <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">{error || 'Experience not found'}</h2>
           <button
             onClick={() => navigate('/experiences')}
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
+            aria-label="Back to experiences"
+            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 min-h-[44px] flex items-center justify-center"
           >
             Back to Experiences
           </button>

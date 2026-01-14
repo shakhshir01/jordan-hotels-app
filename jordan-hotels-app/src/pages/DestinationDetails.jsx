@@ -52,6 +52,7 @@ export default function DestinationDetails() {
                         alt={hotelName}
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        decoding="async"
                         referrerPolicy="no-referrer"
                       />
                     </div>

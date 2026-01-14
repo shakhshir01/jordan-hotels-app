@@ -44,7 +44,7 @@ const AdminUpload = () => {
           className="w-full p-2 mb-3 border rounded"
         />
         <input type="file" accept="image/*" onChange={handleFileChange} className="mb-4" />
-        <button disabled={busy} className="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold disabled:opacity-60">
+        <button disabled={busy} aria-label="Upload hotel image" className="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold disabled:opacity-60 min-h-[44px] flex items-center justify-center">
           {busy ? 'Working...' : 'Upload'}
         </button>
         {status && <p className="mt-4 text-sm">{status}</p>}

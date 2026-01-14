@@ -14,8 +14,9 @@ const WishlistButton = ({ item, className = '' }) => {
 
   return (
     <button
+      type="button"
       onClick={handleClick}
-      className={`p-2 rounded-full transition-colors duration-200 hover:bg-red-50 dark:hover:bg-red-500/10 ${className}`}
+      className={`p-3 min-h-[44px] min-w-[44px] rounded-full transition-colors duration-200 hover:bg-red-50 dark:hover:bg-red-500/10 ${className}`}
       aria-label={isSaved ? 'Remove from wishlist' : 'Add to wishlist'}
     >
       <Heart

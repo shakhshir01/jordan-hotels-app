@@ -283,8 +283,10 @@ const HotelDetails = () => {
             </p>
           </div>
           <button
+            type="button"
             onClick={() => setShowMobileBooking(true)}
-            className="btn-primary px-6 py-3 text-sm font-bold rounded-xl hover-lift touch-manipulation flex-shrink-0"
+            aria-label="Open booking panel"
+            className="btn-primary px-6 py-3 text-sm font-bold rounded-xl hover-lift touch-manipulation flex-shrink-0 min-h-[44px]"
           >
             Reserve
           </button>
@@ -300,8 +302,10 @@ const HotelDetails = () => {
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Book Your Stay</h3>
                 <button
+                  type="button"
                   onClick={() => setShowMobileBooking(false)}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                  aria-label="Close booking"
+                  className="p-3 min-h-[44px] min-w-[44px] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
                 >
                   <X size={20} />
                 </button>

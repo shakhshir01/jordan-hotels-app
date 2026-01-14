@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import hotelsService from '../services/hotelsService';
 import { createHotelImageOnErrorHandler } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,9 @@ export default function FeaturedHotels() {
                 alt={hotelName}
                 onError={createHotelImageOnErrorHandler(hotel.id)}
                 className="w-full h-full object-cover hover:scale-110 transition"
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
               />
               <div className="absolute top-4 left-4 bg-yellow-400 px-3 py-1 rounded-full">
                 ★ {hotel.rating}
@@ -83,10 +87,18 @@ export default function FeaturedHotels() {
               <div className="flex items-center justify-between gap-3">
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{hotel.price} JOD</p>
                 <div className="flex gap-2">
-                  <Link to={`/hotels/${hotel.id}`} className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition text-sm font-medium">
+                  <Link
+                    to={`/hotels/${hotel.id}`}
+                    className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition text-sm font-medium flex items-center justify-center min-h-[48px]"
+                    aria-label={`View details for ${hotelName}`}
+                  >
                     View Details
                   </Link>
-                  <Link to={`/hotels/${hotel.id}?book=true`} className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+                  <Link
+                    to={`/hotels/${hotel.id}?book=true`}
+                    className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium flex items-center justify-center min-h-[48px]"
+                    aria-label={`Book ${hotelName}`}
+                  >
                     📅 Book Now
                   </Link>
                 </div>

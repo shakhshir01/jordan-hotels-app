@@ -314,6 +314,7 @@ const HotelsVirtualizedGrid = function HotelsVirtualizedGrid({
     estimateSize: () => 380,
     overscan: 6,
     scrollMargin,
+    useFlushSync: false,
   });
 
   const items = rowVirtualizer.getVirtualItems();
@@ -529,6 +530,7 @@ const Home = () => {
           {/* Enhanced Search Bar */}
           <div className="max-w-4xl mx-auto mb-12 animate-slide-up" style={{ animationDelay: '0.6s' }}>
             <div className="flex flex-col sm:flex-row gap-4 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-2 shadow-2xl">
+              {/* Search input */}
               <input
                 className="flex-1 px-6 py-4 bg-transparent text-white placeholder-white/60 outline-none text-lg sm:text-xl rounded-2xl border-0 focus:ring-2 focus:ring-white/30 transition-all duration-300"
                 placeholder={t("home.hero.searchPlaceholder", "Where do you want to go?")}
@@ -536,8 +538,54 @@ const Home = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
+
+              {/* Mobile segmented control */}
+              <div className="sm:hidden flex gap-2 w-full">
+                <button
+                  type="button"
+                  aria-pressed={sortBy === 'recommended'}
+                  onClick={() => setSortBy('recommended')}
+                  aria-label="Sort by recommended"
+                  className={`flex-1 text-sm px-3 py-2 rounded-2xl transition ${sortBy === 'recommended' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'}`}
+                >
+                  ✨ {t('home.sort.recommended', 'Recommended')}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={sortBy === 'rating'}
+                  onClick={() => setSortBy('rating')}
+                  aria-label="Sort by highest rated"
+                  className={`flex-1 text-sm px-3 py-2 rounded-2xl transition ${sortBy === 'rating' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'}`}
+                >
+                  ⭐ {t('home.sort.highestRated', 'Highest Rated')}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={sortBy === 'price-low'}
+                  onClick={() => setSortBy('price-low')}
+                  aria-label="Sort by price low to high"
+                  className={`flex-1 text-sm px-3 py-2 rounded-2xl transition ${sortBy === 'price-low' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'}`}
+                >
+                  💰 {t('home.sort.priceLow', 'Price: Low to High')}
+                </button>
+              </div>
+
+              {/* Desktop select */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                aria-label="Sort results"
+                className="hidden sm:block btn-secondary px-4 py-2 sm:py-3 rounded-2xl hover-lift font-semibold min-w-0 w-full sm:w-auto text-sm sm:text-base"
+              >
+                <option value="recommended">✨ {t('home.sort.recommended', 'Recommended')}</option>
+                <option value="rating">⭐ {t('home.sort.highestRated', 'Highest Rated')}</option>
+                <option value="price-low">💰 {t('home.sort.priceLow', 'Price: Low to High')}</option>
+              </select>
+
               <button
+                type="button"
                 onClick={handleSearch}
+                aria-label="Find stays"
                 className="px-8 py-4 bg-gradient-to-r from-jordan-gold to-jordan-rose hover:from-jordan-rose hover:to-jordan-gold text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-105 active:scale-95 min-h-[56px]"
               >
                 <Search size={24} />
@@ -580,8 +628,10 @@ const Home = () => {
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8">
           <div className="flex items-center gap-4 flex-wrap">
             <button
+              type="button"
               onClick={() => setShowFilters(!showFilters)}
-              className="btn-secondary inline-flex items-center gap-2 px-5 py-3 rounded-2xl hover-lift font-semibold"
+              aria-label="Toggle filters"
+              className="btn-secondary inline-flex items-center gap-2 px-5 py-3 rounded-2xl hover-lift font-semibold min-h-[44px]"
             >
               <SlidersHorizontal size={18} />
               <span>Filters</span>
@@ -592,26 +642,19 @@ const Home = () => {
               )}
             </button>
 
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="btn-secondary px-5 py-3 rounded-2xl hover-lift font-semibold min-w-[180px]"
-            >
-              <option value="recommended">✨ Recommended</option>
-              <option value="rating">⭐ Highest Rated</option>
-              <option value="price-low">💰 Price: Low to High</option>
-              <option value="price-high">💎 Price: High to Low</option>
-            </select>
+            {/* Sort control removed from this toolbar to avoid duplication with search bar */}
           </div>
 
           {(priceRange[0] > 0 || priceRange[1] < 500 || minRating > 0 || selectedAmenities.length > 0) && (
-            <button
-              onClick={clearFilters}
-              className="btn-secondary inline-flex items-center gap-2 px-5 py-3 rounded-2xl hover-lift font-semibold"
-            >
-              <X size={18} />
-              <span>Clear filters</span>
-            </button>
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  aria-label="Clear filters"
+                  className="btn-secondary inline-flex items-center gap-2 px-5 py-3 rounded-2xl hover-lift font-semibold"
+                >
+                  <X size={18} />
+                  <span>Clear filters</span>
+                </button>
           )}
         </div>
 
@@ -755,8 +798,10 @@ const Home = () => {
                   Try adjusting your filters to see more options.
                 </p>
                 <button
+                  type="button"
                   onClick={clearFilters}
-                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  aria-label="Clear all filters"
+                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors min-h-[44px] flex items-center justify-center"
                 >
                   Clear all filters
                 </button>

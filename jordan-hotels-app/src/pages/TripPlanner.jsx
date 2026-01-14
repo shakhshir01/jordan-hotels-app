@@ -135,8 +135,8 @@ export default function TripPlanner() {
                 <button
                   type="button"
                   onClick={() => handleDelete(day.id)}
-                  className="p-1 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   aria-label={t('pages.tripPlanner.deleteDay')}
+                  className="p-3 min-h-[44px] min-w-[44px] rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                 >
                   <Trash2 size={16} />
                 </button>

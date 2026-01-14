@@ -115,16 +115,19 @@ const Bookings = () => {
               const reference = booking?.bookingReference || booking?.id;
 
               return (
-              <div key={booking.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+                  <div key={booking.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                   {/* Image */}
                   <div className="md:col-span-1">
-                    <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                        <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-lg">
                       <img
                         src={image}
                         alt={name}
                         onError={createHotelImageOnErrorHandler(`booking:${booking.id}`)}
-                        className="w-full h-full object-cover"
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
                       />
                     </div>
                   </div>

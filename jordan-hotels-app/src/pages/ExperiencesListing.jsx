@@ -141,7 +141,8 @@ export default function ExperiencesListing() {
                       </div>
 
                       <button
-                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-sm"
+                        aria-label={`Book ${experience.title || 'experience'}`}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold text-sm min-h-[44px] inline-flex items-center justify-center"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/experiences/${experience.id}`);

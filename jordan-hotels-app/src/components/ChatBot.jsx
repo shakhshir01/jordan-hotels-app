@@ -75,9 +75,11 @@ export default function ChatBot() {
     <>
       {/* Chat Button - Mobile Optimized */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white p-3 sm:p-4 rounded-full shadow-glow hover:shadow-glow-purple transition-all duration-300 z-40 touch-manipulation animate-float"
         aria-label="Open chat"
+        aria-expanded={isOpen}
         style={{ minWidth: '48px', minHeight: '48px' }} // Minimum touch target size
       >
         {isOpen ? (
@@ -163,8 +165,10 @@ export default function ChatBot() {
                       {message.suggestions.map((suggestion, idx) => (
                         <button
                           key={idx}
+                          type="button"
                           onClick={() => setInputValue(suggestion)}
-                          className="text-xs bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 px-2 py-1 rounded transition-colors touch-manipulation"
+                          aria-label={`Use suggestion: ${suggestion}`}
+                          className="text-xs bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 px-3 py-2 rounded transition-colors touch-manipulation min-h-[44px]"
                         >
                           {suggestion}
                         </button>

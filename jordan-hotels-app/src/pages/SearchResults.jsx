@@ -232,9 +232,9 @@ export default function SearchResults() {
 
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="card-modern animate-pulse">
-                <div className="aspect-[4/3] bg-slate-200 dark:bg-slate-700 rounded-t-2xl"></div>
+                <div className="aspect-[3/2] sm:aspect-[4/3] bg-slate-200 dark:bg-slate-700 rounded-t-2xl"></div>
                 <div className="p-6 space-y-3">
                   <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded"></div>
                   <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
@@ -376,7 +376,7 @@ export default function SearchResults() {
                     <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                       {Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className="card-modern animate-pulse">
-                          <div className="aspect-[4/3] bg-slate-200 dark:bg-slate-700 rounded-t-2xl"></div>
+                          <div className="aspect-[3/2] sm:aspect-[4/3] bg-slate-200 dark:bg-slate-700 rounded-t-2xl"></div>
                           <div className="p-6 space-y-3">
                             <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded"></div>
                             <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>

@@ -64,16 +64,18 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
       {reviews.length > 1 && (
         <div className="flex gap-2 items-center mb-2">
           <span className="text-sm text-slate-600">Sort by:</span>
-          <button
-            className={`px-2 py-1 rounded ${sortBy === 'date' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}
-            onClick={() => setSortBy('date')}
-          >
+            <button
+              type="button"
+              className={`px-2 py-1 rounded min-h-[44px] ${sortBy === 'date' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}
+              onClick={() => setSortBy('date')}
+            >
             {t('reviews.sortNewest', 'Newest')}
           </button>
-          <button
-            className={`px-2 py-1 rounded ${sortBy === 'rating' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}
-            onClick={() => setSortBy('rating')}
-          >
+            <button
+              type="button"
+              className={`px-2 py-1 rounded min-h-[44px] ${sortBy === 'rating' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}
+              onClick={() => setSortBy('rating')}
+            >
             {t('reviews.sortRating', 'Highest Rated')}
           </button>
         </div>
@@ -95,7 +97,8 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
                 key={star}
                 type="button"
                 onClick={() => setNewReview(prev => ({ ...prev, rating: star }))}
-                className="p-1"
+                aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                className="p-3 min-h-[44px] min-w-[44px] rounded-full inline-flex items-center justify-center"
               >
                 <Star
                   className={`w-6 h-6 ${
@@ -126,7 +129,7 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
         <button
           type="submit"
           disabled={submitting || !newReview.comment.trim()}
-          className="flex items-center gap-2 px-4 py-2 bg-jordan-blue text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2 bg-jordan-blue text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
         >
           <Send className="w-4 h-4" />
           {submitting ? t('reviews.submitting', 'Submitting...') : t('reviews.submit', 'Submit Review')}

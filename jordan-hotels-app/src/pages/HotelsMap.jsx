@@ -149,7 +149,8 @@ export default function HotelsMap() {
           <button
             type="button"
             onClick={requestUserLocation}
-            className="mt-3 px-4 py-2 rounded-full border border-amber-200 bg-white text-sm font-semibold text-amber-900 hover:bg-amber-50"
+            aria-label="Retry location request"
+            className="mt-3 px-4 py-2 rounded-full border border-amber-200 bg-white text-sm font-semibold text-amber-900 hover:bg-amber-50 min-h-[44px] inline-flex items-center justify-center"
           >
             Try again
           </button>
@@ -240,7 +241,7 @@ export default function HotelsMap() {
           return (
         <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+            <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-lg">
               <img
                 src={selectedHotel.image}
                 alt={selectedName}

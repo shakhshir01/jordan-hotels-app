@@ -126,7 +126,8 @@ const Trends = () => {
             />
             <button
               type="submit"
-              className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700 transition-colors"
+              aria-label={t('pages.trends.explore')}
+              className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700 transition-colors min-h-[44px] inline-flex items-center justify-center"
             >
               {t('pages.trends.explore')}
             </button>
@@ -185,6 +186,7 @@ const Trends = () => {
                             alt={getHotelDisplayName(h, i18n.language) || h.name}
                             loading="lazy"
                             referrerPolicy="no-referrer"
+                            decoding="async"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             onError={createHotelImageOnErrorHandler(h.id)}
                           />

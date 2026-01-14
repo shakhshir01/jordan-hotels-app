@@ -254,7 +254,8 @@ export default function BlogPost() {
         <div className="mb-8">
           <Link
             to="/blog"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            aria-label={t('pages.blog.backToBlog')}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors min-h-[44px] items-center justify-center"
           >
             ← {t('pages.blog.backToBlog')}
           </Link>

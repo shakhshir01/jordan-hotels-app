@@ -122,14 +122,18 @@ const HotelGallery = ({ images = [], hotelName }) => {
           {currentIndex + 1} / {displayImages.length}
         </div>
         <button 
+          type="button"
           onClick={prevImage}
-          className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full shadow-lg z-10"
+          aria-label="Previous photo"
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-3 min-h-[44px] min-w-[44px] bg-white/80 rounded-full shadow-lg z-10"
         >
           <ChevronLeft className="w-5 h-5 text-gray-800" />
         </button>
         <button 
+          type="button"
           onClick={nextImage}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full shadow-lg z-10"
+          aria-label="Next photo"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-3 min-h-[44px] min-w-[44px] bg-white/80 rounded-full shadow-lg z-10"
         >
           <ChevronRight className="w-5 h-5 text-gray-800" />
         </button>
@@ -137,8 +141,10 @@ const HotelGallery = ({ images = [], hotelName }) => {
 
       {/* View All Button (Desktop) */}
       <button
+        type="button"
         onClick={() => openLightbox(0)}
-        className="hidden md:flex absolute bottom-4 right-4 bg-white text-gray-900 px-4 py-2 rounded-lg shadow-lg items-center gap-2 hover:bg-gray-50 transition-colors font-medium text-sm"
+        aria-label="View all photos"
+        className="hidden md:flex absolute bottom-4 right-4 bg-white text-gray-900 px-4 py-2 rounded-lg shadow-lg items-center gap-2 hover:bg-gray-50 transition-colors font-medium text-sm min-h-[44px] inline-flex items-center justify-center"
       >
         <Grid className="w-4 h-4" />
         View All Photos
@@ -148,14 +154,18 @@ const HotelGallery = ({ images = [], hotelName }) => {
       {showLightbox && (
         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center backdrop-blur-sm">
           <button 
+            type="button"
             onClick={closeLightbox}
-            className="absolute top-4 right-4 text-white/80 hover:text-white p-2 z-50"
+            aria-label="Close photos"
+            className="absolute top-4 right-4 text-white/80 hover:text-white p-3 min-h-[44px] min-w-[44px] rounded-full z-50"
           >
             <X className="w-8 h-8" />
           </button>
 
           <button 
+            type="button"
             onClick={prevImage}
+            aria-label="Previous photo"
             className="absolute left-4 text-white/80 hover:text-white p-4 hover:bg-white/10 rounded-full transition-colors z-50"
           >
             <ChevronLeft className="w-10 h-10" />
@@ -168,7 +178,9 @@ const HotelGallery = ({ images = [], hotelName }) => {
           />
 
           <button 
+            type="button"
             onClick={nextImage}
+            aria-label="Next photo"
             className="absolute right-4 text-white/80 hover:text-white p-4 hover:bg-white/10 rounded-full transition-colors z-50"
           >
             <ChevronRight className="w-10 h-10" />

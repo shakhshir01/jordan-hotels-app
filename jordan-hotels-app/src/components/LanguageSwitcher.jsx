@@ -20,10 +20,12 @@ export default function LanguageSwitcher() {
   return (
     <div className="relative">
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
+        aria-label={`Language: ${currentLanguage.name}`}
       >
         <span className="text-lg">{currentLanguage.flag}</span>
         <span className="hidden sm:inline">{currentLanguage.name}</span>
@@ -43,7 +45,9 @@ export default function LanguageSwitcher() {
             {languages.map((language) => (
               <button
                 key={language.code}
+                type="button"
                 onClick={() => handleLanguageChange(language.code)}
+                aria-label={`Switch language to ${language.name}`}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 ${
                   i18n.language === language.code
                     ? 'bg-blue-600/10 text-blue-600 dark:bg-blue-600/20 dark:text-blue-400'

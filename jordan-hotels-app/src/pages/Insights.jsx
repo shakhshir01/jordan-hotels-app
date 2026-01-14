@@ -259,6 +259,7 @@ const Insights = () => {
                           src={h.image}
                           alt={h.name || 'Hotel image'}
                           loading="lazy"
+                          decoding="async"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
                             e.currentTarget.onerror = null;

@@ -74,7 +74,7 @@ export default function DealsList() {
             
             return (
               <article key={hotel.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-                <div className="relative aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
                   <img
                     src={hotel.image}
                     alt={hotelName}
@@ -103,8 +103,10 @@ export default function DealsList() {
                   </div>
 
                   <button 
+                    type="button"
                     onClick={() => handleClaimDeal(hotel, discount)}
-                    className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 rounded-lg hover:shadow-lg transition font-bold"
+                    className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 rounded-lg hover:shadow-lg transition font-bold min-h-[48px]"
+                    aria-label={`Claim ${discount}% off at ${hotelName}`}
                   >
                     {t('pages.dealsList.claimDeal')}
                   </button>

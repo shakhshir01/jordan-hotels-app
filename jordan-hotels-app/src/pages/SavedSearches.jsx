@@ -49,7 +49,8 @@ const SavedSearches = () => {
             </p>
             <Link
               to="/search"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold shadow-lg hover:bg-blue-700 transition-colors"
+              aria-label="Start exploring hotels"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold shadow-lg hover:bg-blue-700 transition-colors min-h-[44px] inline-flex items-center justify-center"
             >
               <Search size={18} />
               Start exploring
@@ -75,14 +76,16 @@ const SavedSearches = () => {
                 <div className="flex items-center gap-2">
                   <Link
                     to={`/search?q=${encodeURIComponent(s.term)}`}
-                    className="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200"
+                    aria-label={`Open saved search ${s.term}`}
+                    className="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200 min-h-[40px] inline-flex items-center justify-center"
                   >
                     Open
                   </Link>
                   <button
                     type="button"
                     onClick={() => handleDelete(s.id)}
-                    className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+                    aria-label={`Delete saved search ${s.term}`}
+                    className="p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 min-h-[44px] min-w-[44px]"
                   >
                     <Trash2 size={16} />
                   </button>

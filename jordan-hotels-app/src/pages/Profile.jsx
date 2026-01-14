@@ -235,7 +235,7 @@ const Profile = () => {
 
     return (
       <div className="relative">
-        <button onClick={() => setShowEnableOptions((s) => !s)} className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+        <button onClick={() => setShowEnableOptions((s) => !s)} aria-label="Enable two factor authentication options" className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition min-h-[44px] inline-flex items-center justify-center">
           <Check size={16} />
           Enable 2FA
         </button>
@@ -243,8 +243,8 @@ const Profile = () => {
           <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-3 z-50">
             <p className="text-sm font-semibold mb-2">Choose 2FA method</p>
               <div className="flex flex-col gap-2">
-                <button onClick={startTotp} disabled={loading} className="px-3 py-2 text-left rounded-lg hover:bg-slate-50">Authenticator app (TOTP)</button>
-                <button onClick={chooseEmail} className="px-3 py-2 text-left rounded-lg hover:bg-slate-50">Email (alternate address)</button>
+                <button onClick={startTotp} disabled={loading} aria-label="Set up authenticator app (TOTP)" className="px-3 py-2 text-left rounded-lg hover:bg-slate-50 min-h-[44px]">Authenticator app (TOTP)</button>
+                <button onClick={chooseEmail} aria-label="Set up email two factor authentication" className="px-3 py-2 text-left rounded-lg hover:bg-slate-50 min-h-[44px]">Email (alternate address)</button>
               </div>
           </div>
         )}
@@ -278,7 +278,8 @@ const Profile = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="btn-secondary flex items-center gap-2 px-4 py-2 hover:scale-105 transition-all duration-300"
+              aria-label="Logout"
+              className="btn-secondary flex items-center gap-2 px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"
             >
               <LogOut size={18} />
               Logout
@@ -293,7 +294,8 @@ const Profile = () => {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setEditing(true)}
-                    className="btn-primary flex items-center gap-2 px-4 py-2 hover:scale-105 transition-all duration-300"
+                    aria-label="Edit profile"
+                    className="btn-primary flex items-center gap-2 px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"
                   >
                     <Edit2 size={18} />
                     Edit Profile
@@ -356,14 +358,16 @@ const Profile = () => {
                 <div className="flex gap-2 pt-4">
                   <button
                     onClick={handleUpdateProfile}
-                    className="btn-primary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300"
+                    aria-label="Save profile changes"
+                    className="btn-primary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"
                   >
                     <Check size={18} />
                     Save Changes
                   </button>
                   <button
                     onClick={() => setEditing(false)}
-                    className="btn-secondary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300"
+                    aria-label="Cancel profile edit"
+                    className="btn-secondary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"
                   >
                     <X size={18} />
                     Cancel
@@ -399,8 +403,9 @@ const Profile = () => {
             <h2 className="text-xl font-bold gradient-text">Two-Factor Authentication</h2>
             {!mfaEnabled && !showEnableOptions && (
               <button
+                type="button"
                 onClick={() => setShowEnableOptions(true)}
-                className="btn-primary px-4 py-2 hover:scale-105 transition-all duration-300"
+                className="btn-primary px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px]"
               >
                 Enable 2FA
               </button>
@@ -450,8 +455,9 @@ const Profile = () => {
               </div>
               <div className="mt-4 flex justify-end">
                 <button
+                  type="button"
                   onClick={() => setShowEnableOptions(false)}
-                  className="btn-secondary px-3 py-1 text-sm hover:scale-105 transition-all duration-300"
+                  className="btn-secondary px-3 py-1 text-sm hover:scale-105 transition-all duration-300 min-h-[44px]"
                 >
                   Cancel
                 </button>
@@ -469,6 +475,7 @@ const Profile = () => {
                 </span>
               </div>
               <button
+                type="button"
                 onClick={async () => {
                   if (window.confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
                     try {
@@ -479,7 +486,7 @@ const Profile = () => {
                     }
                   }
                 }}
-                className="btn-secondary px-4 py-2 hover:scale-105 transition-all duration-300"
+                className="btn-secondary px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px]"
               >
                 Disable 2FA
               </button>

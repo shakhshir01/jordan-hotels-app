@@ -60,17 +60,21 @@ export default function Wishlist() {
             <article key={item.id} className="card-modern group overflow-hidden hover-lift">
               <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-t-2xl">
                 <img
-                  src={item.image}
-                  alt={item.type === 'experience' ? (item.name || '') : getHotelDisplayName(item, i18n.language)}
-                  onError={createHotelImageOnErrorHandler(item.id)}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                    src={item.image}
+                    alt={item.type === 'experience' ? (item.name || '') : getHotelDisplayName(item, i18n.language)}
+                    onError={createHotelImageOnErrorHandler(item.id)}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                  />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 <button
                   onClick={() => removeFromWishlist(item.id)}
                   className="absolute top-4 right-4 bg-red-500/90 hover:bg-red-600 text-white p-3 rounded-2xl shadow-lg hover-lift transition-all duration-300 touch-manipulation"
                   title={t('pages.wishlist.remove')}
+                  aria-label={t('pages.wishlist.remove')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -115,7 +119,8 @@ export default function Wishlist() {
 
                 <Link
                   to={item.type === 'experience' ? '/experiences' : `/hotels/${item.id}`}
-                  className="btn-primary w-full py-4 text-center font-bold hover-lift touch-manipulation block"
+                  className="btn-primary w-full py-4 text-center font-bold hover-lift touch-manipulation block min-h-[48px] flex items-center justify-center"
+                  aria-label={t('pages.wishlist.viewDetails', 'View Details')}
                 >
                   {t('pages.wishlist.viewDetails', 'View Details')}
                 </Link>
