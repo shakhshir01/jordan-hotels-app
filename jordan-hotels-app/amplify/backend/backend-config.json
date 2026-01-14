@@ -9,17 +9,22 @@
     "jordanhotelsapp": {
       "dependsOn": [],
       "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
         "mfaTypes": [
-          "TOTP",
           "SMS"
         ],
         "passwordProtectionSettings": {
-          "passwordPolicyCharacters": []
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
         },
-        "signupAttributes": [],
+        "signupAttributes": [
+          "EMAIL"
+        ],
         "socialProviders": [],
         "usernameAttributes": [],
-        "verificationMechanisms": []
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito",

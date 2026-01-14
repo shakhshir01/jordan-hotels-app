@@ -95,6 +95,11 @@ const Verify = () => {
             className="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-center text-3xl tracking-widest font-bold text-slate-900 placeholder-slate-400 outline-none focus:border-blue-900 transition"
           />
           <p className="text-xs text-slate-500 mt-2">{t('auth.checkEmail')}</p>
+          <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-xs text-amber-800">
+              <strong>Can't find the email?</strong> Check your spam/junk folder. If it's still not there, you can resend the verification code using the link below.
+            </p>
+          </div>
         </div>
 
         <button 
