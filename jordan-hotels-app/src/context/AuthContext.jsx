@@ -226,8 +226,6 @@ export const AuthProvider = ({ children }) => {
 
           if (mfaEnabled) {
             // MFA is enabled, request MFA challenge
-            setUserAndProfileFromEmail(email);
-
             setMfaEnabled(true);
             setMfaMethod(mfaMethod || 'TOTP');
             localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
@@ -237,15 +235,15 @@ export const AuthProvider = ({ children }) => {
             try {
               if (mfaMethod === 'EMAIL') {
                 await hotelAPI.requestEmailMfaChallenge();
-                setMfaChallenge({ type: 'EMAIL_MFA', message: 'Check your email for the verification code' });
+                setMfaChallenge({ type: 'EMAIL_MFA', message: 'Check your email for the verification code', email });
               } else if (mfaMethod === 'TOTP') {
-                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code' });
+                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code', email });
               } else {
-                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code' }); // Default to TOTP
+                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code', email }); // Default to TOTP
               }
             } catch (challengeErr) {
               console.error('Failed to request MFA challenge', challengeErr);
-              setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code' }); // Fallback
+              setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code', email }); // Fallback
             }
 
             resolve({ mfaRequired: true });

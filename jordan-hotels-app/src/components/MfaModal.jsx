@@ -7,7 +7,7 @@ import QRCode from 'qrcode';
 import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function MfaModal() {
-  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa, verifyLoginTotpMfa, login } = useAuth();
+  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa, verifyLoginTotpMfa, login, completePreAuthLogin } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [code, setCode] = useState('');
@@ -103,10 +103,15 @@ export default function MfaModal() {
             setCode('');
             return;
           }
-          // Login completed via backend
+          // Login completed via backend - complete the authentication
+          const email = mfaChallenge.email || cognitoUserRef.current?.getUsername();
+          if (email) {
+            completePreAuthLogin(email);
+          }
           clearMfaChallenge();
           setCode('');
           showSuccess('Login successful!');
+          navigate('/');
         }
       } else if (mfaChallenge.type === 'TOTP_MFA') {
         // TOTP MFA verification for login
@@ -118,9 +123,14 @@ export default function MfaModal() {
           return;
         }
         // Login completed via backend
+        const email = mfaChallenge.email || cognitoUserRef.current?.getUsername();
+        if (email) {
+          completePreAuthLogin(email);
+        }
         clearMfaChallenge();
         setCode('');
         showSuccess('Login successful!');
+        navigate('/');
       } else {
         // TOTP or other Cognito MFA: use submitMfaCode wrapper to honor pendingLogout
         let mfaType;
@@ -217,6 +227,7 @@ export default function MfaModal() {
       setEmail('');
       setEmailStep('entry');
       showSuccess('Email MFA enabled');
+      clearMfaChallenge();
       navigate('/');
     } catch (err) {
       showError(err?.message || 'Failed to verify code');

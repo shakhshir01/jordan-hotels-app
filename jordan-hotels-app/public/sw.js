@@ -3,9 +3,9 @@
  * Handles caching, offline support, and background sync
  */
 
-const CACHE_NAME = 'visitjo-v3';
-const RUNTIME_CACHE = 'visitjo-runtime-v3';
-const API_CACHE = 'visitjo-api-v3';
+const CACHE_NAME = 'visitjo-v4';
+const RUNTIME_CACHE = 'visitjo-runtime-v4';
+const API_CACHE = 'visitjo-api-v4';
 
 const ASSETS_TO_CACHE = [
   '/manifest.json',
