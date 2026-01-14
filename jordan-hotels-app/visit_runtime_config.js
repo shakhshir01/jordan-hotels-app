@@ -11,6 +11,7 @@ window.__VISITJO_RUNTIME_CONFIG__ = {
   VITE_PAYMENTS_ENABLED: "true",
   VITE_PAYPAL_CLIENT_ID: "AS4zykgSxEpxQfcVgXSsKt025N8zS6kYhxPe9_z7O4TDQTqfqYKSphdMR_Mc890z0EuGpnDxehDZk98s",
   VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_51Sn7WIJFa7tt8KvLusvHeHNYRtIeV8AQHVaJnVYgftrZyncjoIpRO2KJWMK85BngbOA1oiJffhZNYvGQ15mBtP3S00TglRUJrq",
+  VITE_GEMINI_API_KEY: "AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM",
   // Optional: set to your deployed chat function URL (Vercel/Netlify). Leave empty to use local fallback.
   VITE_CHAT_API_URL: "",
 };

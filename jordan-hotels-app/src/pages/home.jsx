@@ -41,7 +41,7 @@ const getNearestJordanPlace = ({ lat, lon }) => {
 
 const HotelCardSkeleton = () => (
   <div className="card-modern animate-pulse overflow-hidden">
-    <div className="cover bg-gradient-to-br from-slate-200 via-slate-300 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 h-48 sm:h-56 lg:h-64"></div>
+    <div className="cover bg-gradient-to-br from-slate-200 via-slate-300 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 aspect-[16/10]"></div>
     <div className="p-4 sm:p-5 lg:p-6">
       <div className="h-6 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 rounded-xl mb-3"></div>
       <div className="h-4 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 rounded-lg mb-4 w-3/4"></div>
@@ -168,7 +168,7 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
   return (
     <article className="group relative card-modern overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50">
       {/* Enhanced Image Container */}
-      <div className="relative overflow-hidden aspect-[4/3] sm:aspect-[16/10]">
+      <div className="relative overflow-hidden aspect-[16/10]">
         <OptimizedImage
           src={hotel.image || FALLBACK_IMG}
           alt={hotelName}
