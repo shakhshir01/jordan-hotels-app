@@ -126,7 +126,7 @@ export default function Gallery() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                       {hotel.images.map((img, idx) => (
                         <div key={idx} className="rounded-lg overflow-hidden shadow-md hover:shadow-xl transition group cursor-pointer">
-                          <div className="relative aspect-[4/3] bg-slate-200 overflow-hidden">
+                          <div className="relative aspect-[3/2] sm:aspect-[4/3] bg-slate-200 overflow-hidden">
                             <LazyLoadImage 
                               src={img} 
                               alt={`${hotelName} - Image ${idx + 1}`}

@@ -254,29 +254,34 @@ const Insights = () => {
                     key={h.id}
                     className="hotel-card group overflow-hidden flex flex-col"
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      <img
-                        src={h.image}
-                        alt={h.name}
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                    <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
+                        <img
+                          src={h.image}
+                          alt={h.name || 'Hotel image'}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450"><rect width="100%" height="100%" fill="%2320232a"/><text x="50%" y="50%" fill="%23ffffff" font-size="18" font-family="Arial,Helvetica" text-anchor="middle" dominant-baseline="middle">Image unavailable</text></svg>';
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-80" />
                       <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
                         <div>
-                          <p className="text-xs uppercase tracking-wide text-white/80">
+                          <p className="text-xs uppercase tracking-wide text-white">
                             {h.location}
                           </p>
-                          <p className="text-sm font-semibold line-clamp-1">
+                          <p className="text-base md:text-lg font-semibold line-clamp-1 text-white">
                             {h.name}
                           </p>
                         </div>
                         <div className="flex flex-col items-end">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/40 text-xs font-semibold">
-                            <Star size={12} className="text-amber-400" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/40 text-xs font-semibold" aria-hidden="true">
+                            <Star size={12} className="text-amber-400" aria-hidden="true" />
                             {h.rating}
                           </span>
+                          <span className="sr-only">Rating: {h.rating} out of 5</span>
                           {h.reviews && (
                             <span className="mt-1 text-[11px] text-white/80">
                               {h.reviews.toLocaleString()} reviews
@@ -287,16 +292,17 @@ const Insights = () => {
                     </div>
                     <div className="p-4 flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                        <p className="text-sm text-white/90">
                           From
                         </p>
-                        <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                          {h.price} JOD <span className="text-xs text-slate-500">/ night</span>
+                        <p className="text-lg md:text-xl font-extrabold text-white">
+                          {h.price} JOD <span className="text-xs text-white/70">/ night</span>
                         </p>
                       </div>
                       <a
                         href={`/hotels/${h.id}`}
-                        className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200"
+                        aria-label={`View ${h.name} details`}
+                        className="h-12 px-4 rounded-xl text-sm font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center"
                       >
                         View details
                       </a>

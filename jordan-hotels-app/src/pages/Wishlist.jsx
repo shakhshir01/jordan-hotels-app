@@ -58,7 +58,7 @@ export default function Wishlist() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 pb-8">
           {wishlist.map((item) => (
             <article key={item.id} className="card-modern group overflow-hidden hover-lift">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
+              <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-t-2xl">
                 <img
                   src={item.image}
                   alt={item.type === 'experience' ? (item.name || '') : getHotelDisplayName(item, i18n.language)}

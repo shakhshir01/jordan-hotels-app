@@ -280,7 +280,7 @@ export default function SearchResults() {
                   {hotels.map((h) => (
                     <article key={h.id} className="card-modern group overflow-hidden flex flex-col hover-lift">
                       {h.image && (
-                        <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
+                        <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-t-2xl">
                           <img
                             src={h.image}
                             alt={h.name}

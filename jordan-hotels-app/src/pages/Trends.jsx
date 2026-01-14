@@ -179,7 +179,7 @@ const Trends = () => {
                   {results.hotels.slice(0, 6).map((h) => (
                     <article key={h.id} className="hotel-card group overflow-hidden flex flex-col">
                       {h.image && (
-                        <div className="relative aspect-[4/3] overflow-hidden">
+                        <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
                           <img
                             src={h.image}
                             alt={getHotelDisplayName(h, i18n.language) || h.name}
@@ -191,7 +191,7 @@ const Trends = () => {
                         </div>
                       )}
                       <div className="p-4 flex flex-col gap-1 flex-1">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 line-clamp-1">
+                        <p className="text-base font-semibold text-slate-900 dark:text-slate-50 line-clamp-1">
                           {getHotelDisplayName(h, i18n.language) || h.name}
                         </p>
                         {h.location && (
@@ -201,10 +201,11 @@ const Trends = () => {
                         )}
                         <div className="mt-auto flex items-center justify-between pt-2 text-xs">
                           {h.rating && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
-                              <Star size={12} /> {h.rating}
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300" aria-hidden="true">
+                              <Star size={12} aria-hidden="true" /> {h.rating}
                             </span>
                           )}
+                          {h.rating && <span className="sr-only">Rating: {h.rating} out of 5</span>}
                           {h.price && (
                             <span className="text-slate-700 dark:text-slate-200 font-semibold">
                               {h.price} JOD <span className="text-[11px] text-slate-500 dark:text-slate-400">{t('hotels.perNight')}</span>
@@ -214,13 +215,15 @@ const Trends = () => {
                         <div className="mt-3 flex gap-2">
                           <Link
                             to={`/hotels/${h.id}`}
-                            className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200 inline-block"
+                            aria-label={`View ${getHotelDisplayName(h, i18n.language) || h.name}`}
+                            className="px-3 py-2 rounded-xl text-sm font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200 inline-flex items-center justify-center min-h-[44px]"
                           >
                             {t('common.view')}
                           </Link>
                           <Link
                             to={`/hotels/${h.id}?book=true`}
-                            className="px-3 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 inline-block"
+                            aria-label={`Book ${getHotelDisplayName(h, i18n.language) || h.name}`}
+                            className="px-3 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 inline-flex items-center justify-center min-h-[44px]"
                           >
                             📅 Book
                           </Link>

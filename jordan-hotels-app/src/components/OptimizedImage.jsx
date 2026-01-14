@@ -60,6 +60,7 @@ const OptimizedImage = ({
         loading={loading}
         decoding="async"
         referrerPolicy="no-referrer"
+        className={className}
         {...props}
       />
     </picture>

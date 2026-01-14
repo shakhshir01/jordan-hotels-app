@@ -168,7 +168,7 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
   return (
     <article className="group relative card-modern overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50">
       {/* Enhanced Image Container */}
-      <div className="relative overflow-hidden aspect-[16/10]">
+      <div className="relative overflow-hidden aspect-[3/2] sm:aspect-[4/3]">
         <OptimizedImage
           src={hotel.image || FALLBACK_IMG}
           alt={hotelName}
@@ -198,17 +198,22 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
           )}
         </div>
         
-        {/* Enhanced Rating Badge */}
-        <div className="absolute top-4 right-4 px-4 py-2 bg-white/95 backdrop-blur-xl text-slate-900 rounded-full shadow-lg border border-white/30 flex items-center gap-2 font-bold text-sm">
-          <Star size={16} fill="currentColor" className="text-amber-500" />
-          {hotel.rating}
+        {/* Enhanced Rating Badge (moved out of image center) */}
+        <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-black/50 text-white text-sm font-semibold rounded-full px-3 py-1.5 backdrop-blur-sm shadow-md border border-white/10" aria-hidden="true">
+          <Star size={14} className="text-amber-400" aria-hidden="true" />
+          <span className="ml-1">{hotel.rating}</span>
         </div>
+        <span className="sr-only">Rating: {hotel.rating} out of 5</span>
         
-        {/* Hover Action Button */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="bg-white/90 backdrop-blur-xl rounded-full p-4 shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
-            <Eye size={24} className="text-slate-900" />
-          </div>
+        {/* Preview Action Button (accessible) */}
+        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <a
+            href={`/hotels/${hotel.id}#photos`}
+            aria-label={`Preview photos for ${hotelName}`}
+            className="inline-flex items-center justify-center bg-white/95 backdrop-blur-xl rounded-full p-3 shadow-lg hover:scale-105 focus:outline-none focus:ring-4 focus:ring-jordan-blue/30 transition-transform duration-200"
+          >
+            <Eye size={18} className="text-slate-900" />
+          </a>
         </div>
       </div>
 
@@ -227,16 +232,31 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
 
         {/* Enhanced Amenities */}
         <div className="flex items-center gap-3 mb-6 flex-wrap">
-          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-jordan-blue/10 hover:text-jordan-blue transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50">
-            <Wifi size={16} />
+          <div
+            role="img"
+            aria-label="WiFi available"
+            className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-100 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-jordan-blue/10 hover:text-jordan-blue transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50 min-w-[44px] min-h-[44px]"
+          >
+            <Wifi size={18} aria-hidden="true" />
+            <span className="sr-only">WiFi available</span>
             <span className="hidden sm:inline font-medium">WiFi</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50">
-            <Car size={16} />
+          <div
+            role="img"
+            aria-label="Parking available"
+            className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-100 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50 min-w-[44px] min-h-[44px]"
+          >
+            <Car size={18} aria-hidden="true" />
+            <span className="sr-only">Parking available</span>
             <span className="hidden sm:inline font-medium">Parking</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-600 transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50">
-            <Utensils size={16} />
+          <div
+            role="img"
+            aria-label="Restaurant on site"
+            className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-100 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-600 transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50 min-w-[44px] min-h-[44px]"
+          >
+            <Utensils size={18} aria-hidden="true" />
+            <span className="sr-only">Restaurant on site</span>
             <span className="hidden sm:inline font-medium">Restaurant</span>
           </div>
         </div>
@@ -276,7 +296,15 @@ const HotelsVirtualizedGrid = function HotelsVirtualizedGrid({
   const parentRef = useRef(null);
   const parentRefCallback = useCallback((node) => {
     parentRef.current = node;
-    if (node) setScrollMargin(node.offsetTop ?? 0);
+    if (node) {
+      // Defer updating state to avoid synchronous flush during commit phase
+      // which can trigger React's "flushSync called inside a lifecycle" warning.
+      setTimeout(() => {
+        setScrollMargin(node.offsetTop ?? 0);
+      }, 0);
+    } else {
+      setTimeout(() => setScrollMargin(0), 0);
+    }
   }, []);
 
   const rows = Math.ceil(hotels.length / columns);

@@ -46,13 +46,15 @@ export default function DestinationDetails() {
                   return (
                 <div key={h.id} className="hotel-card overflow-hidden">
                   {h.image && (
-                    <img
-                      src={h.image}
-                      alt={hotelName}
-                      className="w-full h-40 object-cover"
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                    />
+                    <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
+                      <img
+                        src={h.image}
+                        alt={hotelName}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
                   )}
                   <div className="p-4 flex flex-col gap-1">
                     <h3 className="font-bold text-slate-900 dark:text-slate-100">{hotelName}</h3>
@@ -65,7 +67,8 @@ export default function DestinationDetails() {
                     <div className="mt-3">
                       <Link
                         to={`/hotels/${h.id}`}
-                        className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200 inline-block"
+                        aria-label={`View ${hotelName}`}
+                        className="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-600 transition-colors duration-200 inline-flex items-center justify-center min-h-[44px]"
                       >
                         View
                       </Link>
