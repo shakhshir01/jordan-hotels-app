@@ -35,7 +35,7 @@ function resetHotelImages(hotels) {
 console.log(`Loaded ${hotels.length} hotels. Starting real image fetch process...`);
 
 // Reset images before fetching new ones
-// resetHotelImages(hotels);
+resetHotelImages(hotels);
 
 // Function to validate image URL
 function validateImageUrl(url) {
