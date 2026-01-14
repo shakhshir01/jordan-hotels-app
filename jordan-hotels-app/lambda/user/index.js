@@ -361,10 +361,15 @@ async function sendEmail(toAddress, subject, textBody, htmlBody) {
     Source: from,
   };
   try {
+    console.log('Attempting to send email from:', from, 'to:', toAddress);
     await ses.send(new SendEmailCommand(params));
+    console.log('Email sent successfully to:', toAddress);
     return true;
   } catch (e) {
-    console.error('SES send error:', e);
+    console.error('SES send error:', e.message);
+    console.error('Error name:', e.name);
+    console.error('Error code:', e.code);
+    console.error('Sending to:', toAddress, 'from:', from);
     return false;
   }
 }
