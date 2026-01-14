@@ -182,111 +182,139 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {mobileOpen && (
-          <div className="lg:hidden border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link
-                to="/destinations"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.destinations")}
-              </Link>
-              <Link
-                to="/experiences"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-rose hover:bg-jordan-rose/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.experiences")}
-              </Link>
-              <Link
-                to="/deals"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-gold hover:bg-jordan-gold/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.deals")}
-              </Link>
-              <Link
-                to="/trends"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.trends", "Trends")}
-              </Link>
-              <Link
-                to="/insights"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-teal hover:bg-jordan-teal/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.insights", "Insights")}
-              </Link>
-              <Link
-                to="/reviews"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-rose hover:bg-jordan-rose/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.reviews", "Reviews")}
-              </Link>
-              <Link
-                to="/blog"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-gold hover:bg-jordan-gold/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.blog", "Blog")}
-              </Link>
-              <Link
-                to="/gallery"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.gallery", "Gallery")}
-              </Link>
-              <Link
-                to="/support"
-                onClick={closeMobile}
-                className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-teal hover:bg-jordan-teal/5 rounded-md font-medium transition-colors duration-300"
-              >
-                {t("nav.support", "Support")}
-              </Link>
+          <div className="lg:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-fade-in">
+            <div className="absolute top-16 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-slate-700 shadow-2xl animate-slide-down">
+              <div className="px-4 pt-4 pb-6 space-y-3 max-h-[calc(100vh-4rem)] overflow-y-auto">
+                <Link
+                  to="/destinations"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <MapPin size={20} />
+                  {t("nav.destinations")}
+                </Link>
+                <Link
+                  to="/experiences"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-rose hover:bg-jordan-rose/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <Camera size={20} />
+                  {t("nav.experiences")}
+                </Link>
+                <Link
+                  to="/deals"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-gold hover:bg-jordan-gold/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <Tag size={20} />
+                  {t("nav.deals")}
+                </Link>
+                <Link
+                  to="/trends"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <TrendingUp size={20} />
+                  {t("nav.trends", "Trends")}
+                </Link>
+                <Link
+                  to="/insights"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-teal hover:bg-jordan-teal/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <BarChart3 size={20} />
+                  {t("nav.insights", "Insights")}
+                </Link>
+                <Link
+                  to="/reviews"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-rose hover:bg-jordan-rose/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <MessageSquare size={20} />
+                  {t("nav.reviews", "Reviews")}
+                </Link>
+                <Link
+                  to="/blog"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-gold hover:bg-jordan-gold/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <Image size={20} />
+                  {t("nav.blog", "Blog")}
+                </Link>
+                <Link
+                  to="/gallery"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <Image size={20} />
+                  {t("nav.gallery", "Gallery")}
+                </Link>
+                <Link
+                  to="/support"
+                  onClick={closeMobile}
+                  className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-teal hover:bg-jordan-teal/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  <HelpCircle size={20} />
+                  {t("nav.support", "Support")}
+                </Link>
 
-              <div className="border-t border-gray-200 my-3"></div>
+                <div className="border-t border-gray-200 dark:border-slate-700 my-4"></div>
 
-              {user ? (
-                <div className="space-y-1">
-                  <div className="px-3 py-2 text-gray-900 dark:text-white font-medium">
-                    {displayName}
+                {user ? (
+                  <div className="space-y-3">
+                    <div className="px-4 py-3 text-gray-900 dark:text-white font-semibold bg-gray-50 dark:bg-slate-800 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-jordan-blue to-jordan-teal rounded-full flex items-center justify-center text-white font-bold">
+                          {displayName.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="truncate">{displayName}</span>
+                      </div>
+                    </div>
+                    <Link
+                      to="/profile"
+                      onClick={closeMobile}
+                      className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      {t("nav.profile")}
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full px-4 py-3 bg-gradient-to-r from-jordan-blue to-jordan-teal hover:from-jordan-teal hover:to-jordan-blue text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      {t("nav.logout")}
+                    </button>
                   </div>
-                  <Link
-                    to="/profile"
-                    onClick={closeMobile}
-                    className="block px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue hover:bg-jordan-blue/5 rounded-md font-medium transition-colors duration-300"
-                  >
-                    {t("nav.profile")}
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-3 py-2 bg-gradient-to-r from-jordan-blue to-jordan-teal hover:from-jordan-teal hover:to-jordan-blue text-white rounded-md font-medium transition-all duration-300"
-                  >
-                    {t("nav.logout")}
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  <Link
-                    to="/login"
-                    onClick={closeMobile}
-                    className="block px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md font-medium transition-colors"
-                  >
-                    {t("nav.login")}
-                  </Link>
-                  <Link
-                    to="/signup"
-                    onClick={closeMobile}
-                    className="block px-3 py-2 bg-gray-900 hover:bg-black text-white rounded-md font-medium text-center transition-colors"
-                  >
-                    {t("nav.signup")}
-                  </Link>
-                </div>
-              )}
+                ) : (
+                  <div className="space-y-3">
+                    <Link
+                      to="/login"
+                      onClick={closeMobile}
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      {t("nav.login")}
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={closeMobile}
+                      className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-jordan-rose to-jordan-gold hover:from-jordan-gold hover:to-jordan-rose text-white rounded-xl font-medium text-center transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                      </svg>
+                      {t("nav.signup")}
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

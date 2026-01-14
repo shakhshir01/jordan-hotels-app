@@ -170,192 +170,250 @@ export default function SearchResults() {
   const hasHotels = useMemo(() => Array.isArray(hotels) && hotels.length > 0, [hotels]);
 
   return (
-    <div className="space-y-10">
-      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="page-title text-slate-900 dark:text-slate-50">
-            Search results
-          </h1>
-          <p className="page-subtitle mt-2">
-            Showing matches for <span className="font-semibold">“{term || "All"}”</span>
-          </p>
-        </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <button
-            type="button"
-            onClick={handleSaveSearch}
-            disabled={!term}
-            className="btn-secondary flex items-center gap-2 disabled:opacity-50"
-          >
-            <Search size={16} /> Save this search
-          </button>
-        </div>
-      </header>
-
-      {/* Saved searches */}
-      {savedSearches.length > 0 && (
-        <section className="surface p-6 sm:p-8">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              Saved searches
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex-1">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black gradient-text mb-2">
+              Search Results
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300">
+              {hasHotels ? `Found ${hotels.length} hotels` : 'No results found'} for <span className="font-semibold text-slate-900 dark:text-slate-100">"{term || "All"}"</span>
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {savedSearches.map((s) => (
-              <div
-                key={s.id}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-100"
-              >
-                <button
-                  type="button"
-                  onClick={() => handleUseSaved(s)}
-                  className="flex items-center gap-1"
-                >
-                  <Search size={12} />
-                  <span>{s.term}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteSaved(s.id)}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                >
-                  ×
-                </button>
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={handleSaveSearch}
+              disabled={!term}
+              className="btn-secondary flex items-center gap-2 disabled:opacity-50 hover-lift touch-manipulation px-4 py-3"
+            >
+              <Search size={18} /> Save Search
+            </button>
+          </div>
+        </header>
+
+        {/* Saved searches */}
+        {savedSearches.length > 0 && (
+          <section className="card-modern">
+            <div className="p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl sm:text-2xl font-black gradient-text">
+                  Saved Searches
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {savedSearches.map((s) => (
+                  <div
+                    key={s.id}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleUseSaved(s)}
+                      className="flex items-center gap-1"
+                    >
+                      <Search size={12} />
+                      <span>{s.term}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSaved(s.id)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="card-modern animate-pulse">
+                <div className="aspect-[4/3] bg-slate-200 dark:bg-slate-700 rounded-t-2xl"></div>
+                <div className="p-6 space-y-3">
+                  <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                  <div className="flex justify-between">
+                    <div className="h-8 w-16 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                    <div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-        </section>
-      )}
+        )}
 
-      {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="surface animate-pulse h-64" />
-          ))}
-        </div>
-      )}
+        {!loading && error && !hasHotels && (
+          <div className="glass-card rounded-2xl p-6 border border-red-200/50 bg-red-50/50 dark:bg-red-900/20">
+            <p className="text-red-800 dark:text-red-200 text-sm font-medium">
+              ⚠️ {error.message || "Search failed"}
+            </p>
+            <button
+              type="button"
+              onClick={resetAndLoad}
+              className="mt-4 btn-secondary hover-lift touch-manipulation px-6 py-3"
+            >
+              🔄 Retry
+            </button>
+          </div>
+        )}
 
-      {!loading && error && !hasHotels && (
-        <div className="bg-red-50 border border-red-200 rounded-3xl p-5 text-red-800">
-          <div className="text-sm font-semibold">{error.message || "Search failed"}</div>
-          <button
-            type="button"
-            onClick={resetAndLoad}
-            className="mt-4 btn-secondary"
-          >
-            Retry
-          </button>
-        </div>
-      )}
-
-      {!loading && (hasHotels || !error) && (
-        <div className="space-y-10">
-          {/* Hotels */}
-          {hasHotels && (
-            <section>
-              <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">Hotels</h2>
-              {error && (
-                <div className="mb-4 bg-amber-50 border border-amber-200 rounded-2xl p-3 text-amber-900 text-sm">
-                  {error.message || "Some results failed to load."}
-                </div>
-              )}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {hotels.map((h) => (
-                  <article key={h.id} className="hotel-card group overflow-hidden flex flex-col">
-                    {h.image && (
-                      <div className="relative aspect-[3/2] md:aspect-[4/3] overflow-hidden">
-                        <img
-                          src={h.image}
-                          alt={h.name}
-                          loading="lazy"
-                          decoding="async"
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          onError={createHotelImageOnErrorHandler(h.id)}
-                        />
-                      </div>
-                    )}
-                    <div className="p-4 flex flex-col gap-1 flex-1">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 line-clamp-1">
-                        {h.name}
-                      </p>
-                      {h.location && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                          <MapPin size={12} /> {h.location}
-                        </p>
+        {!loading && (hasHotels || !error) && (
+          <div className="space-y-8">
+            {/* Hotels */}
+            {hasHotels && (
+              <section>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-8 gradient-text">Hotels</h2>
+                {error && (
+                  <div className="mb-6 glass-card rounded-2xl p-4 border border-amber-200/50 bg-amber-50/50 dark:bg-amber-900/20">
+                    <p className="text-amber-800 dark:text-amber-200 text-sm font-medium">
+                      ⚠️ {error.message || "Some results failed to load."}
+                    </p>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                  {hotels.map((h) => (
+                    <article key={h.id} className="card-modern group overflow-hidden flex flex-col hover-lift">
+                      {h.image && (
+                        <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
+                          <img
+                            src={h.image}
+                            alt={h.name}
+                            loading="lazy"
+                            decoding="async"
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={createHotelImageOnErrorHandler(h.id)}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
                       )}
-                      <div className="mt-auto flex items-center justify-between pt-2 text-xs">
-                        {h.rating && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
-                            <Star size={12} /> {h.rating}
-                          </span>
-                        )}
-                        {h.price && (
-                          <span className="text-slate-700 dark:text-slate-200 font-semibold">
-                            {h.price} JOD <span className="text-[11px] text-slate-500 dark:text-slate-400">/ night</span>
-                          </span>
-                        )}
+                      <div className="p-6 flex flex-col gap-3 flex-1">
+                        <div className="flex-1">
+                          <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {h.name}
+                          </h3>
+                          {h.location && (
+                            <p className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 mb-3">
+                              <MapPin size={16} className="text-blue-500 flex-shrink-0" />
+                              <span className="truncate">{h.location}</span>
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between mb-4">
+                          {h.rating && (
+                            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-glow">
+                              <Star size={16} fill="currentColor" />
+                              <span className="text-sm">{h.rating}</span>
+                            </div>
+                          )}
+                          {h.price && (
+                            <div className="text-right">
+                              <span className="text-2xl font-black gradient-text">{h.price}</span>
+                              <span className="text-sm text-slate-500 dark:text-slate-400 font-medium ml-1">JOD</span>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">per night</p>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex gap-3">
+                          <Link
+                            to={`/hotels/${h.id}`}
+                            className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all duration-300 text-center hover-lift touch-manipulation"
+                          >
+                            View Details
+                          </Link>
+                          <Link
+                            to={`/hotels/${h.id}?book=true`}
+                            className="flex-1 btn-primary px-4 py-3 text-sm font-bold rounded-xl text-center hover-lift touch-manipulation"
+                          >
+                            📅 Book Now
+                          </Link>
+                        </div>
                       </div>
-                      <div className="mt-3 flex gap-2">
-                        <Link
-                          to={`/hotels/${h.id}`}
-                          className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200 inline-block"
-                        >
-                          View details
-                        </Link>
-                        <Link
-                          to={`/hotels/${h.id}?book=true`}
-                          className="px-3 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 inline-block"
-                        >
-                          📅 Book Now
-                        </Link>
-                      </div>
+                    </article>
+                  ))}
+                </div>
+
+                <div className="mt-8">
+                  {!loading && error && nextCursor && (
+                    <div className="text-center mb-6">
+                      <button
+                        type="button"
+                        onClick={loadMore}
+                        className="btn-secondary hover-lift touch-manipulation px-6 py-3"
+                      >
+                        🔄 Retry Loading More
+                      </button>
                     </div>
-                  </article>
-                ))}
-              </div>
+                  )}
+                  {nextCursor && (
+                    <div className="flex justify-center">
+                      <button
+                        type="button"
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                        className="btn-primary disabled:opacity-50 hover-lift touch-manipulation px-8 py-4 text-lg font-bold"
+                      >
+                        {loadingMore ? (
+                          <div className="flex items-center gap-3">
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                            Loading More...
+                          </div>
+                        ) : (
+                          "Load More Hotels"
+                        )}
+                      </button>
+                    </div>
+                  )}
+                  {loadingMore && (
+                    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="card-modern animate-pulse">
+                          <div className="aspect-[4/3] bg-slate-200 dark:bg-slate-700 rounded-t-2xl"></div>
+                          <div className="p-6 space-y-3">
+                            <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                            <div className="flex justify-between">
+                              <div className="h-8 w-16 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                              <div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div ref={sentinelRef} className="h-1" />
+                </div>
+              </section>
+            )}
 
-              <div className="mt-6">
-                {!loading && error && nextCursor && (
-                  <div className="mb-3 text-center">
-                    <button
-                      type="button"
-                      onClick={loadMore}
-                      className="btn-secondary"
-                    >
-                      Retry loading more
-                    </button>
-                  </div>
-                )}
-                {nextCursor && (
-                  <div className="flex justify-center">
-                    <button
-                      type="button"
-                      onClick={loadMore}
-                      disabled={loadingMore}
-                      className="btn-secondary disabled:opacity-50"
-                    >
-                      {loadingMore ? "Loading more..." : "Load more"}
-                    </button>
-                  </div>
-                )}
-                {loadingMore && (
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="surface animate-pulse h-64" />
-                    ))}
-                  </div>
-                )}
-                <div ref={sentinelRef} className="h-1" />
+            {!hasHotels && (
+              <div className="text-center py-16">
+                <div className="max-w-md mx-auto">
+                  <div className="text-6xl mb-6">🏨</div>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">No Hotels Found</h3>
+                  <p className="text-slate-600 dark:text-slate-300 mb-8">
+                    We couldn't find any hotels matching your search. Try adjusting your search terms or explore our featured destinations.
+                  </p>
+                  <Link
+                    to="/"
+                    className="btn-primary px-8 py-4 text-lg font-bold hover-lift touch-manipulation inline-block"
+                  >
+                    Explore All Hotels
+                  </Link>
+                </div>
               </div>
-            </section>
-          )}
-
-          {!hasHotels && (
-            <p className="text-sm text-slate-500">No hotels found. Try another search term.</p>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

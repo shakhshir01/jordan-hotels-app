@@ -11,28 +11,32 @@ export default function Wishlist() {
 
   if (wishlist.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-        <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6 mt-8">
-          <div className="absolute inset-0 bg-black/10" />
-          <div className="relative px-4 sm:px-6 py-20 text-center text-white">
-            <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title', 'Your Dream List')}</h1>
-            <p className="text-lg opacity-95">{t('pages.wishlist.subtitle', 'The places you\'re dreaming of, all in one place.')}</p>
-          </div>
-        </section>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12">
-            <div className="text-6xl mb-4">💭</div>
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">{t('pages.wishlist.empty.title')}</h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-              {t('pages.wishlist.empty.body')}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <div className="text-8xl mb-8">💭</div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black gradient-text mb-6">
+              {t('pages.wishlist.title', 'Your Dream List')}
+            </h1>
+            <p className="text-xl text-slate-600 dark:text-slate-300 mb-12 max-w-2xl mx-auto">
+              {t('pages.wishlist.subtitle', 'The places you\'re dreaming of, all in one place.')}
             </p>
-            <Link
-              to="/destinations"
-              className="inline-block px-8 py-3 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white font-bold rounded-full hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
-            >
-              {t('pages.wishlist.empty.cta')}
-            </Link>
+
+            <div className="card-modern max-w-md mx-auto p-8 sm:p-12">
+              <div className="text-6xl mb-6">🏨</div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+                {t('pages.wishlist.empty.title', 'Your wishlist is empty')}
+              </h2>
+              <p className="text-slate-600 dark:text-slate-300 mb-8">
+                {t('pages.wishlist.empty.body', 'Start exploring amazing hotels and experiences to add to your wishlist!')}
+              </p>
+              <Link
+                to="/"
+                className="btn-primary px-8 py-4 text-lg font-bold hover-lift touch-manipulation inline-block"
+              >
+                {t('pages.wishlist.empty.cta', 'Explore Hotels')}
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -40,61 +44,80 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6 mt-8">
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="relative px-4 sm:px-6 py-20 text-center text-white">
-          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.wishlist.title', 'Your Dream List')}</h1>
-          <p className="text-lg opacity-95">{t('pages.wishlist.itemsSaved', { count: wishlist.length, defaultValue: `${wishlist.length} adventures waiting for you` })}</p>
-        </div>
-      </section>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black gradient-text mb-4">
+            {t('pages.wishlist.title', 'Your Dream List')}
+          </h1>
+          <p className="text-xl text-slate-600 dark:text-slate-300">
+            {t('pages.wishlist.itemsSaved', { count: wishlist.length, defaultValue: `${wishlist.length} adventures waiting for you` })}
+          </p>
+        </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 pb-8">
           {wishlist.map((item) => (
-            <article key={item.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-              <div className="relative aspect-[4/3] overflow-hidden">
+            <article key={item.id} className="card-modern group overflow-hidden hover-lift">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
                 <img
                   src={item.image}
                   alt={item.type === 'experience' ? (item.name || '') : getHotelDisplayName(item, i18n.language)}
                   onError={createHotelImageOnErrorHandler(item.id)}
-                  className="w-full h-full object-cover hover:scale-110 transition"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
                 <button
                   onClick={() => removeFromWishlist(item.id)}
-                  className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition"
+                  className="absolute top-4 right-4 bg-red-500/90 hover:bg-red-600 text-white p-3 rounded-2xl shadow-lg hover-lift transition-all duration-300 touch-manipulation"
                   title={t('pages.wishlist.remove')}
                 >
-                  ❌
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
+
                 {item.rating && (
-                  <div className="absolute top-4 left-4 bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-bold">
-                    ★ {item.rating}
+                  <div className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-glow">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <span className="text-sm">{item.rating}</span>
                   </div>
                 )}
               </div>
+
               <div className="p-6">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{item.type === 'experience' ? item.name : getHotelDisplayName(item, i18n.language)}</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm mb-2">{item.location || item.description}</p>
-                
-                <div className="mb-6 space-y-1">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  {item.type === 'experience' ? item.name : getHotelDisplayName(item, i18n.language)}
+                </h3>
+
+                <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2">
+                  {item.location || item.description}
+                </p>
+
+                <div className="mb-6">
                   {item.price && (
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {item.price} JOD{item.type === 'experience' ? '' : ` ${t('hotels.perNight')}`}
-                    </p>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-3xl font-black gradient-text">{item.price}</span>
+                      <span className="text-slate-500 dark:text-slate-400 font-medium">JOD</span>
+                      {item.type !== 'experience' && (
+                        <span className="text-sm text-slate-500 dark:text-slate-400">{t('hotels.perNight')}</span>
+                      )}
+                    </div>
                   )}
                   {item.addedAt && (
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {t('pages.wishlist.savedOn', { date: new Date(item.addedAt).toLocaleDateString() })}
+                      💝 {t('pages.wishlist.savedOn', { date: new Date(item.addedAt).toLocaleDateString() })}
                     </p>
                   )}
                 </div>
 
                 <Link
                   to={item.type === 'experience' ? '/experiences' : `/hotels/${item.id}`}
-                  className="w-full block text-center bg-gradient-to-r from-jordan-blue to-jordan-teal text-white py-2 rounded-lg hover:shadow-lg transition font-bold"
+                  className="btn-primary w-full py-4 text-center font-bold hover-lift touch-manipulation block"
                 >
-                  {t('pages.wishlist.viewDetails')}
+                  {t('pages.wishlist.viewDetails', 'View Details')}
                 </Link>
               </div>
             </article>

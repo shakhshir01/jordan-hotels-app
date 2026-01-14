@@ -166,70 +166,98 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
   );
 
   return (
-    <article className="hotel-card group card-modern mobile-optimized hover-mobile overflow-hidden">
-      <div className="cover relative overflow-hidden">
+    <article className="group relative card-modern overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50">
+      {/* Enhanced Image Container */}
+      <div className="relative overflow-hidden aspect-[4/3] sm:aspect-[16/10]">
         <OptimizedImage
           src={hotel.image || FALLBACK_IMG}
           alt={hotelName}
           width={400}
-          height={250}
+          height={300}
           quality={90}
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
-          className="w-full h-48 sm:h-56 lg:h-64 object-cover transition-all duration-700 group-hover:scale-110"
+          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
+        
+        {/* Enhanced Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
+        {/* Enhanced Badges */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
           {hotel.rating >= 4.5 && (
-            <div className="px-3 py-1.5 sm:px-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse-glow backdrop-blur-sm">
-              Popular
+            <div className="px-4 py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse-glow backdrop-blur-sm border border-white/20">
+              🔥 Popular
+            </div>
+          )}
+          {hotel.price < 50 && (
+            <div className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-full shadow-lg backdrop-blur-sm border border-white/20">
+              💰 Best Deal
             </div>
           )}
         </div>
-        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/95 backdrop-blur-xl text-slate-900 rounded-full shadow-lg border border-white/30 flex items-center gap-1.5 sm:gap-2 font-bold text-xs sm:text-sm">
-          <Star size={14} fill="currentColor" className="text-amber-500 sm:w-[16px] sm:h-[16px]" />
+        
+        {/* Enhanced Rating Badge */}
+        <div className="absolute top-4 right-4 px-4 py-2 bg-white/95 backdrop-blur-xl text-slate-900 rounded-full shadow-lg border border-white/30 flex items-center gap-2 font-bold text-sm">
+          <Star size={16} fill="currentColor" className="text-amber-500" />
           {hotel.rating}
+        </div>
+        
+        {/* Hover Action Button */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="bg-white/90 backdrop-blur-xl rounded-full p-4 shadow-xl transform scale-75 group-hover:scale-100 transition-transform duration-300">
+            <Eye size={24} className="text-slate-900" />
+          </div>
         </div>
       </div>
 
-      <div className="p-4 sm:p-5 lg:p-6">
-        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3 leading-snug line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-          {hotelName}
-        </h3>
-        <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 dark:text-slate-300 mb-4 group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors duration-300">
-          <MapPin size={16} className="text-blue-500 flex-shrink-0 sm:w-5 sm:h-5" />
-          <span className="font-medium truncate">{hotel.location}</span>
-        </div>
-
-        <div className="flex items-center gap-2 sm:gap-3 mb-5 sm:mb-6 flex-wrap">
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-1.5 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 cursor-default backdrop-blur-sm">
-            <Wifi size={14} />
-            <span className="hidden xs:inline font-medium">WiFi</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-1.5 rounded-full hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300 cursor-default backdrop-blur-sm">
-            <Car size={14} />
-            <span className="hidden xs:inline font-medium">Parking</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-1.5 rounded-full hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-300 cursor-default backdrop-blur-sm">
-            <Utensils size={14} />
-            <span className="hidden xs:inline font-medium">Restaurant</span>
+      {/* Enhanced Content */}
+      <div className="p-6 sm:p-8">
+        {/* Title and Location */}
+        <div className="mb-4">
+          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2 leading-tight line-clamp-2 group-hover:text-jordan-blue dark:group-hover:text-jordan-blue transition-colors duration-300">
+            {hotelName}
+          </h3>
+          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+            <MapPin size={18} className="text-jordan-rose flex-shrink-0" />
+            <span className="font-medium truncate text-sm sm:text-base">{hotel.location}</span>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between pt-4 sm:pt-5 lg:pt-6 border-t border-slate-200/50 dark:border-slate-600/50 gap-4 sm:gap-0">
+        {/* Enhanced Amenities */}
+        <div className="flex items-center gap-3 mb-6 flex-wrap">
+          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-jordan-blue/10 hover:text-jordan-blue transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50">
+            <Wifi size={16} />
+            <span className="hidden sm:inline font-medium">WiFi</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50">
+            <Car size={16} />
+            <span className="hidden sm:inline font-medium">Parking</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 px-3 py-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-600 transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50">
+            <Utensils size={16} />
+            <span className="hidden sm:inline font-medium">Restaurant</span>
+          </div>
+        </div>
+
+        {/* Enhanced Price and CTA */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-6 border-t border-slate-200/50 dark:border-slate-600/50">
           <div className="flex-1">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-slate-100 mb-1">
+            <div className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 mb-1">
               From <span className="gradient-text">{hotel.price}</span> {hotel.currency || "JOD"}
             </div>
-            <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">per night</div>
+            <div className="text-slate-500 dark:text-slate-400 font-medium text-sm">per night • Free cancellation</div>
           </div>
           <Link
             to={`/hotels/${hotel.id}`}
-            className="btn-primary inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 lg:px-8 lg:py-4 text-sm sm:text-base lg:text-lg rounded-2xl shadow-lg hover:shadow-glow-purple transition-all duration-300 transform hover:scale-105 active:scale-95 touch-manipulation min-h-[48px] w-full sm:w-auto font-bold"
+            className="group/btn inline-flex items-center justify-center gap-3 px-6 py-4 sm:px-8 sm:py-4 bg-gradient-to-r from-jordan-blue to-jordan-teal hover:from-jordan-teal hover:to-jordan-blue text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 touch-manipulation min-h-[56px] w-full sm:w-auto text-sm sm:text-base"
           >
-            <Eye size={18} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
-            {viewLabel}
+            <Eye size={20} className="sm:w-6 sm:h-6" />
+            <span>{viewLabel}</span>
+            <svg className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
       </div>
@@ -428,50 +456,93 @@ const Home = () => {
         <meta property="og:url" content="https://visitjo.com/" />
         <link rel="canonical" href="https://visitjo.com/" />
       </Helmet>
-      <section className="relative rounded-3xl overflow-hidden gradient-hero shadow-glow mb-16 animate-float">
-        <div className="absolute inset-0 gradient-mesh" />
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative px-6 py-24 md:py-32 lg:py-40 text-center text-gray-900 dark:text-white">
-          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-6 animate-fade-in bg-white/10 dark:bg-black/10 backdrop-blur-sm rounded-full px-4 py-2 inline-block">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Enhanced Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-jordan-blue via-jordan-teal to-jordan-rose animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        
+        {/* Animated Mesh Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-jordan-gold/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-jordan-rose/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-jordan-teal/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        {/* Floating Geometric Shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-16 left-16 w-4 h-4 bg-white/20 rotate-45 animate-float" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute top-32 right-20 w-6 h-6 bg-jordan-gold/30 rounded-full animate-float" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute bottom-24 left-24 w-3 h-3 bg-jordan-rose/25 rotate-12 animate-float" style={{ animationDelay: '2.5s' }}></div>
+          <div className="absolute bottom-32 right-32 w-5 h-5 bg-jordan-teal/20 rounded-full animate-float" style={{ animationDelay: '3.5s' }}></div>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Enhanced Badge */}
+          <div className="inline-flex items-center gap-2 px-6 py-3 mb-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white/90 text-sm font-semibold uppercase tracking-widest shadow-2xl animate-fade-in">
+            <div className="w-2 h-2 bg-jordan-gold rounded-full animate-pulse"></div>
             {t("home.hero.kicker", "The Kingdom of Time")}
+            <div className="w-2 h-2 bg-jordan-gold rounded-full animate-pulse"></div>
           </div>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black font-display mb-8 tracking-tight leading-tight animate-slide-up">
-            {t("home.hero.titleMain", "Experience Jordan's")}{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-jordan-blue via-jordan-teal to-jordan-rose animate-pulse-glow">
+
+          {/* Enhanced Title */}
+          <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black font-display mb-8 tracking-tight leading-tight animate-slide-up">
+            <span className="block text-white drop-shadow-2xl mb-2">{t("home.hero.titleMain", "Experience Jordan's")}</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl">
               {t("home.hero.titleAccent", "Timeless Magic")}
             </span>
           </h1>
-          <p className="text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto opacity-95 mb-16 leading-relaxed animate-fade-in font-light">
+
+          {/* Enhanced Subtitle */}
+          <p className="text-xl sm:text-2xl lg:text-3xl max-w-5xl mx-auto mb-16 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
             {t("home.hero.subtitle", "Journey through ancient cities, float in healing waters, and sleep under desert stars. Your perfect Jordanian adventure starts here.")}
           </p>
 
-          <div className="search-bar max-w-4xl mx-auto animate-slide-up">
-            <input
-              className="flex-1 px-4 sm:px-6 py-3 sm:py-4 bg-white/20 backdrop-blur-xl text-white placeholder-white/70 outline-none text-base sm:text-lg lg:text-xl rounded-full sm:rounded-none sm:rounded-l-full border-b sm:border-b-0 sm:border-r border-white/30 sm:border-r-white/30 focus:border-white/50 transition-all duration-300 input-mobile shadow-lg"
-              placeholder={t("home.hero.searchPlaceholder", "Where do you want to go?")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
-            <button
-              onClick={handleSearch}
-              className="mt-4 sm:mt-0 px-8 sm:px-10 lg:px-12 py-4 sm:py-4 lg:py-5 bg-gradient-to-r from-jordan-blue to-jordan-teal hover:from-jordan-teal hover:to-jordan-blue backdrop-blur-sm text-white font-bold rounded-full sm:rounded-none sm:rounded-r-full shadow-xl hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 touch-manipulation min-h-[56px] w-full sm:w-auto text-lg hover:scale-105"
-            >
-              <Search size={24} className="text-white" />
-              <span className="hidden sm:inline lg:text-lg font-semibold">{t("home.hero.findStays", "Find Stays")}</span>
-            </button>
+          {/* Enhanced Search Bar */}
+          <div className="max-w-4xl mx-auto mb-12 animate-slide-up" style={{ animationDelay: '0.6s' }}>
+            <div className="flex flex-col sm:flex-row gap-4 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-2 shadow-2xl">
+              <input
+                className="flex-1 px-6 py-4 bg-transparent text-white placeholder-white/60 outline-none text-lg sm:text-xl rounded-2xl border-0 focus:ring-2 focus:ring-white/30 transition-all duration-300"
+                placeholder={t("home.hero.searchPlaceholder", "Where do you want to go?")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+              <button
+                onClick={handleSearch}
+                className="px-8 py-4 bg-gradient-to-r from-jordan-gold to-jordan-rose hover:from-jordan-rose hover:to-jordan-gold text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-105 active:scale-95 min-h-[56px]"
+              >
+                <Search size={24} />
+                <span className="hidden sm:inline text-lg font-semibold">{t("home.hero.findStays", "Find Stays")}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Decorative elements */}
-          <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-float" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-20 right-10 w-24 h-24 bg-yellow-300/20 rounded-full blur-lg animate-float" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full blur-md animate-float" style={{ animationDelay: '3s' }} />
-          
-          {/* Simple Decorative Element */}
-          <div className="absolute top-16 right-16 w-20 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 shadow-lg animate-float opacity-80" style={{ animationDelay: '4s' }}>
-            <div className="w-full h-full rounded-lg bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-800 flex items-center justify-center">
-              <div className="w-6 h-6 bg-gray-600 dark:bg-gray-400 rounded-full"></div>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.9s' }}>
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-black text-white mb-2">500+</div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Hotels</div>
             </div>
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-black text-white mb-2">50+</div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-black text-white mb-2">4.8★</div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Average Rating</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-black text-white mb-2">24/7</div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Support</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
           </div>
         </div>
       </section>
@@ -633,10 +704,9 @@ const Home = () => {
                 {isLocationBased ? "Recommendations for you" : "Best Rated Hotels"}
               </h2>
               <p className="page-subtitle">
-                Handpicked stays near you — based on your location when available.
                 {isLocationBased
-                  ? "Handpicked stays near you — based on your location."
-                  : "Discover the highest rated stays across Jordan."}
+                  ? "Discover top-rated stays near you, carefully handpicked"
+                  : "Find the best-reviewed stays throughout Jordan"}
               </p>
             </header>
 

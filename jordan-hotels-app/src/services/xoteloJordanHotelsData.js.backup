@@ -6775,7 +6775,7 @@ export const XOTELO_JORDAN_HOTELS = [
     "nameAr": "",
     "location": "Aqaba",
     "destination": "Aqaba",
-    "price": 929,
+    "price": 200,
     "currency": "JOD",
     "rating": 5,
     "reviews": 340,

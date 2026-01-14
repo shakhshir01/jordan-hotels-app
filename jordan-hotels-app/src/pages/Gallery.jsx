@@ -5,6 +5,8 @@ import hotelsService from '../services/hotelsService';
 import { hotelAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const GallerySkeleton = () => {
   const skeletonCards = Array.from({ length: 3 });
@@ -125,15 +127,16 @@ export default function Gallery() {
                       {hotel.images.map((img, idx) => (
                         <div key={idx} className="rounded-lg overflow-hidden shadow-md hover:shadow-xl transition group cursor-pointer">
                           <div className="relative aspect-[4/3] bg-slate-200 overflow-hidden">
-                            <img 
+                            <LazyLoadImage 
                               src={img} 
                               alt={`${hotelName} - Image ${idx + 1}`}
                               className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                              effect="blur"
+                              threshold={300}
                               onError={(e) => {
                                 e.currentTarget.src = FALLBACK_IMG;
                               }}
-                              loading="lazy"
-                              decoding="async"
+                              wrapperClassName="w-full h-full"
                               referrerPolicy="no-referrer"
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition"></div>

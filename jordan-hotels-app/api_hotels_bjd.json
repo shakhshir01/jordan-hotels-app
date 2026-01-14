@@ -263,8 +263,8 @@
         "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/ee/3f/17/caption.jpg"
       ],
       "priceRanges": {
-        "maximum": 1255,
-        "minimum": 929
+        "maximum": 400,
+        "minimum": 200
       },
       "destination": "Aqaba",
       "description": "",

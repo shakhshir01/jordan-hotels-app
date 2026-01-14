@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle } from 'lucide-react';
+import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle, X } from 'lucide-react';
 import hotelsService from '../services/hotelsService';
 import WishlistButton from '../components/WishlistButton';
 import HotelGallery from '../components/HotelGallery';
@@ -52,6 +52,7 @@ const HotelDetails = () => {
   const [guests, setGuests] = useState('1');
   const [selectedRoomType, setSelectedRoomType] = useState('');
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [showMobileBooking, setShowMobileBooking] = useState(false);
   // Booking fees and policies
   const bookingFees = {
     serviceFee: 15, // JOD
@@ -261,13 +262,200 @@ const HotelDetails = () => {
   };
 
   return (
-    <div className="space-section">
+    <div className="space-section pb-24 lg:pb-8">
       <Seo
         title={`${hotelName} | VisitJo`}
         description={descriptionText}
         canonicalUrl={canonicalUrl}
         jsonLd={jsonLdGraph}
       />
+
+      {/* Mobile Booking Bar - Fixed at bottom */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200/50 dark:border-slate-700/50 p-4 safe-area-inset-bottom">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-end gap-2 mb-1">
+              <span className="text-2xl font-black gradient-text">{hotel.price}</span>
+              <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">JOD</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate">
+              {checkInDate && checkOutDate ? `${calculatePriceBreakdown().nights} nights` : 'Select dates'}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowMobileBooking(true)}
+            className="btn-primary px-6 py-3 text-sm font-bold rounded-xl hover-lift touch-manipulation flex-shrink-0"
+          >
+            Reserve
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Booking Modal */}
+      {showMobileBooking && (
+        <div className="lg:hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm" onClick={() => setShowMobileBooking(false)}>
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-900 rounded-t-3xl max-h-[90vh] overflow-y-auto safe-area-inset-bottom" onClick={e => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200/50 dark:border-slate-700/50 p-4 rounded-t-3xl">
+              <div className="w-12 h-1 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-4"></div>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Book Your Stay</h3>
+                <button
+                  onClick={() => setShowMobileBooking(false)}
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-6">
+              {/* Mobile booking form content */}
+              <div className="space-y-6">
+                {/* Check-in Date */}
+                <div>
+                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                    {t('hotelDetails.booking.checkIn')}
+                  </label>
+                  <input
+                    type="date"
+                    value={checkInDate}
+                    onChange={(e) => setCheckInDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-base touch-manipulation"
+                    required
+                  />
+                </div>
+
+                {/* Check-out Date */}
+                <div>
+                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                    {t('hotelDetails.booking.checkOut')}
+                  </label>
+                  <input
+                    type="date"
+                    value={checkOutDate}
+                    onChange={(e) => setCheckOutDate(e.target.value)}
+                    min={checkInDate || new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-base touch-manipulation"
+                    required
+                  />
+                </div>
+
+                {/* Number of Guests */}
+                <div>
+                  <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                    {t('hotelDetails.booking.guests')}
+                  </label>
+                  <select
+                    value={guests}
+                    onChange={(e) => setGuests(e.target.value)}
+                    className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-base touch-manipulation"
+                  >
+                    <option value="1">{t('hotelDetails.booking.guestCount', { count: 1 })}</option>
+                    <option value="2">{t('hotelDetails.booking.guestCount', { count: 2 })}</option>
+                    <option value="3">{t('hotelDetails.booking.guestCount', { count: 3 })}</option>
+                    <option value="4">{t('hotelDetails.booking.guestCount', { count: 4 })}</option>
+                    <option value="5">{t('hotelDetails.booking.guestCountPlus')}</option>
+                  </select>
+                </div>
+
+                {/* Room Type Selection */}
+                {hotel.roomTypes && hotel.roomTypes.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                      {t('hotelDetails.booking.roomType')}
+                    </label>
+                    <select
+                      value={selectedRoomType}
+                      onChange={(e) => setSelectedRoomType(e.target.value)}
+                      className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-base touch-manipulation"
+                    >
+                      <option value="">{t('hotelDetails.booking.selectRoomType')}</option>
+                      {hotel.roomTypes.map((roomType, index) => (
+                        <option key={index} value={roomType.name}>
+                          {roomType.name} - {roomType.price} JOD ({t('hotelDetails.booking.capacity')}: {roomType.capacity})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Price Breakdown */}
+                <div className="glass-card rounded-2xl p-6 border border-white/20">
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-6 text-lg">💰 Price Breakdown</h3>
+                  {(() => {
+                    const breakdown = calculatePriceBreakdown();
+                    return (
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center py-2">
+                          <span className="text-slate-700 dark:text-slate-300">{breakdown.basePrice} JOD × {breakdown.nights} nights</span>
+                          <span className="font-semibold text-slate-900 dark:text-slate-100">{breakdown.subtotal.toLocaleString()} JOD</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
+                          <span>Service fee</span>
+                          <span>{breakdown.serviceFee} JOD</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
+                          <span>Cleaning fee</span>
+                          <span>{breakdown.cleaningFee} JOD</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
+                          <span>Taxes (16% VAT)</span>
+                          <span>{breakdown.tax} JOD</span>
+                        </div>
+                        <div className="border-t border-slate-200/70 dark:border-slate-700/60 pt-4 mt-4 flex justify-between items-center">
+                          <span className="font-black text-slate-900 dark:text-slate-100 text-xl">Total</span>
+                          <span className="font-black gradient-text text-2xl">{breakdown.total.toLocaleString()} JOD</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Cancellation Policy */}
+                <div className="glass-card rounded-2xl p-6 border border-white/20">
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-3">
+                    <AlertCircle size={20} className="text-amber-500" />
+                    Cancellation Policy
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-green-50 dark:bg-green-900/20">
+                      <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-slate-700 dark:text-slate-300">{cancellationPolicy.free}</span>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-yellow-50 dark:bg-yellow-900/20">
+                      <AlertCircle size={16} className="text-yellow-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-slate-700 dark:text-slate-300">{cancellationPolicy.partial}</span>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-red-50 dark:bg-red-900/20">
+                      <AlertCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-slate-700 dark:text-slate-300">{cancellationPolicy.noRefund}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleBooking}
+                  disabled={bookingLoading || !checkInDate}
+                  className="btn-primary w-full py-5 text-lg font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover-lift touch-manipulation"
+                >
+                  {bookingLoading ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <Loader2 size={20} className="animate-spin" />
+                      {t('hotelDetails.booking.bookingLoading')}
+                    </div>
+                  ) : (
+                    <span>{t('hotelDetails.booking.reserveNow')}</span>
+                  )}
+                </button>
+
+                <p className="text-center text-slate-500 dark:text-slate-400 text-sm font-medium">
+                  🔒 {t('hotelDetails.booking.noChargeYet')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modern Breadcrumbs */}
       <nav className="glass-card rounded-2xl p-4 mb-8 shadow-glow">
@@ -317,40 +505,40 @@ const HotelDetails = () => {
           <section className="card-modern">
             <div className="p-6 sm:p-8 lg:p-10">
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-8 gradient-text">{t('hotelDetails.offers.title')}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-glow transition-all duration-300 group">
-                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300">
-                    <Wifi className="text-white" size={28} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-glow transition-all duration-300 group">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
+                    <Wifi className="text-white" size={24} />
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-lg">{t('hotelDetails.offers.wifi.title')}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">{t('hotelDetails.offers.wifi.title')}</p>
                     <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.wifi.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-glow transition-all duration-300 group">
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300">
-                    <Coffee className="text-white" size={28} />
+                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-glow transition-all duration-300 group">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
+                    <Coffee className="text-white" size={24} />
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-lg">{t('hotelDetails.offers.breakfast.title')}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">{t('hotelDetails.offers.breakfast.title')}</p>
                     <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.breakfast.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 hover:shadow-glow transition-all duration-300 group">
-                  <div className="bg-gradient-to-r from-purple-500 to-violet-600 p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300">
-                    <Car className="text-white" size={28} />
+                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 hover:shadow-glow transition-all duration-300 group">
+                  <div className="bg-gradient-to-r from-purple-500 to-violet-600 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
+                    <Car className="text-white" size={24} />
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-lg">{t('hotelDetails.offers.parking.title')}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">{t('hotelDetails.offers.parking.title')}</p>
                     <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.parking.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-5 p-4 rounded-2xl bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 hover:shadow-glow transition-all duration-300 group">
-                  <div className="bg-gradient-to-r from-pink-500 to-rose-600 p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300">
-                    <CheckCircle className="text-white" size={28} />
+                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 hover:shadow-glow transition-all duration-300 group">
+                  <div className="bg-gradient-to-r from-pink-500 to-rose-600 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
+                    <CheckCircle className="text-white" size={24} />
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-lg">{t('hotelDetails.offers.frontDesk.title')}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">{t('hotelDetails.offers.frontDesk.title')}</p>
                     <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.frontDesk.subtitle')}</p>
                   </div>
                 </div>
@@ -362,10 +550,10 @@ const HotelDetails = () => {
             <div className="p-6 sm:p-8 lg:p-10">
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-6 gradient-text">{t('hotelDetails.about.title')}</h3>
               <div className="prose prose-lg dark:prose-invert max-w-none">
-                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg mb-6">
+                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-base sm:text-lg mb-6">
                   {hotel.description || t('hotelDetails.about.fallbackDescription')}
                 </p>
-                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg">
+                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-base sm:text-lg">
                   {t('hotelDetails.about.extra')}
                 </p>
               </div>
@@ -373,8 +561,8 @@ const HotelDetails = () => {
           </section>
         </div>
 
-        {/* Right Column: Booking Sidebar */}
-        <aside className="card-modern lg:sticky lg:top-24 h-fit">
+        {/* Right Column: Booking Sidebar - Desktop Only */}
+        <aside className="hidden lg:block card-modern lg:sticky lg:top-24 h-fit">
           <div className="p-6 sm:p-8 lg:p-10">
             <div className="mb-8">
               <div className="flex justify-between items-end mb-3 gap-3">
