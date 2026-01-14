@@ -2,7 +2,7 @@
 // This file is safe to commit. It is loaded at runtime before the app boots.
 window.__VISITJO_RUNTIME_CONFIG__ = {
   OPENAI_API_KEY: "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",
-  VITE_API_GATEWAY_URL: "https://lk8nfjc7m1.execute-api.us-east-1.amazonaws.com/prod",
+  VITE_API_GATEWAY_URL: "https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod",
   VITE_COGNITO_CLIENT_ID: "1v5kg2qprjtsnvia0hikm1blvd",
   VITE_COGNITO_DOMAIN: "us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com",
   VITE_COGNITO_USER_POOL_ID: "us-east-1_T5vYoBi0N",

@@ -101,7 +101,7 @@ export default function SearchResults() {
     } finally {
       if (requestIdRef.current === rid) setLoading(false);
     }
-  }, [term]);
+  }, [term, topRated]);
 
   const loadMore = useCallback(async () => {
     if (loading || loadingMore) return;
@@ -142,7 +142,7 @@ export default function SearchResults() {
     } finally {
       if (requestIdRef.current === rid) setLoadingMore(false);
     }
-  }, [loading, loadingMore, nextCursor, term]);
+  }, [loading, loadingMore, nextCursor, term, topRated, hotels.length]);
 
   useEffect(() => {
     resetAndLoad();

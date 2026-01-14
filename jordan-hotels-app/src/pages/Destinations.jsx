@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, MapPin, Camera, Star, Clock, Users, Calendar, ArrowRight, Compass, Mountain, Waves, Castle, Sun } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -71,7 +71,7 @@ export default function Destinations() {
   const { t, i18n } = useTranslation();
   const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
 
-    const loadDestinationData = async () => {
+  const loadDestinationData = useCallback(async () => {
       try {
         setError("");
         setLoading(true);
@@ -136,11 +136,11 @@ export default function Destinations() {
       } finally {
         setLoading(false);
       }
-    };
+    }, [isArabic]);
 
   useEffect(() => {
     loadDestinationData();
-  }, [isArabic]);
+  }, [loadDestinationData]);
 
   // Use the processed destinations data
   const destinations = destinationsData;

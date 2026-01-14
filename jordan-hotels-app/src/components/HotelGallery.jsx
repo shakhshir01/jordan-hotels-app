@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { X, ChevronLeft, ChevronRight, Grid } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 import { staticHotelPrices } from '../data/staticHotelPrices';
@@ -8,7 +8,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Ensure we have at least some images
-  const displayImages = images.length > 0 ? images : ['/placeholder-hotel.jpg'];
+  const displayImages = useMemo(() => images.length > 0 ? images : ['/placeholder-hotel.jpg'], [images]);
   const mainImage = displayImages[0];
   const sideImages = displayImages.slice(1, 5);
   const remainingCount = Math.max(0, displayImages.length - 5);
@@ -30,12 +30,12 @@ const HotelGallery = ({ images = [], hotelName }) => {
   const nextImage = useCallback((e) => {
     e?.stopPropagation();
     setCurrentIndex((prev) => (prev + 1) % displayImages.length);
-  }, [displayImages.length]);
+  }, [displayImages]);
 
   const prevImage = useCallback((e) => {
     e?.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
-  }, [displayImages.length]);
+  }, [displayImages]);
 
   useEffect(() => {
     if (!showLightbox) return;

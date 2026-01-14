@@ -83,23 +83,6 @@ const Verify = () => {
           <span className="font-bold text-blue-900">{email}</span>
         </p>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
-            <div>
-              <p className="text-red-900 font-bold text-sm">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Success Message */}
-        {successMsg && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-900 font-bold text-sm">{successMsg}</p>
-          </div>
-        )}
-
         {/* Code Input */}
         <div className="mb-6">
           <label className="block text-sm font-bold text-slate-700 mb-3">{t('auth.verifyCode')}</label>

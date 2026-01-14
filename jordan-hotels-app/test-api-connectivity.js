@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const testAPI = async () => {
-  const apiUrl = 'https://lk8nfjc7m1.execute-api.us-east-1.amazonaws.com/prod';
+  const apiUrl = 'https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod';
   
   console.log('🔍 Testing API Gateway connectivity...');
   console.log(`API URL: ${apiUrl}`);

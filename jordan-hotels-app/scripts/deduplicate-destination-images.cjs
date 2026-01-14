@@ -37,5 +37,3 @@ for (const key of Object.keys(allImages)) {
 
 fs.writeFileSync('deduplicated-destination-images.json', JSON.stringify(allImages, null, 2));
 console.log('Done! Deduplicated images saved to deduplicated-destination-images.json');
-
-node ./jordan-hotels-app/scripts/seed-destinations.mjs

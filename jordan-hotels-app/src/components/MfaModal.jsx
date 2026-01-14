@@ -7,7 +7,7 @@ import QRCode from 'qrcode';
 import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function MfaModal() {
-  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa, verifyLoginTotpMfa, login, completePreAuthLogin } = useAuth();
+  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa, verifyLoginTotpMfa, login } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [code, setCode] = useState('');
@@ -89,7 +89,7 @@ export default function MfaModal() {
               clearMfaChallenge();
               setCode('');
             }
-          } catch (loginErr) {
+          } catch (_loginErr) {
             showError('Login failed. Please check your credentials.');
             clearMfaChallenge();
             setCode('');

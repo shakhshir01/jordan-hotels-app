@@ -9,7 +9,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { MapPin, Search, Star, AlertCircle, Loader2, Eye, Wifi, Car, Utensils, Filter, X, SlidersHorizontal } from "lucide-react";
 import { hotelAPI } from "../services/api";
-import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
@@ -164,11 +163,6 @@ const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel
   const hotelName = useMemo(
     () => getHotelDisplayName(hotel, i18nLanguage),
     [hotel, i18nLanguage]
-  );
-
-  const onImgError = useMemo(
-    () => createHotelImageOnErrorHandler(hotel.id, FALLBACK_IMG),
-    [hotel.id]
   );
 
   return (
@@ -414,7 +408,7 @@ const Home = () => {
     }
 
     return filtered;
-  }, [hotels, priceRange, minRating, selectedAmenities, sortBy]);
+  }, [hotels, priceRange, minRating, sortBy]);
 
   const clearFilters = () => {
     setPriceRange([0, 500]);

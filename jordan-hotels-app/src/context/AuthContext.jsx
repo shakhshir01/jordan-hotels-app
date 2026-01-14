@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
   const [mfaMethod, setMfaMethod] = useState(null);
   const [pendingSecondaryEmail, setPendingSecondaryEmail] = useState(null);
   const cognitoUserRef = React.useRef(null);
+  const forgotPasswordUserRef = React.useRef(null);
 
   const setUserAndProfileFromEmail = (email) => {
     const derived = deriveNameFromEmail(email);
@@ -167,14 +168,15 @@ export const AuthProvider = ({ children }) => {
 
       // Check localStorage for MFA status first
       const storedMfaEnabled = localStorage.getItem(`visitjo.mfaEnabled.${email}`) === '1';
+      const storedMfaMethod = localStorage.getItem(`visitjo.mfaMethod.${email}`) || 'EMAIL';
 
-      if (storedMfaEnabled) {
-        // MFA is enabled according to localStorage, show challenge first
+      if (storedMfaEnabled && storedMfaMethod !== 'EMAIL') {
+        // MFA is enabled according to localStorage, show challenge first (but not for EMAIL MFA)
         setMfaEnabled(true);
-        setMfaMethod(localStorage.getItem(`visitjo.mfaMethod.${email}`) || 'EMAIL');
+        setMfaMethod(storedMfaMethod);
         setMfaChallenge({
-          type: 'EMAIL_MFA',
-          message: 'Enter the 6-digit code sent to your email',
+          type: storedMfaMethod === 'TOTP' ? 'TOTP_MFA' : 'SOFTWARE_TOKEN_MFA',
+          message: 'Enter your authenticator code',
           preAuth: true,
           email,
           password
@@ -776,6 +778,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       const cognitoUser = new CognitoUser({ Username: email, Pool: UserPool });
+      forgotPasswordUserRef.current = cognitoUser;
       cognitoUser.forgotPassword({
         onSuccess: function (data) {
           resolve(data);
@@ -795,7 +798,7 @@ export const AuthProvider = ({ children }) => {
         reject(new Error('Authentication service not available'));
         return;
       }
-      const cognitoUser = new CognitoUser({ Username: email, Pool: UserPool });
+      const cognitoUser = forgotPasswordUserRef.current || new CognitoUser({ Username: email, Pool: UserPool });
       cognitoUser.confirmPassword(code, newPassword, {
         onSuccess: async function (data) {
           try {
@@ -806,6 +809,8 @@ export const AuthProvider = ({ children }) => {
             console.warn('Failed to disable MFA after password reset:', mfaError);
             // Don't fail the password reset if MFA disable fails
           }
+          // Clear the ref after successful password reset
+          forgotPasswordUserRef.current = null;
           resolve(data);
         },
         onFailure: function (err) {

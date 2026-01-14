@@ -106,7 +106,7 @@ apiClient.interceptors.request.use((config) => {
     const baseUrl = getApiBaseUrl(config.url);
     config.baseURL = baseUrl;
   }
-  return config;h
+  return config;
 });
 
 // Export function to set auth token (used by AuthContext)
