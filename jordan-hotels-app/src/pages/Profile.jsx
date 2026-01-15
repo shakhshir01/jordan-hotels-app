@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, LogOut, Edit2, Check, X, Calendar, Users } from 'lucide-react';
+import { User, Mail, LogOut, Edit2, Check, X, Calendar, Users, AlertCircle } from 'lucide-react';
 import { showSuccess, showError } from '../services/toastService';
 import { InlineLoader } from '../components/LoadingSpinner';
 import { hotelAPI } from '../services/api';
@@ -260,6 +260,15 @@ const Profile = () => {
   return (
     <div className="min-h-screen gradient-hero py-12">
       <div className="max-w-4xl mx-auto px-4">
+        {/* Email Verification Alert */}
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl flex items-start gap-3">
+          <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={20} />
+          <div>
+            <p className="text-yellow-900 font-bold text-sm">Email Verification Temporarily Unavailable</p>
+            <p className="text-yellow-800 text-sm">We're working to restore email verification. Please contact support if you need assistance with account verification.</p>
+          </div>
+        </div>
+
         {/* Profile Card */}
         <div className="glass-card card-modern p-8 mb-8 animate-fade-in">
           <div className="flex items-start justify-between mb-6">
