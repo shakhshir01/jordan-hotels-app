@@ -9,58 +9,58 @@ import Seo from '../components/Seo.jsx';
 
 const DESTINATION_DETAILS = {
   'Dead Sea': {
-    desc: 'Float effortlessly in the mineral-rich waters of the lowest point on Earth.',
+    desc: 'Experience the world\'s most extraordinary spa treatment at 1,412 feet below sea level. Float effortlessly in mineral-rich waters that heal and rejuvenate, surrounded by dramatic desert landscapes and ancient salt formations.',
     descAr: 'اختبر أخفض نقطة على سطح الأرض بمياه غنية بالمعادن',
     nameAr: 'البحر الميت',
     emoji: '💧',
-    activities: ['Spa Treatments', 'Mud Therapy', 'Floating', 'Sunbathing'],
+    activities: ['Therapeutic Spa Treatments', 'Mud Therapy & Skin Care', 'Floating Meditation', 'Sunset Desert Walks'],
     bestTime: 'Year-round',
     duration: '1-2 days',
-    highlights: ['Lowest point on Earth', 'Therapeutic mud', 'Salt harvesting', 'Desert views'],
+    highlights: ['Lowest point on Earth', 'Therapeutic mud baths', 'Salt harvesting traditions', 'Stunning desert sunsets'],
     icon: Waves,
   },
   'Amman': {
-    desc: 'A mesmerizing blend of ancient Roman history and vibrant modern culture.',
+    desc: 'Jordan\'s vibrant capital blends 7,000 years of history with modern sophistication. Wander through ancient Roman theaters, explore bustling souqs, and discover world-class museums in this fascinating city of contrasts.',
     descAr: 'العاصمة بتاريخ روماني وأسواق نابضة بالحياة وثقافة حديثة',
     nameAr: 'عمّان',
     emoji: '🏛️',
-    activities: ['Roman Theater', 'Citadel Tour', 'Souq Shopping', 'Street Food'],
+    activities: ['Roman Theater Exploration', 'Citadel Archaeological Site', 'Rainbow Street Shopping', 'Contemporary Art Galleries'],
     bestTime: 'March-May, Sep-Nov',
     duration: '2-3 days',
-    highlights: ['Roman Theater', 'Amman Citadel', 'Rainbow Street', 'Modern art scene'],
+    highlights: ['Roman Theater & Citadel', 'Rainbow Street nightlife', 'Modern art scene', 'Culinary adventures'],
     icon: Castle,
   },
   'Petra': {
-    desc: 'Walk through history in the Rose City, a world wonder carved into red stone.',
+    desc: 'Marvel at one of the world\'s most spectacular archaeological sites - the Rose City carved directly into vibrant red sandstone cliffs. Walk through 2,000 years of history in this UNESCO World Heritage wonder.',
     descAr: 'موقع تراث عالمي لليونسكو — المدينة الوردية الأسطورية المنحوتة في الصخر',
     nameAr: 'البتراء',
     emoji: '🪨',
-    activities: ['Petra Tour', 'Horse Riding', 'Camel Safari', 'Bedouin Camp'],
+    activities: ['Petra Archaeological Park Tour', 'Horse & Camel Riding', 'Bedouin Camp Experience', 'Siq Canyon Exploration'],
     bestTime: 'March-May, Sep-Nov',
     duration: '1-2 days',
-    highlights: ['Treasury Building', 'Monastery', 'Siq Canyon', 'Caravan routes'],
+    highlights: ['Treasury & Monastery', 'Siq Canyon entrance', 'Caravan trade routes', 'Bedouin hospitality'],
     icon: Mountain,
   },
   'Aqaba': {
-    desc: 'Dive into the crystal-clear waters and vibrant coral reefs of the Red Sea.',
+    desc: 'Jordan\'s only coastal city offers pristine Red Sea diving, luxury beach resorts, and duty-free shopping. Explore vibrant coral reefs, relax on golden beaches, and experience underwater adventures in crystal-clear waters.',
     descAr: 'منتجع شاطئي على البحر الأحمر مع الغوص والرياضات المائية وشعاب مرجانية خلابة',
     nameAr: 'العقبة',
     emoji: '🏖️',
-    activities: ['Scuba Diving', 'Snorkeling', 'Boat Tours', 'Beach Relaxation'],
+    activities: ['Scuba Diving & Snorkeling', 'Boat Tours & Yachting', 'Beach Relaxation', 'Duty-Free Shopping'],
     bestTime: 'April-June, Sep-Oct',
     duration: '3-5 days',
-    highlights: ['Coral reefs', 'Marine life', 'Ayla Oasis', 'Duty-free shopping'],
+    highlights: ['Vibrant coral reefs', 'Marine biodiversity', 'Ayla Oasis development', 'Duty-free paradise'],
     icon: Sun,
   },
   'Wadi Rum': {
-    desc: 'Lose yourself in the Martian landscapes of the Valley of the Moon.',
+    desc: 'Venture into a desert wilderness that inspired T.E. Lawrence and served as a filming location for Star Wars and The Martian. Camp under star-filled skies and experience authentic Bedouin hospitality.',
     descAr: 'مناظر صحراوية تشبه سطح المريخ ومخيمات بدوية وتجارب مغامرة',
     nameAr: 'وادي رم',
     emoji: '🏜️',
-    activities: ['Desert Safari', 'Stargazing', 'Rock Climbing', 'Bedouin Experience'],
+    activities: ['4x4 Desert Safari', 'Stargazing & Astronomy', 'Rock Climbing Adventures', 'Traditional Bedouin Meals'],
     bestTime: 'October-April',
     duration: '1-2 days',
-    highlights: ['Sand dunes', 'Rock formations', 'Lawrence Spring', 'Bedouin culture'],
+    highlights: ['Massive sand dunes', 'Ancient rock formations', 'Lawrence Spring', 'Authentic Bedouin culture'],
     icon: Compass,
   },
 };
@@ -158,10 +158,10 @@ export default function Destinations() {
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 text-center text-white">
-          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.destinations.hero.kicker', 'Explore Jordan')}</div>
-          <h1 className="text-5xl md:text-6xl font-black font-display mb-6 tracking-tight">{t('pages.destinations.hero.title', 'Journey Through Time')}</h1>
+          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.destinations.hero.kicker', 'Explore the Extraordinary')}</div>
+          <h1 className="text-5xl md:text-6xl font-black font-display mb-6 tracking-tight">{t('pages.destinations.hero.title', 'Jordan\'s Iconic Destinations')}</h1>
           <p className="text-lg max-w-3xl mx-auto opacity-95 leading-relaxed">
-            {t('pages.destinations.hero.subtitle', 'From the bustling streets of Amman to the silent majesty of Wadi Rum, discover destinations that will capture your heart.')}
+            {t('pages.destinations.hero.subtitle', 'From the rose-red city of Petra to the Martian landscapes of Wadi Rum, embark on a journey through Jordan\'s most breathtaking and historically rich destinations. Each place tells a story of ancient civilizations, natural wonders, and unforgettable adventures.')}
           </p>
         </div>
       </section>
@@ -182,10 +182,10 @@ export default function Destinations() {
             {/* Featured Destination Spotlight */}
             <section className="text-center">
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 mb-4">
-                {t('pages.destinations.spotlight.title', 'Destination Spotlight')}
+                {t('pages.destinations.spotlight.title', 'Why Choose These Destinations?')}
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                {t('pages.destinations.spotlight.subtitle', 'Discover what makes each destination unique')}
+                {t('pages.destinations.spotlight.subtitle', 'Each destination offers a unique blend of history, culture, and natural beauty. Discover what makes Jordan truly extraordinary.')}
               </p>
             </section>
 

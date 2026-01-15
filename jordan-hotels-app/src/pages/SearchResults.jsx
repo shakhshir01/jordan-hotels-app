@@ -183,10 +183,10 @@ export default function SearchResults() {
         <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black gradient-text mb-2">
-              Search Results
+              Your Perfect Jordan Stay Awaits
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300">
-              {hasHotels ? `Found ${hotels.length} hotels` : 'No results found'} for <span className="font-semibold text-slate-900 dark:text-slate-100">"{term || "All"}"</span>
+              {hasHotels ? `Discover ${hotels.length} exceptional hotels` : 'Discover amazing hotels'} for <span className="font-semibold text-slate-900 dark:text-slate-100">"{term || "Jordan"}"</span>
             </p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -373,7 +373,7 @@ export default function SearchResults() {
                             Loading More...
                           </div>
                         ) : (
-                          "Load More Hotels"
+                          "Discover More Amazing Hotels"
                         )}
                       </button>
                     </div>
@@ -404,15 +404,15 @@ export default function SearchResults() {
               <div className="text-center py-16">
                 <div className="max-w-md mx-auto">
                   <div className="text-6xl mb-6">🏨</div>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">No Hotels Found</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">Let's Find Your Perfect Stay</h3>
                   <p className="text-slate-600 dark:text-slate-300 mb-8">
-                    We couldn't find any hotels matching your search. Try adjusting your search terms or explore our featured destinations.
+                    We couldn't find hotels matching your exact search, but Jordan has countless amazing options waiting for you. Explore our curated destinations or try different search terms.
                   </p>
                   <Link
                     to="/"
                     className="btn-primary px-8 py-4 text-lg font-bold hover-lift touch-manipulation inline-block"
                   >
-                    Explore All Hotels
+                    Discover Amazing Hotels
                   </Link>
                 </div>
               </div>

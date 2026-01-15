@@ -510,21 +510,21 @@ const Home = () => {
           {/* Enhanced Badge */}
           <div className="inline-flex items-center gap-2 px-6 py-3 mb-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white/90 text-sm font-semibold uppercase tracking-widest shadow-2xl animate-fade-in">
             <div className="w-2 h-2 bg-jordan-gold rounded-full animate-pulse"></div>
-            {t("home.hero.kicker", "The Kingdom of Time")}
+            {t("home.hero.kicker", "Award-Winning Jordan Experiences")}
             <div className="w-2 h-2 bg-jordan-gold rounded-full animate-pulse"></div>
           </div>
 
           {/* Enhanced Title */}
           <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black font-display mb-8 tracking-tight leading-tight animate-slide-up">
-            <span className="block text-white drop-shadow-2xl mb-2">{t("home.hero.titleMain", "Experience Jordan's")}</span>
+            <span className="block text-white drop-shadow-2xl mb-2">{t("home.hero.titleMain", "Discover Jordan's")}</span>
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl">
-              {t("home.hero.titleAccent", "Timeless Magic")}
+              {t("home.hero.titleAccent", "Hidden Treasures")}
             </span>
           </h1>
 
           {/* Enhanced Subtitle */}
           <p className="text-xl sm:text-2xl lg:text-3xl max-w-5xl mx-auto mb-16 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
-            {t("home.hero.subtitle", "Journey through ancient cities, float in healing waters, and sleep under desert stars. Your perfect Jordanian adventure starts here.")}
+            {t("home.hero.subtitle", "From the ancient wonders of Petra to the healing waters of the Dead Sea, unlock unforgettable adventures with our handpicked collection of luxury hotels and authentic experiences. Your dream Jordan vacation starts here.")}
           </p>
 
           {/* Enhanced Search Bar */}
@@ -533,7 +533,7 @@ const Home = () => {
               {/* Search input */}
               <input
                 className="flex-1 px-6 py-4 bg-transparent text-white placeholder-white/60 outline-none text-lg sm:text-xl rounded-2xl border-0 focus:ring-2 focus:ring-white/30 transition-all duration-300"
-                placeholder={t("home.hero.searchPlaceholder", "Where do you want to go?")}
+                placeholder={t("home.hero.searchPlaceholder", "Search for luxury hotels in Petra, Wadi Rum, Dead Sea...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -589,7 +589,7 @@ const Home = () => {
                 className="px-8 py-4 bg-gradient-to-r from-jordan-gold to-jordan-rose hover:from-jordan-rose hover:to-jordan-gold text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-105 active:scale-95 min-h-[56px]"
               >
                 <Search size={24} />
-                <span className="hidden sm:inline text-lg font-semibold">{t("home.hero.findStays", "Find Stays")}</span>
+                <span className="hidden sm:inline text-lg font-semibold">{t("home.hero.findStays", "Discover Amazing Hotels")}</span>
               </button>
             </div>
           </div>
@@ -597,20 +597,20 @@ const Home = () => {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.9s' }}>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-black text-white mb-2">500+</div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Hotels</div>
+              <div className="text-3xl sm:text-4xl font-black text-white mb-2">750+</div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Verified Hotels</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-black text-white mb-2">50+</div>
+              <div className="text-3xl sm:text-4xl font-black text-white mb-2">25+</div>
               <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-black text-white mb-2">4.8★</div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Average Rating</div>
+              <div className="text-3xl sm:text-4xl font-black text-white mb-2">4.9★</div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Guest Rating</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-black text-white mb-2">24/7</div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Support</div>
+              <div className="text-3xl sm:text-4xl font-black text-white mb-2">50K+</div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Happy Travelers</div>
             </div>
           </div>
         </div>
@@ -772,12 +772,12 @@ const Home = () => {
           <div className="space-y-8">
             <header className="flex flex-col gap-2">
               <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-slate-900 dark:text-slate-50">
-                {isLocationBased ? "Recommendations for you" : "Best Rated Hotels"}
+                {isLocationBased ? "Exclusive Recommendations Near You" : "Jordan's Finest Accommodations"}
               </h2>
               <p className="page-subtitle">
                 {isLocationBased
-                  ? "Discover top-rated stays near you, carefully handpicked"
-                  : "Find the best-reviewed stays throughout Jordan"}
+                  ? "Handpicked luxury stays and authentic experiences tailored to your location"
+                  : "Discover world-class hotels, boutique resorts, and unique stays across Jordan's most spectacular destinations"}
               </p>
             </header>
 
@@ -792,10 +792,10 @@ const Home = () => {
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
-                  No hotels match your filters
+                  No hotels match your current filters
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400 mb-4">
-                  Try adjusting your filters to see more options.
+                  Try broadening your search criteria to discover amazing Jordanian hospitality
                 </p>
                 <button
                   type="button"

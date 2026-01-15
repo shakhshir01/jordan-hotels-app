@@ -448,37 +448,37 @@
       }
     },
     "about": {
-      "kicker": "ABOUT",
-      "title": "About VisitJo",
-      "intro": "Premium travel discovery and booking experiences for Jordan.",
+      "kicker": "OUR STORY",
+      "title": "Authentic Jordanian Hospitality",
+      "intro": "We're passionate locals who believe every traveler deserves to experience the real Jordan - the hidden treasures, genuine connections, and unforgettable moments that transform ordinary trips into extraordinary memories.",
       "cards": {
         "localFirst": {
-          "title": "Local‑first",
-          "body": "Built around Jordan’s destinations with practical details and authentic stays."
+          "title": "Authentic Local Expertise",
+          "body": "Our team of Jordanian travel experts personally vets every hotel, experience, and destination to ensure you get the genuine, authentic Jordanian hospitality you deserve."
         },
         "curated": {
-          "title": "Curated picks",
-          "body": "A focused selection of hotels, experiences, and offers."
+          "title": "Hand-Curated Excellence",
+          "body": "We don't list everything - we carefully select only the finest accommodations and experiences that showcase Jordan's true beauty and cultural richness."
         },
         "planning": {
-          "title": "Simple planning",
-          "body": "Plan, save, and book faster with a clean workflow."
+          "title": "Seamless Journey Planning",
+          "body": "From dream to reality in just a few clicks. Our intuitive platform makes discovering, planning, and booking your perfect Jordan adventure effortless and enjoyable."
         }
       },
       "focus": {
-        "title": "What we focus on",
+        "title": "What Sets Us Apart",
         "items": [
-          "Great stays in Jordan’s top spots",
-          "Helpful travel inspiration",
-          "Fast search and discovery",
-          "Transparent pricing",
-          "A smooth booking experience"
+          "Personal relationships with Jordan's finest hoteliers and experience providers",
+          "Insider knowledge of hidden gems and authentic local experiences",
+          "Commitment to sustainable tourism that benefits local communities",
+          "24/7 local support in both English and Arabic",
+          "Transparent pricing with no hidden fees or surprises"
         ]
       },
       "reviews": {
-        "title": "Built for real travelers",
-        "body1": "We aim to make it easy to compare options and book with confidence.",
-        "body2": "Have feedback? Use the Support page — we’re listening."
+        "title": "Trusted by Travelers Worldwide",
+        "body1": "Join thousands of satisfied travelers who have discovered Jordan's magic through VisitJo. Our 4.9-star rating reflects our dedication to creating perfect travel experiences.",
+        "body2": "Your feedback shapes our journey. Share your thoughts and help us continue improving the way the world experiences Jordan."
       }
     },
     "login": {

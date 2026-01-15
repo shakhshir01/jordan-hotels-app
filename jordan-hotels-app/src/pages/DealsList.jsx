@@ -66,9 +66,9 @@ export default function DealsList() {
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-red-600 via-orange-600 to-yellow-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 text-center text-white">
-          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.dealsList.hero.kicker', 'Limited Time Offers')}</div>
-          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.dealsList.hero.title', 'Luxury for Less')}</h1>
-          <p className="text-lg max-w-3xl mx-auto opacity-95">{t('pages.dealsList.hero.subtitle', 'Experience the best of Jordan with exclusive rates on premium hotels and resorts.')}</p>
+          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">{t('pages.dealsList.hero.kicker', 'Exclusive Savings')}</div>
+          <h1 className="text-5xl md:text-6xl font-black font-display mb-6">{t('pages.dealsList.hero.title', 'Luxury Hotels at Unbeatable Prices')}</h1>
+          <p className="text-lg max-w-3xl mx-auto opacity-95">{t('pages.dealsList.hero.subtitle', 'Unlock extraordinary savings on Jordan\'s finest accommodations. Experience world-class hospitality, breathtaking destinations, and unforgettable memories without breaking the bank. These limited-time offers won\'t last long!')}</p>
         </div>
       </section>
 
@@ -106,7 +106,7 @@ export default function DealsList() {
                   <div className="mb-6 space-y-1">
                     <p className="text-slate-400 line-through text-sm">{originalPrice} JOD {t('hotels.perNight')}</p>
                     <p className="text-3xl font-bold text-red-600">{discountedPrice} JOD {t('hotels.perNight')}</p>
-                    <p className="text-xs text-slate-500">{t('pages.dealsList.save', { amount: (originalPrice - discountedPriceNum).toFixed(2) })}</p>
+                    <p className="text-xs text-slate-500">{t('pages.dealsList.save', { amount: (originalPrice - discountedPriceNum).toFixed(2) })} - Limited Time!</p>
                   </div>
 
                   <button 
@@ -115,7 +115,7 @@ export default function DealsList() {
                     className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 rounded-lg hover:shadow-lg transition font-bold min-h-[48px]"
                     aria-label={`Claim ${discount}% off at ${hotelName}`}
                   >
-                    {t('pages.dealsList.claimDeal')}
+                    {t('pages.dealsList.claimDeal', 'Book This Amazing Deal Now!')}
                   </button>
                 </div>
               </article>
