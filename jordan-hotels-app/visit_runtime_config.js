@@ -2,7 +2,7 @@
 // This file is safe to commit. It is loaded at runtime before the app boots.
 // If you redeploy the backend, rerun the deploy script so this stays in sync.
 window.__VISITJO_RUNTIME_CONFIG__ = {
-  OPENAI_API_KEY: "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",
+  OPENAI_API_KEY: "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",
   VITE_API_GATEWAY_URL: "https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod",
   VITE_COGNITO_CLIENT_ID: "1v5kg2qprjtsnvia0hikm1blvd",
   VITE_COGNITO_DOMAIN: "us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com",
@@ -11,7 +11,7 @@ window.__VISITJO_RUNTIME_CONFIG__ = {
   VITE_PAYMENTS_ENABLED: "true",
   VITE_PAYPAL_CLIENT_ID: "AS4zykgSxEpxQfcVgXSsKt025N8zS6kYhxPe9_z7O4TDQTqfqYKSphdMR_Mc890z0EuGpnDxehDZk98s",
   VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_51Sn7WIJFa7tt8KvLusvHeHNYRtIeV8AQHVaJnVYgftrZyncjoIpRO2KJWMK85BngbOA1oiJffhZNYvGQ15mBtP3S00TglRUJrq",
-  VITE_GEMINI_API_KEY: "AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM",
+  VITE_GEMINI_API_KEY: "AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64",
   // Optional: set to your deployed chat function URL (Vercel/Netlify). Leave empty to use local fallback.
   VITE_CHAT_API_URL: "",
 };
