@@ -8,14 +8,15 @@ export function daysBetween(checkInIso, checkOutIso) {
   try {
     const a = new Date(checkInIso);
     const b = new Date(checkOutIso);
-    const diff = Math.ceil((b - a) / (24 * 60 * 60 * 1000));
+    const diff = Math.ceil((b.getTime() - a.getTime()) / (24 * 60 * 60 * 1000));
     return diff > 0 ? diff : 0;
   } catch {
     return 0;
   }
 }
 
-export function getDefaultBookingData({ checkInDate, checkOutDate, guests = 2 } = {}) {
+export function getDefaultBookingData(opts = {}) {
+  const { checkInDate, checkOutDate, guests = 2 } = /** @type {{checkInDate?:any,checkOutDate?:any,guests?:number}} */ (opts);
   const today = new Date();
   const start = checkInDate ? new Date(checkInDate) : today;
   // normalize to yyyy-mm-dd

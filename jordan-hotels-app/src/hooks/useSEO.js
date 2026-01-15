@@ -37,20 +37,20 @@ const updateMetaTag = (name, content) => {
   if (!element) {
     element = document.createElement('meta');
     const attr = name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name';
-    element.setAttribute(attr, name);
+      /** @type {HTMLMetaElement} */ (element).setAttribute(attr, name);
     document.head.appendChild(element);
   }
-  element.setAttribute('content', content);
+    /** @type {HTMLMetaElement} */ (element).setAttribute('content', content);
 };
 
 const updateSchemaTag = (schema) => {
   let element = document.querySelector('script[type="application/ld+json"]');
   if (!element) {
     element = document.createElement('script');
-    element.type = 'application/ld+json';
+      /** @type {HTMLScriptElement} */ (element).type = 'application/ld+json';
     document.head.appendChild(element);
   }
-  element.textContent = JSON.stringify(schema);
+    /** @type {HTMLScriptElement} */ (element).textContent = JSON.stringify(schema);
 };
 
 export const SEOMeta = ({ title, description, image, url, type, children }) => {

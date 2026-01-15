@@ -71,7 +71,8 @@ export default function DealsList() {
             const hotelName = getHotelDisplayName(hotel, i18n.language);
             const discount = DISCOUNTS[idx % DISCOUNTS.length];
             const originalPrice = hotel.price;
-            const discountedPrice = (originalPrice * (1 - discount / 100)).toFixed(2);
+            const discountedPriceNum = Number(((originalPrice * (1 - discount / 100))).toFixed(2));
+            const discountedPrice = discountedPriceNum.toFixed(2);
             
             return (
               <article key={hotel.id} className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
@@ -98,7 +99,7 @@ export default function DealsList() {
                   <div className="mb-6 space-y-1">
                     <p className="text-slate-400 line-through text-sm">{originalPrice} JOD {t('hotels.perNight')}</p>
                     <p className="text-3xl font-bold text-red-600">{discountedPrice} JOD {t('hotels.perNight')}</p>
-                    <p className="text-xs text-slate-500">{t('pages.dealsList.save', { amount: (originalPrice - discountedPrice).toFixed(2) })}</p>
+                    <p className="text-xs text-slate-500">{t('pages.dealsList.save', { amount: (originalPrice - discountedPriceNum).toFixed(2) })}</p>
                   </div>
 
                   <button 

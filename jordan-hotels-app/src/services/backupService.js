@@ -235,7 +235,7 @@ export const backupRetentionPolicy = {
   shouldRetain(backup) {
     const now = new Date();
     const backupDate = new Date(backup.timestamp);
-    const diffDays = (now - backupDate) / (1000 * 60 * 60 * 24);
+    const diffDays = (now.getTime() - backupDate.getTime()) / (1000 * 60 * 60 * 24);
 
     // Always keep recent backups
     if (diffDays <= 1) return true;

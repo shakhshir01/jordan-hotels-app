@@ -142,7 +142,7 @@ export default function ContactConcierge() {
               value={formData.message}
               onChange={handleChange}
               required
-              rows="5"
+              rows={5}
               className="w-full border rounded-lg px-4 py-2"
               placeholder="Tell us how we can help..."
             />

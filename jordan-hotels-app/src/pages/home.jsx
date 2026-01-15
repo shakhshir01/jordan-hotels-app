@@ -159,7 +159,9 @@ const useResponsiveColumns = () => {
   return columns;
 };
 
-const HotelCard = React.memo(function HotelCard({ hotel, i18nLanguage, viewLabel }) {
+/** @param {{hotel:any,i18nLanguage?:string,viewLabel?:string}} props */
+const HotelCard = React.memo(function HotelCard(props = {}) {
+  const { hotel, i18nLanguage, viewLabel } = /** @type {{hotel:any,i18nLanguage?:string,viewLabel?:string}} */ (props);
   const hotelName = useMemo(
     () => getHotelDisplayName(hotel, i18nLanguage),
     [hotel, i18nLanguage]
@@ -341,9 +343,7 @@ const HotelsVirtualizedGrid = function HotelsVirtualizedGrid({
                 {rowHotels.map((hotel) => (
                   <HotelCard
                     key={hotel.id}
-                    hotel={hotel}
-                    i18nLanguage={i18nLanguage}
-                    viewLabel={viewLabel}
+                    {.../** @type {any} */ ({ hotel, i18nLanguage, viewLabel })}
                   />
                 ))}
               </div>

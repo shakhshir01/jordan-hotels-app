@@ -159,7 +159,7 @@ export const userInteractions = {
    */
   submitForm: async () => {
     const user = userEvent.setup();
-    const submitButton = screen.getByRole('button', { type: 'submit' });
+    const submitButton = screen.getByRole('button', /** @type {any} */ ({ type: 'submit' }));
     await user.click(submitButton);
   },
 };

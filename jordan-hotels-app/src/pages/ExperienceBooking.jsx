@@ -730,7 +730,7 @@ const ExperienceBooking = () => {
                       alert('Payment failed: ' + error.message);
                     }}
                     disabled={processing}
-                    buttonText={t('experienceBooking.form.payNow', 'Pay Now')}
+                    onProcessingChange={setProcessing}
                     billingDetails={{
                       name: guestInfo.fullName,
                       email: guestInfo.email,

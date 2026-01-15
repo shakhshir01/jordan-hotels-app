@@ -62,14 +62,8 @@ const hotelsService = {
     return page.hotels;
   },
 
-  getNearbyHotelsByGeo: async ({
-    lat,
-    lon,
-    limit = 12,
-    targetKm = 20,
-    pageLimit = 80,
-    maxPages = 3,
-  } = {}) => {
+  getNearbyHotelsByGeo: async (opts = {}) => {
+    const { lat, lon, limit = 12, targetKm = 20, pageLimit = 80, maxPages = 3 } = opts;
     const userLat = Number(lat);
     const userLon = Number(lon);
     if (!Number.isFinite(userLat) || !Number.isFinite(userLon)) return [];

@@ -40,8 +40,8 @@ export const validateSignUp = (email: string, password: string, confirmPassword:
   return errors;
 };
 
-export const validateLogin = (email, password) => {
-  const errors = {};
+export const validateLogin = (email: string, password: string): Record<string, string> => {
+  const errors: Record<string, string> = {};
 
   if (!email.trim()) {
     errors.email = 'auth.validation.emailRequired';

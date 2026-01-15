@@ -4,7 +4,7 @@ import React from 'react';
 // - Uses native lazy-loading + async decoding
 // - Reserves layout using an aspect-ratio wrapper to avoid CLS
 // - Ensures images always fill their container with object-fit:cover
-export default function OptimizedImage({ src, alt = '', className = '', ratio = '3/2', fallback, priority = false, loading, onError, ...rest }) {
+export default function OptimizedImage({ src, alt = '', className = '', ratio = '3/2', fallback = undefined, priority = false, loading = undefined, onError = undefined, ...rest }) {
   const [errored, setErrored] = React.useState(false);
 
   // Provide a simple SVG fallback to avoid broken images and layout shifts
@@ -30,7 +30,7 @@ export default function OptimizedImage({ src, alt = '', className = '', ratio = 
         alt={alt}
         loading={effectiveLoading}
         decoding="async"
-        fetchpriority={priority ? 'high' : 'low'}
+        fetchPriority={priority ? 'high' : 'low'}
         className="w-full h-full object-cover block"
         onError={(e) => {
           setErrored(true);

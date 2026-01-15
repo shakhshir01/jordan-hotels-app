@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-jordanhotelsapp-dev-7bb8d-authRole",
+      "UnauthRoleArn": "arn:aws:iam::497339097084:role/amplify-jordanhotelsapp-dev-7bb8d-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::497339097084:role/amplify-jordanhotelsapp-dev-7bb8d-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-jordanhotelsapp-dev-7bb8d-deployment",
+      "UnauthRoleName": "amplify-jordanhotelsapp-dev-7bb8d-unauthRole",
+      "StackName": "amplify-jordanhotelsapp-dev-7bb8d",
+      "StackId": "arn:aws:cloudformation:us-east-1:497339097084:stack/amplify-jordanhotelsapp-dev-7bb8d/0caa2430-ec93-11f0-a148-120d639912ad",
+      "AmplifyAppId": "d3cljg8vxqx2iy"
+    },
+    "categories": {
+      "auth": {
+        "jordanhotelsapp": {}
+      },
+      "analytics": {
+        "jordanhotelsapp": {}
+      }
+    }
+  }
+}

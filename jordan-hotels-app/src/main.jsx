@@ -100,13 +100,20 @@ function installImageRuntimeOptimizations() {
     // Catch images added later (e.g., dynamic content)
     const mo = new MutationObserver((mutations) => {
       for (const m of mutations) {
-        for (const n of m.addedNodes) {
-          if (n.nodeType === 1) {
-            if (n.tagName === 'IMG') applyAttrs(n);
-            n.querySelectorAll && n.querySelectorAll('img').forEach(applyAttrs);
+          for (let i = 0; i < m.addedNodes.length; i++) {
+            const n = m.addedNodes[i];
+            if (n.nodeType === 1) {
+              /** @type {Element} */
+              const el = /** @type {Element} */ (n);
+              if (el.tagName === 'IMG') {
+                /** @type {HTMLImageElement} */
+                applyAttrs(/** @type {HTMLImageElement} */ (el));
+              }
+              const imgs = el.querySelectorAll ? el.querySelectorAll('img') : [];
+              if (imgs && imgs.forEach) imgs.forEach((img) => applyAttrs(/** @type {HTMLImageElement} */ (img)));
+            }
           }
         }
-      }
     });
     mo.observe(document.documentElement || document, { childList: true, subtree: true });
   } catch {

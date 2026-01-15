@@ -51,7 +51,7 @@ export const getCancellationDeadline = (checkInDate, policyType) => {
 
   return {
     deadline,
-    hoursLeft: (deadline - new Date()) / (1000 * 60 * 60),
-    isRefundable: (deadline - new Date()) > 0,
+    hoursLeft: (deadline.getTime() - Date.now()) / (1000 * 60 * 60),
+    isRefundable: (deadline.getTime() - Date.now()) > 0,
   };
 };

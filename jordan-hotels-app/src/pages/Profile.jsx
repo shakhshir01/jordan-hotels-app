@@ -48,7 +48,7 @@ const normalizeBooking = (booking, index = 0) => {
   if ((!nights || nights <= 0) && checkIn && checkOut) {
     const start = new Date(checkIn);
     const end = new Date(checkOut);
-    const diff = end - start;
+    const diff = end.getTime() - start.getTime();
     if (!Number.isNaN(diff) && diff > 0) {
       nights = Math.round(diff / (1000 * 60 * 60 * 24));
     }

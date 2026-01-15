@@ -11,6 +11,8 @@ export class Migration {
     this.name = name;
     this.version = version;
     this.timestamp = new Date().toISOString();
+    /** @type {any} */
+    this.database = null;
   }
 
   async up() {
@@ -41,6 +43,12 @@ export class MigrationRunner {
       throw new Error(`Migration ${migration.name} already registered`);
     }
     this.migrations.set(migration.name, migration);
+    // Link migration instances to runner's database for convenience
+    try {
+      migration.database = this.database;
+    } catch {
+      // ignore if migration is frozen
+    }
   }
 
   /**

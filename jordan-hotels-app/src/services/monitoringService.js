@@ -20,7 +20,9 @@ const LogLevel = {
 class Logger {
   constructor(options = {}) {
     this.minLevel = options.minLevel || LogLevel.INFO;
-    this.logToConsole = options.logToConsole !== false;
+    // `logToConsole` can be either a boolean flag or a custom function.
+    this.consoleEnabled = options.logToConsole !== false;
+    this.logToConsole = typeof options.logToConsole === 'function' ? options.logToConsole : undefined;
     this.logToServer = options.logToServer !== false;
     this.serverUrl = options.serverUrl || '/api/logs';
     this.appName = options.appName || 'VisitJo';
@@ -55,8 +57,15 @@ class Logger {
     };
 
     // Log to console in development
-    if (this.logToConsole) {
-      this.logToConsole(level, message, metadata);
+    if (this.consoleEnabled) {
+      if (typeof this.logToConsole === 'function') {
+        this.logToConsole(level, message, metadata);
+      } else {
+        // default console logging
+        const style = this.getConsoleStyle(level);
+        const logFn = this.getConsoleFunction(level);
+        logFn(`[%c${this.appName}] ${this.getLevelName(level)}`, style, message, metadata);
+      }
     }
 
     // Store log entry

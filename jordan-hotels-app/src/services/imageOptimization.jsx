@@ -117,7 +117,7 @@ export const compressImage = async (file, maxWidth = 1200, quality = 0.85) => {
       };
 
       img.onerror = () => reject(new Error('Failed to load image'));
-      img.src = event.target.result;
+      img.src = /** @type {string} */ (event.target.result);
     };
 
     reader.onerror = () => reject(new Error('Failed to read file'));

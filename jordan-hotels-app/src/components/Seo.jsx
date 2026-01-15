@@ -11,22 +11,22 @@ const Seo = ({ title, description, canonicalUrl, jsonLd }) => {
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
       metaDescription = document.createElement('meta');
-      metaDescription.name = 'description';
+      /** @type {HTMLMetaElement} */ (metaDescription).name = 'description';
       document.head.appendChild(metaDescription);
     }
     if (description) {
-      metaDescription.content = description;
+      /** @type {HTMLMetaElement} */ (metaDescription).content = description;
     }
 
     // Set canonical URL
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) {
       canonicalLink = document.createElement('link');
-      canonicalLink.rel = 'canonical';
+      /** @type {HTMLLinkElement} */ (canonicalLink).rel = 'canonical';
       document.head.appendChild(canonicalLink);
     }
     if (canonicalUrl) {
-      canonicalLink.href = canonicalUrl;
+      /** @type {HTMLLinkElement} */ (canonicalLink).href = canonicalUrl;
     }
 
     // Add JSON-LD structured data
@@ -34,10 +34,10 @@ const Seo = ({ title, description, canonicalUrl, jsonLd }) => {
       let script = document.querySelector('script[type="application/ld+json"]');
       if (!script) {
         script = document.createElement('script');
-        script.type = 'application/ld+json';
+        /** @type {HTMLScriptElement} */ (script).type = 'application/ld+json';
         document.head.appendChild(script);
       }
-      script.textContent = JSON.stringify(jsonLd);
+      /** @type {HTMLScriptElement} */ (script).textContent = JSON.stringify(jsonLd);
     }
 
     // Cleanup function

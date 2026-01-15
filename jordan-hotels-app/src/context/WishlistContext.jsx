@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export const WishlistContext = createContext();
+export const WishlistContext = createContext(null);
 
 export const useWishlist = () => {
   const context = useContext(WishlistContext);

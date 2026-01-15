@@ -591,7 +591,8 @@ export const hotelAPI = {
     }
   },
 
-  createPaymentIntent: async ({ amount, currency = "jod", metadata } = {}) => {
+  createPaymentIntent: async (opts = {}) => {
+    const { amount, currency = "jod", metadata } = opts;
     // Return mock payment intent if payments are not enabled
     if (!paymentsEnabled) {
       return {
@@ -803,7 +804,8 @@ export const hotelAPI = {
   },
 
   // new dynamic endpoints: search / destinations / deals / experiences / blog
-  searchHotelsPage: async ({ q = "", cursor = "", limit = 30, _signal } = {}) => {
+  searchHotelsPage: async (opts = {}) => {
+    const { q = "", cursor = "", limit = 30, _signal } = opts;
     // Always use combined Xotelo + real hotel data for search
     const result = getHotelsFromStatic({ q, cursor, limit });
     if (!result.hotels || result.hotels.length === 0) {

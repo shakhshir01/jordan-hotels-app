@@ -36,7 +36,7 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
     // Default: newest first
-    return new Date(b.timestamp) - new Date(a.timestamp);
+    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
   });
 
   return (

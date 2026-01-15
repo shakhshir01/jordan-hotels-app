@@ -5,7 +5,7 @@ import { setAuthToken, hotelAPI } from '../services/api';
 import { showSuccess, showError } from '../services/toastService';
 import { deriveNameFromEmail, loadSavedProfile, saveProfile } from '../utils/userProfile';
 
-const AuthContext = (typeof window !== 'undefined' && window.AuthContext) || createContext();
+const AuthContext = (typeof window !== 'undefined' && window.AuthContext) || createContext(null);
 
 if (typeof window !== 'undefined') {
   window.AuthContext = AuthContext;

@@ -70,7 +70,10 @@ const HotelDetails = () => {
   const calculatePriceBreakdown = () => {
     const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
     const basePrice = selectedRoom ? selectedRoom.price : hotel.price;
-    const nights = Math.max(1, Math.ceil((new Date(checkOutDate || Date.now()) - new Date(checkInDate || Date.now())) / (24 * 60 * 60 * 1000)));
+    const nights = Math.max(
+      1,
+      Math.ceil((new Date(checkOutDate || Date.now()).getTime() - new Date(checkInDate || Date.now()).getTime()) / (24 * 60 * 60 * 1000))
+    );
     
     const subtotal = basePrice * nights;
     const serviceFee = bookingFees.serviceFee;
@@ -154,7 +157,7 @@ const HotelDetails = () => {
 
     setBookingLoading(true);
     try {
-      const nights = Math.max(1, Math.ceil((new Date(checkOutDate) - new Date(checkInDate)) / (24 * 60 * 60 * 1000)));
+      const nights = Math.max(1, Math.ceil((new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / (24 * 60 * 60 * 1000)));
       const selectedRoom = hotel.roomTypes?.find(rt => rt.name === selectedRoomType);
       const roomPrice = selectedRoom ? selectedRoom.price : hotel.price;
       

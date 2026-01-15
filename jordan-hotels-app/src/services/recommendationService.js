@@ -77,10 +77,10 @@ export const getTrendingHotels = async (period = 'week', limit = 6) => {
 export const getBestRatedHotels = async (filters = {}, limit = 6) => {
   try {
     const params = new URLSearchParams({
-      limit,
-      minRating: filters.minRating || 4.0,
-      destination: filters.destination || '',
-      maxPrice: filters.maxPrice || '',
+      limit: String(limit),
+      minRating: String(filters.minRating || 4.0),
+      destination: String(filters.destination || ''),
+      maxPrice: String(filters.maxPrice || ''),
     });
 
     const response = await api.get(`/recommendations/best-rated?${params}`);
