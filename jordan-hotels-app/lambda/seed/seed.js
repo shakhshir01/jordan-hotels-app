@@ -7,14 +7,15 @@ import { fetchXoteloHotels } from "../providers/xotelo.js";
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-const stackName = process.env.STACK_NAME || "VisitJo";
+const stackName = process.env.STACK_NAME || "sam-app2";
 
 const TABLES = {
-  HOTELS: process.env.HOTELS_TABLE || `${stackName}-Hotels`,
-  DESTINATIONS: process.env.DESTINATIONS_TABLE || `${stackName}-Destinations`,
-  DEALS: process.env.DEALS_TABLE || `${stackName}-Deals`,
-  EXPERIENCES: process.env.EXPERIENCES_TABLE || `${stackName}-Experiences`,
-  BOOKINGS: process.env.BOOKINGS_TABLE || `${stackName}-Bookings`,
+  HOTELS: process.env.HOTELS_TABLE || `sam-app2-HotelsTable-IVRT1YP6HZZY`,
+  DESTINATIONS: process.env.DESTINATIONS_TABLE || `sam-app2-DestinationsTable-1ESXQCVPPSGB`,
+  DEALS: process.env.DEALS_TABLE || `sam-app2-DealsTable-1E8CHIAEER4FJ`,
+  EXPERIENCES: process.env.EXPERIENCES_TABLE || `sam-app2-ExperiencesTable-QELUJ92T90CE`,
+  BOOKINGS: process.env.BOOKINGS_TABLE || `sam-app2-BookingsTable-73UW8V9X4B3T`,
+  USERS: process.env.USERS_TABLE || `sam-app2-UsersTable-EC920G8QULNI`,
 };
 
 const now = () => new Date().toISOString();

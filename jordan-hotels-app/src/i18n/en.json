@@ -497,7 +497,7 @@
       "confirmPasswordPlaceholder": "Re-enter password",
       "passwordsMatch": "Passwords match",
       "creatingAccount": "Creating account...",
-      "accountCreatedToast": "Account created successfully! Please log in.",
+      "accountCreatedToast": "Account created! Check your email for verification code.",
       "failed": "Failed to sign up. Please try again."
     },
     "forgotPassword": {

@@ -166,26 +166,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      // Check localStorage for MFA status first
-      const storedMfaEnabled = localStorage.getItem(`visitjo.mfaEnabled.${email}`) === '1';
-      const storedMfaMethod = localStorage.getItem(`visitjo.mfaMethod.${email}`) || 'EMAIL';
-
-      if (storedMfaEnabled && storedMfaMethod !== 'EMAIL') {
-        // MFA is enabled according to localStorage, show challenge first (but not for EMAIL MFA)
-        setMfaEnabled(true);
-        setMfaMethod(storedMfaMethod);
-        setMfaChallenge({
-          type: storedMfaMethod === 'TOTP' ? 'TOTP_MFA' : 'SOFTWARE_TOKEN_MFA',
-          message: 'Enter your authenticator code',
-          preAuth: true,
-          email,
-          password
-        });
-        resolve({ mfaRequired: true, preAuth: true });
-        return;
-      }
-
-      // No MFA in localStorage, proceed with normal authentication
+      // Always authenticate first, then check MFA status from database
       const cognitoUser = new CognitoUser({
         Username: email,
         Pool: UserPool,

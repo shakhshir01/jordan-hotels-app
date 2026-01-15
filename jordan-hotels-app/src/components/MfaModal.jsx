@@ -226,7 +226,6 @@ export default function MfaModal() {
       setCode('');
       setEmail('');
       setEmailStep('entry');
-      showSuccess('Email MFA enabled');
       clearMfaChallenge();
       navigate('/');
     } catch (err) {

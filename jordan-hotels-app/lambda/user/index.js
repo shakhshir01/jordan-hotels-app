@@ -203,6 +203,8 @@ async function getUserProfile(userId, event) {
       location: '',
       joinedDate: '',
       membershipTier: '',
+      mfaEnabled: false,
+      mfaMethod: null,
     };
 
     if (USERS_TABLE) {

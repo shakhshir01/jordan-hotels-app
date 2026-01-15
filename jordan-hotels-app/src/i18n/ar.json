@@ -483,7 +483,7 @@
       "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور",
       "passwordsMatch": "كلمتا المرور متطابقتان",
       "creatingAccount": "جاري إنشاء الحساب...",
-      "accountCreatedToast": "تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.",
+      "accountCreatedToast": "تم إنشاء الحساب! تحقق من بريدك الإلكتروني للحصول على رمز التحقق.",
       "failed": "فشل إنشاء الحساب. يرجى المحاولة مرة أخرى."
     },
     "forgotPassword": {

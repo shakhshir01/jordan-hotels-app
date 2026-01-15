@@ -45,7 +45,7 @@ const SignUp = () => {
     try {
       await signUp(email, password, fullName);
       showSuccess(t('pages.signup.accountCreatedToast'));
-      navigate('/login');
+      navigate('/verify', { state: { email } });
     } catch (err) {
       const errorMsg = err.message || t('pages.signup.failed');
       showError(errorMsg);
