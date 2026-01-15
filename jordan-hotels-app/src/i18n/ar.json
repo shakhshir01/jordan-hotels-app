@@ -105,7 +105,9 @@
       "passwordRequired": "كلمة المرور مطلوبة",
       "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
       "passwordUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير",
+      "passwordLowercase": "يجب أن تحتوي كلمة المرور على حرف صغير",
       "passwordNumber": "يجب أن تحتوي كلمة المرور على رقم",
+      "passwordSymbol": "يجب أن تحتوي كلمة المرور على رمز خاص (!@#$%^&*)",
       "passwordsDontMatch": "كلمتا المرور غير متطابقتين"
     }
   },
@@ -481,7 +483,7 @@
       "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور",
       "passwordsMatch": "كلمتا المرور متطابقتان",
       "creatingAccount": "جاري إنشاء الحساب...",
-      "accountCreatedToast": "تم إنشاء الحساب! تحقق من بريدك الإلكتروني لإتمام التحقق.",
+      "accountCreatedToast": "تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.",
       "failed": "فشل إنشاء الحساب. يرجى المحاولة مرة أخرى."
     },
     "forgotPassword": {

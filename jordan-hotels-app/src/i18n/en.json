@@ -108,7 +108,9 @@
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 8 characters",
       "passwordUppercase": "Password must contain an uppercase letter",
+      "passwordLowercase": "Password must contain a lowercase letter",
       "passwordNumber": "Password must contain a number",
+      "passwordSymbol": "Password must contain a special character (!@#$%^&*)",
       "passwordsDontMatch": "Passwords do not match"
         ,
         "passwordTooWeak": "Password is too weak"
@@ -495,7 +497,7 @@
       "confirmPasswordPlaceholder": "Re-enter password",
       "passwordsMatch": "Passwords match",
       "creatingAccount": "Creating account...",
-      "accountCreatedToast": "Account created! Check your email to verify.",
+      "accountCreatedToast": "Account created successfully! Please log in.",
       "failed": "Failed to sign up. Please try again."
     },
     "forgotPassword": {

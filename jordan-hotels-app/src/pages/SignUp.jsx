@@ -45,7 +45,7 @@ const SignUp = () => {
     try {
       await signUp(email, password, fullName);
       showSuccess(t('pages.signup.accountCreatedToast'));
-      navigate('/verify', { state: { email } });
+      navigate('/login');
     } catch (err) {
       const errorMsg = err.message || t('pages.signup.failed');
       showError(errorMsg);
@@ -61,15 +61,6 @@ const SignUp = () => {
       <form onSubmit={handleSignUp} className="surface p-8 sm:p-10">
         <h2 className="page-title text-center text-slate-900 dark:text-slate-50">{t('pages.signup.title')}</h2>
         <p className="page-subtitle text-center mt-2 mb-8">{t('pages.signup.subtitle')}</p>
-
-        {/* Email Verification Alert */}
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl flex items-start gap-3">
-          <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={20} />
-          <div>
-            <p className="text-yellow-900 font-bold text-sm">Email Verification Temporarily Unavailable</p>
-            <p className="text-yellow-800 text-sm">We're working to restore email verification. Please contact support if you need assistance with account verification.</p>
-          </div>
-        </div>
 
         {/* Submit Error */}
         {errors.submit && (

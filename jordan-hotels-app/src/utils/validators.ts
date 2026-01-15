@@ -4,17 +4,19 @@ export const isValidEmail = (email: string): boolean => {
   return emailRegex.test(email);
 };
 
-// Password validation - at least 8 chars, 1 uppercase, 1 number
+// Password validation - at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 symbol
 export const isValidPassword = (password: string): boolean => {
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   return passwordRegex.test(password);
 };
 
 export const getPasswordErrors = (password: string): string[] => {
   const errors: string[] = [];
   if (password.length < 8) errors.push('auth.validation.passwordMinLength');
+  if (!/[a-z]/.test(password)) errors.push('auth.validation.passwordLowercase');
   if (!/[A-Z]/.test(password)) errors.push('auth.validation.passwordUppercase');
   if (!/\d/.test(password)) errors.push('auth.validation.passwordNumber');
+  if (!/[@$!%*?&]/.test(password)) errors.push('auth.validation.passwordSymbol');
   return errors;
 };
 
