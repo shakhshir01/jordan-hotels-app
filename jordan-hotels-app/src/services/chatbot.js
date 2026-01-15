@@ -9,6 +9,46 @@
 
 import { hotelAPI } from './api';
 
+// Get OpenAI API key from runtime config
+const getOpenAIKey = () => {
+  try {
+    const cfg = typeof window !== 'undefined' && window.__VISITJO_RUNTIME_CONFIG__;
+    return cfg?.OPENAI_API_KEY || '';
+  } catch (_) {
+    return '';
+  }
+};
+
+// Call OpenAI API for smart responses
+const callOpenAI = async (messages) => {
+  const apiKey = getOpenAIKey();
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages,
+        max_tokens: 1000,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || null;
+  } catch (error) {
+    console.error('OpenAI call failed:', error);
+    return null;
+  }
+};
+
 // Nashmi's personality constants
 const NASHMI_PERSONALITY = {
   name: "Nashmi",
@@ -95,6 +135,12 @@ const JORDAN_KNOWLEDGE = {
     cancellation: "Most hotels offer free cancellation up to 48 hours before check-in. Check specific hotel details for 'Non-Refundable' vs 'Flexible' rates.",
     booking: "You need a valid credit card to secure your booking. Payment is processed securely via Stripe.",
     checkin: "Standard check-in is 3:00 PM, check-out is 12:00 PM. Early check-in is subject to availability."
+  },
+
+  trends: {
+    current: ["Eco-tourism in Dana Biosphere Reserve", "Adventure activities in Wadi Rum", "Wellness retreats at the Dead Sea", "Cultural experiences in Amman", "Sustainable tourism initiatives"],
+    insights: ["Petra visitor numbers up 15% this year", "Wadi Rum camping popularity increasing", "Dead Sea mud treatments trending", "Local cuisine tourism growing", "Digital nomad spots emerging in Amman"],
+    deals: ["Early bird discounts for summer 2025", "Family packages for school holidays", "Last-minute deals for flexible travelers", "Group discounts for 5+ people"]
   }
 };
 
@@ -218,19 +264,82 @@ async function gatherContextData(message) {
   return data;
 }
 
+const generateAIResponse = async (message, history, userName, contextData) => {
+  const systemPrompt = `You are Nashmi, the witty and intelligent Jordan travel companion chatbot. You are extremely knowledgeable about Jordan - its history, culture, cities, hotels, experiences, and current trends. You have a sharp wit, are conversational, and always address users by their full name.
+
+Your personality:
+- Witty and fun, with a touch of sarcasm
+- Extremely knowledgeable about Jordan
+- Helpful for booking hotels, finding deals, planning trips
+- Can discuss any topic, but always tie it back to Jordan travel when possible
+- Address users by their full name (e.g., "Ahlan ${userName}!")
+- Use Arabic phrases occasionally (Ahlan, Ya hala, Inshallah, etc.)
+- Be funny and engaging
+
+Jordan Knowledge Base:
+${JSON.stringify(JORDAN_KNOWLEDGE, null, 2)}
+
+Available Context:
+- Hotels: ${contextData.hotels.length > 0 ? contextData.hotels.map(h => `${h.name} (${h.location})`).join(', ') : 'None found'}
+- Deals: ${contextData.deals.length > 0 ? 'Available' : 'None'}
+- Experiences: ${contextData.experiences.length > 0 ? contextData.experiences.map(e => e.title).join(', ') : 'None'}
+- Destination: ${contextData.destination || 'General'}
+
+Response Guidelines:
+- Always respond conversationally and helpfully
+- If user asks about hotels, mention specific ones from context and show their images
+- If user wants to book, guide them to click the "Book Now" button or provide booking instructions
+- Be able to discuss trends, insights, deals, experiences, cities, hotels
+- Show hotel images when relevant
+- Give offers and deals when appropriate
+- Respond to ANY topic the user asks about - be omni-capable
+- Keep responses engaging and not too long
+- End with a question to continue conversation when appropriate
+- Use current trends: eco-tourism, adventure travel, wellness retreats, cultural experiences
+- Mention deals and offers proactively when relevant
+- Be funny and witty, but professional when booking
+
+Booking Instructions:
+- If user wants to book, explain the process: select dates, choose room, payment via Stripe
+- Mention free cancellation up to 48 hours
+- Guide to hotel detail pages for booking
+
+Respond naturally as Nashmi would speak.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...history.slice(-5).map(h => ({ role: h.sender === 'bot' ? 'assistant' : 'user', content: h.text })),
+    { role: 'user', content: `${userName}: ${message}` }
+  ];
+
+  return await callOpenAI(messages);
+};
+
 export const generateChatResponse = async (message, _history = [], userProfile = {}) => {
   const userName = userProfile?.displayName || userProfile?.name || 'Friend';
   const contextData = await gatherContextData(message);
 
-  // Always use local response
+  // Try OpenAI first for smarter responses
+  const openAIResponse = await generateAIResponse(message, _history, userName, contextData);
+  if (openAIResponse) {
+    return {
+      text: openAIResponse,
+      hotels: contextData.hotels || [],
+      offers: contextData.deals || [],
+      images: [
+        ...(contextData.hotels.length > 0 ? contextData.hotels.map(h => ({ url: h.image, alt: h.name })) : [])
+      ].filter(i => i.url),
+      suggestions: getSmartSuggestions(contextData.hotels.map(h => h.id))
+    };
+  }
+
+  // Fallback to local response
   const responseText = generateLocalResponse(message, userName, contextData);
 
-  // Construct final response object
   return {
     text: responseText,
     hotels: contextData.hotels || [],
     offers: contextData.deals || [],
-    // Only show images if we found specific hotels, otherwise keep chat clean
     images: [
       ...(contextData.hotels.length > 0 ? contextData.hotels.map(h => ({ url: h.image, alt: h.name })) : [])
     ].filter(i => i.url),

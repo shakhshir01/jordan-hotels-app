@@ -7,7 +7,7 @@ describe('validators', () => {
   });
 
   test('isValidPassword enforces strength', () => {
-    expect(isValidPassword('Password1')).toBe(true);
+    expect(isValidPassword('Password1!')).toBe(true);
     expect(isValidPassword('password')).toBe(false);
     expect(isValidPassword('Pass1')).toBe(false);
   });

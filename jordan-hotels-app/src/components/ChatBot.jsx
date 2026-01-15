@@ -15,6 +15,17 @@ export default function ChatBot() {
   const { t } = useTranslation();
   const { userProfile } = useContext(AuthContext);
 
+  useEffect(() => {
+    if (userProfile?.displayName || userProfile?.name) {
+      const userName = userProfile.displayName || userProfile.name;
+      setMessages(prev => prev.map(msg => 
+        msg.id === 1 
+          ? { ...msg, text: `Ahlan ${userName}! I'm Nashmi, your witty Jordan travel companion! 🌟 How can I make your Jordan adventure unforgettable today?` }
+          : msg
+      ));
+    }
+  }, [userProfile]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -99,8 +110,8 @@ export default function ChatBot() {
         <div className="fixed inset-x-4 bottom-16 sm:bottom-24 sm:right-6 sm:left-auto w-auto sm:w-80 h-[calc(100vh-8rem)] sm:h-96 glass-card rounded-2xl shadow-glow-purple z-50 flex flex-col max-w-sm mx-auto sm:mx-0 border border-white/20">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white p-4 sm:p-5 rounded-t-2xl flex-shrink-0 shadow-lg">
-            <h3 className="font-bold text-base sm:text-lg">{t('chatbot.title', 'Jordan Travel Assistant')}</h3>
-            <p className="text-sm sm:text-base opacity-90 font-light">{t('chatbot.subtitle', 'Ask me anything about your trip!')}</p>
+            <h3 className="font-bold text-base sm:text-lg">{t('chatbot.title', 'Nashmi')}</h3>
+            <p className="text-sm sm:text-base opacity-90 font-light">{t('chatbot.subtitle', 'Your witty Jordan travel companion!')}</p>
           </div>
 
           {/* Messages - Mobile Optimized */}

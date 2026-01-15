@@ -322,7 +322,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
     localStorage.setItem(`visitjo.mfaMethod.${email}`, 'EMAIL');
     setError(null);
-    showSuccess(`Welcome back, ${email}!`);
+    // Success message handled by caller
   };
 
   const completeMfa = (session) => {
@@ -605,7 +605,6 @@ export const AuthProvider = ({ children }) => {
   const verifyLoginEmailMfa = async (code) => {
     try {
       const res = await hotelAPI.verifyLoginEmailMfa(code);
-      showSuccess('Login verified');
       // If this was a logout-initiated verification, perform logout now
       if (mfaChallenge?.pendingLogout) {
         try {
@@ -625,7 +624,6 @@ export const AuthProvider = ({ children }) => {
   const verifyLoginTotpMfa = async (code) => {
     try {
       const res = await hotelAPI.verifyLoginTotpMfa(code);
-      showSuccess('Login verified');
       // If this was a logout-initiated verification, perform logout now
       if (mfaChallenge?.pendingLogout) {
         try {
