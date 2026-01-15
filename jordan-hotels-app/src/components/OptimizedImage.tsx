@@ -1,10 +1,37 @@
 import React from 'react';
 
+// Extend HTMLImageElement attributes to include fetchpriority
+declare module 'react' {
+  interface ImgHTMLAttributes<T> extends React.HTMLAttributes<T> {
+    fetchpriority?: 'high' | 'low' | 'auto';
+  }
+}
+
 // Lightweight, production-ready image component focused on mobile perf
 // - Uses native lazy-loading + async decoding
 // - Reserves layout using an aspect-ratio wrapper to avoid CLS
 // - Ensures images always fill their container with object-fit:cover
-export default function OptimizedImage({ src, alt = '', className = '', ratio = '3/2', fallback = undefined, priority = false, loading = undefined, onError = undefined, ...rest }) {
+export default function OptimizedImage({
+  src,
+  alt = '',
+  className = '',
+  ratio = '3/2',
+  fallback = undefined,
+  priority = false,
+  loading = undefined,
+  onError = undefined,
+  ...rest
+}: {
+  src: string;
+  alt?: string;
+  className?: string;
+  ratio?: string;
+  fallback?: string;
+  priority?: boolean;
+  loading?: 'lazy' | 'eager';
+  onError?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
+  [key: string]: any;
+}) {
   const [errored, setErrored] = React.useState(false);
 
   // Provide a simple SVG fallback to avoid broken images and layout shifts
@@ -30,7 +57,7 @@ export default function OptimizedImage({ src, alt = '', className = '', ratio = 
         alt={alt}
         loading={effectiveLoading}
         decoding="async"
-        fetchPriority={priority ? 'high' : 'low'}
+        fetchpriority={priority ? 'high' : 'low'}
         className="w-full h-full object-cover block"
         onError={(e) => {
           setErrored(true);

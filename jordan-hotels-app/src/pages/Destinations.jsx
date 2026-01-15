@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { hotelAPI } from "../services/api";
 import destinationImages from '../data/destination-images.json';
 import OptimizedImage from '../components/OptimizedImage';
+import Seo from '../components/Seo.jsx';
 
 const DESTINATION_DETAILS = {
   'Dead Sea': {
@@ -148,6 +149,12 @@ export default function Destinations() {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="Explore Jordan Destinations - Petra, Wadi Rum, Dead Sea & More"
+        description="Discover Jordan's most incredible destinations. From Petra's ancient wonders to Wadi Rum's desert majesty, explore the best places to visit in Jordan."
+        canonicalUrl="https://visitjo.com/destinations"
+        keywords="Jordan destinations, Petra, Wadi Rum, Dead Sea, Amman, Jerash, Aqaba, Jordan travel guide, places to visit Jordan"
+      />
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 text-center text-white">

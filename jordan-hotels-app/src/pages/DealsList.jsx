@@ -8,6 +8,7 @@ import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
 import OptimizedImage from "../components/OptimizedImage";
+import Seo from '../components/Seo.jsx';
 
 const DISCOUNTS = [30, 25, 20, 35, 15, 22, 28, 18];
 
@@ -56,6 +57,12 @@ export default function DealsList() {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="Exclusive Hotel Deals in Jordan - Up to 35% Off Luxury Hotels"
+        description="Discover amazing hotel deals in Jordan. Save up to 35% on luxury accommodations in Petra, Wadi Rum, Dead Sea, and Amman. Limited time offers on premium properties."
+        canonicalUrl="https://visitjo.com/deals"
+        keywords="Jordan hotel deals, discounted hotels, luxury hotel offers, Jordan travel deals, hotel discounts, cheap hotels Jordan"
+      />
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-red-600 via-orange-600 to-yellow-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 text-center text-white">

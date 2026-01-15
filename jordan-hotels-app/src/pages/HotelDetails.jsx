@@ -271,6 +271,11 @@ const HotelDetails = () => {
         description={descriptionText}
         canonicalUrl={canonicalUrl}
         jsonLd={jsonLdGraph}
+        breadcrumbs={[
+          { name: 'Home', url: 'https://visitjo.com' },
+          { name: 'Hotels', url: 'https://visitjo.com/hotels' },
+          { name: hotelName, url: canonicalUrl }
+        ]}
       />
 
       {/* Mobile Booking Bar - Fixed at bottom */}

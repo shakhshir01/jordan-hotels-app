@@ -1,55 +1,81 @@
-import { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 
-const Seo = ({ title, description, canonicalUrl, jsonLd }) => {
-  useEffect(() => {
-    // Set document title
-    if (title) {
-      document.title = title;
-    }
+const Seo = ({
+  title,
+  description,
+  canonicalUrl,
+  jsonLd = null,
+  keywords = null,
+  image = null,
+  type = 'website',
+  noindex = false,
+  structuredData = [],
+  breadcrumbs = []
+}) => {
+  const fullTitle = title ? `${title} | VisitJo` : 'VisitJo | Discover Jordan\'s Best Hotels & Experiences';
+  const metaDescription = description || 'Book authentic hotels, explore ancient wonders, and create unforgettable memories in Jordan. From Petra to Wadi Rum, your adventure starts here.';
+  const metaImage = image || 'https://visitjo.com/og-image.jpg';
+  const metaKeywords = keywords || 'Jordan hotels, Jordan travel, Petra, Wadi Rum, Dead Sea, Amman hotels, Jordan experiences, Jordan booking';
 
-    // Set meta description
-    let metaDescription = document.querySelector('meta[name="description"]');
-    if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      /** @type {HTMLMetaElement} */ (metaDescription).name = 'description';
-      document.head.appendChild(metaDescription);
-    }
-    if (description) {
-      /** @type {HTMLMetaElement} */ (metaDescription).content = description;
-    }
+  // Combine all structured data
+  const allJsonLd = Array.isArray(structuredData) ? structuredData : [];
+  if (jsonLd) {
+    allJsonLd.push(jsonLd);
+  }
 
-    // Set canonical URL
-    let canonicalLink = document.querySelector('link[rel="canonical"]');
-    if (!canonicalLink) {
-      canonicalLink = document.createElement('link');
-      /** @type {HTMLLinkElement} */ (canonicalLink).rel = 'canonical';
-      document.head.appendChild(canonicalLink);
-    }
-    if (canonicalUrl) {
-      /** @type {HTMLLinkElement} */ (canonicalLink).href = canonicalUrl;
-    }
-
-    // Add JSON-LD structured data
-    if (jsonLd) {
-      let script = document.querySelector('script[type="application/ld+json"]');
-      if (!script) {
-        script = document.createElement('script');
-        /** @type {HTMLScriptElement} */ (script).type = 'application/ld+json';
-        document.head.appendChild(script);
-      }
-      /** @type {HTMLScriptElement} */ (script).textContent = JSON.stringify(jsonLd);
-    }
-
-    // Cleanup function
-    return () => {
-      // Reset title if needed
-      if (title) {
-        document.title = 'VisitJo - Discover Jordan';
-      }
+  // Add breadcrumb structured data if provided
+  if (breadcrumbs && breadcrumbs.length > 0) {
+    const breadcrumbJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": breadcrumbs.map((crumb, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": crumb.name,
+        "item": crumb.url
+      }))
     };
-  }, [title, description, canonicalUrl, jsonLd]);
+    allJsonLd.push(breadcrumbJsonLd);
+  }
 
-  return null; // This component doesn't render anything
+  return (
+    <Helmet>
+      <title>{fullTitle}</title>
+      <meta name="description" content={metaDescription} />
+      <meta name="keywords" content={metaKeywords} />
+      <meta name="author" content="VisitJo" />
+      <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1'} />
+
+      {/* Canonical URL */}
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+      {/* Open Graph */}
+      <meta property="og:title" content={fullTitle} />
+      <meta property="og:description" content={metaDescription} />
+      <meta property="og:image" content={metaImage} />
+      <meta property="og:url" content={canonicalUrl || 'https://visitjo.com'} />
+      <meta property="og:type" content={type} />
+      <meta property="og:site_name" content="VisitJo" />
+      <meta property="og:locale" content="en_US" />
+
+      {/* Twitter Card */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={fullTitle} />
+      <meta name="twitter:description" content={metaDescription} />
+      <meta name="twitter:image" content={metaImage} />
+
+      {/* Additional SEO meta tags */}
+      <meta name="theme-color" content="#0b1220" />
+      <meta name="msapplication-TileColor" content="#0b1220" />
+
+      {/* Structured Data */}
+      {allJsonLd.map((data, index) => (
+        <script key={index} type="application/ld+json">
+          {JSON.stringify(data)}
+        </script>
+      ))}
+    </Helmet>
+  );
 };
 
 export default Seo;

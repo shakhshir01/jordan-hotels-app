@@ -1,10 +1,17 @@
 import { useTranslation } from 'react-i18next';
+import Seo from '../components/Seo.jsx';
 
 export default function About() {
   const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      <Seo
+        title="About VisitJo - Your Authentic Jordan Travel Guide"
+        description="Learn about VisitJo's mission to provide authentic Jordan travel experiences. Discover our commitment to showcasing Jordan's hidden gems and warm hospitality."
+        canonicalUrl="https://visitjo.com/about"
+        keywords="about VisitJo, Jordan travel company, authentic travel, Jordan tourism, travel platform"
+      />
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 shadow-2xl mb-16 mx-4 sm:mx-6 mt-10">
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative px-4 sm:px-6 py-16 md:py-20 text-center text-white max-w-4xl mx-auto">

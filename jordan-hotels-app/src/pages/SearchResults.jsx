@@ -4,6 +4,7 @@ import { hotelAPI } from "../services/api";
 import { MapPin, Star, Search } from "lucide-react";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import OptimizedImage from "../components/OptimizedImage";
+import Seo from '../components/Seo.jsx';
 
 const STORAGE_KEY = "visitjo.savedSearches";
 
@@ -172,6 +173,12 @@ export default function SearchResults() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <Seo
+        title={`Hotel Search Results${term ? ` for ${term}` : ''} - VisitJo`}
+        description={`Find the best hotels${term ? ` in ${term}` : ' in Jordan'}. Browse ${hotels.length} available properties with real-time pricing and authentic reviews.`}
+        canonicalUrl={`https://visitjo.com/search${term ? `?q=${encodeURIComponent(term)}` : ''}`}
+        keywords={`Jordan hotels${term ? `, ${term} hotels` : ''}, hotel booking, accommodation, travel`}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">

@@ -11,6 +11,7 @@ import { getHotelDisplayName } from '../utils/hotelLocalization';
 import OptimizedImage from '../components/OptimizedImage';
 import LazyStripePaymentIntent from '../components/stripe/LazyStripePaymentIntent';
 import LazyPayPalButtons from '../components/paypal/LazyPayPalButtons';
+import Seo from '../components/Seo.jsx';
 
 /**
  * @typedef {{paymentProvider?:string,paymentIntentId?:string,paypalDetails?:any}} CreateBookingOpts
@@ -376,6 +377,12 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="Secure Checkout - Complete Your Jordan Hotel Booking"
+        description="Complete your secure hotel booking in Jordan. Safe payment processing with multiple options including credit card and PayPal."
+        noindex={true}
+        canonicalUrl="https://visitjo.com/checkout"
+      />
       {/* Hero Section */}
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />

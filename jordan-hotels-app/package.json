@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run generate-sitemaps",
     "prepare": "node scripts/husky-install.cjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -17,6 +17,7 @@
     "test:coverage": "vitest --coverage",
     "analyze": "vite build --sourcemap && echo 'open dist for analysis'",
     "audit": "npm audit --audit-level=moderate",
+    "generate-sitemaps": "node scripts/generate-sitemaps.mjs",
     "deploy:aws": "bash lambda/deploy-and-seed.sh",
     "deploy:aws:windows": "powershell -ExecutionPolicy Bypass -File lambda\\deploy-and-seed.ps1"
   },

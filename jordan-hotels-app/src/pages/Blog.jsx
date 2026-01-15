@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import Seo from '../components/Seo.jsx';
 
 const POSTS = [
   { slug: "petra-guide", title: "A practical Petra guide", titleAr: "دليل عملي للبتراء", meta: "Routes, timing, and tickets", metaAr: "المسارات والتوقيت والتذاكر" },
@@ -13,6 +14,12 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="Jordan Travel Blog - Tips, Guides & Stories from VisitJo"
+        description="Read expert travel guides, tips, and stories about Jordan. From Petra to Wadi Rum, get insider knowledge for your Jordan adventure."
+        canonicalUrl="https://visitjo.com/blog"
+        keywords="Jordan travel blog, Petra guide, Wadi Rum camps, Amman food, Jordan travel tips, travel stories"
+      />
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 text-center text-white">
