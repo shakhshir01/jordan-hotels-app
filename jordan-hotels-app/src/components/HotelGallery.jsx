@@ -6,6 +6,10 @@ import { staticHotelPrices } from '../data/staticHotelPrices';
 const HotelGallery = ({ images = [], hotelName }) => {
   const [showLightbox, setShowLightbox] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [mouseStart, setMouseStart] = useState(null);
+  const [mouseEnd, setMouseEnd] = useState(null);
 
   // Ensure we have at least some images
   const displayImages = useMemo(() => images.length > 0 ? images : ['/placeholder-hotel.jpg'], [images]);
@@ -36,6 +40,64 @@ const HotelGallery = ({ images = [], hotelName }) => {
     e?.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
   }, [displayImages]);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    if (touchStart !== null) {
+      setTouchEnd(e.targetTouches[0].clientX);
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      nextImage();
+    }
+    if (isRightSwipe) {
+      prevImage();
+    }
+  };
+
+  const onMouseDown = (e) => {
+    setMouseEnd(null);
+    setMouseStart(e.clientX);
+  };
+
+  const onMouseMove = (e) => {
+    if (mouseStart !== null) {
+      e.preventDefault();
+      setMouseEnd(e.clientX);
+    }
+  };
+
+  const onMouseUp = () => {
+    if (!mouseStart || !mouseEnd) {
+      setMouseStart(null);
+      setMouseEnd(null);
+      return;
+    }
+    const distance = mouseStart - mouseEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      nextImage();
+    }
+    if (isRightSwipe) {
+      prevImage();
+    }
+    setMouseStart(null);
+    setMouseEnd(null);
+  };
 
   useEffect(() => {
     if (!showLightbox) return;
@@ -117,8 +179,16 @@ const HotelGallery = ({ images = [], hotelName }) => {
       )}
 
       {/* Mobile Carousel Layout */}
-      <div className="md:hidden relative h-[350px] sm:h-[400px] -mx-4 sm:mx-0 overflow-hidden">
-        <div className="flex transition-transform duration-300 ease-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+      <div className="md:hidden relative h-[350px] sm:h-[400px] -mx-4 sm:mx-0 overflow-hidden touch-none"
+           onTouchStart={onTouchStart}
+           onTouchMove={onTouchMove}
+           onTouchEnd={onTouchEnd}
+           onMouseDown={onMouseDown}
+           onMouseMove={onMouseMove}
+           onMouseUp={onMouseUp}
+           onMouseLeave={onMouseUp} // In case mouse leaves
+           style={{ userSelect: 'none' }}>
+        <div className="flex transition-transform duration-150 ease-out" style={{ transform: `translateX(-${currentIndex * 100}%)`, willChange: 'transform' }}>
           {displayImages.map((img, idx) => (
             <div key={idx} className="flex-shrink-0 w-full h-full relative">
               <OptimizedImage 

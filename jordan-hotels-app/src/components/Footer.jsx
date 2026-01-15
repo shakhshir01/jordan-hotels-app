@@ -45,7 +45,7 @@ export default function Footer() {
                     placeholder="Enter your email"
                     className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-jordan-gold/50 focus:border-jordan-gold/50 transition-all duration-300"
                   />
-                  <button className="px-6 py-3 bg-gradient-to-r from-jordan-gold to-jordan-rose hover:from-jordan-rose hover:to-jordan-gold text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
+                  <button onClick={(e) => { e.preventDefault(); alert('Newsletter signup coming soon!'); }} className="px-6 py-3 bg-gradient-to-r from-jordan-gold to-jordan-rose hover:from-jordan-rose hover:to-jordan-gold text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
                     Subscribe
                   </button>
                 </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
@@ -80,6 +80,16 @@ export default function Gallery() {
 
   const virtualItems = rowVirtualizer.getVirtualItems();
 
+  // Callback ref to measure elements without triggering flushSync warning
+  const measureElement = useCallback((element) => {
+    if (element) {
+      // Schedule measurement in next microtask to avoid flushSync during render
+      queueMicrotask(() => {
+        rowVirtualizer.measureElement(element);
+      });
+    }
+  }, [rowVirtualizer]);
+
   const FALLBACK_IMG =
     "data:image/svg+xml;charset=UTF-8," +
     encodeURIComponent(`
@@ -119,7 +129,7 @@ export default function Gallery() {
                   style={{
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
-                  ref={rowVirtualizer.measureElement}
+                  ref={(el) => measureElement(el)}
                   data-index={virtualItem.index}
                 >
                   <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">

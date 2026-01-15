@@ -321,6 +321,16 @@ const HotelsVirtualizedGrid = function HotelsVirtualizedGrid({
 
   const items = rowVirtualizer.getVirtualItems();
 
+  // Callback ref to measure elements without triggering flushSync warning
+  const measureElement = useCallback((element) => {
+    if (element) {
+      // Schedule measurement in next microtask to avoid flushSync during render
+      queueMicrotask(() => {
+        rowVirtualizer.measureElement(element);
+      });
+    }
+  }, [rowVirtualizer]);
+
   return (
     <div ref={parentRefCallback}>
       <div className="relative" style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
@@ -333,7 +343,7 @@ const HotelsVirtualizedGrid = function HotelsVirtualizedGrid({
             <div
               key={virtualRow.key}
               data-index={rowIndex}
-              ref={rowVirtualizer.measureElement}
+              ref={(el) => measureElement(el)}
               className="absolute left-0 top-0 w-full"
               style={{
                 transform: `translateY(${virtualRow.start - scrollMargin}px)`,
