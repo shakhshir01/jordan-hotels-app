@@ -260,7 +260,9 @@
       "passwordsMatch": "Les mots de passe correspondent",
       "creatingAccount": "Création du compte...",
       "accountCreatedToast": "Compte créé ! Vérifiez votre email pour le code de vérification.",
-      "failed": "Échec de l'inscription. Veuillez réessayer."
+      "failed": "Échec de l'inscription. Veuillez réessayer.",
+      "orContinueWith": "Ou continuer avec",
+      "continueWithGoogle": "Continuer avec Google"
     },
     "forgotPassword": {
       "title": "Mot de passe oublié",

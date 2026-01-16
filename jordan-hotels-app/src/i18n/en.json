@@ -501,7 +501,9 @@
       "passwordsMatch": "Passwords match",
       "creatingAccount": "Creating account...",
       "accountCreatedToast": "Account created! Check your email for verification code.",
-      "failed": "Failed to sign up. Please try again."
+      "failed": "Failed to sign up. Please try again.",
+      "orContinueWith": "Or continue with",
+      "continueWithGoogle": "Continue with Google"
     },
     "forgotPassword": {
       "title": "Forgot Password",

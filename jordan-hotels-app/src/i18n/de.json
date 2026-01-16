@@ -260,7 +260,9 @@
       "passwordsMatch": "Passwörter stimmen überein",
       "creatingAccount": "Konto wird erstellt...",
       "accountCreatedToast": "Konto erstellt! Überprüfen Sie Ihre E-Mail auf den Bestätigungscode.",
-      "failed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+      "failed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "orContinueWith": "Oder fortfahren mit",
+      "continueWithGoogle": "Mit Google fortfahren"
     },
     "forgotPassword": {
       "title": "Passwort vergessen",

@@ -189,10 +189,10 @@ const SignUp = () => {
         </button>
 
         <div className="mt-6">
-          <div className="text-center text-sm text-slate-500 mb-3">{t('pages.signup.orContinueWith') || 'Or continue with'}</div>
+          <div className="text-center text-sm text-slate-500 mb-3">{t('pages.signup.orContinueWith')}</div>
           <div className="flex justify-center">
             <button onClick={handleGoogleSignUp} className="btn-outline text-center" disabled={loading}>
-              {t('pages.signup.continueWithGoogle') || 'Continue with Google'}
+              {t('pages.signup.continueWithGoogle')}
             </button>
           </div>
         </div>
