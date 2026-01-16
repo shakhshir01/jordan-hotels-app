@@ -9,6 +9,7 @@ import {
 } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
+import { showError } from '../services/toastService';
 
 const FALLBACK_IMG =
   "data:image/svg+xml;charset=UTF-8," +
@@ -65,6 +66,19 @@ const HotelDetails = () => {
     partial: 'Cancel within 24 hours: 50% refund',
     noRefund: 'No refund for cancellations within 6 hours of check-in',
   };
+
+  // Keyboard support for mobile booking modal
+  useEffect(() => {
+    if (!showMobileBooking) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowMobileBooking(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showMobileBooking]);
 
   // Calculate detailed price breakdown
   const calculatePriceBreakdown = () => {
@@ -141,17 +155,17 @@ const HotelDetails = () => {
     e.preventDefault();
     
     if (!checkInDate) {
-      alert(t('hotelDetails.errors.selectCheckIn'));
+      showError(t('hotelDetails.errors.selectCheckIn'));
       return;
     }
     if (!checkOutDate) {
-      alert(t('hotelDetails.errors.selectCheckOut') || 'Please select a check-out date');
+      showError(t('hotelDetails.errors.selectCheckOut') || 'Please select a check-out date');
       return;
     }
 
     // ensure check-out is after check-in
     if (new Date(checkOutDate) <= new Date(checkInDate)) {
-      alert(t('hotelDetails.errors.invalidCheckOut') || 'Check-out must be after check-in');
+      showError(t('hotelDetails.errors.invalidCheckOut') || 'Check-out must be after check-in');
       return;
     }
 
@@ -177,7 +191,7 @@ const HotelDetails = () => {
       // Navigate to checkout with hotel and booking data
       navigate('/checkout', { state: { hotelId: id, bookingData, hotel } });
     } catch (err) {
-      alert(err.message || t('hotelDetails.errors.bookingFailed'));
+      showError(err.message || t('hotelDetails.errors.bookingFailed'));
     } finally {
       setBookingLoading(false);
     }

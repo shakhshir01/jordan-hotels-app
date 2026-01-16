@@ -59,6 +59,10 @@ export default function OptimizedImage({
         decoding="async"
         fetchpriority={priority ? 'high' : 'low'}
         className="w-full h-full object-cover block"
+        style={priority ? { 
+          contentVisibility: 'auto',
+          containIntrinsicSize: 'auto 300px'
+        } : undefined}
         onError={(e) => {
           setErrored(true);
           if (typeof onError === 'function') onError(e);

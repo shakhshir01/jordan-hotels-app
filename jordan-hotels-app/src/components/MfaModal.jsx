@@ -294,6 +294,19 @@ export default function MfaModal() {
     }
   };
 
+  // Keyboard support for modal
+  useEffect(() => {
+    if (!mfaChallenge) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        clearMfaChallenge();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mfaChallenge, clearMfaChallenge]);
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="surface max-w-lg w-full mx-4 animate-in fade-in-0 zoom-in-95 duration-300">

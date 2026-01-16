@@ -20,16 +20,23 @@ const HotelGallery = ({ images = [], hotelName }) => {
   // Find price for this hotel
   const hotelPriceObj = staticHotelPrices.find(h => h.name === hotelName);
 
-  const openLightbox = useCallback((index) => {
-    setCurrentIndex(index);
-    setShowLightbox(true);
-    document.body.style.overflow = 'hidden';
-  }, []);
-
-  const closeLightbox = useCallback(() => {
-    setShowLightbox(false);
-    document.body.style.overflow = 'auto';
-  }, []);
+  // Focus management for lightbox
+  useEffect(() => {
+    if (showLightbox) {
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+      // Focus the close button when lightbox opens
+      setTimeout(() => {
+        const closeButton = document.querySelector('[aria-label="Close photos (Escape)"]');
+        if (closeButton instanceof HTMLElement) {
+          closeButton.focus();
+        }
+      }, 100);
+    } else {
+      // Restore body scroll
+      document.body.style.overflow = 'auto';
+    }
+  }, [showLightbox]);
 
   const nextImage = useCallback((e) => {
     e?.stopPropagation();
@@ -41,8 +48,17 @@ const HotelGallery = ({ images = [], hotelName }) => {
     setCurrentIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
   }, [displayImages]);
 
-  // Minimum swipe distance (in px)
-  const minSwipeDistance = 50;
+  const openLightbox = useCallback((index) => {
+    setCurrentIndex(index);
+    setShowLightbox(true);
+  }, []);
+
+  const closeLightbox = useCallback(() => {
+    setShowLightbox(false);
+  }, []);
+
+  // Minimum swipe distance (in px) - reduced for more responsive swiping
+  const minSwipeDistance = 30;
 
   const onTouchStart = (e) => {
     setTouchEnd(null);
@@ -51,7 +67,13 @@ const HotelGallery = ({ images = [], hotelName }) => {
 
   const onTouchMove = (e) => {
     if (touchStart !== null) {
-      setTouchEnd(e.targetTouches[0].clientX);
+      const currentX = e.targetTouches[0].clientX;
+      setTouchEnd(currentX);
+      // Only prevent default if horizontal movement is significant (> 5px)
+      // This allows vertical scrolling while still enabling horizontal swipes
+      if (Math.abs(currentX - touchStart) > 5) {
+        e.preventDefault();
+      }
     }
   };
 
@@ -99,16 +121,56 @@ const HotelGallery = ({ images = [], hotelName }) => {
     setMouseEnd(null);
   };
 
+  // Preload adjacent images for faster swiping
   useEffect(() => {
-    if (!showLightbox) return;
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowLeft') prevImage();
-      if (e.key === 'ArrowRight') nextImage();
-      if (e.key === 'Escape') closeLightbox();
+    const preloadImage = (src) => {
+      if (!src) return;
+      const img = new Image();
+      img.src = src;
+      img.decoding = 'async';
+      img.loading = 'eager';
     };
-    window.addEventListener('keydown', handleKeyDown, { passive: true });
+
+    // Preload next and previous images
+    const nextIndex = (currentIndex + 1) % displayImages.length;
+    const prevIndex = (currentIndex - 1 + displayImages.length) % displayImages.length;
+
+    preloadImage(displayImages[nextIndex]);
+    preloadImage(displayImages[prevIndex]);
+  }, [currentIndex, displayImages]);
+
+  // Keyboard support for carousel - only when focused or in lightbox
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Only handle keyboard navigation when in lightbox or when carousel container is focused
+      if (!showLightbox) return;
+      
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          prevImage();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          nextImage();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          closeLightbox();
+          break;
+        case 'Home':
+          e.preventDefault();
+          setCurrentIndex(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          setCurrentIndex(displayImages.length - 1);
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showLightbox, prevImage, nextImage, closeLightbox]);
+  }, [showLightbox, prevImage, nextImage, closeLightbox, displayImages.length]);
 
   return (
     <div className="relative">
@@ -179,7 +241,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
       )}
 
       {/* Mobile Carousel Layout */}
-      <div className="md:hidden relative h-[350px] sm:h-[400px] -mx-4 sm:mx-0 overflow-hidden touch-none"
+      <div className="md:hidden relative h-[350px] sm:h-[400px] -mx-4 sm:mx-0 overflow-hidden"
            onTouchStart={onTouchStart}
            onTouchMove={onTouchMove}
            onTouchEnd={onTouchEnd}
@@ -188,15 +250,29 @@ const HotelGallery = ({ images = [], hotelName }) => {
            onMouseUp={onMouseUp}
            onMouseLeave={onMouseUp} // In case mouse leaves
            style={{ userSelect: 'none' }}>
-        <div className="flex transition-transform duration-150 ease-out" style={{ transform: `translateX(-${currentIndex * 100}%)`, willChange: 'transform' }}>
+        <div className="flex transition-transform duration-75 ease-out" style={{ 
+          transform: `translateX(-${currentIndex * 100}%)`, 
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
+          perspective: 1000
+        }}>
           {displayImages.map((img, idx) => (
             <div key={idx} className="flex-shrink-0 w-full h-full relative">
               <OptimizedImage 
                 src={img} 
                 alt={`${hotelName} ${idx + 1}`} 
                 className="w-full h-full object-cover"
-                priority={idx === 0} // Only prioritize first image
+                priority={idx === currentIndex || idx === (currentIndex + 1) % displayImages.length || idx === (currentIndex - 1 + displayImages.length) % displayImages.length}
                 sizes="100vw"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openLightbox(idx);
+                  }
+                }}
+                role="button"
+                aria-label={`View ${hotelName} image ${idx + 1} of ${displayImages.length}`}
               />
             </div>
           ))}
@@ -235,12 +311,18 @@ const HotelGallery = ({ images = [], hotelName }) => {
 
       {/* Lightbox Modal */}
       {showLightbox && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center backdrop-blur-sm">
+        <div 
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="lightbox-title"
+          aria-describedby="lightbox-description"
+        >
           <button 
             type="button"
             onClick={closeLightbox}
-            aria-label="Close photos"
-            className="absolute top-4 right-4 text-white/80 hover:text-white p-3 min-h-[44px] min-w-[44px] rounded-full z-50"
+            aria-label="Close photos (Escape)"
+            className="absolute top-4 right-4 text-white/80 hover:text-white p-3 min-h-[44px] min-w-[44px] rounded-full z-50 focus:outline-none focus:ring-2 focus:ring-white/50"
           >
             <X className="w-8 h-8" />
           </button>
@@ -254,9 +336,16 @@ const HotelGallery = ({ images = [], hotelName }) => {
             <ChevronLeft className="w-10 h-10" />
           </button>
 
+          <div className="sr-only" id="lightbox-title">
+            {hotelName} Photo Gallery
+          </div>
+          <div className="sr-only" id="lightbox-description">
+            Photo {currentIndex + 1} of {displayImages.length}. Use arrow keys to navigate, Escape to close.
+          </div>
+
           <OptimizedImage 
             src={displayImages[currentIndex]} 
-            alt={`${hotelName} Fullscreen`} 
+            alt={`${hotelName} - Photo ${currentIndex + 1} of ${displayImages.length}`} 
             className="max-h-[90vh] max-w-[90vw] object-cover shadow-2xl"
           />
 

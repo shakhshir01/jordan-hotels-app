@@ -13,6 +13,7 @@
 
   html {
     @apply smooth-scroll;
+    height: 100%;
   }
 
   body {
@@ -20,6 +21,8 @@
     @apply dark:bg-gray-900 dark:text-gray-100;
     background-attachment: fixed;
     transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   img,

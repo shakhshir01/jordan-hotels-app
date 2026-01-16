@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const buttonRef = useRef(null);
+  const menuRef = useRef(null);
 
   const languages = [
     { code: "en", name: "English", flag: "🇺🇸" },
@@ -15,13 +18,71 @@ export default function LanguageSwitcher() {
   const handleLanguageChange = (langCode) => {
     i18n.changeLanguage(langCode);
     setIsOpen(false);
+    setFocusedIndex(-1);
   };
+
+  const handleKeyDown = (e) => {
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+          setFocusedIndex(0);
+        } else if (focusedIndex >= 0) {
+          handleLanguageChange(languages[focusedIndex].code);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setIsOpen(false);
+        setFocusedIndex(-1);
+        buttonRef.current?.focus();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+          setFocusedIndex(0);
+        } else {
+          setFocusedIndex(prev => (prev + 1) % languages.length);
+        }
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        if (isOpen) {
+          setFocusedIndex(prev => prev <= 0 ? languages.length - 1 : prev - 1);
+        }
+        break;
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (buttonRef.current && !buttonRef.current.contains(event.target) && 
+          menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setFocusedIndex(-1);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <div className="relative">
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={handleKeyDown}
         className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 transition-colors duration-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
@@ -40,19 +101,24 @@ export default function LanguageSwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 z-50">
-          <div className="py-1">
-            {languages.map((language) => (
+        <div ref={menuRef} className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 z-50">
+          <div className="py-1" role="listbox">
+            {languages.map((language, index) => (
               <button
                 key={language.code}
                 type="button"
                 onClick={() => handleLanguageChange(language.code)}
+                onKeyDown={handleKeyDown}
                 aria-label={`Switch language to ${language.name}`}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 ${
+                aria-selected={i18n.language === language.code}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 focus:bg-slate-50 dark:focus:bg-slate-700 focus:outline-none ${
+                  focusedIndex === index ? 'bg-slate-50 dark:bg-slate-700' : ''
+                } ${
                   i18n.language === language.code
                     ? 'bg-blue-600/10 text-blue-600 dark:bg-blue-600/20 dark:text-blue-400'
                     : 'text-slate-700 dark:text-slate-300'
                 }`}
+                role="option"
               >
                 <span className="text-lg">{language.flag}</span>
                 <span>{language.name}</span>

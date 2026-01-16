@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { hotelAPI } from '../services/api';
 import LazyStripePaymentIntent from '../components/stripe/LazyStripePaymentIntent';
 import LazyPayPalButtons from '../components/paypal/LazyPayPalButtons';
+import { showError } from '../services/toastService';
 
 const ExperienceBooking = () => {
   const { t } = useTranslation();
@@ -209,7 +210,7 @@ const ExperienceBooking = () => {
       setOrderComplete(true);
     } catch (error) {
       console.error('Booking failed:', error);
-      alert('Booking failed. Please try again.');
+      showError('Booking failed. Please try again.');
     } finally {
       setProcessing(false);
     }
@@ -727,7 +728,7 @@ const ExperienceBooking = () => {
                     onSuccess={handleSubmit}
                     onError={(error) => {
                       console.error('Stripe payment error:', error);
-                      alert('Payment failed: ' + error.message);
+                      showError('Payment failed: ' + error.message);
                     }}
                     disabled={processing}
                     onProcessingChange={setProcessing}
@@ -746,7 +747,7 @@ const ExperienceBooking = () => {
                     onApproved={handleSubmit}
                     onError={(error) => {
                       console.error('PayPal payment error:', error);
-                      alert('Payment failed: ' + error.message);
+                      showError('Payment failed: ' + error.message);
                     }}
                     disabled={processing}
                   />

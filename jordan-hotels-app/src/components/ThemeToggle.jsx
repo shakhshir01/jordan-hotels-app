@@ -32,10 +32,18 @@ export default function ThemeToggle() {
     setTheme(theme === "light" ? "dark" : "light");
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleTheme();
+    }
+  };
+
   return (
     <button
       type="button"
       onClick={toggleTheme}
+      onKeyDown={handleKeyDown}
       className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-all duration-300 shadow-sm hover:shadow-md group"
       aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
