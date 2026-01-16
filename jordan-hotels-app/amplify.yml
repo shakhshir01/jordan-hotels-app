@@ -34,7 +34,7 @@ customHeaders:
   - pattern: '**/*.jpg'
     headers:
       - key: 'Cache-Control'
-        value: 'public, max-age=31536000, immutable'
+           value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.visit-jo.com https://visit-jo.com https://js.stripe.com https://maps.googleapis.com https://www.googletagmanager.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://xu73bk6n25.execute-api.us-east-1.amazonaws.com https://us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com https://cognito-idp.us-east-1.amazonaws.com https://maps.googleapis.com https://www.google-analytics.com; frame-src https://js.stripe.com https://hooks.stripe.com"
   - pattern: '**/*.jpeg'
     headers:
       - key: 'Cache-Control'
