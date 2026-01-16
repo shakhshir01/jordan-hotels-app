@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useAuth } from './AuthContext';
+import { hotelAPI } from '../services/api';
 
 const AccessibilityContext = createContext({
   fontSize: 100,
@@ -12,6 +14,7 @@ const AccessibilityContext = createContext({
   increaseFontSize: () => {},
   decreaseFontSize: () => {},
   resetSettings: () => {},
+  loading: false,
 });
 
 export const useAccessibility = () => {
@@ -23,6 +26,9 @@ export const useAccessibility = () => {
 };
 
 export const AccessibilityProvider = ({ children }) => {
+  const { user, userProfile } = useAuth();
+  const [loading, setLoading] = useState(false);
+
   const [fontSize, setFontSize] = useState(() => {
     const saved = localStorage.getItem('accessibility-fontSize');
     return saved ? parseInt(saved) : 100; // percentage
@@ -43,7 +49,60 @@ export const AccessibilityProvider = ({ children }) => {
     return saved === 'true';
   });
 
-  // Apply settings to document
+  // Load preferences from AWS when user is authenticated
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (!user || !userProfile) {
+        // Not authenticated, use localStorage defaults
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const profile = await hotelAPI.getUserProfile();
+
+        if (profile?.preferences?.accessibility) {
+          const prefs = profile.preferences.accessibility;
+          setFontSize(prefs.fontSize ?? 100);
+          setHighContrast(prefs.highContrast ?? false);
+          setReducedMotion(prefs.reducedMotion ?? false);
+          setKeyboardNavigation(prefs.keyboardNavigation ?? false);
+        }
+      } catch (error) {
+        console.warn('Failed to load accessibility preferences from AWS:', error);
+        // Check if it's a CORS error and enable mock mode if needed
+        if (error?.message?.includes('CORS') || error?.message?.includes('Network Error') || error?.code === 'ERR_NETWORK') {
+          console.warn('CORS error detected, accessibility preferences will use localStorage only');
+        }
+        // Fall back to localStorage
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPreferences();
+  }, [user, userProfile]);
+
+  // Save preferences to AWS when they change
+  const savePreferencesToAWS = useCallback(async (preferences) => {
+    if (!user) return;
+
+    try {
+      const profile = await hotelAPI.getUserProfile();
+      const updatedProfile = {
+        ...profile,
+        preferences: {
+          ...profile.preferences,
+          accessibility: preferences,
+        },
+      };
+      await hotelAPI.updateUserProfile(updatedProfile);
+    } catch (error) {
+      console.warn('Failed to save accessibility preferences to AWS:', error);
+    }
+  }, [user]);
+
+  // Apply settings to document and save to AWS
   useEffect(() => {
     const root = document.documentElement;
 
@@ -72,7 +131,18 @@ export const AccessibilityProvider = ({ children }) => {
     localStorage.setItem('accessibility-highContrast', highContrast.toString());
     localStorage.setItem('accessibility-reducedMotion', reducedMotion.toString());
     localStorage.setItem('accessibility-keyboardNavigation', keyboardNavigation.toString());
-  }, [fontSize, highContrast, reducedMotion, keyboardNavigation]);
+
+    // Save to AWS if user is authenticated
+    if (user && !loading) {
+      const preferences = {
+        fontSize,
+        highContrast,
+        reducedMotion,
+        keyboardNavigation,
+      };
+      savePreferencesToAWS(preferences);
+    }
+  }, [fontSize, highContrast, reducedMotion, keyboardNavigation, user, loading, savePreferencesToAWS]);
 
   const increaseFontSize = () => {
     setFontSize(prev => Math.min(prev + 10, 150));
@@ -101,6 +171,7 @@ export const AccessibilityProvider = ({ children }) => {
     increaseFontSize,
     decreaseFontSize,
     resetSettings,
+    loading,
   };
 
   return (

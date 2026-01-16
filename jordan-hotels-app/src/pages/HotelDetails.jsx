@@ -11,6 +11,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { getHotelDisplayName } from '../utils/hotelLocalization';
 import { showError } from '../services/toastService';
+import { usePreferences } from '../context/PreferencesContext';
+import { formatPrice } from '../utils/hotelPricing';
 
 const FALLBACK_IMG =
   "data:image/svg+xml;charset=UTF-8," +
@@ -46,6 +48,7 @@ const HotelDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { preferences } = usePreferences();
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -189,6 +192,7 @@ const HotelDetails = () => {
         breakdown,
         cancellationPolicy,
         totalPrice: breakdown.total,
+        userPreferences: preferences, // Include user preferences for checkout
       };
       // Navigate to checkout with hotel and booking data
       navigate('/checkout', { state: { hotelId: id, bookingData, hotel } });
@@ -236,7 +240,7 @@ const HotelDetails = () => {
   const descriptionText = (() => {
     const raw = String(hotel?.description || hotel?.summary || '').trim();
     if (raw) return raw.length > 160 ? `${raw.slice(0, 157)}...` : raw;
-    const price = hotel?.price ? `${hotel.price} JOD` : 'great rates';
+    const price = hotel?.price ? formatPrice(hotel.price, preferences.currency) : 'great rates';
     return `Book ${hotelName} in ${hotel.location}. Starting from ${price} per night.`;
   })();
 
@@ -271,7 +275,7 @@ const HotelDetails = () => {
           addressLocality: hotel.location,
           addressCountry: 'JO',
         },
-        priceRange: hotel?.price ? `${hotel.price} JOD` : undefined,
+        priceRange: hotel?.price ? formatPrice(hotel.price, preferences.currency) : undefined,
         aggregateRating:
           typeof hotel?.rating === 'number' && hotel.rating > 0
             ? {
@@ -404,7 +408,7 @@ const HotelDetails = () => {
                       <option value="">{t('hotelDetails.booking.selectRoomType')}</option>
                       {hotel.roomTypes.map((roomType, index) => (
                         <option key={index} value={roomType.name}>
-                          {roomType.name} - {roomType.price} JOD ({t('hotelDetails.booking.capacity')}: {roomType.capacity})
+                          {roomType.name} - {formatPrice(roomType.price, preferences.currency)} ({t('hotelDetails.booking.capacity')}: {roomType.capacity})
                         </option>
                       ))}
                     </select>
@@ -419,24 +423,24 @@ const HotelDetails = () => {
                     return (
                       <div className="space-y-4">
                         <div className="flex justify-between items-center py-2">
-                          <span className="text-slate-700 dark:text-slate-300">{breakdown.basePrice} JOD × {breakdown.nights} nights</span>
-                          <span className="font-semibold text-slate-900 dark:text-slate-100">{breakdown.subtotal.toLocaleString()} JOD</span>
+                          <span className="text-slate-700 dark:text-slate-300">{formatPrice(breakdown.basePrice, preferences.currency)} × {breakdown.nights} nights</span>
+                          <span className="font-semibold text-slate-900 dark:text-slate-100">{formatPrice(breakdown.subtotal, preferences.currency)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
                           <span>Service fee</span>
-                          <span>{breakdown.serviceFee} JOD</span>
+                          <span>{formatPrice(breakdown.serviceFee, preferences.currency)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
                           <span>Cleaning fee</span>
-                          <span>{breakdown.cleaningFee} JOD</span>
+                          <span>{formatPrice(breakdown.cleaningFee, preferences.currency)}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
                           <span>Taxes (16% VAT)</span>
-                          <span>{breakdown.tax} JOD</span>
+                          <span>{formatPrice(breakdown.tax, preferences.currency)}</span>
                         </div>
                         <div className="border-t border-slate-200/70 dark:border-slate-700/60 pt-4 mt-4 flex justify-between items-center">
                           <span className="font-black text-slate-900 dark:text-slate-100 text-xl">Total</span>
-                          <span className="font-black gradient-text text-2xl">{breakdown.total.toLocaleString()} JOD</span>
+                          <span className="font-black gradient-text text-2xl">{formatPrice(breakdown.total, preferences.currency)}</span>
                         </div>
                       </div>
                     );
@@ -678,7 +682,7 @@ const HotelDetails = () => {
                     <option value="">{t('hotelDetails.booking.selectRoomType')}</option>
                     {hotel.roomTypes.map((roomType, index) => (
                       <option key={index} value={roomType.name}>
-                        {roomType.name} - {roomType.price} JOD ({t('hotelDetails.booking.capacity')}: {roomType.capacity})
+                        {roomType.name} - {formatPrice(roomType.price, preferences.currency)} ({t('hotelDetails.booking.capacity')}: {roomType.capacity})
                       </option>
                     ))}
                   </select>
@@ -694,24 +698,24 @@ const HotelDetails = () => {
                   return (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-slate-700 dark:text-slate-300">{breakdown.basePrice} JOD × {breakdown.nights} nights</span>
-                        <span className="font-semibold text-slate-900 dark:text-slate-100">{breakdown.subtotal.toLocaleString()} JOD</span>
+                        <span className="text-slate-700 dark:text-slate-300">{formatPrice(breakdown.basePrice, preferences.currency)} × {breakdown.nights} nights</span>
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">{formatPrice(breakdown.subtotal, preferences.currency)}</span>
                       </div>
                       <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
                         <span>Service fee</span>
-                        <span>{breakdown.serviceFee} JOD</span>
+                        <span>{formatPrice(breakdown.serviceFee, preferences.currency)}</span>
                       </div>
                       <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
                         <span>Cleaning fee</span>
-                        <span>{breakdown.cleaningFee} JOD</span>
+                        <span>{formatPrice(breakdown.cleaningFee, preferences.currency)}</span>
                       </div>
                       <div className="flex justify-between items-center py-2 text-slate-600 dark:text-slate-400">
                         <span>Taxes (16% VAT)</span>
-                        <span>{breakdown.tax} JOD</span>
+                        <span>{formatPrice(breakdown.tax, preferences.currency)}</span>
                       </div>
                       <div className="border-t border-slate-200/70 dark:border-slate-700/60 pt-4 mt-4 flex justify-between items-center">
                         <span className="font-black text-slate-900 dark:text-slate-100 text-xl">Total</span>
-                        <span className="font-black gradient-text text-2xl">{breakdown.total.toLocaleString()} JOD</span>
+                        <span className="font-black gradient-text text-2xl">{formatPrice(breakdown.total, preferences.currency)}</span>
                       </div>
                     </div>
                   );

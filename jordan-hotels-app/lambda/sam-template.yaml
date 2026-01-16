@@ -33,7 +33,7 @@ Resources:
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-        AllowOrigin: "'*'"
+        AllowOrigin: "'http://localhost:5175,https://main.d1ewsonl19kjj7.amplifyapp.com,*'"
         AllowCredentials: false
       Tags:
         App: VisitJo

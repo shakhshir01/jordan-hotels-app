@@ -35,7 +35,11 @@ const INTEGRATIONS = [
   // Hotels
   { path: '/hotels', method: 'GET', lambda: 'getHotels' },
   { path: '/hotels/{id}', method: 'GET', lambda: 'getHotelById' },
-  { path: '/hotels/{id}/book', method: 'POST', lambda: 'bookings' },
+  
+  // Bookings
+  { path: '/bookings', method: 'POST', lambda: 'bookings' },
+  { path: '/bookings', method: 'DELETE', lambda: 'bookings' },
+  { path: '/user/bookings', method: 'GET', lambda: 'bookings', auth: 'COGNITO_USER_POOLS' },
   
   // Search
   { path: '/search', method: 'GET', lambda: 'search' },
@@ -61,7 +65,6 @@ const INTEGRATIONS = [
   // User (NEW) - with Cognito authorizer
   { path: '/user/profile', method: 'GET', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   { path: '/user/profile', method: 'PUT', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
-  { path: '/user/bookings', method: 'GET', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   { path: '/user/mfa/email/setup', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   { path: '/user/mfa/email/verify', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   { path: '/user/mfa/disable', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },

@@ -12,15 +12,21 @@ A modern React application for discovering and booking hotels across Jordan. Bui
 - ⭐ Hotel ratings and detailed information
 - 📱 Fully responsive design
 - 🎨 Beautiful UI with Tailwind CSS
+- ⚙️ Dynamic user preferences (currency, language, theme, notifications)
+- 📸 Secure profile image uploads to AWS S3
 
 ## Tech Stack
 
 - **Frontend**: React 19, Vite, Tailwind CSS v4
 - **Authentication**: AWS Cognito
 - **API**: AWS API Gateway
+- **Database**: DynamoDB (user profiles)
+- **Storage**: AWS S3 (user images)
+- **Serverless**: AWS Lambda
 - **HTTP Client**: Axios
 - **Icons**: Lucide React
 - **Routing**: React Router DOM v7
+- **Internationalization**: react-i18next
 
 ## Project Structure
 
@@ -84,6 +90,24 @@ To enable the chatbot, you must provide a Google Gemini API key in your environm
     ```
 
     The backend API will use this key to authenticate with the Gemini API.
+
+### ⚙️ User Preferences & Profile Images
+
+VisitJo supports dynamic user preferences that update the UI immediately and persist to AWS. Users can customize:
+
+- **Currency**: JOD, USD, EUR, GBP
+- **Language**: English, French, German, Arabic (with i18n support)
+- **Theme**: Light/Dark mode (applied instantly)
+- **Notifications**: Email bookings, promotions, SMS reminders, push notifications
+- **Room Preferences**: Smoking/Non-smoking, bed types, accessibility
+
+**Profile Images**: Secure uploads to AWS S3 with presigned URLs for privacy and scalability.
+
+**Technical Implementation**:
+- Preferences stored in DynamoDB via API Gateway + Lambda
+- Images uploaded directly to S3 with temporary signed URLs
+- Reactive UI updates using React Context
+- Local storage fallback for offline functionality
 
 ### Available Scripts
 

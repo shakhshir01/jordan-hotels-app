@@ -1,4 +1,4 @@
-$uri = 'https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod/bookings'
+$uri = 'https://kmxuskvsvh.execute-api.us-east-1.amazonaws.com/prod/bookings'
 
 function SaveReq($method,$hdr,$body,$out){
   $sb = [System.Text.StringBuilder]::new()

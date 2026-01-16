@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { usePreferences } from '../context/PreferencesContext';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, LogOut, Edit2, Check, X, Calendar, Users } from 'lucide-react';
 import { showSuccess, showError } from '../services/toastService';
@@ -73,6 +74,7 @@ const normalizeBooking = (booking, index = 0) => {
 
 const Profile = () => {
   const { user, userProfile, updateUserProfileName, logout, mfaEnabled, openEmailSetup, disableMfa, mfaMethod, setupTotp } = useAuth();
+  const { preferences, setPreferences } = usePreferences();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -85,18 +87,6 @@ const Profile = () => {
     lastName: '',
     email: '',
     phone: '',
-  });
-  const [preferences, setPreferences] = useState({
-    currency: 'JOD',
-    language: 'en',
-    roomPreference: 'no-preference',
-    bedPreference: 'no-preference',
-    notifications: {
-      emailBookings: true,
-      emailPromotions: false,
-      smsReminders: false,
-      pushNotifications: false,
-    },
   });
 
   const loadUserProfile = React.useCallback(async () => {
@@ -155,29 +145,13 @@ const Profile = () => {
     }
   }, [user, userProfile?.firstName, userProfile?.hasCustomName, userProfile?.lastName]);
 
-  const loadUserPreferences = React.useCallback(async () => {
-    try {
-      // Load preferences from localStorage or API
-      const savedPrefs = localStorage.getItem('userPreferences');
-      if (savedPrefs) {
-        setPreferences(JSON.parse(savedPrefs));
-      }
-      // Could also load from API if backend supports it
-      // const apiPrefs = await hotelAPI.getUserPreferences();
-      // if (apiPrefs) setPreferences(apiPrefs);
-    } catch (error) {
-      console.error('Failed to load preferences:', error);
-    }
-  }, []);
-
   useEffect(() => {
     if (!user) {
       navigate('/login');
       return;
     }
     loadUserProfile();
-    loadUserPreferences();
-  }, [user, navigate, loadUserProfile, loadUserPreferences]);
+  }, [user, navigate, loadUserProfile]);
 
   // Reload profile when MFA status changes
   useEffect(() => {
@@ -228,17 +202,11 @@ const Profile = () => {
 
   const handleSavePreferences = async () => {
     try {
-      // Save to localStorage
-      localStorage.setItem('userPreferences', JSON.stringify(preferences));
-      
-      // Could also save to API if backend supports it
-      // await hotelAPI.updateUserPreferences(preferences);
-      
+      // The context's setPreferences already handles API and localStorage saving
       showSuccess('Preferences saved successfully');
       setEditingPreferences(false);
     } catch (error) {
       showError('Failed to save preferences');
-      console.error('Save preferences error:', error);
     }
   };
 
@@ -594,7 +562,6 @@ const Profile = () => {
                 <button
                   onClick={() => {
                     setEditingPreferences(false);
-                    loadUserPreferences(); // Reset to saved preferences
                   }}
                   aria-label="Cancel editing preferences"
                   className="btn-secondary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"

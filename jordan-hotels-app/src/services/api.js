@@ -75,29 +75,26 @@ if (typeof window !== "undefined" && window.__VISITJO_RUNTIME_CONFIG__ && window
 }
 
 function getApiBaseUrl(path) {
-  // Always use public API for hotels, deals, destinations, experiences, search
-  if (PUBLIC_API_BASE_URL) return PUBLIC_API_BASE_URL;
-
   // In local dev, force Vite proxy for user/profile endpoints to avoid CORS
   if (
     isLocalDevHost &&
-    (/^\/user/.test(path) ||
-      /^\/profile/.test(path) ||
-      /^\/bookings/.test(path) ||
-      /^\/uploads/.test(path) ||
-      /^\/payments/.test(path))
+    (path.startsWith("/user") ||
+      path.startsWith("/profile") ||
+      path.startsWith("/bookings") ||
+      path.startsWith("/uploads") ||
+      path.startsWith("/payments"))
   ) {
     return "/api";
   }
 
-  // Otherwise, use local backend or fallback to public API
-  return LOCAL_API_BASE_URL || PUBLIC_API_BASE_URL;
+  // Otherwise, use public API
+  return PUBLIC_API_BASE_URL || LOCAL_API_BASE_URL;
 }
 
 const apiClient = axios.create({
-  baseURL: PUBLIC_API_BASE_URL,
+  baseURL: '',
   timeout: resolvedTimeoutMs,
-  headers: API_KEY ? { "x-api-key": API_KEY } : undefined,
+  headers: API_KEY ? { "x-api-key": API_KEY } : {},
 });
 
 // Patch axios to use correct baseURL per endpoint
@@ -140,6 +137,14 @@ apiClient.interceptors.response.use(
     const dataMessage = error.response?.data?.message || error.response?.data || null;
     const errorMessage = dataMessage || error.message || "An error occurred";
 
+    // Handle CORS errors specifically
+    if (error.code === 'ERR_NETWORK' || error.message?.includes('CORS') ||
+        error.message?.includes('Network Error') || status === 0) {
+      console.warn('CORS/Network error detected, enabling mock mode for this request');
+      // Don't throw error for CORS issues, let the calling code handle it
+      return Promise.reject(new Error('CORS_ERROR'));
+    }
+
     if (isAuthError(status, errorMessage)) {
       lastAuthError = `API Authentication error: ${errorMessage}`;
       return Promise.reject(new Error(lastAuthError));
@@ -155,7 +160,7 @@ export const getUseMocks = () => {
   if (typeof window === "undefined") return false;
   try {
     return localStorage.getItem("visitjo.useMocks") === "1";
-  } catch {
+  } catch (_error) {
     return false;
   }
 };
@@ -163,7 +168,7 @@ export const getUseMocks = () => {
 export const enableMocks = (enable = true) => {
   try {
     localStorage.setItem("visitjo.useMocks", enable ? "1" : "0");
-  } catch {
+  } catch (_error) {
     // ignore (storage unavailable)
   }
   // reload so components re-run hooks and pick up mock data
@@ -679,6 +684,35 @@ export const hotelAPI = {
           userId: "fallback-user",
         };
       }
+      throw error;
+    }
+  },
+
+  getUserPreferences: async () => {
+    try {
+      const profile = await hotelAPI.getUserProfile();
+      return profile?.preferences || null;
+    } catch (error) {
+      if (lastAuthError) return null;
+      throw error;
+    }
+  },
+
+  updateUserPreferences: async (preferences) => {
+    if (getUseMocks()) return { ...preferences };
+    try {
+      const profile = await hotelAPI.getUserProfile();
+      const updatedProfile = {
+        ...profile,
+        preferences: {
+          ...profile.preferences,
+          ...preferences,
+        },
+      };
+      const res = await hotelAPI.updateUserProfile(updatedProfile);
+      return res?.preferences || preferences;
+    } catch (error) {
+      if (lastAuthError) return preferences;
       throw error;
     }
   },

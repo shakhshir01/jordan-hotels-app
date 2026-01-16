@@ -15,6 +15,8 @@ import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import hotelsService from "../services/hotelsService";
 import { haversineKm } from "../utils/geo";
 import OptimizedImage from "../components/OptimizedImage";
+import { usePreferences } from "../context/PreferencesContext";
+import { formatPrice } from "../utils/hotelPricing";
 
 const JORDAN_PLACES = [
   { name: "Amman", lat: 31.9539, lon: 35.9106 },
@@ -159,9 +161,9 @@ const useResponsiveColumns = () => {
   return columns;
 };
 
-/** @param {{hotel:any,i18nLanguage?:string,viewLabel?:string}} props */
+/** @param {{hotel:any,i18nLanguage?:string,viewLabel?:string,preferences:any}} props */
 const HotelCard = React.memo(function HotelCard(props = {}) {
-  const { hotel, i18nLanguage, viewLabel } = /** @type {{hotel:any,i18nLanguage?:string,viewLabel?:string}} */ (props);
+  const { hotel, i18nLanguage, viewLabel, preferences } = /** @type {{hotel:any,i18nLanguage?:string,viewLabel?:string,preferences:any}} */ (props);
   const hotelName = useMemo(
     () => getHotelDisplayName(hotel, i18nLanguage),
     [hotel, i18nLanguage]
@@ -267,7 +269,7 @@ const HotelCard = React.memo(function HotelCard(props = {}) {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-6 border-t border-slate-200/50 dark:border-slate-600/50">
           <div className="flex-1">
             <div className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100 mb-1">
-              From <span className="gradient-text">{hotel.price}</span> {hotel.currency || "JOD"}
+              From <span className="gradient-text">{formatPrice(hotel.price, preferences.currency)}</span>
             </div>
             <div className="text-slate-500 dark:text-slate-400 font-medium text-sm">per night • Free cancellation</div>
           </div>
@@ -291,6 +293,7 @@ const HotelsVirtualizedGrid = function HotelsVirtualizedGrid({
   hotels,
   viewLabel,
   i18nLanguage,
+  preferences,
 }) {
   const columns = useResponsiveColumns();
   const [scrollMargin, setScrollMargin] = useState(0);
@@ -353,7 +356,7 @@ const HotelsVirtualizedGrid = function HotelsVirtualizedGrid({
                 {rowHotels.map((hotel) => (
                   <HotelCard
                     key={hotel.id}
-                    {.../** @type {any} */ ({ hotel, i18nLanguage, viewLabel })}
+                    {.../** @type {any} */ ({ hotel, i18nLanguage, viewLabel, preferences })}
                   />
                 ))}
               </div>
@@ -367,6 +370,7 @@ const HotelsVirtualizedGrid = function HotelsVirtualizedGrid({
 
 const Home = () => {
   const { t, i18n } = useTranslation();
+  const { preferences } = usePreferences();
   const navigate = useNavigate();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -796,6 +800,7 @@ const Home = () => {
               hotels={filteredAndSortedHotels}
               viewLabel={viewLabel}
               i18nLanguage={i18n.language}
+              preferences={preferences}
             />
 
             {filteredAndSortedHotels.length === 0 && hotels.length > 0 && (

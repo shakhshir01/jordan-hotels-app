@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { AccessibilityProvider } from './context/AccessibilityContext';
+import { PreferencesProvider } from './context/PreferencesContext';
 // Shared layout
 import AppLayout from './layouts/AppLayout.jsx';
 // Components
@@ -126,9 +127,10 @@ function AppRoutes() {
 function App() {
   return (
     <ErrorBoundary>
-      <AccessibilityProvider>
-        <AuthProvider>
-          <WishlistProvider>
+      <AuthProvider>
+        <PreferencesProvider>
+          <AccessibilityProvider>
+            <WishlistProvider>
             <Suspense
               fallback={
                 <div className="flex justify-center py-10">
@@ -151,9 +153,10 @@ function App() {
               pauseOnHover
               theme="dark"
             />
-          </WishlistProvider>
-        </AuthProvider>
-      </AccessibilityProvider>
+            </WishlistProvider>
+          </AccessibilityProvider>
+        </PreferencesProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
