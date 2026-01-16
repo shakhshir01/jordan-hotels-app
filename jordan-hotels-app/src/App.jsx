@@ -12,6 +12,7 @@ import AppLayout from './layouts/AppLayout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ChatBot from './components/ChatBot.jsx';
 import MfaModal from './components/MfaModal.jsx';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 
 // Pages
 const Home = React.lazy(() => import('./pages/home.jsx'));
@@ -124,34 +125,36 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AccessibilityProvider>
-      <AuthProvider>
-        <WishlistProvider>
-          <Suspense
-            fallback={
-              <div className="flex justify-center py-10">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              </div>
-            }
-          >
-            <AppRoutes />
-            <MfaModal />
-          </Suspense>
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={true}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
-        </WishlistProvider>
-      </AuthProvider>
-    </AccessibilityProvider>
+    <ErrorBoundary>
+      <AccessibilityProvider>
+        <AuthProvider>
+          <WishlistProvider>
+            <Suspense
+              fallback={
+                <div className="flex justify-center py-10">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              }
+            >
+              <AppRoutes />
+              <MfaModal />
+            </Suspense>
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={true}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+            />
+          </WishlistProvider>
+        </AuthProvider>
+      </AccessibilityProvider>
+    </ErrorBoundary>
   );
 }
 
