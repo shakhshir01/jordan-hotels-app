@@ -40,6 +40,7 @@ const Checkout = () => {
   const [createdBookingId, setCreatedBookingId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [acknowledgedRisk, setAcknowledgedRisk] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const loadHotel = async () => {
@@ -93,8 +94,10 @@ const Checkout = () => {
           email: profile?.email || '',
           phone: profile?.phone || '',
         });
+        setIsAuthenticated(true);
       } catch {
         // If profile isn't available yet (auth/config), keep fields empty.
+        setIsAuthenticated(false);
       }
     })();
     return () => {
@@ -175,7 +178,7 @@ const Checkout = () => {
 
   const paymentsEnabled = String(import.meta.env.VITE_PAYMENTS_ENABLED || '').toLowerCase() === 'true';
   // Default to demo bookings unless explicitly turned off.
-  const demoBookings = String(import.meta.env.VITE_DEMO_BOOKINGS || 'true').toLowerCase() !== 'false';
+  const demoBookings = String(import.meta.env.VITE_DEMO_BOOKINGS || 'false').toLowerCase() !== 'false';
 
   /**
    * Create a booking record.
@@ -224,22 +227,8 @@ const Checkout = () => {
         throw new Error('Please use the PayPal button to complete PayPal payments.');
       }
 
-      // Fallback demo path (when Stripe isn't configured): keep the old simulated processing.
-      await persistProfile();
-      const bookingId = await createBooking({ paymentProvider: 'demo' });
-
-      // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      setOrderComplete(true);
-
-      setTimeout(() => {
-        navigate('/bookings', {
-          state: {
-            bookingConfirmed: true,
-            bookingId,
-          },
-        });
-      }, 1800);
+      // Demo mode removed - require real payments
+      throw new Error('Payment processing is not configured. Please configure Stripe or PayPal.');
     } catch (err) {
       setError(err.message || 'Payment processing failed');
       setProcessing(false);
@@ -255,7 +244,9 @@ const Checkout = () => {
     setProcessing(true);
     setError('');
     try {
-      await persistProfile();
+      if (isAuthenticated) {
+        await persistProfile();
+      }
       const bookingId = await createBooking({ paymentProvider: 'paypal' });
       setOrderComplete(true);
 
@@ -292,7 +283,9 @@ const Checkout = () => {
    */
   const handleCreateStripePaymentIntent = async (opts = {}) => {
     const { amount, currency = 'jod' } = /** @type {{amount:number,currency?:string}} */ (opts);
-    await persistProfile();
+    if (isAuthenticated) {
+      await persistProfile();
+    }
     const metadata = {
       hotelId: String(hotelId || ''),
     };
@@ -340,14 +333,10 @@ const Checkout = () => {
         <div className="max-w-md mx-auto surface p-8 text-center">
           <div className="text-6xl mb-4">✓</div>
           <h1 className="text-3xl font-bold text-green-600 mb-4">
-            {demoBookings || demoMode ? 'Checkout Complete (Demo)' : 'Checkout Complete'}
+            Checkout Complete
           </h1>
           <p className="text-gray-600 mb-6">
-            {demoBookings
-              ? 'Important: this site is a demo. Your payment does not create a real reservation with any hotel.'
-              : demoMode
-                ? 'This is a test/sandbox payment flow. No real charge was made.'
-                : 'Thank you. Your payment is complete.'}
+            Thank you. Your payment is complete and your booking is confirmed.
           </p>
           {createdBookingId && (
             <p className="text-xs text-gray-500 mb-2">Booking ID: {createdBookingId}</p>
@@ -562,16 +551,7 @@ const Checkout = () => {
         <div className="surface p-6">
           <h2 className="text-2xl font-black font-display tracking-tight mb-6">Payment Details</h2>
 
-          {(demoBookings || demoMode) && (
-            <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 text-sm mb-6">
-              <div className="font-bold mb-1">Important</div>
-              <div>
-                {demoBookings
-                  ? 'This is a demo booking. Completing payment does not reserve a room or confirm a reservation with any hotel.'
-                  : 'This payment method is running in test/sandbox mode. No real charge will be made.'}
-              </div>
-            </div>
-          )}
+
 
           <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 text-sm mb-6">
             <label className="flex items-start gap-3">
@@ -582,7 +562,7 @@ const Checkout = () => {
                 className="mt-1"
               />
               <span>
-                I understand that payments are made at my own risk and this booking does not create a real reservation with the hotel.
+                I acknowledge the booking terms and conditions.
               </span>
             </label>
           </div>
@@ -673,48 +653,9 @@ const Checkout = () => {
                         onError={(e) => setError(e?.message || 'Stripe payment failed')}
                       />
                     ) : (
-                      <>
-                        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm">
-                          {paymentsEnabled
-                            ? 'Stripe is not configured for this environment. This card form is simulated.'
-                            : 'Payments are currently disabled. This card form is simulated.'}
-                          {demoBookings
-                            ? ' No real hotel reservation will be made.'
-                            : ' No real charge is processed.'}
-                        </div>
-
-                        <div>
-                          <label className="block font-bold mb-2">Card Number</label>
-                          <input
-                            type="text"
-                            placeholder="4242 4242 4242 4242"
-                            className="w-full border rounded-lg px-4 py-2"
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block font-bold mb-2">Expiry</label>
-                            <input type="text" placeholder="MM/YY" className="w-full border rounded-lg px-4 py-2" />
-                          </div>
-                          <div>
-                            <label className="block font-bold mb-2">CVV</label>
-                            <input type="text" placeholder="123" className="w-full border rounded-lg px-4 py-2" />
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={handlePayment}
-                          disabled={processing || !acknowledgedRisk}
-                          className="w-full btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                          {processing ? 'Processing...' : `Pay ${calculateTotalWithTax().toFixed(2)} JOD`}
-                        </button>
-
-                        <p className="text-xs text-gray-600 text-center mt-4">
-                          This is a demo checkout flow.
-                        </p>
-                      </>
+                      <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-3 text-sm">
+                        Payment processing is not configured. Please configure Stripe or PayPal to enable bookings.
+                      </div>
                     )}
                   </>
                 )}

@@ -33,7 +33,7 @@ Resources:
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-        AllowOrigin: "'http://localhost:5175,https://main.d1ewsonl19kjj7.amplifyapp.com,*'"
+        AllowOrigin: "'http://localhost:5175,https://main.d1ewsonl19kjj7.amplifyapp.com,https://www.visit-jo.com,*'"
         AllowCredentials: false
       Tags:
         App: VisitJo
@@ -197,10 +197,12 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LogsBucket
+        LogFilePrefix: self-logs/
       Tags:
         - Key: App
           Value: VisitJo
-        - Key: ManagedBy
           Value: SAM
         - Key: Stack
           Value: !Ref AWS::StackName
@@ -232,14 +234,13 @@ Resources:
         - Key: Stack
           Value: !Ref AWS::StackName
 
-  StripeSecret:
+  StripeSecretKey:
     Condition: CreateStripeSecret
-    Type: AWS::SecretsManager::Secret
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
+    Type: AWS::KMS::Key
     Properties:
-      Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
-      KmsKeyId: alias/aws/secretsmanager
+      Description: KMS key for Stripe secret encryption
+      KeyUsage: ENCRYPT_DECRYPT
+      KeySpec: SYMMETRIC_DEFAULT
       Tags:
         - Key: App
           Value: VisitJo
@@ -247,6 +248,57 @@ Resources:
           Value: SAM
         - Key: Stack
           Value: !Ref AWS::StackName
+
+  StripeSecretKeyAlias:
+    Condition: CreateStripeSecret
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${AWS::StackName}-stripe-secret"
+      TargetKeyId: !Ref StripeSecretKey
+
+  StripeSecret:
+    Condition: CreateStripeSecret
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
+      KmsKeyId: !Ref StripeSecretKey
+      Tags:
+        - Key: App
+          Value: VisitJo
+        - Key: ManagedBy
+          Value: SAM
+        - Key: Stack
+          Value: !Ref AWS::StackName
+
+  StripeSecretRotation:
+    Condition: CreateStripeSecret
+    Type: AWS::SecretsManager::RotationSchedule
+    DependsOn: StripeSecret
+    Properties:
+      SecretId: !Ref StripeSecret
+      RotationLambdaARN: !GetAtt StripeSecretRotationFunction.Arn
+      RotationRules:
+        AutomaticallyAfterDays: 30
+
+  StripeSecretRotationFunction:
+    Condition: CreateStripeSecret
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-StripeSecretRotation"
+      CodeUri: rotation/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      Timeout: 300
+      Policies:
+        - SecretsManagerRotationSingleUser
+      Events:
+        RotationSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(30 days)
+            Enabled: false
 
 
 
