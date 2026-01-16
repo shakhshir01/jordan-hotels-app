@@ -42,6 +42,46 @@ export async function initAmplify() {
           allowGuestUsers: true
         }
       });
+    } else {
+      // If no amplifyconfiguration.json was found, attempt to bootstrap
+      // a minimal Amplify config from the runtime `window.__VISITJO_RUNTIME_CONFIG__`.
+      // This enables the hosted frontend to initialize Amplify/Auth when
+      // the build-time json isn't present.
+      try {
+        const runtimeCfg = typeof window !== 'undefined' ? window.__VISITJO_RUNTIME_CONFIG__ : null;
+        if (runtimeCfg && runtimeCfg.VITE_COGNITO_USER_POOL_ID && runtimeCfg.VITE_COGNITO_CLIENT_ID) {
+          const fallback = {
+            Auth: {
+              region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+              userPoolId: runtimeCfg.VITE_COGNITO_USER_POOL_ID,
+              userPoolWebClientId: runtimeCfg.VITE_COGNITO_CLIENT_ID,
+            }
+          };
+
+          // If a hosted UI domain is provided, wire up the oauth entries.
+          if (runtimeCfg.VITE_COGNITO_DOMAIN) {
+            fallback.Auth.oauth = {
+              domain: runtimeCfg.VITE_COGNITO_DOMAIN,
+              scope: ['email','openid','profile'],
+              redirectSignIn: import.meta.env.VITE_REDIRECT_SIGN_IN || window.location.origin,
+              redirectSignOut: import.meta.env.VITE_REDIRECT_SIGN_OUT || window.location.origin,
+              responseType: 'token'
+            };
+          }
+
+          Amplify.configure(fallback);
+          Analytics.configure({
+            AWSPinpoint: {
+              // minimal noop; avoid errors when Analytics isn't configured
+              appId: runtimeCfg.AWSPINPOINT_APP_ID || undefined,
+              region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+              allowGuestUsers: true
+            }
+          });
+        }
+      } catch (e) {
+        // ignore bootstrap errors
+      }
     }
   } catch (error) {
     // Error initializing Amplify
