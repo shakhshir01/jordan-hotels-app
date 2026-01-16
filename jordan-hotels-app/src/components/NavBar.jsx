@@ -4,9 +4,9 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
-import { MapPin, Camera, Tag, TrendingUp, BarChart3, MessageSquare, Image, HelpCircle } from "lucide-react";
+import { MapPin, Camera, Tag, TrendingUp, BarChart3, MessageSquare, Image, HelpCircle, Accessibility } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = ({ onAccessibilityClick }) => {
   const { user, userProfile, logout } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -129,6 +129,13 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-4">
+            <button
+              onClick={onAccessibilityClick}
+              aria-label={t('accessibility.settings', 'Accessibility Settings')}
+              className="p-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue dark:hover:text-jordan-teal transition-colors duration-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <Accessibility size={20} />
+            </button>
             <ThemeToggle />
             <LanguageSwitcher />
             

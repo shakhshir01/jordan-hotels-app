@@ -3,18 +3,22 @@ import { Outlet } from "react-router-dom";
 import NavBar from "../components/NavBar.jsx";
 import Footer from "../components/Footer.jsx";
 import ChatBot from "../components/ChatBot.jsx";
+import AccessibilitySettings from "../components/AccessibilitySettings.jsx";
+import { SkipToMainLink } from "../services/accessibility.jsx";
 import { getLastAuthError, enableMocks, getUseMocks } from "../services/api.js";
 
 export default function AppLayout() {
   const [authError] = useState(() => getLastAuthError());
   const [dismissed, setDismissed] = useState(false);
   const [useMocks, setUseMocks] = useState(getUseMocks());
+  const [accessibilitySettingsOpen, setAccessibilitySettingsOpen] = useState(false);
 
   const showBanner = authError && !dismissed && !useMocks;
 
   return (
     <div className="min-h-screen">
-      <NavBar />
+      <SkipToMainLink />
+      <NavBar onAccessibilityClick={() => setAccessibilitySettingsOpen(true)} />
 
       {/* Auth error banner - Mobile Optimized */}
       {showBanner && (
@@ -46,12 +50,16 @@ export default function AppLayout() {
         </div>
       )}
 
-      <main className="page-shell py-4 sm:py-6 lg:py-8">
+      <main id="main-content" className="page-shell py-4 sm:py-6 lg:py-8">
         <Outlet />
       </main>
 
       <Footer />
       <ChatBot />
+      <AccessibilitySettings
+        isOpen={accessibilitySettingsOpen}
+        onClose={() => setAccessibilitySettingsOpen(false)}
+      />
     </div>
   );
 }

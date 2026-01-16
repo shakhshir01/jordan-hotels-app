@@ -157,7 +157,7 @@ export const AccessibleButton = ({
     disabled={disabled}
     onClick={onClick}
     aria-label={ariaLabel}
-    aria-pressed={ariaPressed}
+    {...(ariaPressed !== undefined && { 'aria-pressed': ariaPressed })}
     className={`focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${className}`}
     {...props}
   >

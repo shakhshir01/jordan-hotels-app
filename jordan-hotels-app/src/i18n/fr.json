@@ -1,0 +1,312 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "hotels": "Hôtels",
+    "bookings": "Réservations",
+    "profile": "Profil",
+    "wishlist": "Liste de souhaits",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "logout": "Déconnexion",
+    "destinations": "Destinations",
+    "experiences": "Expériences",
+    "deals": "Offres",
+    "reviews": "Avis",
+    "support": "Support",
+    "about": "À propos",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "faq": "FAQ",
+    "help": "Aide",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Découvrez les meilleurs hôtels de Jordanie",
+    "subtitle": "Vivez des séjours inoubliables dans les plus belles destinations de Jordanie",
+    "searchPlaceholder": "Où souhaitez-vous aller ?",
+    "findStays": "TROUVER DES SÉJOURS"
+  },
+  "search": {
+    "destination": "Destination ou ville",
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "guests": "Invités",
+    "search": "Rechercher",
+    "priceRange": "Échelle de prix",
+    "applyFilters": "Appliquer les filtres",
+    "clearAll": "Tout effacer",
+    "instantSearch": "Recherche instantanée",
+    "mapView": "Vue carte",
+    "listView": "Vue liste"
+  },
+  "hotels": {
+    "noResults": "Aucun hôtel trouvé",
+    "perNight": "par nuit",
+    "addToWishlist": "Ajouter à la liste",
+    "removeFromWishlist": "Retirer de la liste",
+    "reviews": "avis",
+    "rating": "Note",
+    "amenities": "Équipements",
+    "location": "Emplacement",
+    "photos": "Photos",
+    "description": "Description",
+    "policies": "Politiques",
+    "bestFor": "Idéal pour",
+    "family": "Famille",
+    "business": "Affaires",
+    "couples": "Couples",
+    "solo": "Solo",
+    "luxury": "Luxe",
+    "budget": "Économique",
+    "spa": "Spa",
+    "beach": "Plage",
+    "adventure": "Aventure",
+    "city": "Ville",
+    "compare": "Comparer",
+    "viewDetails": "Voir les détails"
+  },
+  "booking": {
+    "selectDates": "Veuillez sélectionner des dates",
+    "selectGuests": "Veuillez sélectionner le nombre d'invités",
+    "bookNow": "Réserver maintenant",
+    "confirmedEmail": "Un email de confirmation a été envoyé",
+    "bookingId": "ID de réservation",
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "nights": "nuits",
+    "guests": "invités",
+    "totalPrice": "Prix total",
+    "guestDetails": "Détails des invités",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "phone": "Téléphone",
+    "proceedPayment": "Procéder au paiement",
+    "guestCheckout": "Paiement invité",
+    "noAccountRequired": "Aucun compte requis",
+    "createAccount": "Créer un compte",
+    "loginToBook": "Se connecter pour réserver"
+  },
+  "payment": {
+    "cardDetails": "Détails de la carte",
+    "nameOnCard": "Nom sur la carte",
+    "pay": "Payer",
+    "processing": "Traitement...",
+    "paymentSecure": "Votre paiement est sécurisé et crypté",
+    "orderSummary": "Résumé de la commande"
+  },
+  "auth": {
+    "fullName": "Nom complet",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "signup": "S'inscrire",
+    "login": "Connexion",
+    "forgotPassword": "Mot de passe oublié ?",
+    "rememberMe": "Se souvenir de moi",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "sendCode": "Envoyer le code",
+    "verifyCode": "Vérifier le code",
+    "newPassword": "Nouveau mot de passe",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "verificationCodeSent": "Code de vérification envoyé à votre email",
+    "checkEmail": "Vérifiez votre email pour le code de vérification",
+    "resendCode": "Renvoyer le code",
+    "resend": "Renvoyer",
+    "resendIn": "Renvoyer ({{seconds}}s)",
+    "validation": {
+      "fullNameRequired": "Le nom complet est requis",
+      "emailRequired": "L'email est requis",
+      "emailInvalid": "Veuillez entrer un email valide",
+      "passwordRequired": "Le mot de passe est requis",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordUppercase": "Le mot de passe doit contenir une majuscule",
+      "passwordLowercase": "Le mot de passe doit contenir une minuscule",
+      "passwordNumber": "Le mot de passe doit contenir un chiffre",
+      "passwordSymbol": "Le mot de passe doit contenir un caractère spécial (!@#$%^&*)",
+      "passwordsDontMatch": "Les mots de passe ne correspondent pas",
+      "passwordTooWeak": "Le mot de passe est trop faible"
+    },
+    "strength": {
+      "veryWeak": "Très faible",
+      "weak": "Faible",
+      "medium": "Moyen",
+      "strong": "Fort",
+      "veryStrong": "Très fort"
+    }
+  },
+  "messages": {
+    "success": "Succès",
+    "error": "Erreur",
+    "warning": "Avertissement",
+    "loading": "Chargement...",
+    "tryAgain": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer"
+  },
+  "common": {
+    "view": "Voir",
+    "book": "Réserver",
+    "from": "À partir de",
+    "to": "À",
+    "yes": "Oui",
+    "no": "Non",
+    "or": "ou",
+    "and": "et"
+  },
+  "home": {
+    "hero": {
+      "kicker": "DÉCOUVREZ LA JORDANIE",
+      "titleMain": "Jordanie",
+      "titleAccent": "Infinie.",
+      "subtitle": "Découvrez les joyaux cachés et les monuments légendaires de Jordanie. Des roses rouges de Pétra à la tranquillité de la mer Morte, votre voyage d'une vie commence ici.",
+      "searchPlaceholder": "Où en Jordanie ? (ex: Pétra, Mer Morte, Wadi Rum)",
+      "findStays": "TROUVER DES SÉJOURS"
+    }
+  },
+  "profile": {
+    "myProfile": "Mon profil",
+    "editProfile": "Modifier le profil",
+    "myBookings": "Mes réservations",
+    "noBookings": "Aucune réservation pour le moment",
+    "cancelBooking": "Annuler la réservation",
+    "viewBooking": "Voir la réservation",
+    "settings": "Paramètres",
+    "preferences": "Préférences",
+    "bookingHistory": "Historique des réservations",
+    "personalInfo": "Informations personnelles",
+    "changePassword": "Changer le mot de passe",
+    "deleteAccount": "Supprimer le compte",
+    "exportData": "Exporter les données",
+    "privacySettings": "Paramètres de confidentialité"
+  },
+  "footer": {
+    "about": "À propos de nous",
+    "contact": "Contact",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions générales",
+    "copyright": "VisitJo. Tous droits réservés.",
+    "brandDescription": "Expériences de découverte et de réservation de voyages premium pour la Jordanie - vous connecter aux meilleurs séjours, expériences et destinations.",
+    "explore": "Explorer",
+    "plan": "Planifier",
+    "company": "Entreprise",
+    "dealsOffers": "Offres et promotions",
+    "travelBlog": "Blog de voyage",
+    "tripPlanner": "Planificateur de voyage",
+    "helpSupport": "Aide et support"
+  },
+  "pages": {
+    "destinations": {
+      "hero": {
+        "kicker": "Découvrez",
+        "title": "Destinations en Jordanie",
+        "subtitle": "Explorez les lieux emblématiques et réservez les meilleurs séjours."
+      },
+      "hotelsCount": "{{count}} hôtel",
+      "hotelsCount_other": "{{count}} hôtels",
+      "exploreHotels": "Explorer les hôtels"
+    },
+    "experiences": {
+      "hero": {
+        "kicker": "Faites plus",
+        "title": "Expériences inoubliables",
+        "subtitle": "Visites organisées, aventures et activités à travers la Jordanie."
+      },
+      "learnMore": "En savoir plus",
+      "durationLabel": "Durée",
+      "groupSizeLabel": "Taille du groupe"
+    },
+    "dealsList": {
+      "loading": "Chargement des offres...",
+      "hero": {
+        "kicker": "Temps limité",
+        "title": "Offres et promotions",
+        "subtitle": "Économisez sur les meilleurs séjours avec des réductions exclusives."
+      },
+      "save": "Économisez {{amount}} JOD",
+      "claimDeal": "Profiter de l'offre"
+    },
+    "deals": {
+      "hero": {
+        "kicker": "Économisez plus",
+        "title": "Offres en vedette",
+        "subtitle": "Offres sélectionnées pour votre prochain voyage."
+      },
+      "seeOffers": "Voir les offres"
+    },
+    "specialOffers": {
+      "title": "Offres spéciales",
+      "subtitle": "Réductions exclusives sur les hôtels sélectionnés."
+    },
+    "login": {
+      "title": "Bienvenue",
+      "subtitle": "Connectez-vous à votre compte VisitJo",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "signingIn": "Connexion...",
+      "invalidCredentials": "Email ou mot de passe invalide. Veuillez réessayer.",
+      "orContinueWith": "Ou continuer avec",
+      "continueWithGoogle": "Continuer avec Google",
+      "continueWithFacebook": "Continuer avec Facebook"
+    },
+    "signup": {
+      "title": "Rejoignez VisitJo",
+      "subtitle": "Créez votre compte pour réserver des séjours incroyables",
+      "passwordPlaceholder": "Min. 8 caractères, 1 majuscule, 1 chiffre",
+      "confirmPasswordPlaceholder": "Retaper le mot de passe",
+      "passwordsMatch": "Les mots de passe correspondent",
+      "creatingAccount": "Création du compte...",
+      "accountCreatedToast": "Compte créé ! Vérifiez votre email pour le code de vérification.",
+      "failed": "Échec de l'inscription. Veuillez réessayer."
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Entrez votre email pour recevoir un code de vérification.",
+      "sending": "Envoi...",
+      "failed": "Échec de l'envoi du code de vérification."
+    },
+    "resetPassword": {
+      "subtitle": "Entrez le code envoyé à {{email}}",
+      "missingEmail": "Email manquant",
+      "codeRequired": "Le code est requis",
+      "resetting": "Réinitialisation...",
+      "success": "Mot de passe réinitialisé avec succès !",
+      "failed": "Échec de la réinitialisation du mot de passe."
+    }
+  },
+  "reviews": {
+    "title": "Avis",
+    "count": "avis",
+    "addReview": "Ajouter un avis",
+    "writeReview": "Écrire un avis",
+    "rating": "Note",
+    "comment": "Commentaire",
+    "submit": "Soumettre",
+    "verified": "Vérifié",
+    "helpful": "Utile",
+    "sortBy": "Trier par",
+    "newest": "Plus récent",
+    "oldest": "Plus ancien",
+    "highest": "Note la plus haute",
+    "lowest": "Note la plus basse",
+    "moderation": "Cet avis est en attente de modération"
+  },
+  "accessibility": {
+    "increaseFont": "Augmenter la taille de police",
+    "decreaseFont": "Diminuer la taille de police",
+    "highContrast": "Contraste élevé",
+    "normalContrast": "Contraste normal",
+    "screenReader": "Lecteur d'écran",
+    "keyboardNav": "Navigation clavier activée",
+    "skipToContent": "Aller au contenu",
+    "skipToNavigation": "Aller à la navigation"
+  },
+  "seo": {
+    "metaTitle": "VisitJo - Hôtels et expériences en Jordanie",
+    "metaDescription": "Découvrez les meilleurs hôtels et expériences en Jordanie. Réservez votre séjour idéal à Pétra, la Mer Morte, Wadi Rum et plus.",
+    "keywords": "Jordanie, hôtels, Pétra, Mer Morte, Wadi Rum, voyages, réservations"
+  }
+}

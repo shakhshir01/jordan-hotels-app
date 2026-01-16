@@ -488,7 +488,10 @@
       "subtitle": "Sign in to your VisitJo account",
       "passwordPlaceholder": "Enter your password",
       "signingIn": "Signing in...",
-      "invalidCredentials": "Invalid email or password. Please try again."
+      "invalidCredentials": "Invalid email or password. Please try again.",
+      "orContinueWith": "Or continue with",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithFacebook": "Continue with Facebook"
     },
     "signup": {
       "title": "Join VisitJo",
@@ -598,5 +601,25 @@
       "bookingLoading": "Booking...",
       "noChargeYet": "You won't be charged yet. Click to confirm booking."
     }
+  },
+  "accessibility": {
+    "settings": "Accessibility Settings",
+    "fontSize": "Font Size",
+    "increaseFont": "Increase font size",
+    "decreaseFont": "Decrease font size",
+    "highContrast": "High Contrast",
+    "highContrastEnabled": "High contrast enabled",
+    "highContrastDisabled": "High contrast disabled",
+    "reducedMotion": "Reduced Motion",
+    "reducedMotionEnabled": "Reduced motion enabled",
+    "reducedMotionDisabled": "Reduced motion disabled",
+    "keyboardNav": "Keyboard Navigation",
+    "keyboardNavEnabled": "Keyboard navigation enabled",
+    "keyboardNavDisabled": "Keyboard navigation disabled",
+    "reset": "Reset",
+    "resetSettings": "Reset settings",
+    "skipToContent": "Skip to main content",
+    "skipToNavigation": "Skip to navigation",
+    "screenReader": "Screen reader support enabled"
   }
 }

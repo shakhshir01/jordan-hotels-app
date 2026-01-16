@@ -5,6 +5,7 @@ import { User, Mail, LogOut, Edit2, Check, X, Calendar, Users } from 'lucide-rea
 import { showSuccess, showError } from '../services/toastService';
 import { InlineLoader } from '../components/LoadingSpinner';
 import { hotelAPI } from '../services/api';
+import ProfilePhotoUpload from '../components/ProfilePhotoUpload.jsx';
 
 // Email MFA UI is handled in the MFA modal now; inline manager removed.
 
@@ -78,11 +79,24 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [showEnableOptions, setShowEnableOptions] = useState(false);
+  const [editingPreferences, setEditingPreferences] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
+  });
+  const [preferences, setPreferences] = useState({
+    currency: 'JOD',
+    language: 'en',
+    roomPreference: 'no-preference',
+    bedPreference: 'no-preference',
+    notifications: {
+      emailBookings: true,
+      emailPromotions: false,
+      smsReminders: false,
+      pushNotifications: false,
+    },
   });
 
   const loadUserProfile = React.useCallback(async () => {
@@ -111,11 +125,14 @@ const Profile = () => {
       const email = apiProfile?.email || userEmail;
       const phone = apiProfile?.phone || '';
 
+      const avatarUrl = apiProfile?.avatarUrl || apiProfile?.avatar || userProfile?.avatarUrl || null;
+
       setProfile({
         firstName,
         lastName,
         email,
         phone,
+        avatarUrl,
       });
 
       setFormData({
@@ -138,13 +155,29 @@ const Profile = () => {
     }
   }, [user, userProfile?.firstName, userProfile?.hasCustomName, userProfile?.lastName]);
 
+  const loadUserPreferences = React.useCallback(async () => {
+    try {
+      // Load preferences from localStorage or API
+      const savedPrefs = localStorage.getItem('userPreferences');
+      if (savedPrefs) {
+        setPreferences(JSON.parse(savedPrefs));
+      }
+      // Could also load from API if backend supports it
+      // const apiPrefs = await hotelAPI.getUserPreferences();
+      // if (apiPrefs) setPreferences(apiPrefs);
+    } catch (error) {
+      console.error('Failed to load preferences:', error);
+    }
+  }, []);
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
       return;
     }
     loadUserProfile();
-  }, [user, navigate, loadUserProfile]);
+    loadUserPreferences();
+  }, [user, navigate, loadUserProfile, loadUserPreferences]);
 
   // Reload profile when MFA status changes
   useEffect(() => {
@@ -193,13 +226,27 @@ const Profile = () => {
     }
   };
 
-  const handleCancelBooking = async (bookingId) => {
-    if (!window.confirm('Are you sure you want to cancel this booking?')) return;
-    
+  const handleSavePreferences = async () => {
     try {
-      await hotelAPI.cancelBooking(bookingId);
-      showSuccess('Booking cancelled successfully');
-      setBookings((prev) => prev.filter((b) => (b.id || b.bookingId) !== bookingId));
+      // Save to localStorage
+      localStorage.setItem('userPreferences', JSON.stringify(preferences));
+      
+      // Could also save to API if backend supports it
+      // await hotelAPI.updateUserPreferences(preferences);
+      
+      showSuccess('Preferences saved successfully');
+      setEditingPreferences(false);
+    } catch (error) {
+      showError('Failed to save preferences');
+      console.error('Save preferences error:', error);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      // TODO: Implement booking cancellation API call
+      // await hotelAPI.cancelBooking(bookingId);
+      showSuccess('Booking cancellation is not yet implemented. Please contact support.');
     } catch (error) {
       showError('Failed to cancel booking');
       console.error('Cancel booking error:', error);
@@ -263,19 +310,25 @@ const Profile = () => {
         {/* Profile Card */}
         <div className="glass-card card-modern p-8 mb-8 animate-fade-in">
           <div className="flex items-start justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-glow-purple animate-pulse-glow">
-                {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
-              </div>
-              <div>
-                <h1 className="text-3xl font-black gradient-text animate-gradient">
-                  {profile?.firstName} {profile?.lastName}
-                </h1>
-                <p className="text-slate-600 dark:text-slate-300 flex items-center gap-2 mt-1">
-                  <Mail size={18} /> {profile?.email}
-                </p>
-              </div>
-            </div>
+                  <div className="flex items-center gap-4">
+                    <ProfilePhotoUpload
+                      currentAvatarUrl={profile?.avatarUrl || profile?.avatar}
+                      onUploaded={(updated) => {
+                        // Refresh local profile when avatar changes
+                        if (updated) {
+                          setProfile((p) => ({ ...p, ...(updated.avatarUrl ? { avatarUrl: updated.avatarUrl } : {}), ...(updated.avatar ? { avatar: updated.avatar } : {}) }));
+                        }
+                      }}
+                    />
+                    <div>
+                      <h1 className="text-3xl font-black gradient-text animate-gradient">
+                        {profile?.firstName} {profile?.lastName}
+                      </h1>
+                      <p className="text-slate-600 dark:text-slate-300 flex items-center gap-2 mt-1">
+                        <Mail size={18} /> {profile?.email}
+                      </p>
+                    </div>
+                  </div>
             <button
               onClick={handleLogout}
               aria-label="Logout"
@@ -397,7 +450,214 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* MFA Section */}
+        {/* Preferences Section */}
+        <div className="glass-card card-modern p-8 mb-8 animate-fade-in">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold gradient-text">Preferences</h2>
+            <button
+              onClick={() => setEditingPreferences(!editingPreferences)}
+              aria-label={editingPreferences ? "Cancel editing preferences" : "Edit preferences"}
+              className="btn-primary flex items-center gap-2 px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"
+            >
+              <Edit2 size={18} />
+              {editingPreferences ? 'Cancel' : 'Edit Preferences'}
+            </button>
+          </div>
+
+          {editingPreferences ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Currency</label>
+                  <select
+                    value={preferences.currency}
+                    onChange={(e) => setPreferences({...preferences, currency: e.target.value})}
+                    className="w-full px-4 py-3 glass-card border border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900 transition-all duration-300"
+                  >
+                    <option value="JOD">Jordanian Dinar (JOD)</option>
+                    <option value="USD">US Dollar (USD)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                    <option value="GBP">British Pound (GBP)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Language</label>
+                  <select
+                    value={preferences.language}
+                    onChange={(e) => setPreferences({...preferences, language: e.target.value})}
+                    className="w-full px-4 py-3 glass-card border border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900 transition-all duration-300"
+                  >
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="ar">العربية</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Room Preferences</label>
+                  <select
+                    value={preferences.roomPreference}
+                    onChange={(e) => setPreferences({...preferences, roomPreference: e.target.value})}
+                    className="w-full px-4 py-3 glass-card border border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900 transition-all duration-300"
+                  >
+                    <option value="no-preference">No Preference</option>
+                    <option value="smoking">Smoking Room</option>
+                    <option value="non-smoking">Non-Smoking Room</option>
+                    <option value="accessible">Accessible Room</option>
+                    <option value="quiet">Quiet Room</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Bed Preference</label>
+                  <select
+                    value={preferences.bedPreference}
+                    onChange={(e) => setPreferences({...preferences, bedPreference: e.target.value})}
+                    className="w-full px-4 py-3 glass-card border border-slate-200 dark:border-slate-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none text-slate-900 dark:text-slate-100 dark:bg-slate-900 transition-all duration-300"
+                  >
+                    <option value="no-preference">No Preference</option>
+                    <option value="king">King Bed</option>
+                    <option value="queen">Queen Bed</option>
+                    <option value="twin">Twin Beds</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold gradient-text">Notifications</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={preferences.notifications.emailBookings}
+                      onChange={(e) => setPreferences({
+                        ...preferences,
+                        notifications: {...preferences.notifications, emailBookings: e.target.checked}
+                      })}
+                      className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Email booking confirmations</span>
+                  </label>
+
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={preferences.notifications.emailPromotions}
+                      onChange={(e) => setPreferences({
+                        ...preferences,
+                        notifications: {...preferences.notifications, emailPromotions: e.target.checked}
+                      })}
+                      className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Email promotions and deals</span>
+                  </label>
+
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={preferences.notifications.smsReminders}
+                      onChange={(e) => setPreferences({
+                        ...preferences,
+                        notifications: {...preferences.notifications, smsReminders: e.target.checked}
+                      })}
+                      className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">SMS booking reminders</span>
+                  </label>
+
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={preferences.notifications.pushNotifications}
+                      onChange={(e) => setPreferences({
+                        ...preferences,
+                        notifications: {...preferences.notifications, pushNotifications: e.target.checked}
+                      })}
+                      className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-sm text-slate-700 dark:text-slate-300">Push notifications</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <button
+                  onClick={handleSavePreferences}
+                  aria-label="Save preferences"
+                  className="btn-primary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"
+                >
+                  <Check size={18} />
+                  Save Preferences
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingPreferences(false);
+                    loadUserPreferences(); // Reset to saved preferences
+                  }}
+                  aria-label="Cancel editing preferences"
+                  className="btn-secondary flex items-center gap-2 px-6 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"
+                >
+                  <X size={18} />
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 font-semibold">Currency</p>
+                <p className="text-lg text-slate-900 dark:text-slate-100">{preferences.currency}</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 font-semibold">Language</p>
+                <p className="text-lg text-slate-900 dark:text-slate-100">
+                  {preferences.language === 'en' ? 'English' :
+                   preferences.language === 'fr' ? 'Français' :
+                   preferences.language === 'de' ? 'Deutsch' :
+                   preferences.language === 'ar' ? 'العربية' : preferences.language}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 font-semibold">Room Preference</p>
+                <p className="text-lg text-slate-900 dark:text-slate-100">
+                  {preferences.roomPreference === 'no-preference' ? 'No Preference' :
+                   preferences.roomPreference === 'smoking' ? 'Smoking Room' :
+                   preferences.roomPreference === 'non-smoking' ? 'Non-Smoking Room' :
+                   preferences.roomPreference === 'accessible' ? 'Accessible Room' :
+                   preferences.roomPreference === 'quiet' ? 'Quiet Room' : preferences.roomPreference}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 font-semibold">Bed Preference</p>
+                <p className="text-lg text-slate-900 dark:text-slate-100">
+                  {preferences.bedPreference === 'no-preference' ? 'No Preference' :
+                   preferences.bedPreference === 'king' ? 'King Bed' :
+                   preferences.bedPreference === 'queen' ? 'Queen Bed' :
+                   preferences.bedPreference === 'twin' ? 'Twin Beds' : preferences.bedPreference}
+                </p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-sm text-slate-600 dark:text-slate-300 font-semibold mb-2">Notification Preferences</p>
+                <div className="flex flex-wrap gap-2">
+                  {preferences.notifications.emailBookings && (
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Email Bookings</span>
+                  )}
+                  {preferences.notifications.emailPromotions && (
+                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Email Promotions</span>
+                  )}
+                  {preferences.notifications.smsReminders && (
+                    <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">SMS Reminders</span>
+                  )}
+                  {preferences.notifications.pushNotifications && (
+                    <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">Push Notifications</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="glass-card card-modern p-8 mb-8 animate-fade-in">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold gradient-text">Two-Factor Authentication</h2>

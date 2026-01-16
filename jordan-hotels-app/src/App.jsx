@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { AccessibilityProvider } from './context/AccessibilityContext';
 // Shared layout
 import AppLayout from './layouts/AppLayout.jsx';
 // Components
@@ -18,6 +19,7 @@ const HotelDetails = React.lazy(() => import('./pages/HotelDetails.jsx'));
 const SignUp = React.lazy(() => import('./pages/SignUp.jsx'));
 const Verify = React.lazy(() => import('./pages/Verify'));
 const Login = React.lazy(() => import('./pages/Login'));
+const AuthCallback = React.lazy(() => import('./pages/AuthCallback'));
 const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
 const Profile = React.lazy(() => import('./pages/Profile'));
@@ -71,6 +73,7 @@ function AppRoutes() {
         {/* Public routes - anyone can access */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/signup" element={user ? <Navigate to="/" /> : <SignUp />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -121,32 +124,34 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <WishlistProvider>
-        <Suspense
-          fallback={
-            <div className="flex justify-center py-10">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-          }
-        >
-          <AppRoutes />
-          <MfaModal />
-        </Suspense>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
-      </WishlistProvider>
-    </AuthProvider>
+    <AccessibilityProvider>
+      <AuthProvider>
+        <WishlistProvider>
+          <Suspense
+            fallback={
+              <div className="flex justify-center py-10">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            }
+          >
+            <AppRoutes />
+            <MfaModal />
+          </Suspense>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
+        </WishlistProvider>
+      </AuthProvider>
+    </AccessibilityProvider>
   );
 }
 

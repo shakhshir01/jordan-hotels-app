@@ -14,12 +14,24 @@ export async function initAmplify() {
     let cfg = null;
     try {
       const resp = await fetch('/amplifyconfiguration.json', { cache: 'no-store' });
-      if (resp && resp.ok) cfg = await resp.json();
-    } catch {
-      // ignore fetch errors; cfg stays null
+      if (resp && resp.ok) {
+        cfg = await resp.json();
+      }
+    } catch (fetchError) {
+      // Error fetching config
     }
 
     if (cfg) {
+      // Override redirect URLs with environment variables for production
+      if (cfg.oauth) {
+        cfg.oauth.redirectSignIn = import.meta.env.VITE_REDIRECT_SIGN_IN || cfg.oauth.redirectSignIn;
+        cfg.oauth.redirectSignOut = import.meta.env.VITE_REDIRECT_SIGN_OUT || cfg.oauth.redirectSignOut;
+      }
+      if (cfg.Auth && cfg.Auth.oauth) {
+        cfg.Auth.oauth.redirectSignIn = import.meta.env.VITE_REDIRECT_SIGN_IN || cfg.Auth.oauth.redirectSignIn;
+        cfg.Auth.oauth.redirectSignOut = import.meta.env.VITE_REDIRECT_SIGN_OUT || cfg.Auth.oauth.redirectSignOut;
+      }
+
       Amplify.configure(cfg);
 
       // Configure analytics to allow unauthenticated users
@@ -31,8 +43,8 @@ export async function initAmplify() {
         }
       });
     }
-  } catch {
-    // Non-fatal: app should still boot even if Amplify isn't fully configured yet.
+  } catch (error) {
+    // Error initializing Amplify
   }
 
   // Optional test event (safe to ignore if Analytics isn't configured yet)

@@ -5,6 +5,10 @@ import { useAuth } from '../context/AuthContext';
 import { validateLogin } from '../utils/validators';
 import { useTranslation } from 'react-i18next';
 import { showError } from '../services/toastService';
+import { Auth } from 'aws-amplify';
+
+// Runtime config available at window.__VISITJO_RUNTIME_CONFIG__
+const runtime = typeof window !== 'undefined' ? window.__VISITJO_RUNTIME_CONFIG__ || {} : {};
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +19,16 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { t } = useTranslation();
+
+  const handleGoogleLogin = async () => {
+    try {
+      console.log('Starting Google OAuth login');
+      await Auth.federatedSignIn({ provider: 'Google' });
+    } catch (error) {
+      console.error('Google login error:', error);
+      showError('Failed to start Google login');
+    }
+  };
 
   const renderError = (value) => {
     if (!value) return '';
@@ -64,30 +78,36 @@ const Login = () => {
 
         {/* Email Input */}
         <div className="mb-6">
-          <label className="label-premium">{t('auth.email')}</label>
-          <input 
+          <label htmlFor="email" className="label-premium">{t('auth.email')}</label>
+          <input
+            id="email"
             type="email"
-            placeholder="you@example.com" 
+            placeholder="you@example.com"
             value={email}
             onChange={e => setEmail(e.target.value)}
+            aria-describedby={errors.email ? "email-error" : undefined}
+            aria-invalid={!!errors.email}
             className={`input-premium ${
               errors.email
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 bg-red-50'
                 : ''
             }`}
           />
-          {errors.email && <p className="text-red-600 text-sm mt-1">{renderError(errors.email)}</p>}
+          {errors.email && <p id="email-error" className="text-red-600 text-sm mt-1" role="alert">{renderError(errors.email)}</p>}
         </div>
 
         {/* Password Input */}
         <div className="mb-6">
-          <label className="label-premium">{t('auth.password')}</label>
+          <label htmlFor="password" className="label-premium">{t('auth.password')}</label>
           <div className="relative">
-            <input 
+            <input
+              id="password"
               type={showPassword ? 'text' : 'password'}
               placeholder={t('pages.login.passwordPlaceholder')}
               value={password}
               onChange={e => setPassword(e.target.value)}
+              aria-describedby={errors.password ? "password-error" : undefined}
+              aria-invalid={!!errors.password}
               className={`input-premium pr-10 ${
                 errors.password
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 bg-red-50'
@@ -97,21 +117,24 @@ const Login = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
               className="absolute right-3 top-3 text-slate-600 hover:text-slate-900"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
-          {errors.password && <p className="text-red-600 text-sm mt-1">{renderError(errors.password)}</p>}
+          {errors.password && <p id="password-error" className="text-red-600 text-sm mt-1" role="alert">{renderError(errors.password)}</p>}
         </div>
 
-        <button 
+        <button
           type="submit"
           disabled={loading}
+          aria-describedby={loading ? "login-status" : undefined}
           className="btn-primary w-full disabled:opacity-50"
         >
           {loading ? t('pages.login.signingIn') : t('auth.login')}
         </button>
+        {loading && <div id="login-status" className="sr-only" aria-live="polite">{t('pages.login.signingIn')}</div>}
 
         <p className="text-center text-slate-600 dark:text-slate-300 mt-6">
           {t('auth.dontHaveAccount')}{' '}
@@ -124,6 +147,15 @@ const Login = () => {
             {t('auth.forgotPassword')}
           </Link>
         </p>
+
+        <div className="mt-6">
+          <div className="text-center text-sm text-slate-500 mb-3">{t('pages.login.orContinueWith') || 'Or continue with'}</div>
+          <div className="flex justify-center">
+            <button onClick={handleGoogleLogin} className="btn-outline text-center" disabled={loading}>
+              {t('pages.login.continueWithGoogle') || 'Continue with Google'}
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );
