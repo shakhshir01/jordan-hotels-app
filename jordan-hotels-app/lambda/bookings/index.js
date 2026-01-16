@@ -4,7 +4,7 @@ exports.handler = async function (event) {
 
     const getCorsHeaders = () => ({
       "Content-Type": "application/json",
-      // Let API Gateway set Access-Control-Allow-* to avoid duplicates
+      // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
       "Vary": "Origin",
     });
 

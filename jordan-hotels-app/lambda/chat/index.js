@@ -2,6 +2,7 @@ const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 const defaultHeaders = {
   "Content-Type": "application/json",
+  // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
   "Vary": "Origin",
 };
 

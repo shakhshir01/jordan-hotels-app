@@ -35,7 +35,7 @@ Resources:
       Cors:
         AllowMethods: '''GET,POST,PUT,DELETE,OPTIONS'''
         AllowHeaders: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
-        AllowOrigin: '''https://www.visit-jo.com'''
+        AllowOrigin: '''*'''
         AllowCredentials: false
       Tags:
         App: VisitJo
@@ -44,6 +44,58 @@ Resources:
           Ref: AWS::StackName
     Metadata:
       SamResourceId: Api
+  GatewayResponseDefault4xx:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId:
+        Ref: Api
+      ResponseType: DEFAULT_4XX
+      StatusCode: 400
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+        gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
+    Metadata:
+      SamResourceId: GatewayResponseDefault4xx
+  GatewayResponseDefault5xx:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId:
+        Ref: Api
+      ResponseType: DEFAULT_5XX
+      StatusCode: 500
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+        gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
+    Metadata:
+      SamResourceId: GatewayResponseDefault5xx
+  GatewayResponseUnauthorized:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId:
+        Ref: Api
+      ResponseType: UNAUTHORIZED
+      StatusCode: 401
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+        gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
+    Metadata:
+      SamResourceId: GatewayResponseUnauthorized
+  GatewayResponseAccessDenied:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId:
+        Ref: Api
+      ResponseType: ACCESS_DENIED
+      StatusCode: 403
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+        gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
+    Metadata:
+      SamResourceId: GatewayResponseAccessDenied
   HotelsTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -308,7 +360,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getHotels/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/961cf32eedd3d6058cf62736bcc49199
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/f0f5ab5c91d70789097863aa3eb1f85e
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -335,7 +387,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getHotelById/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/475337edfbd1058027ef1a781a9447ef
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/475337edfbd1058027ef1a781a9447ef
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -362,7 +414,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: search/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/79c9b5e82424effbaa65d9c3b87ad12b
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/8e79f7ec09548c8fc0721d2a20471c34
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -395,7 +447,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: destinations/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/a7f9df462cfc7d63f1ebd0f57897f4d2
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/97f5f211b1334948e3bf6c29d94a0ed3
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -429,7 +481,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: deals/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/3557087f864b6026f3c300eab25a67f8
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/110075bff5dbb9dcb3c931e0a8570d64
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -463,7 +515,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: experiences/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/6f22bcd5c1eb790964d63b47a8c6baf7
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/8e002d6c23792dfa456c20f03b78324a
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -497,7 +549,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: bookings/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/79abe3e88a67596f34a7f1fe56f7f347
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/8d659bb054f69cc2900c92019f291f8f
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -524,7 +576,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: createCheckoutSession/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/a814425cb6eba9354ee0d7917aecd3cf
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/9cca75dcbeede759897bc1cfa359e769
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -556,7 +608,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: createPaymentIntent/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/6adb410c650da5aea360941124ae7dba
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/14d1668ea3af7ed6186ad8f77ee5f228
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -588,7 +640,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getSignedUrl/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/1c4373c29dbe0c9c938ac84610ebe1a2
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/f97f40cd31d954aaba57ece826453ef6
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -615,7 +667,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: user/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/3b57ff4af44b9d827feabbd05d7d2445
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/e4a87ff131b3ef0d53c7ac8cefe50a45
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -731,7 +783,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: sendBookingEmail/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/d7622ec284b1fc6a044501f1d75d0140
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/37b0f5625bf530568f0f85f714fb8334
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -759,7 +811,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: chat/index.handler
-      CodeUri: s3://visitjo-sam-deploy-20260116222805/f19cf661e14af45999a3f676a089c4c1
+      CodeUri: s3://visitjo-sam-deploy-20260116230619/1dac242fcf5961ad9e137968e9975b0d
       Tags:
         App: VisitJo
         ManagedBy: SAM

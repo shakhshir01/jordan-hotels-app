@@ -33,38 +33,63 @@ Resources:
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-        # Use wildcard for now so Amplify and other hosts are allowed; can be scoped tighter later
-        AllowOrigin: "'*'"
+        # Restrict to known frontend origins (add additional Amplify hosts as needed)
+        AllowOrigin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
         AllowCredentials: false
-      GatewayResponses:
-        DEFAULT_4XX:
-          StatusCode: 400
-          ResponseParameters:
-            gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-            gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-            gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-        DEFAULT_5XX:
-          StatusCode: 500
-          ResponseParameters:
-            gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-            gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-            gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-        UNAUTHORIZED:
-          StatusCode: 401
-          ResponseParameters:
-            gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-            gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-            gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-        ACCESS_DENIED:
-          StatusCode: 403
-          ResponseParameters:
-            gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-            gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-            gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      # GatewayResponses removed temporarily to avoid SAM transform validation errors.
+      # If needed, create explicit AWS::ApiGateway::GatewayResponse resources
+      # (attached to the RestApi) using valid parameter keys and reference the
+      # generated RestApi from the SAM transform.
       Tags:
         App: VisitJo
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
+
+  # Explicit GatewayResponse resources to ensure CORS headers are present
+  # on API Gateway error responses (prevents missing CORS on 4XX/5XX/error flows).
+  GatewayResponseDefault4xx:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId: !Ref Api
+      ResponseType: DEFAULT_4XX
+      StatusCode: 400
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
+        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+
+  GatewayResponseDefault5xx:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId: !Ref Api
+      ResponseType: DEFAULT_5XX
+      StatusCode: 500
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
+        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+
+  GatewayResponseUnauthorized:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId: !Ref Api
+      ResponseType: UNAUTHORIZED
+      StatusCode: 401
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
+        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+
+  GatewayResponseAccessDenied:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId: !Ref Api
+      ResponseType: ACCESS_DENIED
+      StatusCode: 403
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
+        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
 
   HotelsTable:
     Type: AWS::DynamoDB::Table

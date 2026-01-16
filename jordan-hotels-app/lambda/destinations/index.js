@@ -9,6 +9,7 @@ const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 const defaultHeaders = {
   "Content-Type": "application/json",
+  // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
   "Vary": "Origin",
 };
 
