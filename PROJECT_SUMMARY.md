@@ -75,7 +75,7 @@
 ```env
 VITE_COGNITO_USER_POOL_ID=us-east-1_XXXXXXXXX
 VITE_COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxx
-VITE_API_GATEWAY_URL=https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod
+VITE_API_GATEWAY_URL=https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
 VITE_S3_BUCKET=jordan-hotels-uploads
 VITE_S3_REGION=us-east-1

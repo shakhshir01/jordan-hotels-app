@@ -15,7 +15,7 @@ Your VisitJo application is now **fully deployed on AWS** with all 16 API endpoi
 - **Build**: `npm run build`
 
 ### Backend (AWS)
-- **API Gateway**: `https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod`
+- **API Gateway**: `https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod`
 - **Lambda Functions**: 11 total (all deployed)
 - **Database**: DynamoDB (5 tables)
 - **Storage**: S3 bucket for images
@@ -83,7 +83,7 @@ GET  /blog/{slug}         → blog
 
 ### Environment Variables (`.env.local`)
 ```env
-VITE_API_GATEWAY_URL=https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod
+VITE_API_GATEWAY_URL=https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod
 VITE_COGNITO_USER_POOL_ID=us-east-1_wEYeRj64s
 VITE_COGNITO_CLIENT_ID=7khcvg0ge70sotb9rp1muns504
 VITE_GEMINI_API_KEY=AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64
@@ -103,13 +103,13 @@ VITE_GEMINI_API_KEY=AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64
 ### Test Endpoints from Terminal
 ```bash
 # Test hotels endpoint
-curl https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/hotels
+curl https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod/hotels
 
 # Test search
-curl "https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/search?q=petra"
+curl "https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod/search?q=petra"
 
 # Test blog
-curl https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/blog
+curl https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod/blog
 ```
 
 ### Test from Browser
@@ -263,7 +263,7 @@ npm run dev
 npm run build
 
 # Test endpoints
-curl https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/hotels
+curl https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod/hotels
 
 # View Lambda logs
 aws logs tail /aws/lambda/getHotels --follow
@@ -300,5 +300,5 @@ cd lambda && sam build && sam deploy
 ---
 
 **Deployment Date**: January 3, 2026  
-**API Endpoint**: https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod  
+**API Endpoint**: https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod  
 **Status**: 🟢 LIVE AND OPERATIONAL

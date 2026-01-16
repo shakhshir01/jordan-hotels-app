@@ -92,13 +92,13 @@ Expected Output:
 ```
 VITE_COGNITO_USER_POOL_ID=us-east-1_wEYeRj64s
 VITE_COGNITO_CLIENT_ID=7khcvg0ge70sotb9rp1muns504
-VITE_API_GATEWAY_URL=https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod
+VITE_API_GATEWAY_URL=https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod
 ```
 
 ### 2. Verify API Gateway is Accessible
 ```powershell
 # Windows PowerShell
-$apiUrl = "https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod"
+$apiUrl = "https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod"
 Invoke-WebRequest -Uri "$apiUrl/hotels" -Method Get | ConvertFrom-Json
 ```
 Expected: Returns array of 3 hotels
@@ -225,7 +225,7 @@ cd lambda/getHotels
 node -c index.js  # Syntax check
 
 # Check API Gateway responses
-curl -v https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/hotels
+curl -v https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod/hotels
 
 # Check CloudWatch logs
 aws logs tail /aws/lambda/jordan-hotels-getHotels --follow
@@ -256,7 +256,7 @@ Expected: JS bundle < 500KB, CSS < 50KB
 ### 2. API Response Time
 ```powershell
 # Test response time
-time curl https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/hotels
+time curl https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod/hotels
 ```
 Expected: Response < 2 seconds
 

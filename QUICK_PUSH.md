@@ -125,7 +125,7 @@ git pull origin main
 
 ```bash
 # Test API
-curl https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/hotels
+curl https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod/hotels
 
 # Test Frontend (get URL from Actions output)
 # Visit https://[cloudfront-id].cloudfront.net/

@@ -318,7 +318,7 @@ Day 5 - Launch Ready
 
 ```
 API Gateway Base URL:
-  https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod
+  https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod
 
 Hotels:
   GET  /hotels              - List all hotels

@@ -79,7 +79,7 @@ Your **VisitJo** hotel booking application is fully built and ready for deployme
 - Profile image uploads to S3 with presigned URLs
 
 ✅ **API Gateway**
-- URL: https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod
+- URL: https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod
 - All 7 endpoints responding with proper JSON
 - CORS headers configured
 - Test: GET /hotels returns 3 hotels
