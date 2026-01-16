@@ -17,7 +17,7 @@ Your **VisitJo** hotel booking application is fully built and ready for deployme
   - SignUp (registration)
   - Verify (email verification)
   - ForgotPassword / ResetPassword
-  - Profile (user dashboard)
+  - Profile (user dashboard with preferences & image upload)
   - Bookings (booking history)
   - AdminUpload (hotel image upload)
   - Checkout (Stripe payment)
@@ -36,6 +36,8 @@ Your **VisitJo** hotel booking application is fully built and ready for deployme
   - `bookings` - Create & list bookings
   - `createCheckoutSession` - Stripe checkout
   - `getSignedUrl` - S3 file uploads
+  - `userProfile` - User preferences & profile management
+  - `presignUpload` - S3 presigned URLs for image uploads
 
 - ✅ **Infrastructure as Code (SAM Template)** with:
   - API Gateway configuration
@@ -73,12 +75,16 @@ Your **VisitJo** hotel booking application is fully built and ready for deployme
 - Build completes successfully (395KB gzipped)
 - All pages navigate correctly
 - API client is configured and ready
+- User preferences (currency, language, theme) update UI instantly
+- Profile image uploads to S3 with presigned URLs
 
 ✅ **API Gateway**
-- URL: https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod
-- All 5 endpoints responding with proper JSON
+- URL: https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod
+- All 7 endpoints responding with proper JSON
 - CORS headers configured
 - Test: GET /hotels returns 3 hotels
+- User preferences persist to DynamoDB
+- Image uploads via presigned S3 URLs
 
 ✅ **Local Testing**
 - All Lambda handlers tested locally

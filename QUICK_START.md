@@ -10,7 +10,7 @@
 - **Pages:** ✅ All 9 pages implemented (Home, HotelDetails, Login, SignUp, Verify, ForgotPassword, ResetPassword, Profile, Bookings, AdminUpload, Checkout)
 
 ### API Gateway
-- **URL:** https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod
+- **URL:** https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod
 - **Status:** ✅ Live and responding
 - **Endpoints:** ✅ All 5 Lambda handlers connected
   - GET /hotels → ✅ Returns 3 test hotels
@@ -91,7 +91,7 @@ Check:
 6. When done, copy the API Gateway URL from the output
 7. Update `.env.local`:
    ```
-   VITE_API_GATEWAY_URL=https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod
+   VITE_API_GATEWAY_URL=https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod
    ```
 8. Refresh browser
 

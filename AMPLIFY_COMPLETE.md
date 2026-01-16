@@ -144,7 +144,7 @@ Step 6: Add Environment Variables ⚠️ IMPORTANT!
   VITE_COGNITO_CLIENT_ID=1v5kg2qprjtsnvia0hikm1blvd
   VITE_COGNITO_DOMAIN=us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com
   VITE_API_GATEWAY_URL=https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
-  VITE_GEMINI_API_KEY=AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM
+  VITE_GEMINI_API_KEY=AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64
 
 Step 7: Deploy
   Click "Save and Deploy"

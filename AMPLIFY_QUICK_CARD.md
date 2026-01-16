@@ -32,7 +32,7 @@
    VITE_COGNITO_CLIENT_ID=1v5kg2qprjtsnvia0hikm1blvd
    VITE_COGNITO_DOMAIN=us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com
    VITE_API_GATEWAY_URL=https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
-   VITE_GEMINI_API_KEY=AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM
+   VITE_GEMINI_API_KEY=AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64
 
 7. Click: Save and Deploy
 
@@ -110,7 +110,7 @@ VITE_API_GATEWAY_URL
 ├─ Value: https://ny5ohksmc3.execute-api.us-east-1.amazonaws.com/prod
 
 VITE_GEMINI_API_KEY
-├─ Value: AIzaSyAk3KakpulaXwZi9xxkPQDNUlhyt2LD1LM
+├─ Value: AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64
 ```
 
 ---

@@ -60,7 +60,7 @@
 
 ## 🚀 API Gateway Status
 
-**Connected API URL:** `https://g7itqnbol9.execute-api.us-east-1.amazonaws.com/stage`
+**Connected API URL:** `https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod`
 
 ✅ **API Test Results:**
 - `GET /hotels` → Returns 200 with 3 hotels
@@ -252,7 +252,7 @@ sam list stack-outputs --stack-name jordan-hotels-api
 |-----------|--------|----------|
 | Frontend React App | ✅ Running | `c:\Users\khale\Desktop\VisitJo\jordan-hotels-app` |
 | Dev Server | ✅ Running | `http://localhost:5175` |
-| API Gateway | ✅ Deployed | `https://g7itqnbol9.execute-api.us-east-1.amazonaws.com/stage` |
+| API Gateway | ✅ Deployed | `https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod` |
 | Lambda Stubs | ✅ Created | `lambda/*/index.js` |
 | SAM Template | ✅ Created | `lambda/sam-template.yaml` |
 | Cognito Integration | ⚠️ Config needed | `.env.local` |

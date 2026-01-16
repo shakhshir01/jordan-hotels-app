@@ -183,7 +183,7 @@ See [COGNITO_SETUP.md](./COGNITO_SETUP.md) for detailed auth guide.
 ## 📡 API Integration
 
 ### Live API
-- **Endpoint**: `https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod`
+- **Endpoint**: `https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod`
 - **16 endpoints** fully wired and deployed
 - **Auto-fallback** to mock data on errors
 
@@ -193,13 +193,13 @@ See [API_ENDPOINTS.md](./API_ENDPOINTS.md) for complete endpoint documentation.
 ### Test Endpoints
 ```bash
 # Get all hotels
-curl https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod/hotels
+curl https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/hotels
 
 # Search
-curl "https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod/search?q=petra"
+curl "https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/search?q=petra"
 
 # Get blog posts
-curl https://yv2tcnk6ae.execute-api.us-east-1.amazonaws.com/prod/blog
+curl https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/blog
 ```
 
 ## 🌐 Deployment

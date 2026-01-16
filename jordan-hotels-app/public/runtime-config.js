@@ -6,7 +6,7 @@ window.__VISITJO_RUNTIME_CONFIG__ = (function(){
   return {
     OPENAI_API_KEY: "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",
     VITE_API_GATEWAY_URL: isLocalDev ? '/api' : "https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod",
-    VITE_COGNITO_CLIENT_ID: "57ggsfmkahlngmh03c92uumqv9",
+    VITE_COGNITO_CLIENT_ID: "1v5kg2qprjtsnvia0hikm1blvd",
     VITE_COGNITO_DOMAIN: "us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com",
     VITE_COGNITO_USER_POOL_ID: "us-east-1_T5vYoBi0N",
     VITE_DEMO_BOOKINGS: "false",

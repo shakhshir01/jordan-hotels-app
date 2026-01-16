@@ -1,0 +1,14 @@
+---- POST ----
+Error: The remote server returned an error: (502) Bad Gateway.
+Response Status: BadGateway
+Response Body:
+
+Response Headers:
+  Connection
+  x-amzn-RequestId
+  x-amzn-ErrorType
+  x-amz-apigw-id
+  Content-Length
+  Content-Type
+  Date
+
