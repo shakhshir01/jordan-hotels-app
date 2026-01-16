@@ -1,8 +1,7 @@
 const defaultHeaders = {
   "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-  "Access-Control-Allow-Methods": "GET,OPTIONS",
+  // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
+  "Vary": "Origin",
 };
 
 const json = (statusCode, body) => ({
@@ -40,6 +39,65 @@ const encodeCursor = (lastKey) => {
 module.exports.handler = async function (event) {
   const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
   if (method === "OPTIONS") return { statusCode: 200, headers: defaultHeaders, body: "" };
+
+  const path = event?.path || event?.rawPath || "";
+  const pathHotelId = event?.pathParameters?.id || null;
+
+  // Handle image registration for hotels
+  if (method === "POST" && path.includes("/images") && pathHotelId) {
+    try {
+      const body = event.body ? JSON.parse(event.body) : {};
+      const { key } = body;
+      
+      if (!key) {
+        return json(400, { message: "Image key is required" });
+      }
+
+      const tableName = process.env.HOTELS_TABLE || process.env.DYNAMODB_TABLE_HOTELS;
+      if (!tableName) {
+        return json(500, { message: "Hotels table not configured" });
+      }
+
+      const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+      const { DynamoDBDocumentClient, GetItemCommand, UpdateItemCommand } = require("@aws-sdk/lib-dynamodb");
+      const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+
+      // Get current hotel
+      const getResult = await client.send(new GetItemCommand({
+        TableName: tableName,
+        Key: { id: pathHotelId }
+      }));
+
+      if (!getResult.Item) {
+        return json(404, { message: "Hotel not found" });
+      }
+
+      const hotel = getResult.Item;
+      const currentImages = hotel.images || [];
+      const updatedImages = [...currentImages, key];
+
+      // Update hotel with new image
+      await client.send(new UpdateItemCommand({
+        TableName: tableName,
+        Key: { id: pathHotelId },
+        UpdateExpression: "SET images = :images, updatedAt = :updatedAt",
+        ExpressionAttributeValues: {
+          ":images": updatedImages,
+          ":updatedAt": new Date().toISOString()
+        }
+      }));
+
+      return json(200, { 
+        message: "Image registered successfully",
+        hotelId: pathHotelId,
+        imageKey: key,
+        totalImages: updatedImages.length
+      });
+    } catch (err) {
+      console.error("Register hotel image error", err);
+      return json(500, { message: "Failed to register image" });
+    }
+  }
 
   try {
     // Fetch hotels from DynamoDB as before

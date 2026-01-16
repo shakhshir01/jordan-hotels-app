@@ -41,7 +41,7 @@ Test the deployed API
 After you've deployed the method and stage (for example the `stage` stage), call:
 
 ```bash
-curl -i "https://lk8nfjc7m1.execute-api.us-east-1.amazonaws.com/prod/hotels/123"
+curl -i "https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod/hotels/123"
 ```
 
 You should receive a JSON response with the demo hotel object. Replace `123` with any id to see the stubbed response.

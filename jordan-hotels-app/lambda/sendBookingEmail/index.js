@@ -17,14 +17,9 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:5175",
 ]);
 
-const getCorsHeaders = (event) => {
-  const origin = event?.headers?.origin || event?.headers?.Origin || "";
-  const allowOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "*";
-
+const getCorsHeaders = (/* event */) => {
+  // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates.
   return {
-    "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "POST,OPTIONS",
-    "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
     "Vary": "Origin",
   };
 };

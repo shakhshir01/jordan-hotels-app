@@ -21,9 +21,8 @@ const USERS_TABLE = process.env.USERS_TABLE || "Users";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-  "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+  // Let API Gateway add Access-Control-Allow-Origin/Headers/Methods to avoid duplicate headers
+  "Vary": "Origin",
 };
 
 const parseJwtClaims = (event) => {

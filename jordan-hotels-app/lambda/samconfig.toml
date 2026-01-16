@@ -1,13 +1,14 @@
 version = 0.1
 
 [default.deploy.parameters]
-stack_name = "visitjo-backend-2"
+stack_name = "VisitJo-New"
 s3_bucket = "visitjo-sam-deploy-1768258668990-9051"
-confirm_changeset = false
+confirm_changeset = true
 capabilities = "CAPABILITY_NAMED_IAM"
 parameter_overrides = "OpenAISecretArn=\"\" StripeSecretArn=\"\""
 image_repositories = []
 disable_rollback = true
+s3_prefix = "VisitJo"
 
 [default.global.parameters]
 region = "us-east-1"

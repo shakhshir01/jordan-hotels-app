@@ -3,7 +3,7 @@
 // If you redeploy the backend, rerun the deploy script so this stays in sync.
 window.__VISITJO_RUNTIME_CONFIG__ = {
   OPENAI_API_KEY: "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",
-  VITE_API_GATEWAY_URL: "https://kmxuskvsvh.execute-api.us-east-1.amazonaws.com/prod",
+  VITE_API_GATEWAY_URL: "https://xu73bk6n25.execute-api.us-east-1.amazonaws.com/prod",
   VITE_COGNITO_CLIENT_ID: "57ggsfmkahlngmh03c92uumqv9",
   VITE_COGNITO_DOMAIN: "us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com",
   VITE_COGNITO_USER_POOL_ID: "us-east-1_T5vYoBi0N",

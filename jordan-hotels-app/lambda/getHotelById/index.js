@@ -1,8 +1,7 @@
 export async function handler(event) {
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent',
-    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+    // Avoid setting Access-Control-Allow-* here; API Gateway will set them.
+    'Vary': 'Origin',
   };
 
   // Handle preflight OPTIONS request

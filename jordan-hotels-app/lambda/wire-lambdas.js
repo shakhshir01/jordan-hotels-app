@@ -35,6 +35,7 @@ const INTEGRATIONS = [
   // Hotels
   { path: '/hotels', method: 'GET', lambda: 'getHotels' },
   { path: '/hotels/{id}', method: 'GET', lambda: 'getHotelById' },
+  { path: '/hotels/{id}/images', method: 'POST', lambda: 'getHotels' },
   
   // Bookings
   { path: '/bookings', method: 'POST', lambda: 'bookings' },
@@ -55,6 +56,7 @@ const INTEGRATIONS = [
   // Experiences
   { path: '/experiences', method: 'GET', lambda: 'experiences' },
   { path: '/experiences/{id}', method: 'GET', lambda: 'experiences' },
+  { path: '/experiences/{id}/images', method: 'POST', lambda: 'experiences' },
   
   // Payments
   { path: '/payments/create-checkout-session', method: 'POST', lambda: 'createCheckoutSession' },

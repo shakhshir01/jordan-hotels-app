@@ -33,33 +33,9 @@ Resources:
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-        AllowOrigin: "'*'"
+        AllowOrigin: "'https://www.visit-jo.com'"
         AllowCredentials: false
-      GatewayResponses:
-        UNAUTHORIZED:
-          StatusCode: 401
-          ResponseParameters:
-            "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
-            "gatewayresponse.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-            "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'"
-        ACCESS_DENIED:
-          StatusCode: 403
-          ResponseParameters:
-            "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
-            "gatewayresponse.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-            "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'"
-        DEFAULT_4XX:
-          StatusCode: 400
-          ResponseParameters:
-            "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
-            "gatewayresponse.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-            "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'"
-        DEFAULT_5XX:
-          StatusCode: 500
-          ResponseParameters:
-            "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
-            "gatewayresponse.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-            "gatewayresponse.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'"
+      # GatewayResponses intentionally omitted to allow API Gateway default handling
       Tags:
         App: VisitJo
         ManagedBy: SAM

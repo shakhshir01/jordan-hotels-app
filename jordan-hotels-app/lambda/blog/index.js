@@ -8,9 +8,8 @@ const BLOG_TABLE = process.env.BLOG_TABLE || "Blog";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-  "Access-Control-Allow-Methods": "GET,OPTIONS",
+  // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
+  "Vary": "Origin",
 };
 
 // Mock blog posts for demo mode
@@ -98,14 +97,14 @@ export async function handler(event) {
 
     return {
       statusCode: 404,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Content-Type': 'application/json', ...defaultHeaders },
       body: JSON.stringify({ message: 'Not found' })
     };
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: { 'Content-Type': 'application/json', ...defaultHeaders },
       body: JSON.stringify({ message: 'Internal server error', error: error.message })
     };
   }

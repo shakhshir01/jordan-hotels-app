@@ -26,9 +26,8 @@ async function getStripeSecret(secretArn) {
 
 function getCorsHeaders() {
   return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Authorization,Content-Type",
-    "Access-Control-Allow-Methods": "POST,OPTIONS",
+    // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
+    "Vary": "Origin",
   };
 }
 

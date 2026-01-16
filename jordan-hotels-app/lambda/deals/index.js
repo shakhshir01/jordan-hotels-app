@@ -29,10 +29,9 @@ exports.handler = async (event) => {
   ];
 
   const headers = {
-    "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    "Access-Control-Allow-Methods": "GET,OPTIONS",
-    "Content-Type": "application/json"
+    // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
+    "Vary": "Origin",
+    "Content-Type": "application/json",
   };
 
   return {

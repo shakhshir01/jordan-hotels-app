@@ -2,9 +2,7 @@ const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 const defaultHeaders = {
   "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-  "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+  "Vary": "Origin",
 };
 
 exports.handler = async (event) => {

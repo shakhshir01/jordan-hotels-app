@@ -28,13 +28,10 @@ Resources:
   Api:
     Type: AWS::Serverless::Api
     Properties:
+      Name: VisitJo-Api-New
       StageName: prod
       EndpointConfiguration: REGIONAL
-      Cors:
-        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
-        AllowHeaders: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-        AllowOrigin: "'*'"
-        AllowCredentials: false
+      GatewayResponses: {}
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -197,12 +194,10 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      LoggingConfiguration:
-        DestinationBucketName: !Ref LogsBucket
-        LogFilePrefix: self-logs/
       Tags:
         - Key: App
           Value: VisitJo
+        - Key: ManagedBy
           Value: SAM
         - Key: Stack
           Value: !Ref AWS::StackName
@@ -237,6 +232,8 @@ Resources:
   StripeSecretKey:
     Condition: CreateStripeSecret
     Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Description: KMS key for Stripe secret encryption
       KeyUsage: ENCRYPT_DECRYPT
@@ -275,7 +272,6 @@ Resources:
   StripeSecretRotation:
     Condition: CreateStripeSecret
     Type: AWS::SecretsManager::RotationSchedule
-    DependsOn: StripeSecret
     Properties:
       SecretId: !Ref StripeSecret
       RotationLambdaARN: !GetAtt StripeSecretRotationFunction.Arn
@@ -292,7 +288,7 @@ Resources:
       Runtime: nodejs20.x
       Timeout: 300
       Policies:
-        - SecretsManagerRotationSingleUser
+        - arn:aws:iam::aws:policy/SecretsManagerRotationSingleUser
       Events:
         RotationSchedule:
           Type: Schedule
@@ -354,6 +350,12 @@ Resources:
           Properties:
             Path: /hotels
             Method: GET
+            RestApiId: !Ref Api
+        ApiPostHotelImages:
+          Type: Api
+          Properties:
+            Path: /hotels/{id}/images
+            Method: POST
             RestApiId: !Ref Api
 
   GetHotelByIdFunction:
@@ -491,6 +493,12 @@ Resources:
           Properties:
             Path: /experiences/{id}
             Method: GET
+            RestApiId: !Ref Api
+        ApiPostExperienceImages:
+          Type: Api
+          Properties:
+            Path: /experiences/{id}/images
+            Method: POST
             RestApiId: !Ref Api
 
   BookingsFunction:

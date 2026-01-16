@@ -4,9 +4,8 @@ exports.handler = async function (event) {
 
     const getCorsHeaders = () => ({
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
-      "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+      // Let API Gateway set Access-Control-Allow-* to avoid duplicates
+      "Vary": "Origin",
     });
 
     const parseJwtClaims = () => {
@@ -204,9 +203,7 @@ exports.handler = async function (event) {
       statusCode: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent',
-        'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+        ...getCorsHeaders(),
       },
       body: JSON.stringify({ message: 'error' })
     };
