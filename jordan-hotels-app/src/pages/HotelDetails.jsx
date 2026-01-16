@@ -5,6 +5,7 @@ import hotelsService from '../services/hotelsService';
 import WishlistButton from '../components/WishlistButton';
 import HotelGallery from '../components/HotelGallery';
 import Seo from '../components/Seo.jsx';
+import ReviewsSection from '../components/ReviewsSection.jsx';
 import {
 } from '../utils/hotelImageFallback';
 import { useTranslation } from 'react-i18next';
@@ -54,6 +55,7 @@ const HotelDetails = () => {
   const [selectedRoomType, setSelectedRoomType] = useState('');
   const [bookingLoading, setBookingLoading] = useState(false);
   const [showMobileBooking, setShowMobileBooking] = useState(false);
+  const [reviews, setReviews] = useState([]);
   // Booking fees and policies
   const bookingFees = {
     serviceFee: 15, // JOD
@@ -195,6 +197,10 @@ const HotelDetails = () => {
     } finally {
       setBookingLoading(false);
     }
+  };
+
+  const handleAddReview = async (review) => {
+    setReviews((prev) => [review, ...prev]);
   };
 
   if (loading) {
@@ -525,7 +531,7 @@ const HotelDetails = () => {
               <Star size={20} fill="currentColor" />
               <span className="text-lg">{hotel.rating}</span>
             </div>
-            <span className="text-base text-slate-500 dark:text-slate-400 font-medium">(124 {t('hotels.reviews')})</span>
+            <span className="text-base text-slate-500 dark:text-slate-400 font-medium">({reviews.length} {t('hotels.reviews')})</span>
           </div>
 
           <section className="card-modern">
@@ -583,6 +589,16 @@ const HotelDetails = () => {
                   {t('hotelDetails.about.extra')}
                 </p>
               </div>
+            </div>
+          </section>
+
+          <section className="card-modern">
+            <div className="p-6 sm:p-8 lg:p-10">
+              <ReviewsSection
+                hotelId={id}
+                reviews={reviews}
+                onAddReview={handleAddReview}
+              />
             </div>
           </section>
         </div>

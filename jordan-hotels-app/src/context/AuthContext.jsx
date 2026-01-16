@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import { UserPool } from '../authConfig';
 import { setAuthToken, hotelAPI } from '../services/api';
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   const cognitoUserRef = React.useRef(null);
   const forgotPasswordUserRef = React.useRef(null);
 
-  const setUserAndProfileFromEmail = (email) => {
+  const setUserAndProfileFromEmail = useCallback((email) => {
     const derived = deriveNameFromEmail(email);
     const saved = loadSavedProfile(email);
 
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
     setUser({ email: derived.email });
     setUserProfile(nextProfile);
-  };
+  }, [setUser, setUserProfile]);
 
   // Check if user is already logged in on mount
   useEffect(() => {
@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const signUp = async (email, password, fullName) => {
+  const signUp = useCallback(async (email, password, fullName) => {
     return new Promise((resolve, reject) => {
       if (!UserPool) {
         reject(new Error('Authentication service not available'));
@@ -157,9 +157,9 @@ export const AuthProvider = ({ children }) => {
         }
       });
     });
-  };
+  }, []);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     return new Promise((resolve, reject) => {
       if (!UserPool) {
         reject(new Error('Authentication service not available'));
@@ -280,9 +280,9 @@ export const AuthProvider = ({ children }) => {
         },
       });
     });
-  };
+  }, []);
 
-  const performLogout = () => {
+  const performLogout = useCallback(() => {
     try {
       if (UserPool) {
         const cognitoUser = UserPool.getCurrentUser();
@@ -304,18 +304,18 @@ export const AuthProvider = ({ children }) => {
     }
     cognitoUserRef.current = null;
     showSuccess('Logged out successfully');
-  };
+  }, [setUser, setUserProfile, setAuthToken, setError, cognitoUserRef, showSuccess]);
 
   // Logout entrypoint: if MFA is enabled, trigger a verification flow instead
   // of immediately signing the user out. Returns an object when MFA is required.
-  const logout = async () => {
+  const logout = useCallback(async () => {
     // Do not require MFA to sign out — immediately perform logout.
     // MFA will be required on subsequent sign-in (login flow handles it).
     performLogout();
     return { success: true };
-  };
+  }, [performLogout]);
 
-  const completePreAuthLogin = (email) => {
+  const completePreAuthLogin = useCallback((email) => {
     setUserAndProfileFromEmail(email);
     setMfaEnabled(true);
     setMfaMethod('EMAIL');
@@ -323,9 +323,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem(`visitjo.mfaMethod.${email}`, 'EMAIL');
     setError(null);
     // Success message handled by caller
-  };
+  }, [setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, setError]);
 
-  const completeMfa = (session) => {
+  const clearMfaChallenge = useCallback(() => {
+    setMfaChallenge(null);
+  }, []);
+
+  const completeMfa = useCallback((session) => {
     const email = cognitoUserRef.current?.getUsername();
     if (email) {
       setUserAndProfileFromEmail(email);
@@ -340,17 +344,13 @@ export const AuthProvider = ({ children }) => {
     showSuccess(`Welcome back!`);
     clearMfaChallenge();
     setLoading(false); // Complete loading when MFA is verified
-  };
+  }, [cognitoUserRef, setUserAndProfileFromEmail, setAuthToken, setError, showSuccess, clearMfaChallenge, setLoading]);
 
-  const clearMfaChallenge = () => {
-    setMfaChallenge(null);
-  };
-
-  const openEmailSetup = () => {
+  const openEmailSetup = useCallback(() => {
     setMfaChallenge({ type: 'EMAIL_SETUP' });
-  };
+  }, []);
 
-  const submitMfaCode = (code, mfaType) => {
+  const submitMfaCode = useCallback((code, mfaType) => {
     const cognitoUser = cognitoUserRef.current;
     if (!cognitoUser) return Promise.reject(new Error('No active Cognito user for MFA'));
     return new Promise((resolve, reject) => {
@@ -394,9 +394,9 @@ export const AuthProvider = ({ children }) => {
         },
       }, mfaType || undefined);
     });
-  };
+  }, [cognitoUserRef, setAuthToken, setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, clearMfaChallenge, showSuccess, mfaChallenge, performLogout, setError]);
 
-  const setupTotp = () => {
+  const setupTotp = useCallback(() => {
     const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
     console.log('setupTotp: cognitoUser =', cognitoUser);
     if (!cognitoUser) return Promise.reject(new Error('No active user to setup TOTP'));
@@ -437,9 +437,9 @@ export const AuthProvider = ({ children }) => {
         });
       });
     });
-  };
+  }, [cognitoUserRef, UserPool, setError, setMfaChallenge]);
 
-  const verifyTotp = (userCode, friendlyName = 'My device') => {
+  const verifyTotp = useCallback((userCode, friendlyName = 'My device') => {
     const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
     console.log('verifyTotp called with userCode:', userCode, 'cognitoUser:', cognitoUser);
     if (!cognitoUser) return Promise.reject(new Error('No active user to verify TOTP'));
@@ -506,10 +506,10 @@ export const AuthProvider = ({ children }) => {
         },
       });
     });
-  };
+  }, [cognitoUserRef, UserPool, showSuccess, setMfaEnabled, setMfaMethod, hotelAPI, clearMfaChallenge, setMfaChallenge, setError, showError]);
 
   // Email MFA flows (secondary address)
-  const setupEmailMfa = async (secondaryEmail) => {
+  const setupEmailMfa = useCallback(async (secondaryEmail) => {
     if (!secondaryEmail) throw new Error('Secondary email required');
     // Disallow using primary/registered email as secondary
     const primary = user?.email || cognitoUserRef.current?.getUsername?.();
@@ -529,9 +529,9 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to send verification email');
       throw e;
     }
-  };
+  }, [user, cognitoUserRef, setError, showError, setPendingSecondaryEmail, hotelAPI, showSuccess]);
 
-  const setupTotpMfa = async () => {
+  const setupTotpMfa = useCallback(async () => {
     try {
       const res = await hotelAPI.setupTotpMfa();
       // Set up the challenge for TOTP setup
@@ -542,9 +542,9 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to setup TOTP MFA');
       throw e;
     }
-  };
+  }, [hotelAPI, setMfaChallenge, setError, showError]);
 
-  const verifyTotpMfa = async (code) => {
+  const verifyTotpMfa = useCallback(async (code) => {
     try {
       const res = await hotelAPI.verifyTotpMfa(code);
       // on success, persist state
@@ -570,9 +570,9 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to verify TOTP code');
       throw e;
     }
-  };
+  }, [hotelAPI, cognitoUserRef, UserPool, user, setMfaEnabled, setMfaMethod, showSuccess, setError, showError]);
 
-  const verifyEmailMfa = async (code) => {
+  const verifyEmailMfa = useCallback(async (code) => {
     try {
       const res = await hotelAPI.verifyEmailMfa(code);
       // on success, persist state
@@ -600,9 +600,9 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setPendingSecondaryEmail(null);
     }
-  };
+  }, [hotelAPI, cognitoUserRef, UserPool, user, setMfaEnabled, setMfaMethod, pendingSecondaryEmail, showSuccess, setError, showError, setPendingSecondaryEmail]);
 
-  const verifyLoginEmailMfa = async (code) => {
+  const verifyLoginEmailMfa = useCallback(async (code) => {
     try {
       const res = await hotelAPI.verifyLoginEmailMfa(code);
       // If this was a logout-initiated verification, perform logout now
@@ -619,9 +619,9 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to verify login code');
       throw e;
     }
-  };
+  }, [mfaChallenge, clearMfaChallenge, performLogout, setError, showError]);
 
-  const verifyLoginTotpMfa = async (code) => {
+  const verifyLoginTotpMfa = useCallback(async (code) => {
     try {
       const res = await hotelAPI.verifyLoginTotpMfa(code);
       // If this was a logout-initiated verification, perform logout now
@@ -638,18 +638,18 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to verify TOTP code');
       throw e;
     }
-  };
+  }, [mfaChallenge, clearMfaChallenge, performLogout, setError, showError]);
 
-  const requestEmailMfaChallenge = async () => {
+  const requestEmailMfaChallenge = useCallback(async () => {
     try {
       return await hotelAPI.requestEmailMfaChallenge();
     } catch (e) {
       setError(e?.message || String(e));
       throw e;
     }
-  };
+  }, [setError]);
 
-  const disableMfa = async () => {
+  const disableMfa = useCallback(async () => {
     try {
       const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
       if (!cognitoUser) {
@@ -685,9 +685,9 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to disable MFA');
       throw e;
     }
-  };
+  }, [cognitoUserRef, UserPool, user, setMfaEnabled, setMfaMethod, showSuccess, showError]);
 
-  const updateUserProfileName = (patch) => {
+  const updateUserProfileName = useCallback((patch) => {
     const email = user?.email;
     if (!email) return;
 
@@ -706,9 +706,9 @@ export const AuthProvider = ({ children }) => {
 
     setUserProfile(next);
     saveProfile(email, next);
-  };
+  }, [user?.email, setUserProfile]);
 
-  const verifyEmail = async (email, code) => {
+  const verifyEmail = useCallback(async (email, code) => {
     return new Promise((resolve, reject) => {
       if (!UserPool) {
         reject(new Error('Authentication service not available'));
@@ -728,9 +728,9 @@ export const AuthProvider = ({ children }) => {
         }
       });
     });
-  };
+  }, []);
 
-  const resendConfirmation = async (email) => {
+  const resendConfirmation = useCallback(async (email) => {
     return new Promise((resolve, reject) => {
       if (!UserPool) {
         reject(new Error('Authentication service not available'));
@@ -746,9 +746,9 @@ export const AuthProvider = ({ children }) => {
         }
       });
     });
-  };
+  }, []);
 
-  const forgotPassword = async (email) => {
+  const forgotPassword = useCallback(async (email) => {
     return new Promise((resolve, reject) => {
       if (!UserPool) {
         reject(new Error('Authentication service not available'));
@@ -767,9 +767,9 @@ export const AuthProvider = ({ children }) => {
         // inputVerificationCode can be handled on the client side flow
       });
     });
-  };
+  }, []);
 
-  const confirmNewPassword = async (email, code, newPassword) => {
+  const confirmNewPassword = useCallback(async (email, code, newPassword) => {
     return new Promise((resolve, reject) => {
       if (!UserPool) {
         reject(new Error('Authentication service not available'));
@@ -796,11 +796,14 @@ export const AuthProvider = ({ children }) => {
         },
       });
     });
-  };
+  }, []);
 
-  const value = {
-    user,
-    userProfile,
+  const memoizedUser = useMemo(() => user, [user?.email]);
+  const memoizedUserProfile = useMemo(() => userProfile, [userProfile?.email, userProfile?.firstName, userProfile?.lastName, userProfile?.displayName, userProfile?.hasCustomName]);
+
+  const value = useMemo(() => ({
+    user: memoizedUser,
+    userProfile: memoizedUserProfile,
     loading,
     error,
     signUp,
@@ -832,7 +835,39 @@ export const AuthProvider = ({ children }) => {
     disableMfa,
     cognitoUserRef,
     isAuthenticated: !!user,
-  };
+  }), [
+    memoizedUser,
+    memoizedUserProfile,
+    loading,
+    error,
+    signUp,
+    login,
+    logout,
+    verifyEmail,
+    forgotPassword,
+    confirmNewPassword,
+    resendConfirmation,
+    updateUserProfileName,
+    mfaChallenge,
+    submitMfaCode,
+    setupTotp,
+    verifyTotp,
+    clearMfaChallenge,
+    completeMfa,
+    completePreAuthLogin,
+    openEmailSetup,
+    mfaEnabled,
+    mfaMethod,
+    setupEmailMfa,
+    verifyEmailMfa,
+    setupTotpMfa,
+    verifyTotpMfa,
+    requestEmailMfaChallenge,
+    verifyLoginEmailMfa,
+    verifyLoginTotpMfa,
+    disableMfa,
+    cognitoUserRef,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

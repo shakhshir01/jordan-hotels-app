@@ -648,6 +648,17 @@ export const hotelAPI = {
     }
   },
 
+  registerExperienceImage: async (experienceId, imageKey) => {
+    if (getUseMocks()) return { success: true };
+    try {
+      const response = await apiClient.post(`/experiences/${experienceId}/images`, { key: imageKey });
+      return response.data;
+    } catch (error) {
+      if (lastAuthError) return { success: true };
+      throw error;
+    }
+  },
+
   getUserProfile: async () => {
     if (getUseMocks()) {
       // In mock mode, return an empty profile so the UI derives

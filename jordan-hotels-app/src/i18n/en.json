@@ -512,6 +512,7 @@
       "missingEmail": "Missing email. Please start from the Forgot Password flow.",
       "codeRequired": "Please enter the verification code.",
       "resetting": "Resetting...",
+      "success": "Password reset successfully! You can now log in with your new password.",
       "failed": "Failed to reset password."
     },
     "verify": {

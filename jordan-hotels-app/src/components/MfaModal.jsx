@@ -64,6 +64,19 @@ export default function MfaModal() {
     }
   }, [mfaChallenge, requestEmailMfaChallenge]);
 
+  // Keyboard support for modal (keep hooks in stable order by placing before early return)
+  useEffect(() => {
+    if (!mfaChallenge) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        clearMfaChallenge();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mfaChallenge, clearMfaChallenge]);
+
   if (!mfaChallenge) {
     return null;
   }
@@ -105,20 +118,6 @@ export default function MfaModal() {
           }
           // Login completed via backend - complete the authentication
           const email = mfaChallenge.email || cognitoUserRef.current?.getUsername();
-          if (email) {
-            completePreAuthLogin(email);
-          }
-          clearMfaChallenge();
-          setCode('');
-          showSuccess('Login successful!');
-          navigate('/');
-        }
-      } else if (mfaChallenge.type === 'TOTP_MFA') {
-        // TOTP MFA verification for login
-        const res = await verifyLoginTotpMfa(code);
-        // If verifyLoginTotpMfa performed logout, stop here
-        if (res && res.loggedOut) {
-          clearMfaChallenge();
           setCode('');
           return;
         }
@@ -293,19 +292,6 @@ export default function MfaModal() {
         return <Shield className="w-8 h-8 text-purple-600" />;
     }
   };
-
-  // Keyboard support for modal
-  useEffect(() => {
-    if (!mfaChallenge) return;
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        clearMfaChallenge();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown, { passive: false });
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mfaChallenge, clearMfaChallenge]);
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">

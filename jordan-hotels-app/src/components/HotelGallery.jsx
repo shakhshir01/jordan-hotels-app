@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, Grid } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 import { staticHotelPrices } from '../data/staticHotelPrices';
@@ -6,10 +6,11 @@ import { staticHotelPrices } from '../data/staticHotelPrices';
 const HotelGallery = ({ images = [], hotelName }) => {
   const [showLightbox, setShowLightbox] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const touchStart = useRef(null);
+  const touchEnd = useRef(null);
   const [mouseStart, setMouseStart] = useState(null);
   const [mouseEnd, setMouseEnd] = useState(null);
+  const carouselRef = useRef(null);
 
   // Ensure we have at least some images
   const displayImages = useMemo(() => images.length > 0 ? images : ['/placeholder-hotel.jpg'], [images]);
@@ -38,6 +39,30 @@ const HotelGallery = ({ images = [], hotelName }) => {
     }
   }, [showLightbox]);
 
+  // Handle touchmove with non-passive listener to allow preventDefault
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const handleTouchMove = (e) => {
+      if (touchStart.current !== null) {
+        const currentX = e.targetTouches[0].clientX;
+        touchEnd.current = currentX;
+        // Only prevent default if horizontal movement is significant (> 5px)
+        // This allows vertical scrolling while still enabling horizontal swipes
+        if (Math.abs(currentX - touchStart.current) > 5) {
+          e.preventDefault();
+        }
+      }
+    };
+
+    carousel.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      carousel.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
+
   const nextImage = useCallback((e) => {
     e?.stopPropagation();
     setCurrentIndex((prev) => (prev + 1) % displayImages.length);
@@ -61,25 +86,21 @@ const HotelGallery = ({ images = [], hotelName }) => {
   const minSwipeDistance = 30;
 
   const onTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+    touchEnd.current = null;
+    touchStart.current = e.targetTouches[0].clientX;
   };
 
   const onTouchMove = (e) => {
-    if (touchStart !== null) {
+    if (touchStart.current !== null) {
       const currentX = e.targetTouches[0].clientX;
-      setTouchEnd(currentX);
-      // Only prevent default if horizontal movement is significant (> 5px)
-      // This allows vertical scrolling while still enabling horizontal swipes
-      if (Math.abs(currentX - touchStart) > 5) {
-        e.preventDefault();
-      }
+      touchEnd.current = currentX;
+      // preventDefault is now handled by the event listener
     }
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
+    if (!touchStart.current || !touchEnd.current) return;
+    const distance = touchStart.current - touchEnd.current;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
     if (isLeftSwipe) {
@@ -242,6 +263,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
 
       {/* Mobile Carousel Layout */}
       <div className="md:hidden relative h-[350px] sm:h-[400px] -mx-4 sm:mx-0 overflow-hidden"
+           ref={carouselRef}
            onTouchStart={onTouchStart}
            onTouchMove={onTouchMove}
            onTouchEnd={onTouchEnd}
