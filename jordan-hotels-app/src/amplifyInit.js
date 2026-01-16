@@ -1,5 +1,6 @@
-import { Amplify } from "aws-amplify";
+import { Amplify, Auth } from "aws-amplify";
 import { Analytics } from "@aws-amplify/analytics";
+import { setAuthToken } from "./services/api";
 
 let didInit = false;
 
@@ -85,6 +86,22 @@ export async function initAmplify() {
     }
   } catch (error) {
     // Error initializing Amplify
+  }
+
+  // After configuring Amplify, if there's an existing authenticated session
+  // set the API Authorization header immediately so early requests include it.
+  try {
+    const session = await Auth.currentSession();
+    if (session) {
+      try {
+        const idToken = session.getIdToken().getJwtToken();
+        setAuthToken(idToken);
+      } catch (_e) {
+        // ignore token set failures
+      }
+    }
+  } catch (_err) {
+    // no session available, that's fine
   }
 
   // Optional test event (safe to ignore if Analytics isn't configured yet)
