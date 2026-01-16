@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { validateSignUp, getPasswordErrors } from '../utils/validators';
 import { showSuccess, showError } from '../services/toastService';
 import { useTranslation } from 'react-i18next';
+import { Auth } from 'aws-amplify';
 
 const SignUp = () => {
   const [fullName, setFullName] = useState('');
@@ -18,6 +19,14 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const { t } = useTranslation();
+
+  const handleGoogleSignUp = async () => {
+    try {
+      await Auth.federatedSignIn({ provider: 'Google' });
+    } catch (error) {
+      showError('Failed to start Google sign up');
+    }
+  };
 
   const renderError = (value) => {
     if (!value) return '';
@@ -178,6 +187,15 @@ const SignUp = () => {
         >
           {loading ? t('pages.signup.creatingAccount') : t('auth.signup')}
         </button>
+
+        <div className="mt-6">
+          <div className="text-center text-sm text-slate-500 mb-3">{t('pages.signup.orContinueWith') || 'Or continue with'}</div>
+          <div className="flex justify-center">
+            <button onClick={handleGoogleSignUp} className="btn-outline text-center" disabled={loading}>
+              {t('pages.signup.continueWithGoogle') || 'Continue with Google'}
+            </button>
+          </div>
+        </div>
 
         <p className="text-center text-slate-600 dark:text-slate-300 mt-6">
           {t('auth.haveAccount')}{' '}
