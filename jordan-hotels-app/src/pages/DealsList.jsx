@@ -170,11 +170,11 @@ export default function DealsList() {
         {!loading && hotels.length > 0 && (
           <div className="space-y-12">
             {/* Deals Spotlight */}
-            <section className="text-center">
+            <section className="text-center pt-64">
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 mb-4">
                 {t('pages.dealsList.spotlight.title', 'Premium Deals You Can\'t Miss')}
               </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 max-w-3xl mx-auto leading-relaxed">
                 {t('pages.dealsList.spotlight.subtitle', 'Handpicked luxury accommodations with unbeatable savings. Book now and save big on your Jordan adventure.')}
               </p>
             </section>

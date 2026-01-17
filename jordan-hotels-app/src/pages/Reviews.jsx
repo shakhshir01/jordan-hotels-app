@@ -76,12 +76,12 @@ function Reviews() {
           </section>
 
           {/* Reviews Section */}
-          <section className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+          <section className="animate-fade-in-up pt-64" style={{ animationDelay: '0.6s' }}>
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">
                 Community Reviews
               </h2>
-              <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 max-w-4xl mx-auto leading-relaxed">
                 Join thousands of travelers sharing their authentic Jordan experiences
               </p>
             </div>

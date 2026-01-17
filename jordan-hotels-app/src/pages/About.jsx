@@ -127,13 +127,13 @@ export default function About() {
           </section>
 
           {/* Mission & Vision Section */}
-          <section className="grid lg:grid-cols-2 gap-16 items-center">
+          <section className="grid lg:grid-cols-2 gap-16 items-center pt-16">
             <div className="space-y-8 animate-slide-in-left">
               <div>
                 <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">
                   {t('pages.about.mission.title', 'Our Mission')}
                 </h2>
-                <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed mb-8">
+                <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 leading-relaxed mb-8 max-w-3xl">
                   {t('pages.about.mission.body', 'To showcase the authentic beauty of Jordan while supporting local communities and preserving cultural heritage for future generations.')}
                 </p>
               </div>

@@ -222,7 +222,7 @@ const Insights = () => {
         {!loading && !error && (
           <>
             {/* Key stats */}
-            <section>
+            <section className="pt-64">
               <h2 className="text-xl md:text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">
                 Jordan at a glance
               </h2>
@@ -275,12 +275,12 @@ const Insights = () => {
             </section>
 
             {/* Top destinations */}
-            <section>
+            <section className="pt-64">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100">
                   Top destinations by rating
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
                   Sorted by average hotel rating, then by hotel count.
                 </p>
               </div>
@@ -317,12 +317,12 @@ const Insights = () => {
             </section>
 
             {/* Top rated hotels */}
-            <section>
+            <section className="pt-64">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100">
                   Standout stays by guest rating
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
                   High ratings and strong review counts from the curated data.
                 </p>
               </div>
@@ -393,12 +393,12 @@ const Insights = () => {
             </section>
 
             {/* Best value section */}
-            <section>
+            <section className="pt-64">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100">
                   Exceptional value picks
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
                   Ranking hotels by a simple rating-to-price signal.
                 </p>
               </div>

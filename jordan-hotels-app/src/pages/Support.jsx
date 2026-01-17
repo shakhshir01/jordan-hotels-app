@@ -202,12 +202,12 @@ export default function Support() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 space-y-24">
 
           {/* Support Channels */}
-          <section className="animate-fade-in-up">
+          <section className="animate-fade-in-up pt-64">
             <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-8 leading-tight">
                 How Can We Help You?
               </h2>
-              <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 max-w-4xl mx-auto leading-relaxed">
                 Choose your preferred way to get in touch. Our expert team is ready to assist you.
               </p>
             </div>
@@ -240,12 +240,12 @@ export default function Support() {
           </section>
 
           {/* FAQ Section */}
-          <section className="animate-fade-in-up mt-16 lg:mt-24" style={{ animationDelay: '0.3s' }}>
+          <section className="animate-fade-in-up mt-16 lg:mt-24 pt-64" style={{ animationDelay: '0.3s' }}>
             <div className="text-center mb-12 lg:mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-slate-900 dark:text-slate-100 mb-4 lg:mb-6 leading-tight">
                 Frequently Asked Questions
               </h2>
-              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto px-4">
+              <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 max-w-4xl mx-auto px-4 leading-relaxed">
                 Quick answers to common questions about bookings, payments, and travel
               </p>
             </div>

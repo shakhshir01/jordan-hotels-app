@@ -254,11 +254,11 @@ export default function Destinations() {
         {!loading && (
           <div className="space-y-12">
             {/* Featured Destination Spotlight */}
-            <section className="text-center">
+            <section className="text-center pt-64">
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 mb-4">
                 {t('pages.destinations.spotlight.title', 'Why Choose These Destinations?')}
               </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 max-w-3xl mx-auto leading-relaxed">
                 {t('pages.destinations.spotlight.subtitle', 'Each destination offers a unique blend of history, culture, and natural beauty. Discover what makes Jordan truly extraordinary.')}
               </p>
             </section>

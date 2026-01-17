@@ -185,7 +185,7 @@ function SearchResults() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black gradient-text mb-2">
               Your Perfect Jordan Stay Awaits
             </h1>
-            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300">
+            <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 leading-relaxed">
               {hasHotels ? `Discover ${hotels.length} exceptional hotels` : 'Discover amazing hotels'} for <span className="font-semibold text-slate-900 dark:text-slate-100">"{term || "Jordan"}"</span>
             </p>
           </div>

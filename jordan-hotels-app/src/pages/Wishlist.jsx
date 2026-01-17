@@ -21,7 +21,7 @@ export default function Wishlist() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black gradient-text mb-6">
               {t('pages.wishlist.title', 'Your Dream List')}
             </h1>
-            <p className="text-xl text-slate-600 dark:text-slate-300 mb-12 max-w-2xl mx-auto">
+            <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 mb-12 max-w-3xl mx-auto leading-relaxed">
               {t('pages.wishlist.subtitle', 'The places you\'re dreaming of, all in one place.')}
             </p>
 
@@ -67,7 +67,7 @@ export default function Wishlist() {
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6">
             {t('pages.wishlist.title', 'Your Dream Collection')}
           </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+          <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 max-w-3xl mx-auto leading-relaxed">
             {t('pages.wishlist.subtitle', 'Carefully curated places that captured your heart. Turn these dreams into unforgettable memories.')}
           </p>
         </div>
@@ -180,12 +180,12 @@ export default function Wishlist() {
         </div>
 
         {/* Call to Action Section */}
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-center pt-16">
           <div className="card-modern p-12 lg:p-16 bg-gradient-to-r from-jordan-blue/5 to-jordan-teal/5 dark:from-jordan-blue/10 dark:to-jordan-teal/10">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 mb-6">
               Ready to Make Your Dreams Come True?
             </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 mb-8 max-w-3xl mx-auto leading-relaxed">
               You've saved some amazing places. Now it's time to turn those saved items into real memories. Book your perfect Jordan adventure today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

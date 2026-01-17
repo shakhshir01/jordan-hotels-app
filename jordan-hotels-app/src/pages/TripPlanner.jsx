@@ -105,11 +105,11 @@ function TripPlanner() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
         {/* Enhanced Header Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 pt-64">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-4">
             {t('pages.tripPlanner.itinerary', 'Your Custom Itinerary')}
           </h2>
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 max-w-3xl mx-auto leading-relaxed">
             {t('pages.tripPlanner.subtitle', 'Build your perfect Jordan adventure. Add, edit, and customize each day to match your travel style and interests.')}
           </p>
         </div>

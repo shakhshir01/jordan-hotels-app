@@ -36,42 +36,42 @@ export default function ContactConcierge() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-2">Concierge Service</h1>
-      <p className="text-gray-600 dark:text-gray-300 mb-8">Get personalized assistance for your Jordan trip</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <h1 className="text-4xl font-black gradient-text mb-2">Concierge Service</h1>
+      <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">Get personalized assistance for your Jordan trip</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <h3 className="text-2xl font-bold mb-4">Available 24/7</h3>
+          <div className="card-modern p-8 mb-6">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Available 24/7</h3>
             <div className="space-y-4">
               <div className="flex items-start">
                 <span className="text-2xl mr-3">📞</span>
-                <div>
-                  <p className="font-bold">Call Us</p>
-                  <p className="text-gray-600 dark:text-gray-300">+962 6 465 1234</p>
+                <div className="flex-1">
+                  <p className="font-bold text-slate-900 dark:text-slate-100">Call Us</p>
+                  <p className="text-slate-600 dark:text-slate-400">+962 6 465 1234</p>
                 </div>
               </div>
               <div className="flex items-start">
                 <span className="text-2xl mr-3">✉️</span>
-                <div>
-                  <p className="font-bold">Email</p>
-                  <p className="text-gray-600 dark:text-gray-300">concierge@visitjo.com</p>
+                <div className="flex-1">
+                  <p className="font-bold text-slate-900 dark:text-slate-100">Email</p>
+                  <p className="text-slate-600 dark:text-slate-400">concierge@visitjo.com</p>
                 </div>
               </div>
               <div className="flex items-start">
                 <span className="text-2xl mr-3">💬</span>
-                <div>
-                  <p className="font-bold">WhatsApp</p>
-                  <p className="text-gray-600 dark:text-gray-300">+962 79 5555 1234</p>
+                <div className="flex-1">
+                  <p className="font-bold text-slate-900 dark:text-slate-100">WhatsApp</p>
+                  <p className="text-slate-600 dark:text-slate-400">+962 79 5555 1234</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-blue-50 rounded-lg p-6">
-            <h4 className="font-bold mb-3">Services Include:</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="glass-card p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800">
+            <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4">Services Include:</h4>
+            <ul className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
               <li>✓ Restaurant reservations</li>
               <li>✓ Tour bookings</li>
               <li>✓ Transportation arrangements</li>
@@ -82,61 +82,61 @@ export default function ContactConcierge() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-2xl font-bold mb-6">Request Assistance</h3>
+        <form onSubmit={handleSubmit} className="card-modern p-8">
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Request Assistance</h3>
 
           {submitted && (
-            <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+            <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 rounded-xl">
               Thank you! Our concierge team will contact you shortly.
             </div>
           )}
 
           <div className="mb-4">
-            <label className="block font-bold mb-2">Name *</label>
+            <label className="label-premium">Name *</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full border rounded-lg px-4 py-2"
+              className="input-premium"
               placeholder="Your name"
             />
           </div>
 
           <div className="mb-4">
-            <label className="block font-bold mb-2">Email *</label>
+            <label className="label-premium">Email *</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full border rounded-lg px-4 py-2"
+              className="input-premium"
               placeholder="your@email.com"
             />
           </div>
 
           <div className="mb-4">
-            <label className="block font-bold mb-2">Phone *</label>
+            <label className="label-premium">Phone *</label>
             <input
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               required
-              className="w-full border rounded-lg px-4 py-2"
+              className="input-premium"
               placeholder="+962"
             />
           </div>
 
           <div className="mb-4">
-            <label className="block font-bold mb-2">Priority</label>
+            <label className="label-premium">Priority</label>
             <select
               name="priority"
               value={formData.priority}
               onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
+              className="input-premium"
             >
               <option value="normal">Normal</option>
               <option value="urgent">Urgent</option>
@@ -145,21 +145,21 @@ export default function ContactConcierge() {
           </div>
 
           <div className="mb-6">
-            <label className="block font-bold mb-2">Message *</label>
+            <label className="label-premium">Message *</label>
             <textarea
               name="message"
               value={formData.message}
               onChange={handleChange}
               required
               rows={5}
-              className="w-full border rounded-lg px-4 py-2"
+              className="input-premium"
               placeholder="Tell us how we can help..."
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold"
+            className="btn-primary w-full py-3 font-bold"
           >
             Send Request
           </button>

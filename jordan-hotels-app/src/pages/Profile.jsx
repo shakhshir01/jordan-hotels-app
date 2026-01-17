@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { usePreferences } from '../context/PreferencesContext';
+import { useWishlist } from '../context/WishlistContext';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, LogOut, Edit2, Check, X, Calendar, Users } from 'lucide-react';
+import { User, Mail, LogOut, Edit2, Check, X, Calendar, Users, Heart, ArrowRight } from 'lucide-react';
 import { showSuccess, showError } from '../services/toastService';
 import { InlineLoader } from '../components/LoadingSpinner';
 import { hotelAPI } from '../services/api';
 import ProfilePhotoUpload from '../components/ProfilePhotoUpload.jsx';
+import OptimizedImage from '../components/OptimizedImage';
 
 // Email MFA UI is handled in the MFA modal now; inline manager removed.
 
@@ -75,6 +77,7 @@ const normalizeBooking = (booking, index = 0) => {
 const Profile = () => {
   const { user, userProfile, updateUserProfileName, logout, mfaEnabled, openEmailSetup, disableMfa, mfaMethod, setupTotp } = useAuth();
   const { preferences, setPreferences } = usePreferences();
+  const { wishlist } = useWishlist();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -428,6 +431,70 @@ const Profile = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Wishlist Section */}
+        <div className="glass-card card-modern p-8 mb-8 animate-fade-in bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/10 dark:to-pink-900/10 border border-rose-100 dark:border-rose-800/30">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm text-rose-500">
+                <Heart size={24} className="fill-current" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">My Wishlist</h2>
+                <p className="text-slate-600 dark:text-slate-400 font-medium">
+                  {wishlist.length} saved {wishlist.length === 1 ? 'item' : 'items'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/wishlist')}
+              className="btn-primary flex items-center gap-2 px-6 py-3 hover:scale-105 transition-all duration-300 min-h-[48px] bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 shadow-lg shadow-rose-500/20"
+            >
+              View Wishlist
+              <ArrowRight size={20} />
+            </button>
+          </div>
+
+          {wishlist.length > 0 ? (
+            <div className="flex gap-4 overflow-x-auto pb-4 pt-2 scrollbar-hide snap-x">
+              {wishlist.slice(0, 5).map((item) => (
+                <div 
+                  key={item.id} 
+                  onClick={() => navigate('/wishlist')}
+                  className="flex-shrink-0 w-32 h-32 rounded-2xl overflow-hidden shadow-lg border-2 border-white dark:border-slate-700 relative group cursor-pointer hover:scale-105 transition-transform duration-300 snap-start"
+                >
+                  <OptimizedImage 
+                    src={item.image} 
+                    alt={item.name || item.hotelName || 'Wishlist item'} 
+                    className="w-full h-full object-cover" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2">
+                    <span className="text-white text-xs font-bold truncate w-full">{item.name || item.hotelName}</span>
+                  </div>
+                </div>
+              ))}
+              {wishlist.length > 5 && (
+                <div 
+                  onClick={() => navigate('/wishlist')}
+                  className="flex-shrink-0 w-32 h-32 rounded-2xl bg-white dark:bg-slate-800 border-2 border-dashed border-rose-300 dark:border-rose-700 flex flex-col items-center justify-center text-rose-500 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors snap-start"
+                >
+                  <span className="text-2xl font-black">+{wishlist.length - 5}</span>
+                  <span className="text-xs font-medium">More</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-6 bg-white/50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+              <p className="text-slate-500 dark:text-slate-400 mb-3">Your wishlist is empty</p>
+              <button 
+                onClick={() => navigate('/')}
+                className="text-sm font-bold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 underline"
+              >
+                Start exploring hotels
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Preferences Section */}

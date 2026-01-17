@@ -7,14 +7,14 @@ export default function Privacy() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-indigo-900/20 dark:to-purple-900/20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
         <div className="glass-card rounded-3xl p-10 space-y-8 bg-gradient-to-br from-white to-blue-50/50 dark:from-slate-800 dark:to-blue-900/20 shadow-2xl border border-blue-200/50 dark:border-blue-700/50">
-          <header className="text-center">
+          <header className="text-center pt-16">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-6 shadow-lg">
               🔒 Privacy Policy
             </div>
             <h1 className="text-4xl md:text-5xl font-black font-display mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               {t('pages.privacy.title')}
             </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 max-w-3xl mx-auto leading-relaxed">
               {t('pages.privacy.intro')}
             </p>
             <div className="mt-6 text-sm text-slate-500 dark:text-slate-400 bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-4 border border-blue-200/50 dark:border-blue-700/50">

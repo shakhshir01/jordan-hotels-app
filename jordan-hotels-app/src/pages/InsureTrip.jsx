@@ -154,12 +154,12 @@ export default function InsureTrip() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 space-y-24">
 
           {/* Insurance Plans */}
-          <section className="animate-fade-in-up">
+          <section className="animate-fade-in-up pt-16">
             <div className="text-center mb-16">
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">
                 Choose Your Protection
               </h2>
-              <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 max-w-4xl mx-auto leading-relaxed">
                 Comprehensive coverage options designed specifically for Jordan travelers
               </p>
             </div>
@@ -224,12 +224,12 @@ export default function InsureTrip() {
           </section>
 
           {/* Why Choose Us */}
-          <section className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <section className="animate-fade-in-up pt-16" style={{ animationDelay: '0.3s' }}>
             <div className="text-center mb-16">
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">
                 Why Jordan Travelers Choose Us
               </h2>
-              <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 max-w-4xl mx-auto leading-relaxed">
                 Specialized insurance coverage designed for the unique adventures of Jordan
               </p>
             </div>

@@ -144,12 +144,12 @@ export default function Blog() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 space-y-24">
 
           {/* Featured Posts Section */}
-          <section className="animate-fade-in-up">
+          <section className="animate-fade-in-up pt-64">
             <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-10 leading-tight">
                 Featured Stories
               </h2>
-              <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 max-w-4xl mx-auto leading-relaxed">
                 Dive into our most popular travel guides and insider tips for exploring Jordan
               </p>
             </div>
@@ -196,12 +196,12 @@ export default function Blog() {
           </section>
 
           {/* All Posts Grid */}
-          <section className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <section className="animate-fade-in-up pt-64" style={{ animationDelay: '0.3s' }}>
             <div className="text-center mb-16">
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">
                 All Travel Guides
               </h2>
-              <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 max-w-4xl mx-auto leading-relaxed">
                 Comprehensive guides to help you make the most of your Jordan adventure
               </p>
             </div>

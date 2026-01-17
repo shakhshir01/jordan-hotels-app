@@ -64,9 +64,9 @@ export async function initAmplify() {
             fallback.Auth.oauth = {
               domain: runtimeCfg.VITE_COGNITO_DOMAIN,
               scope: ['email','openid','profile'],
-              redirectSignIn: import.meta.env.VITE_REDIRECT_SIGN_IN || window.location.origin,
-              redirectSignOut: import.meta.env.VITE_REDIRECT_SIGN_OUT || window.location.origin,
-              responseType: 'token'
+              redirectSignIn: import.meta.env.VITE_REDIRECT_SIGN_IN || `${window.location.origin}/auth/callback`,
+              redirectSignOut: import.meta.env.VITE_REDIRECT_SIGN_OUT || `${window.location.origin}/`,
+              responseType: 'code'
             };
           }
 

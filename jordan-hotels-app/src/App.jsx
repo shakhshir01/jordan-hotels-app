@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { Auth } from 'aws-amplify';
 import { WishlistProvider } from './context/WishlistContext';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 import { PreferencesProvider } from './context/PreferencesContext';
@@ -92,6 +93,7 @@ const AppRoutes = React.memo(() => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/oauth/callback" element={<AuthCallback />} />
         <Route path="/signup" element={user ? <Navigate to="/" /> : <SignUp />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -144,6 +146,28 @@ const AppRoutes = React.memo(() => {
 });
 
 function App() {
+  // Dynamically configure Amplify redirects to match the current domain/port
+  // This fixes 'redirect_mismatch' errors when running on different ports (e.g. 5175 vs 5173)
+  React.useEffect(() => {
+    try {
+      const currentConfig = Auth.configure();
+      if (currentConfig && currentConfig.oauth) {
+        const origin = window.location.origin;
+        const updatedConfig = {
+          ...currentConfig,
+          oauth: {
+            ...currentConfig.oauth,
+            redirectSignIn: `${origin}/auth/callback`,
+            redirectSignOut: `${origin}/`,
+          }
+        };
+        Auth.configure(updatedConfig);
+      }
+    } catch (e) {
+      console.warn('Auto-configuration of redirects failed:', e);
+    }
+  }, []);
+
   return (
     <ErrorBoundary>
       <AuthProvider>
