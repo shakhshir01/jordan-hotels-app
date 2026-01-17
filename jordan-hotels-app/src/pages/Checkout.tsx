@@ -12,6 +12,8 @@ import OptimizedImage from '../components/OptimizedImage';
 import LazyStripePaymentIntent from '../components/stripe/LazyStripePaymentIntent';
 import LazyPayPalButtons from '../components/paypal/LazyPayPalButtons';
 import Seo from '../components/Seo.jsx';
+import { usePreferences } from '../context/PreferencesContext';
+import { formatPrice } from '../utils/hotelPricing';
 
 /**
  * @typedef {{paymentProvider?:string,paymentIntentId?:string,paypalDetails?:any}} CreateBookingOpts
@@ -21,6 +23,7 @@ const Checkout = () => {
   const { i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const { preferences } = usePreferences();
   const { hotelId, bookingData, discount } = location.state || {};
   const resolvedBookingData = bookingData || {
     checkInDate: '',
@@ -84,7 +87,7 @@ const Checkout = () => {
     const subtotal = (hotel.price || 0) * nights;
     const amount = Number(((subtotal * pct) / 100).toFixed(2));
     if (amount > 0) {
-      setPromoResult({ valid: true, message: `Deal applied! Save ${amount.toFixed(2)} JOD` });
+      setPromoResult({ valid: true, message: `Deal applied! Save ${formatPrice(amount, preferences.currency)}` });
       setAppliedDiscount(amount);
     }
   }, [hotel, discount, resolvedBookingData.nights]);
@@ -139,9 +142,9 @@ const Checkout = () => {
   // Derived helpers used in the JSX (fixes undefined references)
   const hotelName = hotel ? getHotelDisplayName(hotel, i18n?.language) || hotel.name : '';
   const getDisplayPrice = (h) => {
-    if (!h) return '0.00';
+    if (!h) return formatPrice(0, preferences.currency);
     const p = Number(h.price || 0);
-    return p.toFixed(2);
+    return formatPrice(p, preferences.currency);
   };
 
   const handleApplyPromoCode = () => {
@@ -153,7 +156,7 @@ const Checkout = () => {
     const result = validatePromoCode(promoCode, calculateTotal(), hotelId);
     
     if (result.valid) {
-      setPromoResult({ valid: true, message: `Discount applied! Save ${result.discountAmount.toFixed(2)} JOD` });
+      setPromoResult({ valid: true, message: `Discount applied! Save ${formatPrice(result.discountAmount, preferences.currency)}` });
       setAppliedDiscount(result.discountAmount);
     } else {
       setPromoResult({ valid: false, message: 'Invalid or expired promo code' });
@@ -445,7 +448,7 @@ const Checkout = () => {
                   <div className="flex-1">
                     <h3 className="font-bold text-lg">{hotelName}</h3>
                     <p className="text-gray-600 text-sm">{hotel.location}</p>
-                    <p className="text-blue-600 font-bold mt-2">{getDisplayPrice(hotel)} JOD/night</p>
+                    <p className="text-blue-600 font-bold mt-2">{getDisplayPrice(hotel)}/night</p>
                   </div>
                 </div>
               </div>
@@ -491,27 +494,27 @@ const Checkout = () => {
                 // Detailed breakdown from booking data
                 <>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{resolvedBookingData.breakdown.basePrice} JOD × {resolvedBookingData.breakdown.nights} nights</span>
-                    <span className="font-bold">{resolvedBookingData.breakdown.subtotal} JOD</span>
+                    <span className="text-gray-600">{formatPrice(resolvedBookingData.breakdown.basePrice, preferences.currency)} × {resolvedBookingData.breakdown.nights} nights</span>
+                    <span className="font-bold">{formatPrice(resolvedBookingData.breakdown.subtotal, preferences.currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Service fee</span>
-                    <span className="font-bold">{resolvedBookingData.breakdown.serviceFee} JOD</span>
+                    <span className="font-bold">{formatPrice(resolvedBookingData.breakdown.serviceFee, preferences.currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Cleaning fee</span>
-                    <span className="font-bold">{resolvedBookingData.breakdown.cleaningFee} JOD</span>
+                    <span className="font-bold">{formatPrice(resolvedBookingData.breakdown.cleaningFee, preferences.currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Taxes (16% VAT)</span>
-                    <span className="font-bold">{resolvedBookingData.breakdown.tax} JOD</span>
+                    <span className="font-bold">{formatPrice(resolvedBookingData.breakdown.tax, preferences.currency)}</span>
                   </div>
                 </>
               ) : (
                 // Fallback to simple subtotal
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-bold">{calculateTotal()} JOD</span>
+                  <span className="font-bold">{formatPrice(calculateTotal(), preferences.currency)}</span>
                 </div>
               )}
               
@@ -547,20 +550,20 @@ const Checkout = () => {
               {appliedDiscount > 0 && (
                 <div className="flex justify-between text-green-600 font-bold">
                   <span>Discount</span>
-                  <span>-{appliedDiscount.toFixed(2)} JOD</span>
+                  <span>-{formatPrice(appliedDiscount, preferences.currency)}</span>
                 </div>
               )}
               
               {!resolvedBookingData.breakdown && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Taxes & Fees</span>
-                  <span className="font-bold">{((calculateTotal() - appliedDiscount) * 0.1).toFixed(2)} JOD</span>
+                  <span className="font-bold">{formatPrice((calculateTotal() - appliedDiscount) * 0.1, preferences.currency)}</span>
                 </div>
               )}
               
               <div className="border-t pt-3 flex justify-between text-lg">
                 <span className="font-bold">Total</span>
-                <span className="font-bold text-blue-600">{calculateTotalWithTax().toFixed(2)} JOD</span>
+                <span className="font-bold text-blue-600">{formatPrice(calculateTotalWithTax(), preferences.currency)}</span>
               </div>
             </div>
           </div>

@@ -61,9 +61,9 @@ const HotelDetails = () => {
   const [reviews, setReviews] = useState([]);
   // Booking fees and policies
   const bookingFees = {
-    serviceFee: 15, // JOD
+    serviceFee: 10, // JOD
     taxRate: 0.16, // 16% VAT
-    cleaningFee: 25, // JOD
+    cleaningFee: 15, // JOD
   };
 
   const cancellationPolicy = {
@@ -795,20 +795,20 @@ const HotelDetails = () => {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {['Petra', 'Amman', 'Dead Sea', 'Wadi Rum', 'Aqaba'].filter(dest => dest !== hotel.location).slice(0, 3).map((destination) => {
-              // Map destination names to their proper IDs
-              const destinationIdMap = {
-                'Petra': 'd-petra',
-                'Amman': 'd-amman',
-                'Dead Sea': 'd-dead-sea',
-                'Wadi Rum': 'd-wadi-rum',
-                'Aqaba': 'd-aqaba'
+              // Map destination names to their search query format
+              const destinationQueryMap = {
+                'Petra': 'petra',
+                'Amman': 'amman',
+                'Dead Sea': 'dead sea',
+                'Wadi Rum': 'wadi rum',
+                'Aqaba': 'aqaba'
               };
-              const destinationId = destinationIdMap[destination] || destination.toLowerCase().replace(' ', '-');
+              const destinationQuery = destinationQueryMap[destination] || destination.toLowerCase();
 
               return (
                 <Link
                   key={destination}
-                  to={`/destinations/${destinationId}`}
+                  to={`/search?destination=${encodeURIComponent(destinationQuery)}&topRated=true`}
                   className="group card-modern p-6 hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
                 >
                   <div className="flex items-center gap-4">
