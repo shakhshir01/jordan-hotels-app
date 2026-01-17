@@ -17,9 +17,27 @@ export const PreferencesProvider = ({ children }) => {
   const [preferences, setPreferences] = useState(() => {
     try {
       const raw = localStorage.getItem('userPreferences');
-      return raw ? JSON.parse(raw) : { currency: 'JOD', language: 'en', theme: 'light' };
+      return raw ? JSON.parse(raw) : { 
+        currency: 'JOD', 
+        language: 'en', 
+        theme: 'light',
+        notifications: {
+          emailBookings: true,
+          emailPromotions: false,
+          pushNotifications: true
+        }
+      };
     } catch {
-      return { currency: 'JOD', language: 'en', theme: 'light' };
+      return { 
+        currency: 'JOD', 
+        language: 'en', 
+        theme: 'light',
+        notifications: {
+          emailBookings: true,
+          emailPromotions: false,
+          pushNotifications: true
+        }
+      };
     }
   });
 
@@ -31,7 +49,18 @@ export const PreferencesProvider = ({ children }) => {
         setLoading(true);
         const prefs = await hotelAPI.getUserPreferences();
         if (prefs) {
-          setPreferences((prev) => ({ ...prev, ...prefs }));
+          setPreferences((prev) => {
+            const merged = { ...prev, ...prefs };
+            // Ensure notifications structure exists
+            if (!merged.notifications) {
+              merged.notifications = {
+                emailBookings: true,
+                emailPromotions: false,
+                pushNotifications: true
+              };
+            }
+            return merged;
+          });
           localStorage.setItem('userPreferences', JSON.stringify({ ...preferences, ...prefs }));
         }
       } catch (err) {
@@ -69,7 +98,18 @@ export const PreferencesProvider = ({ children }) => {
   }, [preferences]);
 
   const savePreferences = useCallback(async (nextPrefs) => {
-    setPreferences((p) => ({ ...p, ...nextPrefs }));
+    setPreferences((p) => {
+      const updated = { ...p, ...nextPrefs };
+      // Ensure notifications structure exists
+      if (!updated.notifications) {
+        updated.notifications = {
+          emailBookings: true,
+          emailPromotions: false,
+          pushNotifications: true
+        };
+      }
+      return updated;
+    });
     try {
       localStorage.setItem('userPreferences', JSON.stringify({ ...preferences, ...nextPrefs }));
     } catch {}
