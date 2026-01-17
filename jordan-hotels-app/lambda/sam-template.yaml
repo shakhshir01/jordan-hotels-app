@@ -355,7 +355,12 @@ Resources:
               - s3:PutObject
               - s3:GetObject
               - s3:PutObjectAcl
+              - s3:ListBucket
             Resource: !Sub "arn:aws:s3:::${UploadsBucket}/*"
+          - Effect: Allow
+            Action:
+              - s3:ListBucket
+            Resource: !Sub "arn:aws:s3:::${UploadsBucket}"
           - Effect: Allow
             Action:
               - ses:SendEmail

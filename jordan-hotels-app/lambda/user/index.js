@@ -8,6 +8,8 @@ const {
   UpdateCommand,
   ScanCommand,
 } = require("@aws-sdk/lib-dynamodb");
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
@@ -15,6 +17,7 @@ const qrcode = require('qrcode');
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" });
 const docClient = DynamoDBDocumentClient.from(client);
 const ses = new SESClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const s3 = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
 
 const BOOKINGS_TABLE = process.env.BOOKINGS_TABLE || "Bookings";
 const USERS_TABLE = process.env.USERS_TABLE || "Users";
@@ -26,6 +29,22 @@ const defaultHeaders = {
   "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
   "Vary": "Origin",
 };
+
+async function generateSignedAvatarUrl(key) {
+  if (!key || !process.env.S3_UPLOAD_BUCKET) return null;
+  try {
+    const command = new GetObjectCommand({
+      Bucket: process.env.S3_UPLOAD_BUCKET,
+      Key: `uploads/${key}`,
+    });
+    // Generate URL that expires in 1 hour
+    const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    return signedUrl;
+  } catch (error) {
+    console.error('Error generating signed URL:', error);
+    return null;
+  }
+}
 
 const parseJwtClaims = (event) => {
   const auth = event?.headers?.authorization || event?.headers?.Authorization || '';
@@ -178,10 +197,15 @@ async function getUserProfile(userId, event) {
       }
 
       if (result && result.Item) {
+        const item = result.Item;
+        // Generate signed URL for avatar if key exists
+        if (item.avatarKey && !item.avatarUrl) {
+          item.avatarUrl = await generateSignedAvatarUrl(item.avatarKey);
+        }
         return {
           statusCode: 200,
           headers: defaultHeaders,
-          body: JSON.stringify(result.Item),
+          body: JSON.stringify(item),
         };
       }
     }
@@ -280,7 +304,7 @@ async function updateUserProfile(userId, event) {
       mfaChallengeCode: body.mfaChallengeCode !== undefined ? body.mfaChallengeCode : existing.mfaChallengeCode || null,
       mfaChallengeExpires: body.mfaChallengeExpires !== undefined ? body.mfaChallengeExpires : existing.mfaChallengeExpires || null,
       avatarKey: bodyAvatarKey !== undefined ? bodyAvatarKey : existing.avatarKey || null,
-      avatarUrl: bodyAvatarUrl !== undefined ? bodyAvatarUrl : (bodyAvatarKey ? `https://${process.env.S3_UPLOAD_BUCKET}.s3.us-east-1.amazonaws.com/uploads/${bodyAvatarKey}` : existing.avatarUrl || null),
+      avatarUrl: null, // Will be set after saving
     };
 
     // Remove explicit nulls for cleaner storage (optional)
@@ -295,6 +319,13 @@ async function updateUserProfile(userId, event) {
           Item: merged,
         })
       );
+    }
+
+    // Generate signed URL for avatar if key exists
+    if (merged.avatarKey) {
+      merged.avatarUrl = await generateSignedAvatarUrl(merged.avatarKey);
+    } else if (existing.avatarUrl) {
+      merged.avatarUrl = existing.avatarUrl;
     }
 
     return {

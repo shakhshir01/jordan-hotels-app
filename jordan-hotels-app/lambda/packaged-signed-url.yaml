@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: "VisitJo SAM template \xE2\u20AC\u201D API, Lambdas, DynamoDB, S3, Secrets\
-  \ Manager (updated)"
+Description: "VisitJo SAM template \u2014 API, Lambdas, DynamoDB, S3, Secrets Manager\
+  \ (updated)"
 Globals:
   Function:
     Runtime: nodejs20.x
@@ -358,14 +358,8 @@ Resources:
           - s3:PutObject
           - s3:GetObject
           - s3:PutObjectAcl
-          - s3:ListBucket
           Resource:
             Fn::Sub: arn:aws:s3:::${UploadsBucket}/*
-        - Effect: Allow
-          Action:
-          - s3:ListBucket
-          Resource:
-            Fn::Sub: arn:aws:s3:::${UploadsBucket}
         - Effect: Allow
           Action:
           - ses:SendEmail
@@ -676,7 +670,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getSignedUrl/index.handler
-      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/d998a7e41d53d0f38d0853caa8122e25
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/c51a84705437412b3b158e57837eaf14
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -703,7 +697,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: user/index.handler
-      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/cdbe07d2f60ad252a40eacc3a8b0b597
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/73ab1e0e1895df9cf9192a28b9332213
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -849,7 +843,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: chat/index.handler
-      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/c7229a698e9c4ce2162427235944ee44
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/2eedab19d09a63f20b037fde9cd3a069
       Tags:
         App: VisitJo
         ManagedBy: SAM
