@@ -87,6 +87,7 @@ function AppRoutes() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/support" element={<Support />} />
+        <Route path="/contact" element={<Navigate to="/support" replace />} />
 
         {/* Protected routes - only logged in users */}
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

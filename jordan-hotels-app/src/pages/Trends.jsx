@@ -104,49 +104,53 @@ const Trends = () => {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-sky-600 via-blue-700 to-indigo-700 shadow-2xl mb-16 mx-6">
-        <div className="absolute inset-0 bg-black/10" />
+      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 shadow-2xl mb-16 mx-6">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-80 h-80 bg-yellow-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
         <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
-          <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
-            {t('pages.trends.hero.kicker', 'Trending Now')}
+          <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3 bg-white/20 inline-block px-4 py-2 rounded-full">
+            🔥 Trending Now 🔥
           </p>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-display tracking-tight mb-4">
-            {t('pages.trends.hero.title', 'What Everyone is Talking About')}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-display tracking-tight mb-4 bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+            What Everyone is Talking About
           </h1>
-          <p className="text-base md:text-lg opacity-95 leading-relaxed max-w-3xl mx-auto">
-            {t('pages.trends.hero.subtitle', 'Discover the top-rated stays and experiences that travelers are falling in love with right now.')}
+          <p className="text-base md:text-lg opacity-95 leading-relaxed max-w-3xl mx-auto text-white/90">
+            Discover the top-rated stays and experiences that travelers are falling in love with right now. ✨
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-8 max-w-xl mx-auto flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 rounded-full px-3 py-2 shadow-2xl border border-white/30 dark:border-slate-700/60">
+          <form onSubmit={handleSubmit} className="mt-8 max-w-xl mx-auto flex items-center gap-3 bg-white/95 dark:bg-slate-900/90 rounded-full px-3 py-2 shadow-2xl border border-white/30 dark:border-slate-700/60 backdrop-blur-sm">
             <Search className="text-slate-400" size={18} />
             <input
               className="flex-1 bg-transparent outline-none text-sm md:text-base text-slate-900 dark:text-slate-50 placeholder-slate-400 dark:placeholder-slate-500"
-              placeholder={t('pages.trends.searchPlaceholder', 'Search across hotels and experiences')}
+              placeholder="Search across hotels and experiences..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
             <button
               type="submit"
-              aria-label={t('pages.trends.explore')}
-              className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs md:text-sm font-semibold hover:bg-blue-700 transition-colors min-h-[44px] inline-flex items-center justify-center"
+              aria-label="Explore"
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs md:text-sm font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center shadow-lg hover:shadow-xl"
             >
-              {t('pages.trends.explore')}
+              Explore 🚀
             </button>
           </form>
 
-          <div className="mt-4 flex flex-wrap justify-center gap-2 text-xs md:text-sm">
+          <div className="mt-6 flex flex-wrap justify-center gap-3 text-xs md:text-sm">
             {defaultQueries.map((q) => (
               <button
                 key={q.id}
                 type="button"
                 onClick={() => runSearch(q.q)}
-                className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
+                className={`px-4 py-2 rounded-full border-2 font-medium transition-all duration-300 hover:scale-105 ${
                   activeQuery === q.q
-                    ? "bg-white text-slate-900 border-transparent"
-                    : "border-white/40 text-white/80 hover:bg-white/10"
+                    ? "bg-white text-purple-600 border-white shadow-lg scale-105"
+                    : "border-white/40 text-white/80 hover:bg-white/10 hover:border-white/60"
                 }`}
               >
-                {isArabic ? q.labelAr : q.label}
+                {isArabic ? q.labelAr : q.label} 🌟
               </button>
             ))}
           </div>
@@ -179,54 +183,57 @@ const Trends = () => {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {results.hotels.slice(0, 6).map((h) => (
-                    <article key={h.id} className="hotel-card group overflow-hidden flex flex-col">
+                    <article key={h.id} className="hotel-card group overflow-hidden bg-gradient-to-br from-white to-purple-50 dark:from-slate-800 dark:to-purple-900/20 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-purple-200/50 dark:border-purple-700/50">
                       {h.image && (
-                        <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden">
+                        <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-t-3xl">
                           <OptimizedImage
                             src={h.image}
                             alt={getHotelDisplayName(h, i18n.language) || h.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             onError={createHotelImageOnErrorHandler(h.id)}
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
+                          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                            ⭐ {h.rating}
+                          </div>
                         </div>
                       )}
-                      <div className="p-4 flex flex-col gap-1 flex-1">
-                        <p className="text-base font-semibold text-slate-900 dark:text-slate-50 line-clamp-1">
+                      <div className="p-6 flex flex-col gap-3 flex-1">
+                        <p className="text-lg font-bold text-slate-900 dark:text-slate-50 line-clamp-1 group-hover:text-purple-600 transition-colors">
                           {getHotelDisplayName(h, i18n.language) || h.name}
                         </p>
                         {h.location && (
-                          <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                            <MapPin size={12} /> {h.location}
+                          <p className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                            <MapPin size={14} className="text-purple-500" /> {h.location}
                           </p>
                         )}
-                        <div className="mt-auto flex items-center justify-between pt-2 text-xs">
-                          {h.rating && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300" aria-hidden="true">
-                              <Star size={12} aria-hidden="true" /> {h.rating}
+                        <div className="mt-auto flex items-center justify-between pt-3">
+                          {h.reviews && (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-300 text-sm font-medium">
+                              💬 {h.reviews} reviews
                             </span>
                           )}
-                          {h.rating && <span className="sr-only">Rating: {h.rating} out of 5</span>}
                           {h.price && (
-                            <span className="text-slate-700 dark:text-slate-200 font-semibold">
-                              {h.price} JOD <span className="text-[11px] text-slate-500 dark:text-slate-400">{t('hotels.perNight')}</span>
+                            <span className="text-slate-700 dark:text-slate-200 font-bold text-lg bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                              {h.price} JOD <span className="text-sm text-slate-500 dark:text-slate-400">/night</span>
                             </span>
                           )}
                         </div>
-                        <div className="mt-3 flex gap-2">
+                        <div className="mt-4 flex gap-3">
                           <Link
                             to={`/hotels/${h.id}`}
                             aria-label={`View ${getHotelDisplayName(h, i18n.language) || h.name}`}
-                            className="px-3 py-2 rounded-xl text-sm font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200 inline-flex items-center justify-center min-h-[44px]"
+                            className="flex-1 px-4 py-3 rounded-2xl text-sm font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all duration-300 inline-flex items-center justify-center min-h-[44px] shadow-lg hover:shadow-xl hover:scale-105"
                           >
-                            {t('common.view')}
+                            View ✨
                           </Link>
                           <Link
                             to={`/hotels/${h.id}?book=true`}
                             aria-label={`Book ${getHotelDisplayName(h, i18n.language) || h.name}`}
-                            className="px-3 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 inline-flex items-center justify-center min-h-[44px]"
+                            className="flex-1 px-4 py-3 rounded-2xl text-sm font-bold bg-gradient-to-r from-green-500 to-teal-500 text-white hover:from-green-600 hover:to-teal-600 transition-all duration-300 inline-flex items-center justify-center min-h-[44px] shadow-lg hover:shadow-xl hover:scale-105"
                           >
-                            📅 Book
+                            Book Now 🚀
                           </Link>
                         </div>
                       </div>
@@ -243,25 +250,43 @@ const Trends = () => {
                   <Percent size={18} className="text-pink-500" />
                   {t('nav.experiences')}
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {results.experiences.slice(0, 6).map((e) => (
                     <article
                       key={e.id}
-                      className="glass-card rounded-2xl p-4 flex flex-col gap-1 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
+                      className="glass-card rounded-3xl p-6 flex flex-col gap-3 hover:-translate-y-2 hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border border-orange-200/50 dark:border-orange-700/50"
                     >
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{e.title}</p>
+                      <p className="text-lg font-bold text-slate-900 dark:text-slate-50 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                        {e.title}
+                      </p>
                       {e.meta && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{e.meta}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                          <MapPin size={14} className="text-orange-500" /> {e.meta}
+                        </p>
                       )}
+                      <div className="flex items-center gap-2 mt-2">
+                        {e.rating && (
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-300 text-sm font-medium">
+                            ⭐ {e.rating}
+                          </span>
+                        )}
+                        {e.reviews && (
+                          <span className="text-sm text-slate-500 dark:text-slate-400">
+                            ({e.reviews} reviews)
+                          </span>
+                        )}
+                      </div>
                       {e.price && (
-                        <p className="text-xs text-slate-700 dark:text-slate-200 mt-1">{t('pages.trends.fromPrice', { price: e.price })}</p>
+                        <p className="text-slate-700 dark:text-slate-200 mt-2 font-bold text-lg bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                          From {e.price} JOD
+                        </p>
                       )}
-                      <div className="mt-3">
+                      <div className="mt-auto">
                         <Link
                           to={`/experiences/${e.id}`}
-                          className="px-3 py-2 rounded-xl text-xs font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-colors duration-200 inline-block"
+                          className="w-full px-4 py-3 rounded-2xl text-sm font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 transition-all duration-300 inline-block text-center shadow-lg hover:shadow-xl hover:scale-105"
                         >
-                          📅 Book Now
+                          Book Experience 🚀
                         </Link>
                       </div>
                     </article>

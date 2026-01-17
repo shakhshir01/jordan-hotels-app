@@ -277,12 +277,12 @@ const Profile = () => {
   const totalSpent = bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
   return (
-    <div className="min-h-screen gradient-hero py-12">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-purple-900/20 dark:to-pink-900/20 py-12">
       <div className="max-w-4xl mx-auto px-4">
         {/* Profile Card */}
-        <div className="glass-card card-modern p-8 mb-8 animate-fade-in">
+        <div className="glass-card card-modern p-8 mb-8 animate-fade-in bg-gradient-to-br from-white to-blue-50 dark:from-slate-800 dark:to-blue-900/20 rounded-3xl shadow-2xl border border-blue-200/50 dark:border-blue-700/50">
           <div className="flex items-start justify-between mb-6">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-6">
                     <ProfilePhotoUpload
                       currentAvatarUrl={profile?.avatarUrl || profile?.avatar}
                       onUploaded={(updated) => {
@@ -293,20 +293,28 @@ const Profile = () => {
                       }}
                     />
                     <div>
-                      <h1 className="text-3xl font-black gradient-text animate-gradient">
+                      <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
                         {profile?.firstName} {profile?.lastName}
                       </h1>
-                      <p className="text-slate-600 dark:text-slate-300 flex items-center gap-2 mt-1">
-                        <Mail size={18} /> {profile?.email}
+                      <p className="text-slate-600 dark:text-slate-300 flex items-center gap-2 mt-2 text-lg">
+                        <Mail size={20} className="text-blue-500" /> {profile?.email}
                       </p>
+                      <div className="flex items-center gap-4 mt-3">
+                        <div className="bg-gradient-to-r from-green-500 to-teal-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                          Premium Member ✨
+                        </div>
+                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                          Jordan Explorer 🏛️
+                        </div>
+                      </div>
                     </div>
                   </div>
             <button
               onClick={handleLogout}
               aria-label="Logout"
-              className="btn-secondary flex items-center gap-2 px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px] inline-flex items-center justify-center"
+              className="btn-secondary flex items-center gap-2 px-6 py-3 hover:scale-105 transition-all duration-300 min-h-[48px] inline-flex items-center justify-center bg-gradient-to-r from-red-500 to-pink-500 text-white hover:from-red-600 hover:to-pink-600 shadow-lg"
             >
-              <LogOut size={18} />
+              <LogOut size={20} />
               Logout
             </button>
           </div>

@@ -503,13 +503,15 @@ const Home = () => {
         {/* Enhanced Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-jordan-blue via-jordan-teal to-jordan-rose animate-gradient-shift"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-        
+
         {/* Animated Mesh Background */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-jordan-gold/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
           <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-jordan-rose/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
           <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-jordan-teal/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/3 right-1/3 w-56 h-56 bg-jordan-emerald/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute bottom-1/4 left-1/3 w-40 h-40 bg-jordan-purple/4 rounded-full blur-3xl animate-float" style={{ animationDelay: '5s' }}></div>
         </div>
 
         {/* Floating Geometric Shapes */}
@@ -518,6 +520,16 @@ const Home = () => {
           <div className="absolute top-32 right-20 w-6 h-6 bg-jordan-gold/30 rounded-full animate-float" style={{ animationDelay: '1.5s' }}></div>
           <div className="absolute bottom-24 left-24 w-3 h-3 bg-jordan-rose/25 rotate-12 animate-float" style={{ animationDelay: '2.5s' }}></div>
           <div className="absolute bottom-32 right-32 w-5 h-5 bg-jordan-teal/20 rounded-full animate-float" style={{ animationDelay: '3.5s' }}></div>
+          <div className="absolute top-24 right-1/4 w-4 h-4 bg-jordan-emerald/30 rotate-12 animate-float" style={{ animationDelay: '4.5s' }}></div>
+          <div className="absolute bottom-16 left-1/4 w-5 h-5 bg-jordan-purple/25 rounded-full animate-float" style={{ animationDelay: '1.2s' }}></div>
+        </div>
+
+        {/* Animated Particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white/40 rounded-full animate-pulse-glow" style={{ animationDelay: '0s' }}></div>
+          <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-jordan-gold/60 rounded-full animate-pulse-glow" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-jordan-rose/50 rounded-full animate-pulse-glow" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-jordan-teal/40 rounded-full animate-pulse-glow" style={{ animationDelay: '3s' }}></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

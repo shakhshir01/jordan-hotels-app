@@ -13,16 +13,12 @@ import { hotelAPI } from './api';
 const getGeminiKey = () => {
   try {
     const cfg = typeof window !== 'undefined' && window.__VISITJO_RUNTIME_CONFIG__;
-    const key = cfg?.VITE_GEMINI_API_KEY || '';
-    if (key) {
-      // API key found
-    } else {
-      // No API key found in runtime config
-    }
+    // Use provided key as fallback or primary if config is missing
+    const key = cfg?.VITE_GEMINI_API_KEY || 'AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64';
     return key;
   } catch (error) {
     console.error('Error getting Gemini key:', error);
-    return '';
+    return 'AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64';
   }
 };
 
@@ -450,6 +446,12 @@ Your personality:
 - Use Arabic phrases frequently: Ahlan, Ya hala, Inshallah, Ya'ani, Wallahi, etc.
 - Be funny, sarcastic, and engaging - never boring or robotic
 - Have opinions and preferences (e.g., "Petra at sunset? Wallahi, it's magical!")
+
+Capabilities:
+- BOOKING: You can help users book hotels and experiences. Encourage them to click the "Book Now" buttons on the cards I will display.
+- VIEW PAGES: You know about the website sections. If they ask about blogs, gallery, or support, direct them there.
+- READ STUFF: You have access to the current context (hotels, deals, experiences) listed below. Use this information to answer specific questions.
+- CONVERSATION: You are a great conversationalist. Keep it flowing!
 
 Jordan Expertise Areas:
 ${JSON.stringify(JORDAN_KNOWLEDGE, null, 2)}

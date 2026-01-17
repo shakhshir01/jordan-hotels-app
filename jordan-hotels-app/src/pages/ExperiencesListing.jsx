@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, MapPin, Clock, Star } from "lucide-react";
+import { Loader2, MapPin, Clock, Star, Sparkles, Compass, Mountain, Waves, Camera, Heart } from "lucide-react";
 import { hotelAPI } from "../services/api";
 import { useTranslation } from "react-i18next";
 import OptimizedImage from "../components/OptimizedImage";
+import Seo from '../components/Seo.jsx';
 
 export default function ExperiencesListing() {
   const navigate = useNavigate();
@@ -29,20 +30,95 @@ export default function ExperiencesListing() {
   }, []);
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 shadow-2xl mb-16 mx-6">
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="relative px-4 sm:px-6 py-20 text-center text-white">
-          <div className="text-sm font-semibold uppercase tracking-widest opacity-90 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <Seo
+        title="Jordan Experiences - Authentic Adventures & Cultural Tours"
+        description="Discover authentic Jordanian experiences. From Petra tours to Wadi Rum safaris, Dead Sea spas to Red Sea diving. Create unforgettable memories in Jordan."
+        canonicalUrl="https://visitjo.com/experiences"
+        keywords="Jordan experiences, Petra tours, Wadi Rum safari, Dead Sea spa, Red Sea diving, Jordan adventures, cultural tours"
+      />
+
+      {/* Enhanced Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Dynamic Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-jordan-emerald via-jordan-teal to-jordan-blue animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+        {/* Animated Mesh Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-jordan-gold/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-jordan-rose/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-jordan-teal/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        {/* Floating Geometric Shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-16 left-16 w-6 h-6 bg-white/20 rotate-45 animate-float" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute top-32 right-20 w-8 h-8 bg-jordan-gold/30 rounded-full animate-float" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute bottom-24 left-24 w-5 h-5 bg-jordan-rose/25 rotate-12 animate-float" style={{ animationDelay: '2.5s' }}></div>
+          <div className="absolute bottom-32 right-32 w-7 h-7 bg-jordan-teal/20 rounded-full animate-float" style={{ animationDelay: '3.5s' }}></div>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Enhanced Badge */}
+          <div className="inline-flex items-center gap-3 px-8 py-4 mb-12 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full text-white/90 text-sm font-bold uppercase tracking-widest shadow-2xl animate-fade-in">
+            <Sparkles className="w-5 h-5 text-jordan-gold" />
             {t('pages.experiences.hero.kicker', 'Unforgettable Moments')}
+            <Sparkles className="w-5 h-5 text-jordan-gold" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-black font-display mb-6 tracking-tight">
-            {t('pages.experiences.hero.title', 'Go Beyond the Ordinary')}
+
+          {/* Enhanced Title */}
+          <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black font-display mb-8 tracking-tight leading-tight animate-slide-up">
+            <span className="block text-white drop-shadow-2xl mb-2">{t("pages.experiences.hero.titleMain", "Go Beyond the")}</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl">
+              {t("pages.experiences.hero.titleAccent", "Ordinary")}
+            </span>
           </h1>
-          <p className="text-lg max-w-3xl mx-auto opacity-95 leading-relaxed">
+
+          {/* Enhanced Subtitle */}
+          <p className="text-xl sm:text-2xl lg:text-3xl max-w-5xl mx-auto mb-16 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
             {t('pages.experiences.hero.subtitle', 'Don\'t just visit Jordan—live it. From Bedouin tea in the desert to diving in the Red Sea, create memories that last a lifetime.')}
           </p>
+
+          {/* Stats Section */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <div className="text-center">
+              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
+                <Compass className="w-8 h-8 text-jordan-gold" />
+                25+
+              </div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
+                <Camera className="w-8 h-8 text-jordan-rose" />
+                50+
+              </div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Experiences</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
+                <Star className="w-8 h-8 text-jordan-gold" />
+                4.9★
+              </div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Avg Rating</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
+                <Heart className="w-8 h-8 text-jordan-teal" />
+                10K+
+              </div>
+              <div className="text-white/70 text-sm sm:text-base font-medium">Happy Travelers</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
+          </div>
         </div>
       </section>
 

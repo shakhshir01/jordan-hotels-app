@@ -5,6 +5,7 @@ window.__VISITJO_RUNTIME_CONFIG__ = (function(){
   const isLocalDev = (typeof location !== 'undefined') && (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && (location.port === '5175');
   return {
     OPENAI_API_KEY: "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",
+    VITE_GEMINI_API_KEY: "AIzaSyC424S-HHeYt7Fio20xGyaCimKRq-6oh64",
     VITE_API_GATEWAY_URL: isLocalDev ? '/api' : "https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod",
     VITE_COGNITO_CLIENT_ID: "57ggsfmkahlngmh03c92uumqv9",
     VITE_COGNITO_DOMAIN: "us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com",

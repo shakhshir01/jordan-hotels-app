@@ -40,6 +40,29 @@ export default function ChatBot() {
     }
   }, [userProfile]);
 
+  // Listen for external open chat events
+  useEffect(() => {
+    const handleOpenChat = () => {
+      console.log('ChatBot: Received openChatBot event, opening chat...');
+      setIsOpen(true);
+    };
+
+    console.log('ChatBot: Setting up event listener for openChatBot');
+    window.addEventListener('openChatBot', handleOpenChat);
+
+    // Also expose a global function for direct calling
+    window.openChatBot = () => {
+      console.log('ChatBot: openChatBot() function called, opening chat...');
+      setIsOpen(true);
+    };
+
+    return () => {
+      console.log('ChatBot: Removing event listener for openChatBot');
+      window.removeEventListener('openChatBot', handleOpenChat);
+      delete window.openChatBot;
+    };
+  }, []);
+
   // Auto-scroll with smooth animation
   const scrollToBottom = () => {
     if (mountedRef.current && messagesEndRef.current) {
@@ -186,11 +209,11 @@ export default function ChatBot() {
 
   return (
     <>
-      {/* Enhanced Chat Button with Pulse Animation */}
+      {/* Premium Jordan-Inspired Chat Button */}
       <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
         {/* Notification Badge */}
         {messages.length > 1 && (
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
+          <div className="absolute -top-2 -right-2 bg-jordan-gold text-slate-900 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse shadow-lg">
             {messages.filter(m => m.sender === 'bot' && m.status !== 'read').length}
           </div>
         )}
@@ -198,12 +221,13 @@ export default function ChatBot() {
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="group relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white p-4 rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 transform hover:scale-110 animate-bounce-subtle"
-          aria-label="Open Nashmi Chat"
+          className="group relative bg-gradient-to-br from-jordan-blue via-jordan-teal to-jordan-rose hover:from-jordan-blue/90 hover:via-jordan-teal/90 hover:to-jordan-rose/90 text-white p-4 rounded-full shadow-2xl hover:shadow-jordan-gold/25 transition-all duration-500 transform hover:scale-110 animate-float"
+          aria-label="Open Nashmi Chat - Your Jordan Travel Companion"
           aria-expanded={isOpen}
         >
-          {/* Glow Effect */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-pink-400 blur-lg opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
+          {/* Enhanced Glow Effect */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-jordan-gold/50 to-jordan-rose/50 blur-lg opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-jordan-blue/30 to-jordan-teal/30 blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
 
           <div className="relative">
             {isOpen ? (
@@ -212,14 +236,19 @@ export default function ChatBot() {
               </svg>
             ) : (
               <div className="relative">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                {/* Online Indicator */}
-                <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${isOnline ? 'bg-green-400' : 'bg-gray-400'}`}></div>
+                {/* Jordan-Inspired Chat Icon */}
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <span className="text-lg animate-pulse">🤖</span>
+                </div>
+                {/* Enhanced Online Indicator */}
+                <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow-lg ${isOnline ? 'bg-jordan-gold animate-pulse' : 'bg-slate-400'}`}></div>
               </div>
             )}
           </div>
+
+          {/* Floating Sparkles */}
+          <div className="absolute -top-1 -left-1 w-2 h-2 bg-jordan-gold rounded-full animate-ping opacity-75"></div>
+          <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-jordan-rose rounded-full animate-ping opacity-75" style={{ animationDelay: '1s' }}></div>
         </button>
       </div>
 
