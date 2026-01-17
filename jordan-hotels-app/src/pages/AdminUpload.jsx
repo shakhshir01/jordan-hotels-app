@@ -3,10 +3,8 @@ import { useDropzone } from 'react-dropzone';
 import { hotelAPI } from '../services/api';
 import { Upload, X, CheckCircle, AlertCircle, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { showSuccess, showError } from '../services/toastService';
-import { useTranslation } from 'react-i18next';
 
 const AdminUpload = () => {
-  const { t } = useTranslation();
   const [hotelId, setHotelId] = useState('');
   const [experienceId, setExperienceId] = useState('');
   const [uploadType, setUploadType] = useState('hotel'); // 'hotel' or 'experience'
@@ -90,7 +88,7 @@ const AdminUpload = () => {
       setUploadProgress({});
       setCompletedUploads([]);
 
-    } catch (error) {
+    } catch (_error) {
       showError('Upload process failed');
     } finally {
       setUploading(false);

@@ -37,12 +37,12 @@ const AuthCallback = () => {
           const checkAuth = async () => {
             attempts++;
             try {
-              const user = await Auth.currentAuthenticatedUser({ bypassCache: true });
+              const _user = await Auth.currentAuthenticatedUser({ bypassCache: true });
               Hub.remove('auth', authListener);
               navigate('/', { replace: true });
               setBusy(false);
               return;
-            } catch (err) {
+            } catch (_err) {
               if (attempts < 10) {
                 setTimeout(checkAuth, 1000);
               } else {
@@ -60,7 +60,7 @@ const AuthCallback = () => {
           navigate('/login', { replace: true });
           setBusy(false);
         }
-      } catch (error) {
+      } catch (_error) {
         navigate('/login', { replace: true });
         setBusy(false);
       }

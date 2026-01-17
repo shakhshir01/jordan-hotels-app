@@ -4,16 +4,16 @@ import NavBar from "../components/NavBar.jsx";
 import Footer from "../components/Footer.jsx";
 import ChatBot from "../components/ChatBot.jsx";
 import AccessibilitySettings from "../components/AccessibilitySettings.jsx";
-import { SkipToMainLink } from "../services/accessibility.jsx";
-import { getLastAuthError, enableMocks, getUseMocks } from "../services/api.js";
+import { SkipToMainLink } from "../components/AccessibilityComponents.jsx";
+import { getLastAuthError, getUseMocks } from "../services/api.js";
 
 export default function AppLayout() {
   const [authError] = useState(() => getLastAuthError());
   const [dismissed, setDismissed] = useState(false);
-  const [useMocks, setUseMocks] = useState(getUseMocks());
+  const [_useMocks, _setUseMocks] = useState(getUseMocks());
   const [accessibilitySettingsOpen, setAccessibilitySettingsOpen] = useState(false);
 
-  const showBanner = authError && !dismissed && !useMocks;
+  const showBanner = authError && !dismissed && !_useMocks;
 
   return (
     <div className="min-h-screen">

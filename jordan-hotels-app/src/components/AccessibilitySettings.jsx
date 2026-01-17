@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccessibility } from '../context/AccessibilityContext';
-import { AccessibleButton } from '../services/accessibility.jsx';
+import { AccessibleButton } from './AccessibilityComponents.jsx';
 
 const AccessibilitySettings = ({ isOpen, onClose }) => {
   const { t } = useTranslation();

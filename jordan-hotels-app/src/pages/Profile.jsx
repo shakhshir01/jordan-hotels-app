@@ -147,7 +147,7 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, userProfile?.firstName, userProfile?.hasCustomName, userProfile?.lastName]);
+  }, [user, userProfile?.firstName, userProfile?.hasCustomName, userProfile?.lastName, userProfile?.avatarUrl]);
 
   useEffect(() => {
     if (!user) {
@@ -209,12 +209,12 @@ const Profile = () => {
       // The context's setPreferences already handles API and localStorage saving
       showSuccess('Preferences saved successfully');
       setEditingPreferences(false);
-    } catch (error) {
+    } catch (_error) {
       showError('Failed to save preferences');
     }
   };
 
-  const handleCancelBooking = async (bookingId) => {
+  const handleCancelBooking = async (_bookingId) => {
     try {
       // TODO: Implement booking cancellation API call
       // await hotelAPI.cancelBooking(bookingId);

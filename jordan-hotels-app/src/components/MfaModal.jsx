@@ -7,7 +7,7 @@ import QRCode from 'qrcode';
 import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function MfaModal() {
-  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa, verifyLoginTotpMfa, login, completePreAuthLogin } = useAuth();
+  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, setupEmailMfa, verifyEmailMfa, requestEmailMfaChallenge, verifyLoginEmailMfa, submitMfaCode, setupTotpMfa, verifyTotpMfa, login, completePreAuthLogin } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [code, setCode] = useState('');
@@ -117,12 +117,12 @@ export default function MfaModal() {
             return;
           }
           // Login completed via backend - complete the authentication
-          const email = mfaChallenge.email || cognitoUserRef.current?.getUsername();
+          const _email = mfaChallenge.email || cognitoUserRef.current?.getUsername();
           setCode('');
           return;
         }
         // Login completed via backend
-        const email = mfaChallenge.email || cognitoUserRef.current?.getUsername();
+        const _email = mfaChallenge.email || cognitoUserRef.current?.getUsername();
         if (email) {
           completePreAuthLogin(email);
         }

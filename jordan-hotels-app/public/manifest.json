@@ -1,36 +1,105 @@
 {
-  "name": "VisitJo",
+  "name": "VisitJo - Jordan Travel Guide",
   "short_name": "VisitJo",
-  "description": "Your ultimate guide to Jordan's best hotels, experiences, and travel deals.",
+  "description": "Your ultimate guide to Jordan's best hotels, experiences, and travel deals. Discover amazing destinations, book accommodations, and explore authentic Jordanian culture.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
+  "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
+  "dir": "ltr",
   "version": "1.1.1",
   "categories": [
     "travel",
-    "lifestyle"
+    "lifestyle",
+    "business"
   ],
   "icons": [
     {
       "src": "/jordanfavicon.png",
-      "sizes": "512x512",
+      "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/jordanfavicon.png",
-      "sizes": "192x192",
+      "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/jordanfavicon.png",
       "sizes": "180x180",
       "type": "image/png",
+      "purpose": "apple-touch-icon"
+    },
+    {
+      "src": "/jordanfavicon.png",
+      "sizes": "32x32",
+      "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/jordanfavicon.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Find Hotels",
+      "short_name": "Hotels",
+      "description": "Search and book hotels in Jordan",
+      "url": "/search?type=hotels",
+      "icons": [
+        {
+          "src": "/jordanfavicon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Explore Experiences",
+      "short_name": "Experiences",
+      "description": "Discover unique experiences in Jordan",
+      "url": "/experiences",
+      "icons": [
+        {
+          "src": "/jordanfavicon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Travel Deals",
+      "short_name": "Deals",
+      "description": "Find the best travel deals",
+      "url": "/deals",
+      "icons": [
+        {
+          "src": "/jordanfavicon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "/jordanfavicon.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/jordanfavicon.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }

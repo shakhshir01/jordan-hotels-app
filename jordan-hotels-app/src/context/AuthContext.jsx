@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
             return;
           }
-        } catch (amplifyError) {
+        } catch (_amplifyError) {
           console.log('No Amplify user found on mount');
         }
 
@@ -155,7 +155,7 @@ export const AuthProvider = ({ children }) => {
     // Delay to ensure Amplify is configured
     const timer = setTimeout(checkAuth, 1500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [setUserAndProfileFromEmail]);
 
   // Listen for Amplify authentication state changes (for OAuth)
   useEffect(() => {
@@ -270,7 +270,7 @@ export const AuthProvider = ({ children }) => {
         }
       });
     });
-  }, []);
+  }, [setUserAndProfileFromEmail]);
 
   const login = useCallback(async (email, password) => {
     return new Promise((resolve, reject) => {
@@ -406,7 +406,7 @@ export const AuthProvider = ({ children }) => {
         },
       });
     });
-  }, []);
+  }, [setUserAndProfileFromEmail]);
 
   const performLogout = useCallback(() => {
     try {
@@ -430,6 +430,7 @@ export const AuthProvider = ({ children }) => {
     }
     cognitoUserRef.current = null;
     showSuccess('Logged out successfully');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setUser, setUserProfile, setAuthToken, setError, cognitoUserRef, showSuccess]);
 
   // Logout entrypoint: if MFA is enabled, trigger a verification flow instead
@@ -470,6 +471,7 @@ export const AuthProvider = ({ children }) => {
     showSuccess(`Welcome back!`);
     clearMfaChallenge();
     setLoading(false); // Complete loading when MFA is verified
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cognitoUserRef, setUserAndProfileFromEmail, setAuthToken, setError, showSuccess, clearMfaChallenge, setLoading]);
 
   const openEmailSetup = useCallback(() => {
@@ -520,6 +522,7 @@ export const AuthProvider = ({ children }) => {
         },
       }, mfaType || undefined);
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cognitoUserRef, setAuthToken, setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, clearMfaChallenge, showSuccess, mfaChallenge, performLogout, setError]);
 
   const setupTotp = useCallback(() => {
@@ -563,6 +566,7 @@ export const AuthProvider = ({ children }) => {
         });
       });
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cognitoUserRef, UserPool, setError, setMfaChallenge]);
 
   const verifyTotp = useCallback((userCode, friendlyName = 'My device') => {
@@ -632,6 +636,7 @@ export const AuthProvider = ({ children }) => {
         },
       });
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cognitoUserRef, UserPool, showSuccess, setMfaEnabled, setMfaMethod, hotelAPI, clearMfaChallenge, setMfaChallenge, setError, showError]);
 
   // Email MFA flows (secondary address)
@@ -655,6 +660,7 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to send verification email');
       throw e;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, cognitoUserRef, setError, showError, setPendingSecondaryEmail, hotelAPI, showSuccess]);
 
   const setupTotpMfa = useCallback(async () => {
@@ -668,6 +674,7 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to setup TOTP MFA');
       throw e;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hotelAPI, setMfaChallenge, setError, showError]);
 
   const verifyTotpMfa = useCallback(async (code) => {
@@ -696,6 +703,7 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to verify TOTP code');
       throw e;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hotelAPI, cognitoUserRef, UserPool, user, setMfaEnabled, setMfaMethod, showSuccess, setError, showError]);
 
   const verifyEmailMfa = useCallback(async (code) => {
@@ -726,6 +734,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setPendingSecondaryEmail(null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hotelAPI, cognitoUserRef, UserPool, user, setMfaEnabled, setMfaMethod, pendingSecondaryEmail, showSuccess, setError, showError, setPendingSecondaryEmail]);
 
   const verifyLoginEmailMfa = useCallback(async (code) => {
@@ -745,6 +754,7 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to verify login code');
       throw e;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mfaChallenge, clearMfaChallenge, performLogout, setError, showError]);
 
   const verifyLoginTotpMfa = useCallback(async (code) => {
@@ -764,6 +774,7 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to verify TOTP code');
       throw e;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mfaChallenge, clearMfaChallenge, performLogout, setError, showError]);
 
   const requestEmailMfaChallenge = useCallback(async () => {
@@ -811,6 +822,7 @@ export const AuthProvider = ({ children }) => {
       showError(e?.message || 'Failed to disable MFA');
       throw e;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cognitoUserRef, UserPool, user, setMfaEnabled, setMfaMethod, showSuccess, showError]);
 
   const updateUserProfileName = useCallback((patch) => {
@@ -924,8 +936,8 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
-  const memoizedUser = useMemo(() => user, [user?.email]);
-  const memoizedUserProfile = useMemo(() => userProfile, [userProfile?.email, userProfile?.firstName, userProfile?.lastName, userProfile?.displayName, userProfile?.hasCustomName]);
+  const memoizedUser = useMemo(() => user, [user]);
+  const memoizedUserProfile = useMemo(() => userProfile, [userProfile]);
 
   // Handle tokens returned from Cognito Hosted UI (implicit flow)
   const handleHostedUiToken = useCallback(async (idToken) => {
@@ -1030,6 +1042,8 @@ export const AuthProvider = ({ children }) => {
     verifyLoginTotpMfa,
     disableMfa,
     cognitoUserRef,
+    user,
+    handleHostedUiToken,
   ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -23,7 +23,7 @@ const SignUp = () => {
   const handleGoogleSignUp = async () => {
     try {
       await Auth.federatedSignIn({ provider: 'Google' });
-    } catch (error) {
+    } catch (_error) {
       showError('Failed to start Google sign up');
     }
   };

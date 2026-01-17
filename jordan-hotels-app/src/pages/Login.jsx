@@ -8,7 +8,7 @@ import { showError } from '../services/toastService';
 import { Auth } from 'aws-amplify';
 
 // Runtime config available at window.__VISITJO_RUNTIME_CONFIG__
-const runtime = typeof window !== 'undefined' ? window.__VISITJO_RUNTIME_CONFIG__ || {} : {};
+const _runtime = typeof window !== 'undefined' ? window.__VISITJO_RUNTIME_CONFIG__ || {} : {};
 
 const Login = () => {
   const [email, setEmail] = useState('');

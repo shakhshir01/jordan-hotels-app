@@ -18,7 +18,7 @@ export async function initAmplify() {
       if (resp && resp.ok) {
         cfg = await resp.json();
       }
-    } catch (fetchError) {
+    } catch (_fetchError) {
       // Error fetching config
     }
 
@@ -80,11 +80,11 @@ export async function initAmplify() {
             }
           });
         }
-      } catch (e) {
+      } catch (_e) {
         // ignore bootstrap errors
       }
     }
-  } catch (error) {
+  } catch (_error) {
     // Error initializing Amplify
   }
 

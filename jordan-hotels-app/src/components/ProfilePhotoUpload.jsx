@@ -65,7 +65,7 @@ export default function ProfilePhotoUpload({ currentAvatarUrl, onUploaded }) {
                 setPreview(null);
                 showSuccess('Profile photo removed');
                 onUploaded && onUploaded(updated);
-              } catch (err) {
+              } catch (_err) {
                 showError('Failed to remove photo');
               } finally {
                 setLoading(false);

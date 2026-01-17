@@ -87,7 +87,9 @@ export const PreferencesProvider = ({ children }) => {
 
     try {
       localStorage.setItem('userPreferences', JSON.stringify(preferences));
-    } catch {}
+    } catch {
+      // ignore localStorage errors
+    }
   }, [preferences]);
 
   const savePreferences = useCallback(async (nextPrefs) => {
@@ -105,7 +107,9 @@ export const PreferencesProvider = ({ children }) => {
     });
     try {
       localStorage.setItem('userPreferences', JSON.stringify({ ...preferences, ...nextPrefs }));
-    } catch {}
+    } catch {
+      // ignore localStorage errors
+    }
     if (user) {
       try {
         await hotelAPI.updateUserPreferences({ ...preferences, ...nextPrefs });
