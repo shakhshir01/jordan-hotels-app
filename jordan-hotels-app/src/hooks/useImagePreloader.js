@@ -60,7 +60,7 @@ export const useImagePreloader = (imageUrls = []) => {
 export const preloadCriticalImages = () => {
   // Preload hero images, logos, and commonly used images
   const criticalImages = [
-    '/favicon.ico',
+    '/favicon.png',
     // Add other critical images here
   ];
 

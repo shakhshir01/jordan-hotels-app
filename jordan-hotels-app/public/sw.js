@@ -9,7 +9,7 @@ const API_CACHE = 'visitjo-api-v4';
 
 const ASSETS_TO_CACHE = [
   '/manifest.json',
-  '/favicon.ico',
+  '/favicon.png',
 ];
 
 /**
