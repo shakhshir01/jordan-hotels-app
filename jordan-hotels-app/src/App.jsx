@@ -11,6 +11,7 @@ import { PreferencesProvider } from './context/PreferencesContext';
 import AppLayout from './layouts/AppLayout.jsx';
 // Components
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import AdminRoute from './components/AdminRoute.jsx';
 import ChatBot from './components/ChatBot.jsx';
 import MfaModal from './components/MfaModal.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
@@ -94,7 +95,7 @@ function AppRoutes() {
         <Route path="/trip-planner" element={<ProtectedRoute><TripPlanner /></ProtectedRoute>} />
         <Route path="/saved-searches" element={<ProtectedRoute><SavedSearches /></ProtectedRoute>} />
         <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-        <Route path="/admin/upload" element={<ProtectedRoute><AdminUpload /></ProtectedRoute>} />
+        <Route path="/admin/upload" element={<AdminRoute><AdminUpload /></AdminRoute>} />
 
         {/* Semi-public routes - can view but need auth to book */}
         <Route path="/hotels/:id" element={<HotelDetails />} />
