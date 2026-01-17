@@ -1,7 +1,0 @@
-[{
-  "AllowedOrigins": ["http://localhost:5175", "https://your-production-domain.com"],
-  "AllowedMethods": ["GET", "PUT", "POST", "HEAD"],
-  "AllowedHeaders": ["*"],
-  "ExposeHeaders": [],
-  "MaxAgeSeconds": 3000
-}]
