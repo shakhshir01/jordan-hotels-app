@@ -44,7 +44,7 @@
       "url": "/search?type=hotels",
       "icons": [
         {
-          "src": "/jordanfavicon.png",
+          "src": "/favicon.ico",
           "sizes": "96x96"
         }
       ]
@@ -56,7 +56,7 @@
       "url": "/experiences",
       "icons": [
         {
-          "src": "/jordanfavicon.png",
+          "src": "/favicon.ico",
           "sizes": "96x96"
         }
       ]
@@ -68,7 +68,7 @@
       "url": "/deals",
       "icons": [
         {
-          "src": "/jordanfavicon.png",
+          "src": "/favicon.ico",
           "sizes": "96x96"
         }
       ]
@@ -78,15 +78,15 @@
   "prefer_related_applications": false,
   "screenshots": [
     {
-      "src": "/jordanfavicon.png",
+      "src": "/favicon.ico",
       "sizes": "1280x720",
-      "type": "image/png",
+      "type": "image/x-icon",
       "form_factor": "wide"
     },
     {
-      "src": "/jordanfavicon.png",
+      "src": "/favicon.ico",
       "sizes": "750x1334",
-      "type": "image/png",
+      "type": "image/x-icon",
       "form_factor": "narrow"
     }
   ]
