@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
 import OptimizedImage from "../components/OptimizedImage";
 import Seo from '../components/Seo.jsx';
-import { Sparkles, Clock, Zap, Crown, Star, MapPin, TrendingDown, Gift } from 'lucide-react';
+import { Sparkles, Clock, Zap, Crown, Star, MapPin, TrendingDown, Gift, Loader2 } from 'lucide-react';
 
 
 export default function DealsList() {

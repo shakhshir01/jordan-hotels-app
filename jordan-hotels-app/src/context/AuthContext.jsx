@@ -330,18 +330,26 @@ export const AuthProvider = ({ children }) => {
 
             if (mfaMethod === 'EMAIL') {
               // For email MFA, send a verification code to the secondary email
-              try {
-                // Use the setupEmailMfa function but with a special flag for login
-                await hotelAPI.sendLoginMfaCode(profile.mfaSecondaryEmail);
-                setMfaChallenge({ 
-                  type: 'EMAIL_MFA', 
-                  message: 'Enter the code sent to your email', 
-                  email: profile.mfaSecondaryEmail 
-                });
-              } catch (emailError) {
-                console.error('Failed to send login MFA code:', emailError);
-                // Fall back to TOTP if email fails
+              if (!profile.mfaSecondaryEmail) {
+                console.error('Email MFA enabled but no secondary email found in profile');
+                showError('Email MFA is enabled but no secondary email is configured. Please disable and re-enable MFA.');
+                // Fall back to TOTP
                 setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your authenticator code', email });
+              } else {
+                try {
+                  console.log('Sending login MFA code to:', profile.mfaSecondaryEmail);
+                  await hotelAPI.sendLoginMfaCode(profile.mfaSecondaryEmail, profile.userId);
+                  setMfaChallenge({ 
+                    type: 'EMAIL_MFA', 
+                    message: 'Enter the code sent to your email', 
+                    email: profile.mfaSecondaryEmail 
+                  });
+                } catch (emailError) {
+                  console.error('Failed to send login MFA code:', emailError);
+                  showError('Failed to send email verification code. Please try again or use authenticator app.');
+                  // Fall back to TOTP if email fails
+                  setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your authenticator code', email });
+                }
               }
             } else {
               // Default to TOTP MFA challenge

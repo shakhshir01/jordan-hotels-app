@@ -751,10 +751,10 @@ export const hotelAPI = {
     }
   },
 
-  sendLoginMfaCode: async (email) => {
+  sendLoginMfaCode: async (email, userId) => {
     if (getUseMocks()) return { sent: true };
     try {
-      const response = await apiClient.post("/user/mfa/email/login-code", { email });
+      const response = await apiClient.post("/user/mfa/email/login-code", { email, userId });
       return normalizeLambdaResponse(response.data);
     } catch (error) {
       if (lastAuthError) return { sent: true };

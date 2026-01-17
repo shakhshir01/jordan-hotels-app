@@ -104,12 +104,12 @@ async function handler(event) {
 
     // POST /user/mfa/email/login-code
     if (path === '/user/mfa/email/login-code' && method === 'POST') {
-      return await sendLoginMfaCode(userId, event);
+      return await sendLoginMfaCode(event);
     }
 
     // POST /user/mfa/email/verify-login
     if (path === '/user/mfa/email/verify-login' && method === 'POST') {
-      return await verifyLoginMfaCode(userId, event);
+      return await verifyLoginMfaCode(event);
     }
 
     // POST /user/mfa/totp/setup
@@ -390,6 +390,24 @@ function generateNumericCode(digits = 6) {
 }
 
 async function sendEmail(toAddress, subject, textBody, htmlBody) {
+  // Always log verification codes for debugging
+  if (subject.includes('verification') || subject.includes('Verification') || subject.includes('Login')) {
+    console.log('🔐 VERIFICATION CODE DEBUG:', textBody);
+  }
+
+  // Check if we're running locally (no AWS region or specific indicators)
+  const isLocal = !process.env.AWS_REGION || process.env.NODE_ENV === 'development' || process.env.IS_LOCAL === 'true';
+
+  if (isLocal) {
+    console.log('========================================');
+    console.log('📧 LOCAL DEVELOPMENT: EMAIL NOT SENT');
+    console.log('📧 To:', toAddress);
+    console.log('📧 Subject:', subject);
+    console.log('📧 Content:', textBody);
+    console.log('========================================');
+    return true; // Pretend it was sent successfully
+  }
+
   const from = process.env.SES_FROM_EMAIL || process.env.SENDER_EMAIL || `no-reply@${process.env.DOMAIN || 'visit-jo.com'}`;
   const params = {
     Destination: { ToAddresses: [toAddress] },
@@ -412,6 +430,14 @@ async function sendEmail(toAddress, subject, textBody, htmlBody) {
     console.error('Error name:', e.name);
     console.error('Error code:', e.code);
     console.error('Sending to:', toAddress, 'from:', from);
+
+    // Fallback: log the email content
+    console.log('=== FALLBACK: EMAIL CONTENT (SES FAILED) ===');
+    console.log('To:', toAddress);
+    console.log('Subject:', subject);
+    console.log('Body:', textBody);
+    console.log('===========================================');
+
     return false;
   }
 }
@@ -502,23 +528,35 @@ async function verifyEmailMfa(userId, event) {
   }
 }
 
-async function sendLoginMfaCode(userId, event) {
+async function sendLoginMfaCode(event) {
   try {
     const body = event.body ? JSON.parse(event.body) : {};
     const email = String(body.email || '').trim();
+    const userId = String(body.userId || '').trim();
     if (!email) {
       return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'email required' }) };
     }
-
-    // Verify this email belongs to the authenticated user
-    let existingItem = {};
-    if (USERS_TABLE) {
-      const found = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
-      existingItem = found?.Item || {};
+    if (!userId) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'userId required' }) };
     }
-    const userEmail = String(existingItem.email || '').trim().toLowerCase();
+
+    // Get user by userId
+    if (!USERS_TABLE) {
+      return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
+    }
+
+    const result = await docClient.send(new GetCommand({
+      TableName: USERS_TABLE,
+      Key: { userId }
+    }));
+
+    const existingItem = result?.Item;
+    if (!existingItem) {
+      return { statusCode: 403, headers: defaultHeaders, body: JSON.stringify({ message: 'User not found' }) };
+    }
+
+    // Check if the email matches the secondary email
     const secondaryEmail = String(existingItem.mfaSecondaryEmail || '').trim().toLowerCase();
-    
     if (secondaryEmail !== email.toLowerCase()) {
       return { statusCode: 403, headers: defaultHeaders, body: JSON.stringify({ message: 'Email not authorized for this user' }) };
     }
@@ -526,30 +564,40 @@ async function sendLoginMfaCode(userId, event) {
     const code = generateNumericCode(6);
     const expiresAt = Date.now() + 1000 * 60 * 15; // 15 minutes
 
+    // Always log the code for debugging
+    console.log('🔐 MFA LOGIN CODE GENERATED:', code, 'for email:', email);
+
     // Store the login MFA code in the user item
-    if (USERS_TABLE) {
-      const item = { ...existingItem };
-      item.mfaLoginCode = code;
-      item.mfaLoginExpires = expiresAt;
-      await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
-    }
+    const item = { ...existingItem };
+    item.mfaLoginCode = code;
+    item.mfaLoginExpires = expiresAt;
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
 
     // Send email
+    console.log('About to send email to:', email);
+    console.log('LOGIN VERIFICATION CODE:', code); // Always log for debugging
     const sent = await sendEmail(
       email,
       'VisitJO Login Verification',
       `Your VisitJO login verification code is: ${code}`,
       `<p>Your VisitJO login verification code is: <strong>${code}</strong></p><p>This code will expire in 15 minutes.</p>`
     );
+    console.log('sendEmail returned:', sent);
 
-    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ sent: !!sent }) };
+    if (!sent) {
+      console.error('Failed to send login verification email to:', email);
+      throw new Error('Failed to send verification email');
+    }
+
+    console.log('Login verification email sent successfully to:', email);
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ sent: true }) };
   } catch (error) {
     console.error('sendLoginMfaCode error', error);
     return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to send login verification code' }) };
   }
 }
 
-async function verifyLoginMfaCode(userId, event) {
+async function verifyLoginMfaCode(event) {
   try {
     const body = event.body ? JSON.parse(event.body) : {};
     const code = String(body.code || body.token || '').trim();
@@ -557,8 +605,19 @@ async function verifyLoginMfaCode(userId, event) {
 
     if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
 
-    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
-    const item = result?.Item || {};
+    // Find user by login code
+    const scanResult = await docClient.send(new ScanCommand({
+      TableName: USERS_TABLE,
+      FilterExpression: 'mfaLoginCode = :code',
+      ExpressionAttributeValues: { ':code': code }
+    }));
+
+    const items = scanResult?.Items || [];
+    if (items.length === 0) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Invalid code' }) };
+    }
+
+    const item = items[0];
     const loginCode = String(item.mfaLoginCode || '');
     const expires = Number(item.mfaLoginExpires || 0);
 
