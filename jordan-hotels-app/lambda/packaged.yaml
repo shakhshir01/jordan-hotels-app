@@ -30,15 +30,13 @@ Resources:
   Api:
     Type: AWS::Serverless::Api
     Properties:
-      Name: VisitJo-Api-New
       StageName: prod
       EndpointConfiguration: REGIONAL
       Cors:
         AllowMethods: '''GET,POST,PUT,DELETE,OPTIONS'''
         AllowHeaders: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
-        AllowOrigin: '''https://www.visit-jo.com'''
-        AllowCredentials: true
-      GatewayResponses: {}
+        AllowOrigin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        AllowCredentials: false
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -46,6 +44,58 @@ Resources:
           Ref: AWS::StackName
     Metadata:
       SamResourceId: Api
+  GatewayResponseDefault4xx:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId:
+        Ref: Api
+      ResponseType: DEFAULT_4XX
+      StatusCode: 400
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
+    Metadata:
+      SamResourceId: GatewayResponseDefault4xx
+  GatewayResponseDefault5xx:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId:
+        Ref: Api
+      ResponseType: DEFAULT_5XX
+      StatusCode: 500
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
+    Metadata:
+      SamResourceId: GatewayResponseDefault5xx
+  GatewayResponseUnauthorized:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId:
+        Ref: Api
+      ResponseType: UNAUTHORIZED
+      StatusCode: 401
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
+    Metadata:
+      SamResourceId: GatewayResponseUnauthorized
+  GatewayResponseAccessDenied:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      RestApiId:
+        Ref: Api
+      ResponseType: ACCESS_DENIED
+      StatusCode: 403
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
+        gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
+    Metadata:
+      SamResourceId: GatewayResponseAccessDenied
   HotelsTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -230,22 +280,11 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      CorsConfiguration:
-        CorsRules:
-        - AllowedHeaders:
-          - '*'
-          AllowedMethods:
-          - GET
-          - PUT
-          - POST
-          AllowedOrigins:
-          - '*'
-          MaxAge: 3000
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
-        BlockPublicPolicy: false
+        BlockPublicPolicy: true
         IgnorePublicAcls: true
-        RestrictPublicBuckets: false
+        RestrictPublicBuckets: true
       VersioningConfiguration:
         Status: Enabled
       BucketEncryption:
@@ -266,60 +305,6 @@ Resources:
           Ref: AWS::StackName
     Metadata:
       SamResourceId: UploadsBucket
-  UploadsBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket:
-        Ref: UploadsBucket
-      PolicyDocument:
-        Statement:
-        - Sid: PublicReadForUploads
-          Effect: Allow
-          Principal: '*'
-          Action: s3:GetObject
-          Resource:
-            Fn::Sub: arn:aws:s3:::${UploadsBucket}/uploads/*
-        - Sid: ForceSSLOnly
-          Effect: Deny
-          Principal: '*'
-          Action: s3:*
-          Resource:
-          - Fn::Sub: arn:aws:s3:::${UploadsBucket}
-          - Fn::Sub: arn:aws:s3:::${UploadsBucket}/*
-          Condition:
-            Bool:
-              aws:SecureTransport: false
-    Metadata:
-      SamResourceId: UploadsBucketPolicy
-  StripeSecretKey:
-    Condition: CreateStripeSecret
-    Type: AWS::KMS::Key
-    DeletionPolicy: Retain
-    UpdateReplacePolicy: Retain
-    Properties:
-      Description: KMS key for Stripe secret encryption
-      KeyUsage: ENCRYPT_DECRYPT
-      KeySpec: SYMMETRIC_DEFAULT
-      Tags:
-      - Key: App
-        Value: VisitJo
-      - Key: ManagedBy
-        Value: SAM
-      - Key: Stack
-        Value:
-          Ref: AWS::StackName
-    Metadata:
-      SamResourceId: StripeSecretKey
-  StripeSecretKeyAlias:
-    Condition: CreateStripeSecret
-    Type: AWS::KMS::Alias
-    Properties:
-      AliasName:
-        Fn::Sub: alias/${AWS::StackName}-stripe-secret
-      TargetKeyId:
-        Ref: StripeSecretKey
-    Metadata:
-      SamResourceId: StripeSecretKeyAlias
   StripeSecret:
     Condition: CreateStripeSecret
     Type: AWS::SecretsManager::Secret
@@ -327,8 +312,7 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
-      KmsKeyId:
-        Ref: StripeSecretKey
+      KmsKeyId: alias/aws/secretsmanager
       Tags:
       - Key: App
         Value: VisitJo
@@ -360,12 +344,8 @@ Resources:
           - s3:PutObjectAcl
           - s3:ListBucket
           Resource:
-            Fn::Sub: arn:aws:s3:::${UploadsBucket}/*
-        - Effect: Allow
-          Action:
-          - s3:ListBucket
-          Resource:
-            Fn::Sub: arn:aws:s3:::${UploadsBucket}
+          - Fn::Sub: arn:aws:s3:::${UploadsBucket}/*
+          - Fn::Sub: arn:aws:s3:::${UploadsBucket}
         - Effect: Allow
           Action:
           - ses:SendEmail
@@ -401,13 +381,6 @@ Resources:
           Properties:
             Path: /hotels
             Method: GET
-            RestApiId:
-              Ref: Api
-        ApiPostHotelImages:
-          Type: Api
-          Properties:
-            Path: /hotels/{id}/images
-            Method: POST
             RestApiId:
               Ref: Api
     Metadata:
@@ -572,13 +545,6 @@ Resources:
             Method: GET
             RestApiId:
               Ref: Api
-        ApiPostExperienceImages:
-          Type: Api
-          Properties:
-            Path: /experiences/{id}/images
-            Method: POST
-            RestApiId:
-              Ref: Api
     Metadata:
       SamResourceId: ExperiencesFunction
   BookingsFunction:
@@ -703,7 +669,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: user/index.handler
-      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/cdbe07d2f60ad252a40eacc3a8b0b597
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/92da55abab9d68297c18c85ac1412cbf
       Tags:
         App: VisitJo
         ManagedBy: SAM
@@ -718,8 +684,6 @@ Resources:
             Ref: BookingsTable
           USERS_TABLE:
             Ref: UsersTable
-          S3_UPLOAD_BUCKET:
-            Ref: UploadsBucket
           SES_EMAIL_FROM: no-reply@visit-jo.com
           SES_FROM_EMAIL: no-reply@visit-jo.com
           DOMAIN: visit-jo.com

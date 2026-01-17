@@ -33,9 +33,11 @@ const defaultHeaders = {
 async function generateSignedAvatarUrl(key) {
   if (!key || !process.env.S3_UPLOAD_BUCKET) return null;
   try {
+    // If key already starts with 'uploads/', don't add it again
+    const s3Key = key.startsWith('uploads/') ? key : `uploads/${key}`;
     const command = new GetObjectCommand({
       Bucket: process.env.S3_UPLOAD_BUCKET,
-      Key: `uploads/${key}`,
+      Key: s3Key,
     });
     // Generate URL that expires in 1 hour
     const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
