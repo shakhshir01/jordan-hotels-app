@@ -66,6 +66,13 @@ export default function Support() {
       action: 'Send Email',
       primary: false,
       onClick: () => {
+        // Track contact form submission
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'contact_submit', {
+            event_category: 'engagement',
+            event_label: 'Contact Form'
+          });
+        }
         window.location.href = 'mailto:support@visitjo.com';
       }
     },
@@ -82,6 +89,20 @@ export default function Support() {
     }
   ];
 
+  // FAQ Structured Data
+  const faqStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQ.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.a
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Seo
@@ -89,6 +110,7 @@ export default function Support() {
         description="Get instant support for your Jordan travel plans. Our expert team is here 24/7 to help with bookings, cancellations, and any questions about your trip."
         canonicalUrl="https://visitjo.com/support"
         keywords="VisitJo support, Jordan travel help, booking assistance, travel support, customer service"
+        structuredData={[faqStructuredData]}
       />
 
       {/* Enhanced Hero Section */}

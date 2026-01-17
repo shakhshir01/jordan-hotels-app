@@ -65,6 +65,13 @@ const Checkout = () => {
     };
 
     loadHotel();
+
+    // Track booking start event when checkout page loads
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'booking_start', {
+        event_category: 'ecommerce',
+      });
+    }
   }, [hotelId]);
 
   useEffect(() => {
@@ -247,6 +254,14 @@ const Checkout = () => {
       const bookingId = await createBooking({ paymentProvider: 'paypal' });
       setOrderComplete(true);
 
+      // Track booking complete event
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'booking_complete', {
+          event_category: 'ecommerce',
+          value: calculateTotalWithTax()
+        });
+      }
+
       setTimeout(() => {
         navigate('/bookings', {
           state: {
@@ -307,6 +322,14 @@ const Checkout = () => {
       });
 
       setOrderComplete(true);
+
+      // Track booking complete event
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'booking_complete', {
+          event_category: 'ecommerce',
+          value: calculateTotalWithTax()
+        });
+      }
       setTimeout(() => {
         navigate('/bookings', {
           state: {

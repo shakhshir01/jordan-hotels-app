@@ -5,6 +5,7 @@ import { hotelAPI } from "../services/api";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
 import OptimizedImage from "../components/OptimizedImage";
+import { ArrowRight } from "lucide-react";
 
 export default function DestinationDetails() {
   const { id } = useParams();
@@ -78,6 +79,55 @@ export default function DestinationDetails() {
                   );
                 })()
               ))}
+            </div>
+          </section>
+
+          {/* Related Destinations */}
+          <section className="mt-16 mb-8">
+            <div className="card-modern p-8">
+              <h2 className="text-3xl font-black mb-8 gradient-text text-center">
+                Explore Other Jordan Destinations
+              </h2>
+              <p className="text-center text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
+                Jordan has so much more to offer. Discover these incredible destinations for your next adventure.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {['Petra', 'Amman', 'Dead Sea', 'Wadi Rum', 'Aqaba', 'Jerash'].filter(dest => dest !== id).slice(0, 3).map((destination) => (
+                  <Link
+                    key={destination}
+                    to={`/destinations/${encodeURIComponent(destination)}`}
+                    className="group card-modern p-6 hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-jordan-blue to-jordan-teal flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <MapPin className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-jordan-blue transition-colors">
+                          {destination}
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-300">
+                          {destination === 'Petra' ? 'Ancient rose-red city carved in stone' :
+                           destination === 'Amman' ? 'Vibrant capital with Roman history' :
+                           destination === 'Dead Sea' ? 'Lowest point on Earth with healing waters' :
+                           destination === 'Wadi Rum' ? 'Martian desert landscape and Bedouin culture' :
+                           destination === 'Aqaba' ? 'Red Sea diving and beach paradise' :
+                           'Ancient Roman city with stunning ruins'}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div className="text-center mt-8">
+                <Link
+                  to="/destinations"
+                  className="btn-secondary inline-flex items-center gap-2"
+                >
+                  View All Destinations
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           </section>
         </>

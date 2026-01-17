@@ -19,6 +19,15 @@ export default function ContactConcierge() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Concierge request:', formData);
+
+    // Track contact form submission
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'contact_submit', {
+        event_category: 'engagement',
+        event_label: 'Concierge Form'
+      });
+    }
+
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);

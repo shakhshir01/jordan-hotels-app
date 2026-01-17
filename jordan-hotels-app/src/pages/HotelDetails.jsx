@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle, X } from 'lucide-react';
+import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle, X, ArrowRight } from 'lucide-react';
 import hotelsService from '../services/hotelsService';
 import WishlistButton from '../components/WishlistButton';
 import HotelGallery from '../components/HotelGallery';
@@ -196,6 +196,13 @@ const HotelDetails = () => {
       };
       // Navigate to checkout with hotel and booking data
       navigate('/checkout', { state: { hotelId: id, bookingData, hotel } });
+
+      // Track booking start event
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'booking_start', {
+          event_category: 'ecommerce',
+        });
+      }
     } catch (err) {
       showError(err.message || t('hotelDetails.errors.bookingFailed'));
     } finally {
@@ -500,7 +507,12 @@ const HotelDetails = () => {
             {t('nav.home')}
           </Link>
           <span className="text-slate-400">/</span>
-          <span className="text-slate-600 dark:text-slate-300">{hotel.location}</span>
+          <Link
+            to={`/destinations/${encodeURIComponent(hotel.location)}`}
+            className="text-slate-600 dark:text-slate-300 hover:text-jordan-blue transition-colors"
+          >
+            {hotel.location}
+          </Link>
           <span className="text-slate-400">/</span>
           <span className="gradient-text font-semibold">{hotelName}</span>
         </div>
@@ -522,7 +534,12 @@ const HotelDetails = () => {
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 gradient-text leading-tight">{hotelName}</h1>
               <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 flex items-center gap-3 mb-6">
                 <MapPin className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                <span className="font-medium">{hotel.location}, {t('hotelDetails.location.country')}</span>
+                <Link
+                  to={`/destinations/${encodeURIComponent(hotel.location)}`}
+                  className="font-medium hover:text-jordan-blue transition-colors"
+                >
+                  {hotel.location}, {t('hotelDetails.location.country')}
+                </Link>
               </p>
             </div>
             <div className="flex-shrink-0">
@@ -766,6 +783,50 @@ const HotelDetails = () => {
           </div>
         </aside>
       </div>
+
+      {/* Related Destinations */}
+      <section className="mt-16 mb-8">
+        <div className="card-modern p-8">
+          <h2 className="text-3xl font-black mb-8 gradient-text text-center">
+            {t('hotelDetails.relatedDestinations.title', 'Explore More Jordan Destinations')}
+          </h2>
+          <p className="text-center text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
+            {t('hotelDetails.relatedDestinations.subtitle', 'Discover other incredible places in Jordan for your next adventure')}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {['Petra', 'Amman', 'Dead Sea', 'Wadi Rum', 'Aqaba', 'Jerash'].filter(dest => dest !== hotel.location).slice(0, 3).map((destination) => (
+              <Link
+                key={destination}
+                to={`/destinations/${encodeURIComponent(destination)}`}
+                className="group card-modern p-6 hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-jordan-blue to-jordan-teal flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <MapPin className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-jordan-blue transition-colors">
+                      {destination}
+                    </h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300">
+                      {t(`destinations.${destination.toLowerCase().replace(' ', '')}.desc`, 'Explore this amazing destination')}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link
+              to="/destinations"
+              className="btn-secondary inline-flex items-center gap-2"
+            >
+              {t('hotelDetails.relatedDestinations.viewAll', 'View All Destinations')}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

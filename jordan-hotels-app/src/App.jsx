@@ -56,6 +56,8 @@ const HotelsMap = React.lazy(() => import('./pages/HotelsMap.jsx'));
 const FeaturedHotels = React.lazy(() => import('./pages/FeaturedHotels.jsx'));
 const ContactConcierge = React.lazy(() => import('./pages/ContactConcierge.jsx'));
 const SavedSearches = React.lazy(() => import('./pages/SavedSearches.jsx'));
+const CityHotels = React.lazy(() => import('./pages/CityHotels.jsx'));
+const CityExperiences = React.lazy(() => import('./pages/CityExperiences.jsx'));
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -118,6 +120,8 @@ function AppRoutes() {
         <Route path="/hotels-map" element={<HotelsMap />} />
         <Route path="/featured-hotels" element={<FeaturedHotels />} />
         <Route path="/concierge" element={<ContactConcierge />} />
+        <Route path="/cities/:city/hotels" element={<CityHotels />} />
+        <Route path="/cities/:city/experiences" element={<CityExperiences />} />
 
         {/* Catch all */}
         <Route path="*" element={<NotFound />} />

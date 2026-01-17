@@ -58,6 +58,13 @@ const ExperienceBooking = () => {
           setError('Experience not found');
         } else {
           setExperience(foundExperience);
+
+          // Track booking start event when experience loads successfully
+          if (typeof window !== 'undefined' && window.gtag) {
+            window.gtag('event', 'booking_start', {
+              event_category: 'ecommerce',
+            });
+          }
         }
       } catch (err) {
         setError('Failed to load experience');
@@ -208,6 +215,14 @@ const ExperienceBooking = () => {
       // });
 
       setOrderComplete(true);
+
+      // Track booking complete event
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'booking_complete', {
+          event_category: 'ecommerce',
+          value: totalPrice
+        });
+      }
     } catch (error) {
       console.error('Booking failed:', error);
       showError('Booking failed. Please try again.');
