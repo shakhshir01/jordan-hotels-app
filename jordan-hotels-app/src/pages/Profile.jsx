@@ -119,7 +119,7 @@ const Profile = () => {
       const email = apiProfile?.email || userEmail;
       const phone = apiProfile?.phone || '';
 
-      const avatarUrl = apiProfile?.avatarUrl || apiProfile?.avatar || userProfile?.avatarUrl || null;
+      const avatarUrl = apiProfile?.avatarUrl || apiProfile?.avatar || null;
 
       setProfile({
         firstName,
