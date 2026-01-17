@@ -59,16 +59,16 @@ const SavedSearches = React.lazy(() => import('./pages/SavedSearches.jsx'));
 const CityHotels = React.lazy(() => import('./pages/CityHotels.jsx'));
 const CityExperiences = React.lazy(() => import('./pages/CityExperiences.jsx'));
 
-function AppRoutes() {
+const AppRoutes = React.memo(() => {
   const { user } = useAuth();
 
   // Scroll to top on route change for better UX
   const loc = useLocation();
   React.useEffect(() => {
     try {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      window.scrollTo({ top: 80, left: 0, behavior: 'auto' });
     } catch (_e) {
-      window.scrollTo(0, 0);
+      window.scrollTo(0, 80);
     }
   }, [loc.pathname]);
 
@@ -128,7 +128,7 @@ function AppRoutes() {
       </Route>
     </Routes>
   );
-}
+});
 
 function App() {
   return (
@@ -167,4 +167,4 @@ function App() {
   );
 }
 
-export default App;
+export default React.memo(App);

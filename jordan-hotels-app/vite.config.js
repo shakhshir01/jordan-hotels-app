@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { VitePWA } from 'vite-plugin-pwa'
+import compression from 'vite-plugin-compression'
 
 const normalizeBaseUrl = (value) => String(value || '').trim().replace(/\/$/, '')
 
@@ -34,6 +36,45 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        workbox: {
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'images-cache',
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/.*\/api\/.*/,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'api-cache',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60, // 1 hour
+                },
+              },
+            },
+          ],
+        },
+      }),
+      compression({
+        algorithm: 'gzip',
+        ext: '.gz',
+      }),
+      compression({
+        algorithm: 'brotliCompress',
+        ext: '.br',
+      }),
       (env.VITE_ANALYZE === 'true' || process.env.ANALYZE === 'true') ? visualizer({ filename: 'dist/bundle-stats.html', open: false }) : undefined,
     ].filter(Boolean),
     build: {

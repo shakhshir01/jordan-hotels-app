@@ -43,7 +43,7 @@ const normalizeHotel = (raw) => {
   };
 };
 
-const HotelDetails = () => {
+function HotelDetails() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -309,13 +309,13 @@ const HotelDetails = () => {
         ]}
       />
 
-      {/* Mobile Booking Bar - Fixed at bottom */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200/50 dark:border-slate-700/50 p-4 safe-area-inset-bottom">
-        <div className="flex items-center justify-between gap-4">
+      {/* Mobile Booking Bar - Fixed at bottom - Enhanced for mobile */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200/50 dark:border-slate-700/50 p-3 sm:p-4 safe-area-inset-bottom">
+        <div className="flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-end gap-2 mb-1">
-              <span className="text-2xl font-black gradient-text">{hotel.price}</span>
-              <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">JOD</span>
+            <div className="flex items-end gap-1.5 sm:gap-2 mb-1">
+              <span className="text-xl sm:text-2xl font-black gradient-text">{hotel.price}</span>
+              <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400">JOD</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate">
               {checkInDate && checkOutDate ? `${calculatePriceBreakdown().nights} nights` : 'Select dates'}
@@ -325,28 +325,28 @@ const HotelDetails = () => {
             type="button"
             onClick={() => setShowMobileBooking(true)}
             aria-label="Open booking panel"
-            className="btn-primary px-6 py-3 text-sm font-bold rounded-xl hover-lift touch-manipulation flex-shrink-0 min-h-[44px]"
+            className="btn-primary px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-bold rounded-xl hover-lift touch-manipulation flex-shrink-0 min-h-[44px] text-sm sm:text-base"
           >
             Reserve
           </button>
         </div>
       </div>
 
-      {/* Mobile Booking Modal */}
+      {/* Mobile Booking Modal - Enhanced for mobile */}
       {showMobileBooking && (
         <div className="lg:hidden fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm" onClick={() => setShowMobileBooking(false)}>
           <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-900 rounded-t-3xl max-h-[90vh] overflow-y-auto safe-area-inset-bottom" onClick={e => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200/50 dark:border-slate-700/50 p-4 rounded-t-3xl">
-              <div className="w-12 h-1 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-4"></div>
+            <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200/50 dark:border-slate-700/50 p-3 sm:p-4 rounded-t-3xl">
+              <div className="w-12 h-1 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-3 sm:mb-4"></div>
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Book Your Stay</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Book Your Stay</h3>
                 <button
                   type="button"
                   onClick={() => setShowMobileBooking(false)}
                   aria-label="Close booking"
-                  className="p-3 min-h-[44px] min-w-[44px] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                  className="p-2.5 sm:p-3 min-h-[44px] min-w-[44px] hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors touch-manipulation"
                 >
-                  <X size={20} />
+                  <X size={18} className="sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
@@ -363,7 +363,7 @@ const HotelDetails = () => {
                     value={checkInDate}
                     onChange={(e) => setCheckInDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-base touch-manipulation"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base touch-manipulation min-h-[44px]"
                     required
                   />
                 </div>
@@ -378,7 +378,7 @@ const HotelDetails = () => {
                     value={checkOutDate}
                     onChange={(e) => setCheckOutDate(e.target.value)}
                     min={checkInDate || new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-base touch-manipulation"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base touch-manipulation min-h-[44px]"
                     required
                   />
                 </div>
@@ -391,7 +391,7 @@ const HotelDetails = () => {
                   <select
                     value={guests}
                     onChange={(e) => setGuests(e.target.value)}
-                    className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-base touch-manipulation"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base touch-manipulation min-h-[44px]"
                   >
                     <option value="1">{t('hotelDetails.booking.guestCount', { count: 1 })}</option>
                     <option value="2">{t('hotelDetails.booking.guestCount', { count: 2 })}</option>
@@ -410,7 +410,7 @@ const HotelDetails = () => {
                     <select
                       value={selectedRoomType}
                       onChange={(e) => setSelectedRoomType(e.target.value)}
-                      className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-base touch-manipulation"
+                      className="w-full px-3 sm:px-4 py-3 sm:py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium text-sm sm:text-base touch-manipulation min-h-[44px]"
                     >
                       <option value="">{t('hotelDetails.booking.selectRoomType')}</option>
                       {hotel.roomTypes.map((roomType, index) => (
@@ -479,7 +479,7 @@ const HotelDetails = () => {
                 <button
                   onClick={handleBooking}
                   disabled={bookingLoading || !checkInDate}
-                  className="btn-primary w-full py-5 text-lg font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover-lift touch-manipulation"
+                  className="btn-primary w-full py-4 sm:py-5 text-base sm:text-lg font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover-lift touch-manipulation min-h-[48px] sm:min-h-[56px]"
                 >
                   {bookingLoading ? (
                     <div className="flex items-center justify-center gap-3">
@@ -531,9 +531,9 @@ const HotelDetails = () => {
         <div className="lg:col-span-2 space-y-10">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
             <div className="flex-1">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 gradient-text leading-tight">{hotelName}</h1>
-              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 flex items-center gap-3 mb-6">
-                <MapPin className="w-6 h-6 text-blue-500 flex-shrink-0" />
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 gradient-text leading-tight">{hotelName}</h1>
+              <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 flex items-center gap-2 sm:gap-3 mb-6">
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
                 <Link
                   to={`/destinations/${encodeURIComponent(hotel.location)}`}
                   className="font-medium hover:text-jordan-blue transition-colors"
@@ -547,34 +547,34 @@ const HotelDetails = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 mb-8">
-            <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-glow animate-pulse-glow">
-              <Star size={20} fill="currentColor" />
-              <span className="text-lg">{hotel.rating}</span>
+          <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 sm:gap-3 px-4 py-2 sm:px-5 sm:py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-glow animate-pulse-glow min-h-[44px]">
+              <Star size={16} className="sm:w-5 sm:h-5" fill="currentColor" />
+              <span className="text-base sm:text-lg">{hotel.rating}</span>
             </div>
-            <span className="text-base text-slate-500 dark:text-slate-400 font-medium">({reviews.length} {t('hotels.reviews')})</span>
+            <span className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium">({reviews.length} {t('hotels.reviews')})</span>
           </div>
 
           <section className="card-modern">
             <div className="p-6 sm:p-8 lg:p-10">
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-8 gradient-text">{t('hotelDetails.offers.title')}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-glow transition-all duration-300 group">
-                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
-                    <Wifi className="text-white" size={24} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+                <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 p-3 sm:p-4 lg:p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-glow transition-all duration-300 group touch-manipulation min-h-[80px] sm:min-h-[100px]">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2.5 sm:p-3 lg:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
+                    <Wifi className="text-white sm:w-6 sm:h-6" size={20} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">{t('hotelDetails.offers.wifi.title')}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.wifi.subtitle')}</p>
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base lg:text-lg truncate">{t('hotelDetails.offers.wifi.title')}</p>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.wifi.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-glow transition-all duration-300 group">
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
-                    <Coffee className="text-white" size={24} />
+                <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 p-3 sm:p-4 lg:p-6 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-glow transition-all duration-300 group touch-manipulation min-h-[80px] sm:min-h-[100px]">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-2.5 sm:p-3 lg:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
+                    <Coffee className="text-white sm:w-6 sm:h-6" size={20} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">{t('hotelDetails.offers.breakfast.title')}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.breakfast.subtitle')}</p>
+                    <p className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base lg:text-lg truncate">{t('hotelDetails.offers.breakfast.title')}</p>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.breakfast.subtitle')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 hover:shadow-glow transition-all duration-300 group">
@@ -841,6 +841,6 @@ const HotelDetails = () => {
       </section>
     </div>
   );
-};
+}
 
-export default HotelDetails;
+export default React.memo(HotelDetails);

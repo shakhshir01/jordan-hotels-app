@@ -1,8 +1,29 @@
 import React, { useState } from 'react';
 import { Star, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import PropTypes from 'prop-types';
 
-const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
+/**
+ * @typedef {Object} Review
+ * @property {string} id
+ * @property {number} rating
+ * @property {string} comment
+ * @property {string} timestamp
+ * @property {string} [commentAr]
+ */
+
+/**
+ * @typedef {Object} ReviewsSectionProps
+ * @property {string} hotelId
+ * @property {Review[]} [reviews]
+ * @property {(review: Omit<Review, 'id' | 'timestamp'>) => Promise<void>} onAddReview
+ */
+
+/**
+ * @type {React.FC<ReviewsSectionProps>}
+ */
+const ReviewsSection = React.memo(({ hotelId, reviews = [], onAddReview }) => {
   // Add sorting and credibility
   const [sortBy, setSortBy] = useState('date'); // 'date' or 'rating'
   const { t } = useTranslation();
@@ -39,6 +60,16 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
     return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
   });
 
+  // Virtual scrolling for performance when many reviews
+  const shouldVirtualize = sortedReviews.length > 10;
+  const virtualizer = shouldVirtualize ? useWindowVirtualizer({
+    count: sortedReviews.length,
+    estimateSize: () => 120, // Estimated height per review
+    overscan: 5,
+  }) : null;
+
+  const virtualItems = virtualizer ? virtualizer.getVirtualItems() : null;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -66,15 +97,27 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
           <span className="text-sm text-slate-600">Sort by:</span>
             <button
               type="button"
-              className={`px-2 py-1 rounded min-h-[44px] ${sortBy === 'date' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}
+              className={`px-2 py-1 rounded min-h-[44px] ${sortBy === 'date' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
               onClick={() => setSortBy('date')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSortBy('date');
+                }
+              }}
             >
             {t('reviews.sortNewest', 'Newest')}
           </button>
             <button
               type="button"
-              className={`px-2 py-1 rounded min-h-[44px] ${sortBy === 'rating' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}
+              className={`px-2 py-1 rounded min-h-[44px] ${sortBy === 'rating' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
               onClick={() => setSortBy('rating')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSortBy('rating');
+                }
+              }}
             >
             {t('reviews.sortRating', 'Highest Rated')}
           </button>
@@ -97,8 +140,14 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
                 key={star}
                 type="button"
                 onClick={() => setNewReview(prev => ({ ...prev, rating: star }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setNewReview(prev => ({ ...prev, rating: star }));
+                  }
+                }}
                 aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
-                className="p-3 min-h-[44px] min-w-[44px] rounded-full inline-flex items-center justify-center"
+                className="p-3 min-h-[44px] min-w-[44px] rounded-full inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <Star
                   className={`w-6 h-6 ${
@@ -142,6 +191,51 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             {t('reviews.noReviews', 'No reviews yet. Be the first to share your experience!')}
           </div>
+        ) : shouldVirtualize ? (
+          <div
+            style={{ height: `${virtualizer.getTotalSize()}px` }}
+            className="relative"
+          >
+            {virtualItems.map((virtualRow) => {
+              const review = sortedReviews[virtualRow.index];
+              return (
+                <div
+                  key={virtualRow.key}
+                  className="absolute top-0 left-0 w-full"
+                  style={{
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  <div className="surface p-4 mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-4 h-4 ${
+                              star <= review.rating
+                                ? 'fill-amber-400 text-amber-400'
+                                : 'text-slate-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-slate-600 dark:text-slate-400">
+                        {new Date(review.timestamp).toLocaleDateString()}
+                      </span>
+                      {/* Verified Stay badge if review.verified === true */}
+                      {review.verified && (
+                        <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                          {t('reviews.verifiedStay', 'Verified Stay')}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-slate-700 dark:text-slate-300">{review.comment}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         ) : (
           sortedReviews.map((review, index) => (
             <div key={index} className="surface p-4">
@@ -175,6 +269,12 @@ const ReviewsSection = ({ hotelId, reviews = [], onAddReview }) => {
       </div>
     </div>
   );
+});
+
+ReviewsSection.propTypes = {
+  hotelId: PropTypes.string,
+  reviews: PropTypes.arrayOf(PropTypes.object),
+  onAddReview: PropTypes.func,
 };
 
 export default ReviewsSection;

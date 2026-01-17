@@ -1063,3 +1063,45 @@ input:focus, select:focus, textarea:focus {
   border: 2px solid var(--border-color) !important;
   box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1) !important;
 }
+
+/* Mobile optimizations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Reduce animations on mobile for better performance */
+@media (max-width: 768px) {
+  .animate-float,
+  .animate-gradient-shift,
+  .animate-gradient-flow,
+  .animate-pulse-glow {
+    animation-duration: 3s !important;
+    animation-delay: 0s !important;
+  }
+  
+  /* Simplify complex animations */
+  .animate-slide-up,
+  .animate-fade-in,
+  .animate-fade-in-up {
+    animation-duration: 0.3s !important;
+  }
+}
+
+/* Improve touch scrolling on mobile */
+@media (max-width: 768px) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure buttons are touch-friendly */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

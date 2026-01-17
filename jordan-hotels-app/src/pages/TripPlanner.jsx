@@ -31,7 +31,7 @@ const defaultDays = [
   },
 ];
 
-export default function TripPlanner() {
+function TripPlanner() {
   const { t, i18n } = useTranslation();
   const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
   const [days, setDays] = useState(() => {
@@ -94,7 +94,7 @@ export default function TripPlanner() {
           <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.25em] opacity-90 mb-3">
             {t('pages.tripPlanner.hero.kicker', 'Your Journey, Your Way')}
           </p>
-          <h1 className="text-4xl md:text-5xl font-black font-display tracking-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-display tracking-tight mb-3">
             {t('pages.tripPlanner.hero.title', 'Craft Your Perfect Itinerary')}
           </h1>
           <p className="text-base md:text-lg opacity-95 leading-relaxed max-w-3xl mx-auto">
@@ -106,7 +106,7 @@ export default function TripPlanner() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
         {/* Enhanced Header Section */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-4">
             {t('pages.tripPlanner.itinerary', 'Your Custom Itinerary')}
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
@@ -127,7 +127,13 @@ export default function TripPlanner() {
           <button
             type="button"
             onClick={handleAddDay}
-            className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-2xl hover-lift font-semibold"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleAddDay();
+              }
+            }}
+            className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-2xl hover-lift font-semibold focus:outline-none focus:ring-2 focus:ring-jordan-blue min-h-[48px] sm:min-h-[56px] flex items-center justify-center"
           >
             <Plus size={18} />
             {t('pages.tripPlanner.addDay', 'Add Day')}
@@ -160,8 +166,14 @@ export default function TripPlanner() {
                 <button
                   type="button"
                   onClick={() => handleDelete(day.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleDelete(day.id);
+                    }
+                  }}
                   aria-label={t('pages.tripPlanner.deleteDay', 'Delete day')}
-                  className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                  className="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 sm:duration-300 opacity-0 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-500 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   disabled={days.length === 1}
                 >
                   <Trash2 size={20} />
@@ -203,7 +215,7 @@ export default function TripPlanner() {
                 <button
                   type="button"
                   onClick={() => {/* Add hotel search */}}
-                  className="flex-1 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white py-3 px-4 rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 hover-lift"
+                  className="flex-1 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white py-3 px-4 rounded-xl hover:shadow-lg transition-all duration-200 sm:duration-300 flex items-center justify-center gap-2 hover-lift min-h-[48px] sm:min-h-[56px]"
                 >
                   <Hotel size={16} />
                   {t('pages.tripPlanner.findHotels', 'Find Hotels')}
@@ -211,7 +223,7 @@ export default function TripPlanner() {
                 <button
                   type="button"
                   onClick={() => {/* Add experience search */}}
-                  className="flex-1 bg-gradient-to-r from-jordan-emerald to-jordan-teal text-white py-3 px-4 rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 hover-lift"
+                  className="flex-1 bg-gradient-to-r from-jordan-emerald to-jordan-teal text-white py-3 px-4 rounded-xl hover:shadow-lg transition-all duration-200 sm:duration-300 flex items-center justify-center gap-2 hover-lift min-h-[48px] sm:min-h-[56px]"
                 >
                   <Camera size={16} />
                   {t('pages.tripPlanner.findExperiences', 'Find Experiences')}
@@ -225,7 +237,7 @@ export default function TripPlanner() {
         <div className="mt-16">
           <div className="card-modern p-8 lg:p-12 bg-gradient-to-r from-jordan-blue/5 to-jordan-teal/5 dark:from-jordan-blue/10 dark:to-jordan-teal/10">
             <div className="text-center mb-8">
-              <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 mb-4">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-slate-100 mb-4">
                 {t('pages.tripPlanner.summary.title', 'Your Trip at a Glance')}
               </h3>
               <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
@@ -253,10 +265,10 @@ export default function TripPlanner() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="btn-primary px-8 py-4 text-lg font-bold rounded-2xl hover-lift">
+              <button className="btn-primary px-8 py-4 text-lg font-bold rounded-2xl hover-lift min-h-[48px] sm:min-h-[56px] flex items-center justify-center">
                 {t('pages.tripPlanner.summary.bookNow', 'Book Your Trip')}
               </button>
-              <button className="btn-secondary px-8 py-4 text-lg font-bold rounded-2xl hover-lift">
+              <button className="btn-secondary px-8 py-4 text-lg font-bold rounded-2xl hover-lift min-h-[48px] sm:min-h-[56px] flex items-center justify-center">
                 {t('pages.tripPlanner.summary.share', 'Share Itinerary')}
               </button>
             </div>
@@ -317,3 +329,5 @@ export default function TripPlanner() {
     </div>
   );
 }
+
+export default React.memo(TripPlanner);

@@ -90,7 +90,13 @@ export default function Wishlist() {
                 {/* Enhanced Remove Button */}
                 <button
                   onClick={() => removeFromWishlist(item.id)}
-                  className="absolute top-4 right-4 bg-red-500/90 hover:bg-red-600 text-white p-3 rounded-2xl shadow-lg hover-lift transition-all duration-300 touch-manipulation opacity-0 group-hover:opacity-100"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      removeFromWishlist(item.id);
+                    }
+                  }}
+                  className="absolute top-4 right-4 bg-red-500/90 hover:bg-red-600 text-white p-3 rounded-2xl shadow-lg hover-lift transition-all duration-300 touch-manipulation opacity-0 group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-500"
                   title={t('pages.wishlist.remove')}
                   aria-label={t('pages.wishlist.remove')}
                 >
@@ -156,7 +162,13 @@ export default function Wishlist() {
                   </Link>
                   <button
                     onClick={() => removeFromWishlist(item.id)}
-                    className="px-4 py-4 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-600 hover:text-red-700 dark:text-red-400 rounded-2xl transition-all duration-300 touch-manipulation min-h-[48px] flex items-center justify-center"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        removeFromWishlist(item.id);
+                      }
+                    }}
+                    className="px-4 py-4 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-600 hover:text-red-700 dark:text-red-400 rounded-2xl transition-all duration-300 touch-manipulation min-h-[48px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500"
                     aria-label={t('pages.wishlist.remove', 'Remove from wishlist')}
                   >
                     <Heart size={18} className="fill-current" />

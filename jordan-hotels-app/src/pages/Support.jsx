@@ -8,26 +8,26 @@ export default function Support() {
   const FAQ = [
     {
       icon: Shield,
-      q: t('support.faq.cancellations.q', 'How do I cancel or modify my booking?'),
-      a: t('support.faq.cancellations.a', 'You can cancel or modify your booking through your account dashboard up to 24 hours before check-in. Contact us immediately for assistance.'),
+      q: t('support.faq.cancellations.q', 'How do cancellations and changes work?'),
+      a: t('support.faq.cancellations.a', 'Each booking clearly shows if it is flexible or non‑refundable. Flexible stays usually allow changes up to a certain time before check‑in.'),
       category: 'Bookings'
     },
     {
       icon: Users,
-      q: t('support.faq.bookings.q', 'What should I do if I have booking issues?'),
-      a: t('support.faq.bookings.a', 'Check your booking confirmation email first. If you need help, contact our support team with your booking ID and we\'ll assist you immediately.'),
+      q: t('support.faq.bookings.q', 'Where can I see my bookings?'),
+      a: t('support.faq.bookings.a', 'Open your Profile and go to the My Bookings section. From there you can review details and, where supported, request cancellation.'),
       category: 'Bookings'
     },
     {
       icon: Zap,
-      q: t('support.faq.currency.q', 'What currencies do you accept?'),
-      a: t('support.faq.currency.a', 'We accept major credit cards and display prices in Jordanian Dinar (JOD), US Dollar (USD), and Euro (EUR). Your bank will convert accordingly.'),
+      q: t('support.faq.currency.q', 'Do you support multi‑currency?'),
+      a: t('support.faq.currency.a', 'Prices are shown in Jordanian Dinar (JOD) for now. Your bank or card provider may convert from your home currency.'),
       category: 'Payments'
     },
     {
       icon: Heart,
-      q: t('support.faq.problem.q', 'What if I encounter problems during my stay?'),
-      a: t('support.faq.problem.a', 'Our 24/7 concierge service is available for any issues. Contact us via phone, email, or our in-app chat for immediate assistance.'),
+      q: t('support.faq.problem.q', 'Something is wrong with my stay—what should I do?'),
+      a: t('support.faq.problem.a', 'First, speak to the property directly so they can resolve it quickly. If you still need help, contact VisitJo support with your booking ID.'),
       category: 'During Stay'
     },
   ];
@@ -240,31 +240,31 @@ export default function Support() {
           </section>
 
           {/* FAQ Section */}
-          <section className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">
+          <section className="animate-fade-in-up mt-16 lg:mt-24" style={{ animationDelay: '0.3s' }}>
+            <div className="text-center mb-12 lg:mb-16">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-slate-900 dark:text-slate-100 mb-4 lg:mb-6 leading-tight">
                 Frequently Asked Questions
               </h2>
-              <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto px-4">
                 Quick answers to common questions about bookings, payments, and travel
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 px-4 lg:px-0">
               {FAQ.map((item, index) => (
-                <article key={item.q} className="group card-modern p-8 hover:shadow-floating transition-all duration-500 hover:-translate-y-1 animate-fade-in-up" style={{ animationDelay: `${0.1 * index}s` }}>
+                <article key={item.q} className="group card-modern p-6 lg:p-8 hover:shadow-floating transition-all duration-500 hover:-translate-y-1 animate-fade-in-up min-h-[200px] lg:min-h-[220px]" style={{ animationDelay: `${0.1 * index}s` }}>
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-jordan-gold/20 to-jordan-rose/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <item.icon className="w-6 h-6 text-jordan-gold" />
+                    <div className="flex-shrink-0 w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-jordan-gold/20 to-jordan-rose/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <item.icon className="w-6 h-6 lg:w-7 lg:h-7 text-jordan-gold" />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <span className="inline-block px-3 py-1 bg-gradient-to-r from-jordan-teal/20 to-jordan-blue/20 text-jordan-teal font-semibold text-sm rounded-full mb-3">
                         {item.category}
                       </span>
-                      <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-3 group-hover:text-jordan-blue transition-colors duration-300 leading-tight">
+                      <h3 className="text-lg lg:text-xl font-black text-slate-900 dark:text-slate-100 mb-3 group-hover:text-jordan-blue transition-colors duration-300 leading-tight">
                         {item.q}
                       </h3>
-                      <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                      <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm lg:text-base">
                         {item.a}
                       </p>
                     </div>

@@ -8,7 +8,7 @@ import Seo from '../components/Seo.jsx';
 
 const STORAGE_KEY = "visitjo.savedSearches";
 
-export default function SearchResults() {
+function SearchResults() {
   const [params, setParams] = useSearchParams();
   const q = params.get("q") || "";
   const destination = params.get("destination") || "";
@@ -182,7 +182,7 @@ export default function SearchResults() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black gradient-text mb-2">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black gradient-text mb-2">
               Your Perfect Jordan Stay Awaits
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300">
@@ -194,7 +194,7 @@ export default function SearchResults() {
               type="button"
               onClick={handleSaveSearch}
               disabled={!term}
-              className="btn-secondary flex items-center gap-2 disabled:opacity-50 hover-lift touch-manipulation px-4 py-3"
+              className="btn-secondary flex items-center gap-2 disabled:opacity-50 hover-lift touch-manipulation px-4 py-3 min-h-[44px]"
             >
               <Search size={18} /> Save Search
             </button>
@@ -214,20 +214,20 @@ export default function SearchResults() {
                 {savedSearches.map((s) => (
                   <div
                     key={s.id}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-slate-100 text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-100 min-h-[44px]"
                   >
                     <button
                       type="button"
                       onClick={() => handleUseSaved(s)}
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 min-h-[44px] px-2 py-1"
                     >
-                      <Search size={12} />
+                      <Search size={14} />
                       <span>{s.term}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteSaved(s.id)}
-                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
                     >
                       ×
                     </button>
@@ -276,7 +276,7 @@ export default function SearchResults() {
             {/* Hotels */}
             {hasHotels && (
               <section>
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-8 gradient-text">Hotels</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 gradient-text">Hotels</h2>
                 {error && (
                   <div className="mb-6 glass-card rounded-2xl p-4 border border-amber-200/50 bg-amber-50/50 dark:bg-amber-900/20">
                     <p className="text-amber-800 dark:text-amber-200 text-sm font-medium">
@@ -285,21 +285,36 @@ export default function SearchResults() {
                   </div>
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {hotels.map((h) => (
-                    <article key={h.id} className="card-modern group overflow-hidden flex flex-col hover-lift">
+                  {hotels.map((h) => {
+                    const handleKeyDown = (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        window.location.href = `/hotels/${h.id}`;
+                      }
+                    };
+
+                    return (
+                      <article 
+                        key={h.id} 
+                        className="card-modern group overflow-hidden flex flex-col hover-lift focus:outline-none focus:ring-4 focus:ring-jordan-blue/30 focus:shadow-2xl focus:-translate-y-1 transition-all duration-200 sm:duration-300"
+                        tabIndex={0}
+                        role="button"
+                        aria-label={`View details for ${h.name}`}
+                        onKeyDown={handleKeyDown}
+                      >
                       {h.image && (
-                        <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-t-2xl">
+                        <div className="relative aspect-[4/3] sm:aspect-[3/2] overflow-hidden rounded-t-2xl">
                           <OptimizedImage
                             src={h.image}
                             alt={h.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 sm:duration-500"
                             onError={createHotelImageOnErrorHandler(h.id)}
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 sm:duration-300"></div>
                         </div>
                       )}
-                      <div className="p-6 flex flex-col gap-3 flex-1">
+                      <div className="p-4 sm:p-6 flex flex-col gap-3 flex-1">
                         <div className="flex-1">
                           <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                             {h.name}
@@ -314,7 +329,7 @@ export default function SearchResults() {
 
                         <div className="flex items-center justify-between mb-4">
                           {h.rating && (
-                            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-glow">
+                            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-glow min-h-[44px]">
                               <Star size={16} fill="currentColor" />
                               <span className="text-sm">{h.rating}</span>
                             </div>
@@ -331,20 +346,21 @@ export default function SearchResults() {
                         <div className="flex gap-3">
                           <Link
                             to={`/hotels/${h.id}`}
-                            className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all duration-300 text-center hover-lift touch-manipulation"
+                            className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all duration-200 sm:duration-300 text-center hover-lift touch-manipulation min-h-[44px] flex items-center justify-center"
                           >
                             View Details
                           </Link>
                           <Link
                             to={`/hotels/${h.id}?book=true`}
-                            className="flex-1 btn-primary px-4 py-3 text-sm font-bold rounded-xl text-center hover-lift touch-manipulation"
+                            className="flex-1 btn-primary px-4 py-3 text-sm font-bold rounded-xl text-center hover-lift touch-manipulation min-h-[44px] flex items-center justify-center"
                           >
                             📅 Book Now
                           </Link>
                         </div>
                       </div>
                     </article>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div className="mt-8">
@@ -353,7 +369,7 @@ export default function SearchResults() {
                       <button
                         type="button"
                         onClick={loadMore}
-                        className="btn-secondary hover-lift touch-manipulation px-6 py-3"
+                        className="btn-secondary hover-lift touch-manipulation px-6 py-3 min-h-[44px]"
                       >
                         🔄 Retry Loading More
                       </button>
@@ -365,7 +381,7 @@ export default function SearchResults() {
                         type="button"
                         onClick={loadMore}
                         disabled={loadingMore}
-                        className="btn-primary disabled:opacity-50 hover-lift touch-manipulation px-8 py-4 text-lg font-bold"
+                        className="btn-primary disabled:opacity-50 hover-lift touch-manipulation px-8 py-4 text-lg font-bold min-h-[48px] sm:min-h-[56px]"
                       >
                         {loadingMore ? (
                           <div className="flex items-center gap-3">
@@ -410,7 +426,7 @@ export default function SearchResults() {
                   </p>
                   <Link
                     to="/"
-                    className="btn-primary px-8 py-4 text-lg font-bold hover-lift touch-manipulation inline-block"
+                    className="btn-primary px-8 py-4 text-lg font-bold hover-lift touch-manipulation inline-block min-h-[48px] sm:min-h-[56px] flex items-center justify-center"
                   >
                     Discover Amazing Hotels
                   </Link>
@@ -423,3 +439,5 @@ export default function SearchResults() {
     </div>
   );
 }
+
+export default React.memo(SearchResults);
