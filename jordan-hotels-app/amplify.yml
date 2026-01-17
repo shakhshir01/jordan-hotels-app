@@ -14,6 +14,19 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+  rewrites:
+    - source: /manifest.json
+      target: /manifest.json
+      status: 200
+    - source: /sw.js
+      target: /sw.js
+      status: 200
+    - source: /registerSW.js
+      target: /registerSW.js
+      status: 200
+    - source: /workbox-78ef5c9b.js
+      target: /workbox-78ef5c9b.js
+      status: 200
 customHeaders:
 customHeaders:
   - pattern: '**/favicon.png'
