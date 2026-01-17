@@ -8,6 +8,11 @@ export default function ProfilePhotoUpload({ currentAvatarUrl, onUploaded }) {
   const [preview, setPreview] = useState(currentAvatarUrl || null);
   const inputRef = useRef(null);
 
+  // Update preview when currentAvatarUrl prop changes
+  React.useEffect(() => {
+    setPreview(currentAvatarUrl || null);
+  }, [currentAvatarUrl]);
+
   const handleFile = async (file) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) return showError('Please upload an image file');
@@ -62,11 +67,12 @@ export default function ProfilePhotoUpload({ currentAvatarUrl, onUploaded }) {
               try {
                 setLoading(true);
                 const updated = await hotelAPI.updateUserProfile({ avatarKey: null });
-                setPreview(null);
+                setPreview(null); // Clear preview immediately
                 showSuccess('Profile photo removed');
                 onUploaded && onUploaded(updated);
-              } catch (_err) {
+              } catch (err) {
                 showError('Failed to remove photo');
+                console.error('Remove photo error:', err);
               } finally {
                 setLoading(false);
               }

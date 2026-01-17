@@ -323,9 +323,11 @@ async function updateUserProfile(userId, event) {
       );
     }
 
-    // Generate signed URL for avatar if key exists
+    // Generate signed URL for avatar if key exists, clear if explicitly null
     if (merged.avatarKey) {
       merged.avatarUrl = await generateSignedAvatarUrl(merged.avatarKey);
+    } else if (bodyAvatarKey === null) {
+      merged.avatarUrl = null;
     } else if (existing.avatarUrl) {
       merged.avatarUrl = existing.avatarUrl;
     }
