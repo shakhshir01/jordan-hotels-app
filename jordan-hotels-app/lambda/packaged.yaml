@@ -35,7 +35,7 @@ Resources:
       Cors:
         AllowMethods: '''GET,POST,PUT,DELETE,OPTIONS'''
         AllowHeaders: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
-        AllowOrigin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        AllowOrigin: '''*'''
         AllowCredentials: false
       Tags:
         App: VisitJo
@@ -52,7 +52,7 @@ Resources:
       ResponseType: DEFAULT_4XX
       StatusCode: 400
       ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
         gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
         gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
     Metadata:
@@ -65,7 +65,7 @@ Resources:
       ResponseType: DEFAULT_5XX
       StatusCode: 500
       ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
         gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
         gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
     Metadata:
@@ -78,7 +78,7 @@ Resources:
       ResponseType: UNAUTHORIZED
       StatusCode: 401
       ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
         gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
         gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
     Metadata:
@@ -91,7 +91,7 @@ Resources:
       ResponseType: ACCESS_DENIED
       StatusCode: 403
       ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: '''https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'''
+        gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
         gatewayresponse.header.Access-Control-Allow-Headers: '''Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'''
         gatewayresponse.header.Access-Control-Allow-Methods: '''GET,POST,PUT,DELETE,OPTIONS'''
     Metadata:

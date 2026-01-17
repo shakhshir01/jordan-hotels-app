@@ -33,8 +33,8 @@ Resources:
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
-        # Restrict to known frontend origins (add additional Amplify hosts as needed)
-        AllowOrigin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        # Allow all origins for now - restrict in production if needed
+        AllowOrigin: "'*'"
         AllowCredentials: false
       # GatewayResponses removed temporarily to avoid SAM transform validation errors.
       # If needed, create explicit AWS::ApiGateway::GatewayResponse resources
@@ -54,7 +54,7 @@ Resources:
       ResponseType: DEFAULT_4XX
       StatusCode: 400
       ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
         gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
         gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
 
@@ -65,7 +65,7 @@ Resources:
       ResponseType: DEFAULT_5XX
       StatusCode: 500
       ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
         gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
         gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
 
@@ -76,7 +76,7 @@ Resources:
       ResponseType: UNAUTHORIZED
       StatusCode: 401
       ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
         gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
         gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
 
@@ -87,7 +87,7 @@ Resources:
       ResponseType: ACCESS_DENIED
       StatusCode: 403
       ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: "'https://www.visit-jo.com,https://main.d1ewsonl19kjj7.amplifyapp.com'"
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
         gatewayresponse.header.Access-Control-Allow-Headers: "'Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent'"
         gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
 
