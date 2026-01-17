@@ -90,12 +90,16 @@ const Profile = () => {
   });
 
   const loadUserProfile = React.useCallback(async () => {
+    console.log('Loading user profile, user:', user);
     try {
       setLoading(true);
       const userEmail = user?.email || user?.attributes?.email || 'User';
+      console.log('userEmail:', userEmail);
       const isUUID = userEmail.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
+      console.log('Fetching API profile');
       const apiProfile = await hotelAPI.getUserProfile();
+      console.log('API profile received:', apiProfile);
 
       const fullName = apiProfile?.name || '';
       const [firstFromName, ...restName] = fullName.split(' ');

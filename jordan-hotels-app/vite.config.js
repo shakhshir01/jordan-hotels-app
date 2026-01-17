@@ -75,7 +75,7 @@ export default defineConfig(({ mode }) => {
       proxy: apiTarget
         ? {
             '/api': {
-              target: apiTarget,
+              target: apiTarget === '/api' ? 'https://ttfcw5hak8.execute-api.us-east-1.amazonaws.com/prod' : apiTarget,
               changeOrigin: true,
               secure: true,
               rewrite: (path) => path.replace(/^\/api/, ''),

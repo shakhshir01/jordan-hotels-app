@@ -634,7 +634,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: getSignedUrl/index.handler
-      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/ff893719d785fc3e443590f9ee532d1f
+      CodeUri: s3://visitjo-sam-deploy-1768258668990-9051/c4261b693c4c66c18a3f2bf7ebc214c5
       Tags:
         App: VisitJo
         ManagedBy: SAM

@@ -1,10 +1,17 @@
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+
+const s3 = new S3Client({});
+
 const defaultHeaders = {
   "Content-Type": "application/json",
-  // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+  "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
   "Vary": "Origin",
 };
 
-export async function handler(event) {
+exports.handler = async function(event) {
   try {
     const method = event?.httpMethod || event?.requestContext?.http?.method || "GET";
     if (method === "OPTIONS") {
@@ -24,9 +31,6 @@ export async function handler(event) {
     const key = `uploads/${Date.now()}-${filename}`;
     if (bucket) {
       try {
-        const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
-        const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
-        const s3 = new S3Client({});
         const cmd = new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: 'application/octet-stream' });
         // 15 minutes
         const url = await getSignedUrl(s3, cmd, { expiresIn: 900 });
@@ -52,3 +56,4 @@ export async function handler(event) {
     return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'error' }) };
   }
 }
+

@@ -29,7 +29,9 @@ exports.handler = async (event) => {
   ];
 
   const headers = {
-    // Let API Gateway set Access-Control-Allow-* headers to avoid duplicates
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Api-Key,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent",
     "Vary": "Origin",
     "Content-Type": "application/json",
   };

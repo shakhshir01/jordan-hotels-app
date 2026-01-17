@@ -38,16 +38,14 @@ class ErrorBoundary extends React.Component {
             >
               Refresh Page
             </button>
-            {import.meta.env.DEV && (
-              <details className="mt-4 text-left">
-                <summary className="cursor-pointer text-sm text-gray-500">Error Details (Dev Only)</summary>
-                <pre className="text-xs bg-gray-100 p-2 mt-2 overflow-auto">
-                  {this.state.error && this.state.error.toString()}
-                  <br />
-                  {this.state.errorInfo?.componentStack}
-                </pre>
-              </details>
-            )}
+            <details className="mt-4 text-left">
+              <summary className="cursor-pointer text-sm text-gray-500">Error Details</summary>
+              <pre className="text-xs bg-gray-100 p-2 mt-2 overflow-auto">
+                {this.state.error && this.state.error.toString()}
+                <br />
+                {this.state.errorInfo?.componentStack}
+              </pre>
+            </details>
           </div>
         </div>
       );
