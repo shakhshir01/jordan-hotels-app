@@ -1,7 +1,7 @@
 # Deployment script to update the existing stack without creating duplicates
 # Usage: .\deploy-update.ps1
 
-$StackName = "VisitJo"
+$StackName = "visitjo-backend-cors"
 $Region = "us-east-1"
 
 Write-Host "🚀 Starting deployment for stack: $StackName"
@@ -16,9 +16,9 @@ $ApiId = aws cloudformation describe-stacks --stack-name $StackName --query "Sta
 # 3. Get AWS Account ID
 $AccountId = aws sts get-caller-identity --query Account --output text
 
-if ($ApiId -and $ApiId -ne "None") {
+if ($ApiId -and ($ApiId -ne "None")) {
     Write-Host "✅ Found API ID: $ApiId"
-    
+
     # 4. Wire up the Lambdas to the API Gateway
     Write-Host "🔗 Wiring Lambdas to API Gateway..."
     node lambda/wire-lambdas.js $ApiId $Region $AccountId
