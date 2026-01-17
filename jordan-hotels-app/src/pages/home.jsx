@@ -393,7 +393,7 @@ function Home() {
   const [isLocationBased, setIsLocationBased] = useState(false);
 
   // Debounce search query to avoid excessive API calls
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  // const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Filter states
   const [priceRange, setPriceRange] = useState([0, 500]);

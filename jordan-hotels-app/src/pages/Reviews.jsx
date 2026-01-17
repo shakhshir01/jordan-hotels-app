@@ -28,7 +28,7 @@ const FEATURES = [
 const INITIAL_DEMO_REVIEWS = [];
 
 function Reviews() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
   const [reviews, setReviews] = useState(INITIAL_DEMO_REVIEWS);
 

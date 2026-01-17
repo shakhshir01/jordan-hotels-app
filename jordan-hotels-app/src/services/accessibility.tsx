@@ -111,7 +111,7 @@ export const useFocusTrap = (ref, options = {}) => {
         // Return focus to trigger element if specified
         if (returnFocusOnDeactivate) {
           const triggerElement = document.querySelector('[data-focus-trigger]');
-          triggerElement?.focus();
+          (triggerElement as HTMLElement)?.focus();
         }
       }
     };
@@ -146,7 +146,16 @@ export const useAriaLive = () => {
 /**
  * Accessible Button Component
  */
-export const AccessibleButton = React.forwardRef(({
+interface AccessibleButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  ariaLabel?: string;
+  ariaPressed?: boolean;
+  ariaExpanded?: boolean;
+}
+
+export const AccessibleButton = React.forwardRef<HTMLButtonElement, AccessibleButtonProps>(({
   children,
   onClick,
   disabled,
@@ -170,81 +179,36 @@ export const AccessibleButton = React.forwardRef(({
 
 AccessibleButton.displayName = 'AccessibleButton';
 
-/**
- * Accessible Focus Trap (for modals)
- */
-export const useFocusTrap = (ref) => {
-  React.useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key !== 'Tab') return;
+AccessibleButton.displayName = 'AccessibleButton';
 
-      const focusableElements = ref.current?.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
 
-      if (!focusableElements || focusableElements.length === 0) return;
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement.focus();
-        }
-      }
-    };
-
-    const element = ref.current;
-    if (element) {
-      element.addEventListener('keydown', handleKeyDown);
-    }
-
-    return () => {
-      if (element) {
-        element.removeEventListener('keydown', handleKeyDown);
-      }
-    };
-  }, [ref]);
-};
-
-/**
- * Announce to Screen Readers
- */
-export const useAriaLive = () => {
-  const [announcement, setAnnouncement] = React.useState('');
-
-  const announce = React.useCallback((message) => {
-    setAnnouncement('');
-    // Force reflow to trigger screen reader announcement
-    setTimeout(() => setAnnouncement(message), 100);
-  }, []);
-
-  return { announcement, announce };
-};
 
 /**
  * Check contrast ratio (WCAG AA: 4.5:1 for text)
  */
 export const getContrastRatio = (color1, color2) => {
-  const getLuminance = (color) => {
-    const rgb = parseInt(color.slice(1), 16);
-    const r = (rgb >> 16) & 0xff;
-    const g = (rgb >> 8) & 0xff;
-    const b = (rgb >> 0) & 0xff;
+  const getRelativeLuminance = (hex) => {
+    const rgb = parseInt(hex.slice(1), 16);
+    let r = (rgb >> 16) & 0xff;
+    let g = (rgb >> 8) & 0xff;
+    let b = (rgb >> 0) & 0xff;
 
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance > 0.5
-      ? (luminance + 0.05) / (0.05 + 0.05)
-      : (0.05 + 0.05) / (luminance + 0.05);
+    // Normalize to 0-1
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+    // Linearize for sRGB
+    r = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+    g = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+    b = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
 
-  const l1 = getLuminance(color1);
-  const l2 = getLuminance(color2);
-  return Math.max(l1, l2) / Math.min(l1, l2);
+  const l1 = getRelativeLuminance(color1);
+  const l2 = getRelativeLuminance(color2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
 };

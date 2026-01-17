@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Star, ArrowLeft, Clock, Users, Calendar, Camera } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { hotelAPI } from '../services/api';
 import OptimizedImage from '../components/OptimizedImage';
 import Seo from '../components/Seo.jsx';
 

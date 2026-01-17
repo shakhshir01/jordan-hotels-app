@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
 
     setUser({ email: derived.email });
     setUserProfile(nextProfile);
-  }, [setUser, setUserProfile]);
+  }, []);
 
   // Check if user is already logged in on mount
   useEffect(() => {
@@ -457,7 +457,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem(`visitjo.mfaMethod.${email}`, 'EMAIL');
     setError(null);
     // Success message handled by caller
-  }, [setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, setError]);
+  }, [setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, setError, user?.email]);
 
   const clearMfaChallenge = useCallback(() => {
     setMfaChallenge(null);
@@ -591,7 +591,7 @@ export const AuthProvider = ({ children }) => {
       setError(userFriendlyMessage);
       throw error;
     }
-  }, [hotelAPI, showSuccess, setMfaEnabled, setMfaMethod, clearMfaChallenge, setError, showError, setupTotp]);
+  }, [showSuccess, setMfaEnabled, setMfaMethod, clearMfaChallenge, setError, showError, setupTotp]);
 
   const verifyLoginTotp = useCallback(async (userCode) => {
     try {

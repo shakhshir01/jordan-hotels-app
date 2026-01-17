@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { showError, showSuccess } from '../services/toastService';
 import QRCode from 'qrcode';
 import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function MfaModal() {
-  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, verifyLoginTotp, setupTotp, submitMfaCode, setupTotpMfa, verifyTotpMfa, login, completePreAuthLogin, setupEmailMfa, verifyEmailMfa, verifyLoginEmailMfa } = useAuth();
+  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, verifyLoginTotp, setupTotp, submitMfaCode, setupTotpMfa, verifyTotpMfa, setupEmailMfa, verifyEmailMfa, verifyLoginEmailMfa } = useAuth();
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState(null);

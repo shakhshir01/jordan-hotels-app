@@ -7,9 +7,11 @@ import PropTypes from 'prop-types';
 /**
  * @typedef {Object} Review
  * @property {string} id
+ * @property {string} hotelId
  * @property {number} rating
  * @property {string} comment
  * @property {string} timestamp
+ * @property {boolean} [verified]
  * @property {string} [commentAr]
  */
 
@@ -17,7 +19,7 @@ import PropTypes from 'prop-types';
  * @typedef {Object} ReviewsSectionProps
  * @property {string} hotelId
  * @property {Review[]} [reviews]
- * @property {(review: Omit<Review, 'id' | 'timestamp'>) => Promise<void>} onAddReview
+ * @property {(review: Omit<Review, 'id'>) => Promise<void>} onAddReview
  */
 
 /**
@@ -62,13 +64,13 @@ const ReviewsSection = React.memo(({ hotelId, reviews = [], onAddReview }) => {
 
   // Virtual scrolling for performance when many reviews
   const shouldVirtualize = sortedReviews.length > 10;
-  const virtualizer = shouldVirtualize ? useWindowVirtualizer({
+  const virtualizer = useWindowVirtualizer({
     count: sortedReviews.length,
     estimateSize: () => 120, // Estimated height per review
     overscan: 5,
-  }) : null;
+  });
 
-  const virtualItems = virtualizer ? virtualizer.getVirtualItems() : null;
+  const virtualItems = shouldVirtualize ? virtualizer.getVirtualItems() : null;
 
   return (
     <div className="space-y-6">
