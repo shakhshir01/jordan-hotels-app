@@ -794,27 +794,39 @@ const HotelDetails = () => {
             {t('hotelDetails.relatedDestinations.subtitle', 'Discover other incredible places in Jordan for your next adventure')}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {['Petra', 'Amman', 'Dead Sea', 'Wadi Rum', 'Aqaba', 'Jerash'].filter(dest => dest !== hotel.location).slice(0, 3).map((destination) => (
-              <Link
-                key={destination}
-                to={`/destinations/${encodeURIComponent(destination)}`}
-                className="group card-modern p-6 hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-jordan-blue to-jordan-teal flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <MapPin className="w-6 h-6 text-white" />
+            {['Petra', 'Amman', 'Dead Sea', 'Wadi Rum', 'Aqaba'].filter(dest => dest !== hotel.location).slice(0, 3).map((destination) => {
+              // Map destination names to their proper IDs
+              const destinationIdMap = {
+                'Petra': 'd-petra',
+                'Amman': 'd-amman',
+                'Dead Sea': 'd-dead-sea',
+                'Wadi Rum': 'd-wadi-rum',
+                'Aqaba': 'd-aqaba'
+              };
+              const destinationId = destinationIdMap[destination] || destination.toLowerCase().replace(' ', '-');
+
+              return (
+                <Link
+                  key={destination}
+                  to={`/destinations/${destinationId}`}
+                  className="group card-modern p-6 hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-jordan-blue to-jordan-teal flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <MapPin className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-jordan-blue transition-colors">
+                        {destination}
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-300">
+                        {t(`destinations.${destination.toLowerCase().replace(' ', '')}.desc`, 'Explore this amazing destination')}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-jordan-blue transition-colors">
-                      {destination}
-                    </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-300">
-                      {t(`destinations.${destination.toLowerCase().replace(' ', '')}.desc`, 'Explore this amazing destination')}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
           <div className="text-center mt-8">
             <Link
