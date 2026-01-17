@@ -15,29 +15,22 @@ export const PreferencesProvider = ({ children }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [preferences, setPreferences] = useState(() => {
+    const defaults = { 
+      currency: 'JOD', 
+      language: 'en', 
+      theme: 'light',
+      notifications: {
+        emailBookings: true,
+        emailPromotions: false,
+        pushNotifications: true
+      }
+    };
     try {
       const raw = localStorage.getItem('userPreferences');
-      return raw ? JSON.parse(raw) : { 
-        currency: 'JOD', 
-        language: 'en', 
-        theme: 'light',
-        notifications: {
-          emailBookings: true,
-          emailPromotions: false,
-          pushNotifications: true
-        }
-      };
+      const stored = raw ? JSON.parse(raw) : {};
+      return { ...defaults, ...stored };
     } catch {
-      return { 
-        currency: 'JOD', 
-        language: 'en', 
-        theme: 'light',
-        notifications: {
-          emailBookings: true,
-          emailPromotions: false,
-          pushNotifications: true
-        }
-      };
+      return defaults;
     }
   });
 
