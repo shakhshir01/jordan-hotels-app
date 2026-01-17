@@ -243,6 +243,8 @@ async function updateUserProfile(userId, event) {
     const bodyLast = body.lastName || body.family_name || '';
     const bodyEmail = body.email;
     const bodyPhone = body.phone;
+    const bodyAvatarKey = body.avatarKey;
+    const bodyAvatarUrl = body.avatarUrl;
 
     // Fetch existing item so we can merge instead of overwrite
     let existing = {};
@@ -277,6 +279,8 @@ async function updateUserProfile(userId, event) {
       mfaPendingExpires: body.mfaPendingExpires !== undefined ? body.mfaPendingExpires : existing.mfaPendingExpires || null,
       mfaChallengeCode: body.mfaChallengeCode !== undefined ? body.mfaChallengeCode : existing.mfaChallengeCode || null,
       mfaChallengeExpires: body.mfaChallengeExpires !== undefined ? body.mfaChallengeExpires : existing.mfaChallengeExpires || null,
+      avatarKey: bodyAvatarKey !== undefined ? bodyAvatarKey : existing.avatarKey || null,
+      avatarUrl: bodyAvatarUrl !== undefined ? bodyAvatarUrl : (bodyAvatarKey ? `https://${process.env.S3_UPLOAD_BUCKET}.s3.us-east-1.amazonaws.com/uploads/${bodyAvatarKey}` : existing.avatarUrl || null),
     };
 
     // Remove explicit nulls for cleaner storage (optional)
