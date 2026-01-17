@@ -724,14 +724,8 @@ export const hotelAPI = {
   },
 
   updateUserProfile: async (profile) => {
-    if (getUseMocks()) return { ...profile, userId: profile.userId || "demo-user" };
-    try {
-      const response = await apiClient.put("/user/profile", profile);
-      return response.data;
-    } catch (error) {
-      if (lastAuthError) return { ...profile, userId: profile.userId || "demo-user" };
-      throw error;
-    }
+    const response = await apiClient.put("/user/profile", profile);
+    return response.data;
   },
 
   // Email MFA management (backend endpoints expected)

@@ -44,12 +44,11 @@ exports.handler = async function(event) {
       }
     }
 
-    // Fallback stub when bucket not set or presign fails
-    const url = `https://s3.us-east-1.amazonaws.com/demo-bucket/${key}?signature=stub`;
+    // If bucket not configured, return error
     return {
-      statusCode: 200,
+      statusCode: 500,
       headers: defaultHeaders,
-      body: JSON.stringify({ url, key }),
+      body: JSON.stringify({ message: 'File upload service unavailable' }),
     };
   } catch (err) {
     console.error(err);

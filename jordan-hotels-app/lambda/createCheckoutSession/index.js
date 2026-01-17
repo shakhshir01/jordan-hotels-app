@@ -37,8 +37,7 @@ export async function handler(event) {
     const { hotelId, amount, booking } = body;
     const secretArn = process.env.STRIPE_SECRET_ARN;
 
-    // Safety valve: only allow real Stripe sessions when explicitly enabled.
-    // This prevents accidental live charges when the app is running in demo mode.
+    // Safety valve: only allow Stripe sessions when payments are explicitly enabled.
     const paymentsEnabled = String(process.env.PAYMENTS_ENABLED || '').toLowerCase() === 'true';
 
     const stripeKey = await getStripeSecret(secretArn);

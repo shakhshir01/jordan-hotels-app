@@ -225,9 +225,9 @@ Resources:
             MaxAge: 3000
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
-        BlockPublicPolicy: true
+        BlockPublicPolicy: false
         IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+        RestrictPublicBuckets: false
       VersioningConfiguration:
         Status: Enabled
       BucketEncryption:
@@ -244,6 +244,28 @@ Resources:
           Value: SAM
         - Key: Stack
           Value: !Ref AWS::StackName
+
+  UploadsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref UploadsBucket
+      PolicyDocument:
+        Statement:
+          - Sid: PublicReadForUploads
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Sub "arn:aws:s3:::${UploadsBucket}/uploads/*"
+          - Sid: ForceSSLOnly
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !Sub "arn:aws:s3:::${UploadsBucket}"
+              - !Sub "arn:aws:s3:::${UploadsBucket}/*"
+            Condition:
+              Bool:
+                "aws:SecureTransport": false
 
   StripeSecretKey:
     Condition: CreateStripeSecret

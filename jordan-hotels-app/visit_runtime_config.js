@@ -7,7 +7,6 @@ window.__VISITJO_RUNTIME_CONFIG__ = {
   VITE_COGNITO_CLIENT_ID: "57ggsfmkahlngmh03c92uumqv9",
   VITE_COGNITO_DOMAIN: "us-east-1t5vyobi0n.auth.us-east-1.amazoncognito.com",
   VITE_COGNITO_USER_POOL_ID: "us-east-1_T5vYoBi0N",
-  VITE_DEMO_BOOKINGS: "false",
   VITE_PAYMENTS_ENABLED: "true",
   VITE_PAYPAL_CLIENT_ID: "AS4zykgSxEpxQfcVgXSsKt025N8zS6kYhxPe9_z7O4TDQTqfqYKSphdMR_Mc890z0EuGpnDxehDZk98s",
   VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_51Sn7WIJFa7tt8KvLusvHeHNYRtIeV8AQHVaJnVYgftrZyncjoIpRO2KJWMK85BngbOA1oiJffhZNYvGQ15mBtP3S00TglRUJrq",

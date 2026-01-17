@@ -243,7 +243,7 @@ Resources:
           MaxAge: 3000
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
-        BlockPublicPolicy: false
+        BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       VersioningConfiguration:

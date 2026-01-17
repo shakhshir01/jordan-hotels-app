@@ -177,8 +177,6 @@ const Checkout = () => {
   };
 
   const paymentsEnabled = String(import.meta.env.VITE_PAYMENTS_ENABLED || '').toLowerCase() === 'true';
-  // Default to demo bookings unless explicitly turned off.
-  const demoBookings = String(import.meta.env.VITE_DEMO_BOOKINGS || 'false').toLowerCase() !== 'false';
 
   /**
    * Create a booking record.
@@ -198,14 +196,13 @@ const Checkout = () => {
       nights: resolvedBookingData.nights || 1,
       guests: resolvedBookingData.guests || 2,
       totalPrice: total,
-      status: demoBookings ? 'demo' : 'confirmed',
+      status: 'confirmed',
       userName: guestInfo.fullName.trim(),
       userEmail: guestInfo.email.trim(),
       phone: guestInfo.phone.trim(),
       paymentProvider: paymentProvider || undefined,
       paymentIntentId: paymentIntentId || undefined,
       paypal: paypalDetails || undefined,
-      ...(demoBookings ? { demoBooking: true } : {}),
     };
 
     const created = await hotelAPI.bookHotel(hotelId, bookingPayload);

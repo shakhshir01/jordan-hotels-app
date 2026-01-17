@@ -27,17 +27,7 @@ export default function AppLayout() {
             <div className="text-xs sm:text-sm flex-1 min-w-0">
               <strong>⚠️ API Issue:</strong> {authError}
             </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => {
-                  setUseMocks(true);
-                  enableMocks(true);
-                }}
-                className="px-3 sm:px-4 py-2 bg-amber-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors touch-manipulation min-h-[40px] flex items-center justify-center"
-              >
-                Use demo data
-              </button>
+            <div className="flex flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setDismissed(true)}

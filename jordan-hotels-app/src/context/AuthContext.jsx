@@ -237,12 +237,10 @@ export const AuthProvider = ({ children }) => {
   const signUp = useCallback(async (email, password, fullName) => {
     return new Promise((resolve, reject) => {
       if (!UserPool) {
-        console.warn('Cognito not available, falling back to demo mode signup');
-        // Demo mode: accept any signup
-        setUserAndProfileFromEmail(email);
-        setError(null);
-        showSuccess(`Demo mode: Account created for ${email}!`);
-        resolve({ success: true });
+        const error = new Error('Authentication service unavailable');
+        setError(error.message);
+        showError('Unable to create account. Please try again later.');
+        reject(error);
         return;
       }
 
@@ -277,16 +275,10 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (email, password) => {
     return new Promise((resolve, reject) => {
       if (!UserPool) {
-        console.warn('Cognito not available, falling back to demo mode');
-        // Demo mode: accept any email/password combination
-        setUserAndProfileFromEmail(email);
-        setMfaEnabled(false);
-        setMfaMethod(null);
-        localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
-        localStorage.removeItem(`visitjo.mfaMethod.${email}`);
-        setError(null);
-        showSuccess(`Demo mode: Welcome, ${email}!`);
-        resolve({ success: true });
+        const error = new Error('Authentication service unavailable');
+        setError(error.message);
+        showError('Unable to sign in. Please try again later.');
+        reject(error);
         return;
       }
 
@@ -376,22 +368,6 @@ export const AuthProvider = ({ children }) => {
           console.error('Cognito authentication failed:', err);
           console.error('Error code:', err.code);
           console.error('Error message:', err.message);
-
-          // If it's a network error or user pool issue, fall back to demo mode
-          if (err.code === 'InvalidParameterException' || err.code === 'NotAuthorizedException' ||
-              err.message.includes('400') || err.message.includes('Bad Request') ||
-              err.message.includes('User pool') || err.message.includes('client')) {
-            console.warn('Cognito authentication failed, falling back to demo mode');
-            setUserAndProfileFromEmail(email);
-            setMfaEnabled(false);
-            setMfaMethod(null);
-            localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
-            localStorage.removeItem(`visitjo.mfaMethod.${email}`);
-            setError(null);
-            showSuccess(`Demo mode: Welcome, ${email}! (Cognito unavailable)`);
-            resolve({ success: true });
-            return;
-          }
 
           setError(err.message);
           showError('Invalid email or password');

@@ -24,15 +24,7 @@ export default function ProfilePhotoUpload({ currentAvatarUrl, onUploaded }) {
       onUploaded && onUploaded(updated);
     } catch (err) {
       console.error('Upload error', err);
-      // Fallback for demo mode or API failures
-      if (err?.message?.includes('CORS') || err?.message?.includes('502') || err?.message?.includes('Network Error')) {
-        console.warn('API upload failed, using local preview for demo mode');
-        setPreview(URL.createObjectURL(file));
-        showSuccess('Profile photo updated (demo mode)');
-        onUploaded && onUploaded({ avatarUrl: URL.createObjectURL(file) });
-      } else {
-        showError(err?.message || 'Failed to upload image');
-      }
+      showError(err?.message || 'Failed to upload image');
     } finally {
       setLoading(false);
     }

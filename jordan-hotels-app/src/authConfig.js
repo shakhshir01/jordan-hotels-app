@@ -19,7 +19,7 @@ try {
   if (poolData.UserPoolId && poolData.ClientId) {
     UserPool = new CognitoUserPool(poolData);
   } else {
-    console.warn('Cognito config incomplete - AuthContext will run in demo mode', poolData);
+    console.warn('Cognito config incomplete');
     UserPool = null;
   }
 } catch (err) {
