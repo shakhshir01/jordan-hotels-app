@@ -25,20 +25,7 @@ const FEATURES = [
   },
 ];
 
-const INITIAL_DEMO_REVIEWS = [
-  {
-    rating: 5,
-    comment: 'Perfect base for exploring Petra. Staff helped arrange sunrise entry and packed breakfast.',
-    commentAr: 'مكان مثالي لاستكشاف البتراء. ساعدنا الطاقم في ترتيب دخول شروق الشمس وجهزوا لنا الإفطار.',
-    timestamp: new Date().toISOString(),
-  },
-  {
-    rating: 4,
-    comment: 'Great Dead Sea pools and spa. Wi‑Fi could be stronger in the rooms, but views were incredible.',
-    commentAr: 'مسبح وسبا البحر الميت رائعان. الواي فاي بحاجة لتحسين في الغرف، لكن الإطلالة مذهلة.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
-  },
-];
+const INITIAL_DEMO_REVIEWS = [];
 
 export default function Reviews() {
   const { t, i18n } = useTranslation();
@@ -212,7 +199,7 @@ export default function Reviews() {
             </div>
 
             <ReviewsSection
-              hotelId="demo-hub"
+              hotelId="general"
               reviews={reviews.map((r) => ({ ...r, comment: isArabic ? (r.commentAr || r.comment) : r.comment }))}
               onAddReview={handleAddReview}
             />

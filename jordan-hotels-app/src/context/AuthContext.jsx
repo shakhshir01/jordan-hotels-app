@@ -259,12 +259,7 @@ export const AuthProvider = ({ children }) => {
       UserPool.signUp(email, password, userAttributes, null, (err, data) => {
         if (err) {
           console.error('Cognito signup failed:', err);
-          // If Cognito signup fails, fall back to demo mode
-          console.warn('Cognito signup failed, falling back to demo mode');
-          setUserAndProfileFromEmail(email);
-          setError(null);
-          showSuccess(`Demo mode: Account created for ${email}! (Cognito unavailable)`);
-          resolve({ success: true });
+          reject(err);
         } else {
           resolve(data);
         }
@@ -328,25 +323,29 @@ export const AuthProvider = ({ children }) => {
           const mfaMethod = profile?.mfaMethod;
 
           if (mfaEnabled) {
-            // MFA is enabled, request MFA challenge
             setMfaEnabled(true);
             setMfaMethod(mfaMethod || 'TOTP');
             localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
-            localStorage.setItem(`visitjo.mfaMethod.${email}`, mfaMethod || 'EMAIL');
+            localStorage.setItem(`visitjo.mfaMethod.${email}`, mfaMethod || 'TOTP');
 
-            // Request MFA challenge based on method
-            try {
-              if (mfaMethod === 'EMAIL') {
-                await hotelAPI.requestEmailMfaChallenge();
-                setMfaChallenge({ type: 'EMAIL_MFA', message: 'Check your email for the verification code', email });
-              } else if (mfaMethod === 'TOTP') {
-                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code', email });
-              } else {
-                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code', email }); // Default to TOTP
+            if (mfaMethod === 'EMAIL') {
+              // For email MFA, send a verification code to the secondary email
+              try {
+                // Use the setupEmailMfa function but with a special flag for login
+                await hotelAPI.sendLoginMfaCode(profile.mfaSecondaryEmail);
+                setMfaChallenge({ 
+                  type: 'EMAIL_MFA', 
+                  message: 'Enter the code sent to your email', 
+                  email: profile.mfaSecondaryEmail 
+                });
+              } catch (emailError) {
+                console.error('Failed to send login MFA code:', emailError);
+                // Fall back to TOTP if email fails
+                setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your authenticator code', email });
               }
-            } catch (challengeErr) {
-              console.error('Failed to request MFA challenge', challengeErr);
-              setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your TOTP code', email }); // Fallback
+            } else {
+              // Default to TOTP MFA challenge
+              setMfaChallenge({ type: 'TOTP_MFA', message: 'Enter your authenticator code', email });
             }
 
             resolve({ mfaRequired: true });
@@ -540,29 +539,19 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
-        console.log('Session valid, enabling TOTP MFA first...');
-        // First enable TOTP MFA for the user
-        cognitoUser.setUserMfaPreference(null, { Enabled: true }, (mfaErr, _mfaResult) => {
-          if (mfaErr) {
-            console.error('Failed to enable TOTP MFA:', mfaErr);
-            setError('Failed to enable TOTP MFA');
-            reject(mfaErr);
-            return;
-          }
-
-          console.log('TOTP MFA enabled, now associating software token...');
-          cognitoUser.associateSoftwareToken({
-            associateSecretCode: (secretCode) => {
-              console.log('TOTP secret received:', secretCode);
-              setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
-              resolve(secretCode);
-            },
-            onFailure: (e) => {
-              console.error('TOTP association failed:', e);
-              setError(e.message || String(e));
-              reject(e);
-            },
-          });
+        console.log('Session valid, associating software token...');
+        // Associate software token for TOTP
+        cognitoUser.associateSoftwareToken({
+          associateSecretCode: (secretCode) => {
+            console.log('TOTP secret received:', secretCode);
+            setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
+            resolve(secretCode);
+          },
+          onFailure: (e) => {
+            console.error('TOTP association failed:', e);
+            setError(e.message || String(e));
+            reject(e);
+          },
         });
       });
     });
@@ -577,6 +566,16 @@ export const AuthProvider = ({ children }) => {
       cognitoUser.verifySoftwareToken(userCode, friendlyName, {
         onSuccess: async (res) => {
           try {
+            // Enable TOTP MFA for this user in Cognito
+            cognitoUser.setUserMfaPreference(null, { Enabled: true, PreferredMfa: true }, (mfaErr, _mfaResult) => {
+              if (mfaErr) {
+                console.error('Failed to enable TOTP MFA preference:', mfaErr);
+                // Continue anyway since the token is verified
+              } else {
+                console.log('TOTP MFA preference enabled for user');
+              }
+            });
+
             showSuccess('Two-factor authentication enabled');
             try {
               const email = cognitoUser.getUsername();
@@ -654,6 +653,8 @@ export const AuthProvider = ({ children }) => {
       setPendingSecondaryEmail(secondaryEmail);
       const res = await hotelAPI.setupEmailMfa(secondaryEmail);
       showSuccess('Verification email sent to secondary address');
+      // Set challenge for code verification
+      setMfaChallenge({ type: 'EMAIL_VERIFY', email: secondaryEmail });
       return res;
     } catch (e) {
       setError(e?.message || String(e));
@@ -726,6 +727,7 @@ export const AuthProvider = ({ children }) => {
         showError('Email MFA enabled but failed to save status. Please try again.');
       }
       showSuccess('Email MFA enabled');
+      clearMfaChallenge();
       return res;
     } catch (e) {
       setError(e?.message || String(e));
@@ -739,15 +741,20 @@ export const AuthProvider = ({ children }) => {
 
   const verifyLoginEmailMfa = useCallback(async (code) => {
     try {
-      const res = await hotelAPI.verifyLoginEmailMfa(code);
-      // If this was a logout-initiated verification, perform logout now
-      if (mfaChallenge?.pendingLogout) {
-        try {
-          clearMfaChallenge();
-          performLogout();
-        } catch (_e) { console.warn('performLogout failed after email login verification', _e); }
-        return { loggedOut: true };
+      const res = await hotelAPI.verifyLoginMfaCode(code);
+      // Complete the login process
+      const cognitoUser = cognitoUserRef.current;
+      if (cognitoUser) {
+        cognitoUser.getSession((err, session) => {
+          if (err) {
+            console.error('Failed to get session after email MFA verification:', err);
+            showError('Login failed after MFA verification');
+            return;
+          }
+          completeMfa(session);
+        });
       }
+      clearMfaChallenge();
       return res;
     } catch (e) {
       setError(e?.message || String(e));
@@ -755,7 +762,7 @@ export const AuthProvider = ({ children }) => {
       throw e;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mfaChallenge, clearMfaChallenge, performLogout, setError, showError]);
+  }, [hotelAPI, cognitoUserRef, completeMfa, showError, setError, clearMfaChallenge]);
 
   const verifyLoginTotpMfa = useCallback(async (code) => {
     try {
@@ -777,15 +784,6 @@ export const AuthProvider = ({ children }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mfaChallenge, clearMfaChallenge, performLogout, setError, showError]);
 
-  const requestEmailMfaChallenge = useCallback(async () => {
-    try {
-      return await hotelAPI.requestEmailMfaChallenge();
-    } catch (e) {
-      setError(e?.message || String(e));
-      throw e;
-    }
-  }, [setError]);
-
   const disableMfa = useCallback(async () => {
     try {
       const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
@@ -793,20 +791,58 @@ export const AuthProvider = ({ children }) => {
         throw new Error('No active user session to disable MFA');
       }
 
-      // First disable MFA in Cognito
-      await new Promise((resolve, reject) => {
-        cognitoUser.setUserMfaPreference({ Enabled: false }, { Enabled: false }, (err, result) => {
-          if (err) {
-            console.error('Failed to disable MFA in Cognito:', err);
-            reject(new Error('Failed to disable MFA in Cognito: ' + err.message));
+      // Check if user has a valid session before trying to disable MFA in Cognito
+      const hasValidSession = await new Promise((resolve) => {
+        cognitoUser.getSession((err, session) => {
+          if (err || !session || !session.isValid()) {
+            resolve(false);
           } else {
-            console.log('MFA disabled in Cognito successfully');
-            resolve(result);
+            resolve(true);
           }
         });
       });
 
-      // Then update the database
+      if (hasValidSession) {
+        // Check current MFA preferences before disabling
+        try {
+          const currentMfaPrefs = await new Promise((resolve) => {
+            cognitoUser.getUserMfaPreference((err, smsSettings, totpSettings) => {
+              if (err) {
+                console.warn('Could not get current MFA preferences:', err);
+                resolve(null);
+              } else {
+                console.log('Current MFA preferences - SMS:', smsSettings, 'TOTP:', totpSettings);
+                resolve({ sms: smsSettings, totp: totpSettings });
+              }
+            });
+          });
+        } catch (e) {
+          console.warn('Failed to check current MFA preferences:', e);
+        }
+
+        // Try to disable MFA in Cognito for both SMS and TOTP
+        await new Promise((resolve, reject) => {
+          cognitoUser.setUserMfaPreference(
+            null, // SMS MFA - set to null to disable
+            null, // TOTP MFA - set to null to disable
+            (err, result) => {
+              if (err) {
+                console.error('Failed to disable MFA in Cognito:', err);
+                // Continue anyway - this is not critical for our custom MFA
+                console.warn('Continuing with database update despite Cognito MFA disable failure');
+                resolve(null);
+              } else {
+                console.log('MFA disabled in Cognito successfully');
+                resolve(result);
+              }
+            }
+          );
+        });
+      } else {
+        console.warn('No valid session for Cognito MFA disable, skipping Cognito update');
+      }
+
+      // Always update the database
       await hotelAPI.disableMfa();
 
       // Update local state
@@ -1001,10 +1037,9 @@ export const AuthProvider = ({ children }) => {
     mfaMethod,
     setupEmailMfa,
     verifyEmailMfa,
+    verifyLoginEmailMfa,
     setupTotpMfa,
     verifyTotpMfa,
-    requestEmailMfaChallenge,
-    verifyLoginEmailMfa,
     verifyLoginTotpMfa,
     disableMfa,
     cognitoUserRef,
@@ -1035,10 +1070,9 @@ export const AuthProvider = ({ children }) => {
     mfaMethod,
     setupEmailMfa,
     verifyEmailMfa,
+    verifyLoginEmailMfa,
     setupTotpMfa,
     verifyTotpMfa,
-    requestEmailMfaChallenge,
-    verifyLoginEmailMfa,
     verifyLoginTotpMfa,
     disableMfa,
     cognitoUserRef,

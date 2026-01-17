@@ -102,6 +102,16 @@ async function handler(event) {
       return await verifyEmailMfa(userId, event);
     }
 
+    // POST /user/mfa/email/login-code
+    if (path === '/user/mfa/email/login-code' && method === 'POST') {
+      return await sendLoginMfaCode(userId, event);
+    }
+
+    // POST /user/mfa/email/verify-login
+    if (path === '/user/mfa/email/verify-login' && method === 'POST') {
+      return await verifyLoginMfaCode(userId, event);
+    }
+
     // POST /user/mfa/totp/setup
     if (path === '/user/mfa/totp/setup' && method === 'POST') {
       return await setupTotpMfa(userId, event);
@@ -115,16 +125,6 @@ async function handler(event) {
     // POST /auth/email-mfa/setup
     if (path === '/auth/email-mfa/setup' && method === 'POST') {
       return await setupEmailMfa(userId, event);
-    }
-
-    // POST /auth/email-mfa/request
-    if (path === '/auth/email-mfa/request' && method === 'POST') {
-      return await requestEmailMfaChallenge(userId, event);
-    }
-
-    // POST /auth/email-mfa/verify-login
-    if (path === '/auth/email-mfa/verify-login' && method === 'POST') {
-      return await verifyLoginEmailMfa(userId, event);
     }
 
     // POST /auth/totp/verify-login
@@ -502,6 +502,87 @@ async function verifyEmailMfa(userId, event) {
   }
 }
 
+async function sendLoginMfaCode(userId, event) {
+  try {
+    const body = event.body ? JSON.parse(event.body) : {};
+    const email = String(body.email || '').trim();
+    if (!email) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'email required' }) };
+    }
+
+    // Verify this email belongs to the authenticated user
+    let existingItem = {};
+    if (USERS_TABLE) {
+      const found = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+      existingItem = found?.Item || {};
+    }
+    const userEmail = String(existingItem.email || '').trim().toLowerCase();
+    const secondaryEmail = String(existingItem.mfaSecondaryEmail || '').trim().toLowerCase();
+    
+    if (secondaryEmail !== email.toLowerCase()) {
+      return { statusCode: 403, headers: defaultHeaders, body: JSON.stringify({ message: 'Email not authorized for this user' }) };
+    }
+
+    const code = generateNumericCode(6);
+    const expiresAt = Date.now() + 1000 * 60 * 15; // 15 minutes
+
+    // Store the login MFA code in the user item
+    if (USERS_TABLE) {
+      const item = { ...existingItem };
+      item.mfaLoginCode = code;
+      item.mfaLoginExpires = expiresAt;
+      await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
+    }
+
+    // Send email
+    const sent = await sendEmail(
+      email,
+      'VisitJO Login Verification',
+      `Your VisitJO login verification code is: ${code}`,
+      `<p>Your VisitJO login verification code is: <strong>${code}</strong></p><p>This code will expire in 15 minutes.</p>`
+    );
+
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ sent: !!sent }) };
+  } catch (error) {
+    console.error('sendLoginMfaCode error', error);
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to send login verification code' }) };
+  }
+}
+
+async function verifyLoginMfaCode(userId, event) {
+  try {
+    const body = event.body ? JSON.parse(event.body) : {};
+    const code = String(body.code || body.token || '').trim();
+    if (!code) return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'code required' }) };
+
+    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
+
+    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
+    const item = result?.Item || {};
+    const loginCode = String(item.mfaLoginCode || '');
+    const expires = Number(item.mfaLoginExpires || 0);
+
+    if (!loginCode || Date.now() > expires) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'No valid login code' }) };
+    }
+
+    if (loginCode !== code) {
+      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Invalid code' }) };
+    }
+
+    // Clear the login code after successful verification
+    const updated = { ...item };
+    delete updated.mfaLoginCode;
+    delete updated.mfaLoginExpires;
+    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
+
+    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ verified: true }) };
+  } catch (error) {
+    console.error('verifyLoginMfaCode error', error);
+    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to verify login code' }) };
+  }
+}
+
 async function setupTotpMfa(userId, event) {
   try {
     // Generate TOTP secret
@@ -591,69 +672,6 @@ async function verifyTotpMfa(userId, event) {
   }
 }
 
-async function requestEmailMfaChallenge(userId, event) {
-  try {
-    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
-    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
-    const item = result?.Item || {};
-    if (!item.mfaEnabled || item.mfaMethod !== 'EMAIL' || !item.mfaSecondaryEmail) {
-      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Email MFA not enabled' }) };
-    }
-
-    const code = generateNumericCode(6);
-    const expiresAt = Date.now() + 1000 * 60 * 10; // 10 minutes
-
-    item.mfaChallengeCode = code;
-    item.mfaChallengeExpires = expiresAt;
-    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
-
-    const sent = await sendEmail(
-      item.mfaSecondaryEmail,
-      'Your VisitJO login code',
-      `Your VisitJO login code is: ${code}`,
-      `<p>Your VisitJO login code is: <strong>${code}</strong></p>`
-    );
-
-    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ sent: !!sent }) };
-  } catch (error) {
-    console.error('requestEmailMfaChallenge error', error);
-    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to request challenge' }) };
-  }
-}
-
-async function verifyLoginEmailMfa(userId, event) {
-  try {
-    const body = event.body ? JSON.parse(event.body) : {};
-    const code = String(body.code || body.token || '').trim();
-    if (!code) return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'code required' }) };
-
-    if (!USERS_TABLE) return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Users table not configured' }) };
-
-    const result = await docClient.send(new GetCommand({ TableName: USERS_TABLE, Key: { userId } }));
-    const item = result?.Item || {};
-    const challengeCode = String(item.mfaChallengeCode || '');
-    const expires = Number(item.mfaChallengeExpires || 0);
-
-    if (!challengeCode || Date.now() > expires) {
-      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'No valid challenge code' }) };
-    }
-
-    if (challengeCode !== code) {
-      return { statusCode: 400, headers: defaultHeaders, body: JSON.stringify({ message: 'Invalid code' }) };
-    }
-
-    // Clear the challenge codes
-    delete item.mfaChallengeCode;
-    delete item.mfaChallengeExpires;
-    await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: item }));
-
-    return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ verified: true }) };
-  } catch (error) {
-    console.error('verifyLoginEmailMfa error', error);
-    return { statusCode: 500, headers: defaultHeaders, body: JSON.stringify({ message: 'Failed to verify code' }) };
-  }
-}
-
 async function verifyLoginTotpMfa(userId, event) {
   try {
     const body = event.body ? JSON.parse(event.body) : {};
@@ -717,6 +735,9 @@ async function disableMfa(userId, event) {
       // Clear TOTP fields
       mfaTotpSecret: null,
       mfaTotpPending: null,
+      // Clear login MFA fields
+      mfaLoginCode: null,
+      mfaLoginExpires: null,
     };
 
     console.log('Updating user in DynamoDB...');
@@ -775,6 +796,8 @@ async function disableMfaByEmail(event) {
       mfaChallengeExpires: null,
       mfaTotpSecret: null,
       mfaTotpPending: null,
+      mfaLoginCode: null,
+      mfaLoginExpires: null,
     };
 
     await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));

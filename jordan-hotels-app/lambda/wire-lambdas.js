@@ -69,6 +69,8 @@ const INTEGRATIONS = [
   { path: '/user/profile', method: 'PUT', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   { path: '/user/mfa/email/setup', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   { path: '/user/mfa/email/verify', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
+  { path: '/user/mfa/email/login-code', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
+  { path: '/user/mfa/email/verify-login', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   { path: '/user/mfa/disable', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   { path: '/auth/email-mfa/request', method: 'POST', lambda: 'user', auth: 'COGNITO_USER_POOLS' },
   

@@ -107,7 +107,7 @@
     "dontHaveAccount": "Vous n'avez pas de compte ?",
     "haveAccount": "Vous avez déjà un compte ?",
     "sendCode": "Envoyer le code",
-    "verifyCode": "Vérifier le code",
+    "verifyCode": "Entrez le code à 6 chiffres envoyé à votre email (vérifiez votre email de secours si nécessaire)",
     "newPassword": "Nouveau mot de passe",
     "resetPassword": "Réinitialiser le mot de passe",
     "verificationCodeSent": "Code de vérification envoyé à votre email",

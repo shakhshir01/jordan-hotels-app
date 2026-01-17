@@ -107,7 +107,7 @@
     "dontHaveAccount": "Haben Sie noch kein Konto?",
     "haveAccount": "Haben Sie bereits ein Konto?",
     "sendCode": "Code senden",
-    "verifyCode": "Code verifizieren",
+    "verifyCode": "Geben Sie den 6-stelligen Code ein, der an Ihre E-Mail gesendet wurde (prüfen Sie Ihre Backup-E-Mail falls nötig)",
     "newPassword": "Neues Passwort",
     "resetPassword": "Passwort zurücksetzen",
     "verificationCodeSent": "Bestätigungscode an Ihre E-Mail gesendet",

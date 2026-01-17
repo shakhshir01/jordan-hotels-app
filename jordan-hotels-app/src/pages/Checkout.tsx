@@ -270,7 +270,6 @@ const Checkout = () => {
   const stripeTestMode = String(stripePublishableKey).startsWith('pk_test_');
   const paypalClientId = String(import.meta.env.VITE_PAYPAL_CLIENT_ID || '');
   const paypalSandboxMode = paypalClientId === 'sb' || paypalClientId.startsWith('sb');
-  const demoMode = !paymentsEnabled || stripeTestMode || paypalSandboxMode;
 
   /**
    * Create a Stripe PaymentIntent via API.

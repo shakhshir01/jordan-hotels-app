@@ -672,9 +672,9 @@ export const hotelAPI = {
 
   getUserProfile: async () => {
     if (getUseMocks()) {
-      // In mock mode, return an empty profile so the UI derives
+      // In fallback mode, return an empty profile so the UI derives
       // real-looking data from the signed-in user's info instead
-      // of showing hard-coded demo names.
+      // of showing placeholder data.
       return {
         userId: "mock-user",
       };
@@ -685,7 +685,7 @@ export const hotelAPI = {
     } catch (error) {
       if (lastAuthError) {
         // If the API auth fails, surface an empty profile so
-        // the frontend never shows fake "Demo User" data.
+        // the frontend never shows placeholder user data.
         return {
           userId: "fallback-user",
         };
@@ -751,10 +751,10 @@ export const hotelAPI = {
     }
   },
 
-  requestEmailMfaChallenge: async () => {
+  sendLoginMfaCode: async (email) => {
     if (getUseMocks()) return { sent: true };
     try {
-      const response = await apiClient.post("/auth/email-mfa/request");
+      const response = await apiClient.post("/user/mfa/email/login-code", { email });
       return normalizeLambdaResponse(response.data);
     } catch (error) {
       if (lastAuthError) return { sent: true };
@@ -762,10 +762,10 @@ export const hotelAPI = {
     }
   },
 
-  verifyLoginEmailMfa: async (code) => {
+  verifyLoginMfaCode: async (code) => {
     if (getUseMocks()) return { verified: true };
     try {
-      const response = await apiClient.post("/auth/email-mfa/verify-login", { code });
+      const response = await apiClient.post("/user/mfa/email/verify-login", { code });
       return normalizeLambdaResponse(response.data);
     } catch (error) {
       if (lastAuthError) return { verified: true };
