@@ -121,9 +121,18 @@ export const AccessibilityProvider = ({ children }) => {
     if (reducedMotion) {
       root.style.setProperty('--animation-duration', '0s');
       root.style.setProperty('--transition-duration', '0s');
+      root.classList.add('reduced-motion');
     } else {
       root.style.removeProperty('--animation-duration');
       root.style.removeProperty('--transition-duration');
+      root.classList.remove('reduced-motion');
+    }
+
+    // Keyboard navigation - enhance focus visibility
+    if (keyboardNavigation) {
+      root.classList.add('keyboard-navigation');
+    } else {
+      root.classList.remove('keyboard-navigation');
     }
 
     // Save to localStorage

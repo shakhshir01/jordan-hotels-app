@@ -903,29 +903,44 @@
   --accent-color: #ffff00;
   --link-color: #00ffff;
   --focus-color: #ffff00;
+  --surface-color: #000000;
+  --glass-bg: #000000;
+  --glass-border: #ffffff;
 }
 
 .high-contrast body {
   background-color: var(--bg-primary) !important;
   color: var(--text-primary) !important;
+  background-image: none !important;
 }
 
-.high-contrast .bg-white {
+.high-contrast .bg-white,
+.high-contrast .ui-glass {
   background-color: var(--bg-primary) !important;
+  background-image: none !important;
+  border-color: var(--border-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .high-contrast .text-slate-900,
-.high-contrast .text-gray-900 {
+.high-contrast .text-gray-900,
+.high-contrast .text-slate-700,
+.high-contrast .text-gray-700 {
   color: var(--text-primary) !important;
 }
 
-.high-contrast .text-slate-700,
-.high-contrast .text-gray-700 {
+.high-contrast .text-slate-300,
+.high-contrast .text-slate-400,
+.high-contrast .text-gray-300,
+.high-contrast .text-gray-400 {
   color: var(--text-secondary) !important;
 }
 
 .high-contrast .border-slate-200,
-.high-contrast .border-gray-200 {
+.high-contrast .border-gray-200,
+.high-contrast .border-slate-700,
+.high-contrast .border-gray-700 {
   border-color: var(--border-color) !important;
 }
 
@@ -936,16 +951,115 @@
 .high-contrast button:focus,
 .high-contrast input:focus,
 .high-contrast select:focus,
-.high-contrast textarea:focus {
+.high-contrast textarea:focus,
+.high-contrast a:focus,
+.high-contrast [tabindex]:focus {
   outline: 3px solid var(--focus-color) !important;
   outline-offset: 2px !important;
+  box-shadow: 0 0 0 1px var(--bg-primary), 0 0 0 4px var(--focus-color) !important;
 }
 
-.high-contrast .bg-blue-600 {
+.high-contrast .bg-blue-600,
+.high-contrast .bg-blue-700 {
   background-color: var(--accent-color) !important;
   color: var(--bg-primary) !important;
 }
 
-.high-contrast .text-blue-600 {
+.high-contrast .text-blue-600,
+.high-contrast .text-blue-700 {
   color: var(--accent-color) !important;
+}
+
+/* Enhanced focus indicators for better keyboard navigation */
+.keyboard-navigation :focus-visible,
+.keyboard-navigation button:focus,
+.keyboard-navigation input:focus,
+.keyboard-navigation select:focus,
+.keyboard-navigation textarea:focus,
+.keyboard-navigation a:focus,
+.keyboard-navigation [tabindex]:focus {
+  outline: 3px solid var(--brand-500) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 1px var(--bg), 0 0 0 6px rgba(59, 130, 246, 0.3) !important;
+  border-radius: 4px !important;
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--brand-500);
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+  font-weight: 600;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Reduced motion styles */
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Enhanced focus for interactive elements */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px var(--bg), 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Better contrast for form elements */
+input, select, textarea {
+  border: 2px solid var(--border);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* High contrast mode adjustments for gradients and complex backgrounds */
+.high-contrast [style*="background-image"],
+.high-contrast [style*="linear-gradient"],
+.high-contrast [style*="radial-gradient"] {
+  background-image: none !important;
+}
+
+.high-contrast .glass-card,
+.high-contrast .ui-glass {
+  background: var(--bg-primary) !important;
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1) !important;
 }

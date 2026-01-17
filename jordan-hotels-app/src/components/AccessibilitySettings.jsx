@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccessibility } from '../context/AccessibilityContext';
-import { AccessibleButton } from './AccessibilityComponents.jsx';
+import AccessibleButton from './AccessibleButton.jsx';
 
 const AccessibilitySettings = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
@@ -30,8 +30,7 @@ const AccessibilitySettings = ({ isOpen, onClose }) => {
             </h2>
             <AccessibleButton
               onClick={onClose}
-              ariaLabel={t('common.close', 'Close')}
-              ariaPressed={false}
+              aria-label={t('common.close', 'Close')}
               className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,8 +48,7 @@ const AccessibilitySettings = ({ isOpen, onClose }) => {
               <div className="flex items-center space-x-3">
                 <AccessibleButton
                   onClick={decreaseFontSize}
-                  ariaLabel={t('accessibility.decreaseFont', 'Decrease font size')}
-                  ariaPressed={false}
+                  aria-label={t('accessibility.decreaseFont', 'Decrease font size')}
                   className="px-3 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,8 +60,7 @@ const AccessibilitySettings = ({ isOpen, onClose }) => {
                 </span>
                 <AccessibleButton
                   onClick={increaseFontSize}
-                  ariaLabel={t('accessibility.increaseFont', 'Increase font size')}
-                  ariaPressed={false}
+                  aria-label={t('accessibility.increaseFont', 'Increase font size')}
                   className="px-3 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,16 +144,14 @@ const AccessibilitySettings = ({ isOpen, onClose }) => {
             <AccessibleButton
               onClick={resetSettings}
               className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
-              ariaLabel={t('accessibility.resetSettings', 'Reset settings')}
-              ariaPressed={false}
+              aria-label={t('accessibility.resetSettings', 'Reset settings')}
             >
               {t('accessibility.reset', 'Reset')}
             </AccessibleButton>
             <AccessibleButton
               onClick={onClose}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              ariaLabel={t('common.close', 'Close')}
-              ariaPressed={false}
+              aria-label={t('common.close', 'Close')}
             >
               {t('common.close', 'Close')}
             </AccessibleButton>

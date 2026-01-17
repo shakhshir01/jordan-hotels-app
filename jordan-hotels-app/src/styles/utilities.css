@@ -23,3 +23,32 @@
 .u-pill { border-radius: var(--r-pill); }
 .u-shadow-1 { box-shadow: var(--shadow-1); }
 .u-shadow-2 { box-shadow: var(--shadow-2); }
+
+/* Accessibility Utilities */
+.u-sr-only { @apply sr-only; }
+.u-focus-visible { @apply focus:outline-2 focus:outline-blue-500 focus:outline-offset-2; }
+.u-focus-ring { @apply focus:ring-2 focus:ring-blue-500 focus:ring-offset-2; }
+
+/* High contrast utilities */
+.u-high-contrast-text { color: var(--text-primary) !important; }
+.u-high-contrast-bg { background-color: var(--bg-primary) !important; }
+.u-high-contrast-border { border-color: var(--border-color) !important; }
+
+/* Motion preferences */
+.u-motion-safe { @apply motion-safe:transition-all motion-safe:duration-300; }
+.u-motion-reduce { @apply motion-reduce:transition-none; }
+
+/* Keyboard navigation helpers */
+.u-keyboard-nav {
+  @apply focus:outline-2 focus:outline-blue-500 focus:outline-offset-2 focus:shadow-lg;
+}
+
+/* Accessible interactive states */
+.u-interactive {
+  @apply focus:outline-2 focus:outline-blue-500 focus:outline-offset-2
+         hover:shadow-md active:scale-95 transition-all duration-200;
+}
+
+.u-interactive:disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}

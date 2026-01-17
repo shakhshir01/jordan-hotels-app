@@ -30,4 +30,4 @@ try {
 
 } catch (error) {
   console.log('❌ Error parsing hotels:', error.message);
-}
+}o
