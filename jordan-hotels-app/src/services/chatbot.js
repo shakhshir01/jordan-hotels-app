@@ -22,6 +22,8 @@ const getGeminiKey = () => {
   }
 };
 
+let cachedModel = null;
+
 /**
  * Helper function to select the best available Gemini model.
  * Call this after fetching the list of models from the API.
@@ -66,19 +68,24 @@ const callGemini = async (messages) => {
   if (!apiKey) return null;
 
   try {
-    // First, fetch available models
-    const listResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    let selectedModel = cachedModel;
 
-    if (!listResponse.ok) {
-      console.error('Failed to fetch models:', listResponse.status, listResponse.statusText);
-      return null;
+    if (!selectedModel) {
+      // First, fetch available models
+      const listResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+
+      if (!listResponse.ok) {
+        console.error('Failed to fetch models:', listResponse.status, listResponse.statusText);
+        // Fallback to a safe default if listing fails
+        selectedModel = 'gemini-2.0-flash';
+      } else {
+        const modelsData = await listResponse.json();
+        const availableModels = modelsData.models || [];
+        // Use the helper function to select the best model
+        selectedModel = selectBestModel(availableModels);
+      }
+      cachedModel = selectedModel;
     }
-
-    const modelsData = await listResponse.json();
-    const availableModels = modelsData.models || [];
-
-    // Use the helper function to select the best model
-    const selectedModel = selectBestModel(availableModels);
 
     // Now use the selected model for generation
 
@@ -272,6 +279,16 @@ const JORDAN_KNOWLEDGE = {
     pets: "Pet policies vary - some hotels welcome pets with fees, others don't. Always check and declare at booking.",
     accessibility: "Many hotels have accessible rooms. Wheelchair-friendly tours available. Let us know your needs for personalized recommendations.",
     groups: "Special rates for groups of 5+. Contact us for custom packages including transportation and guides."
+  },
+
+  navigation: {
+    home: "/",
+    hotels: "/search",
+    search: "/search",
+    deals: "/deals",
+    experiences: "/experiences",
+    blog: "/blog",
+    profile: "/profile"
   },
 
   trends: {
