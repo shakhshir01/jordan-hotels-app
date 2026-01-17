@@ -532,119 +532,82 @@ export const AuthProvider = ({ children }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cognitoUserRef, setAuthToken, setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, clearMfaChallenge, showSuccess, mfaChallenge, performLogout, setError]);
 
-  const setupTotp = useCallback(() => {
-    const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
-    console.log('setupTotp: cognitoUser =', cognitoUser);
-    if (!cognitoUser) return Promise.reject(new Error('No active user to setup TOTP'));
+  const setupTotp = useCallback(async () => {
+    try {
+      const response = await hotelAPI.post('/user/mfa/totp/setup');
+      const { secret, qrCode, otpauthUrl } = response;
+      console.log('TOTP setup response:', { secret: secret.substring(0, 10) + '...', qrCode: qrCode.substring(0, 50) + '...', otpauthUrl });
+      setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secret, qrCode, otpauthUrl }));
+      return { secret, qrCode, otpauthUrl };
+    } catch (error) {
+      console.error('TOTP setup failed:', error);
+      setError(error.message || 'Failed to setup TOTP');
+      throw error;
+    }
+  }, [setError, setMfaChallenge]);
 
-    return new Promise((resolve, reject) => {
-      // Check if user has a valid session
-      cognitoUser.getSession((err, _session) => {
-        if (err) {
-          console.error('No valid session for TOTP setup:', err);
-          setError('Please sign in again to setup 2FA');
-          reject(new Error('Session error'));
-          return;
+  const verifyTotp = useCallback(async (userCode) => {
+    try {
+      const response = await hotelAPI.post('/user/mfa/totp/verify', { code: userCode });
+      if (response.verified) {
+        showSuccess('Two-factor authentication enabled');
+        try {
+          const email = cognitoUserRef.current?.getUsername?.() || user?.email;
+          if (email) localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+        } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
+        setMfaEnabled(true);
+        setMfaMethod('TOTP');
+
+        // persist server-side
+        try {
+          await hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' });
+          console.log('MFA status saved to database');
+        } catch (e) {
+          console.error('Failed to save MFA status to database:', e);
+          showError('2FA enabled but failed to save status. Please try again.');
         }
 
-        console.log('Session valid, associating software token...');
-        // Associate software token for TOTP
-        cognitoUser.associateSoftwareToken({
-          associateSecretCode: (secretCode) => {
-            console.log('TOTP secret received:', secretCode);
-            setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
-            resolve(secretCode);
-          },
-          onFailure: (e) => {
-            console.error('TOTP association failed:', e);
-            setError(e.message || String(e));
-            reject(e);
-          },
-        });
-      });
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cognitoUserRef, UserPool, setError, setMfaChallenge]);
+        clearMfaChallenge();
+        return response;
+      } else {
+        throw new Error('Invalid code');
+      }
+    } catch (error) {
+      console.error('TOTP verification failed:', error);
+      let userFriendlyMessage = 'Failed to verify TOTP code';
 
-  const verifyTotp = useCallback((userCode, friendlyName = 'My device') => {
-    const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
-    console.log('verifyTotp called with userCode:', userCode, 'cognitoUser:', cognitoUser);
-    if (!cognitoUser) return Promise.reject(new Error('No active user to verify TOTP'));
-    return new Promise((resolve, reject) => {
-      cognitoUser.verifySoftwareToken(userCode, friendlyName, {
-        onSuccess: async (res) => {
-          try {
-            // Enable TOTP MFA for this user in Cognito
-            cognitoUser.setUserMfaPreference(null, { Enabled: true, PreferredMfa: true }, (mfaErr, _mfaResult) => {
-              if (mfaErr) {
-                console.error('Failed to enable TOTP MFA preference:', mfaErr);
-                // Continue anyway since the token is verified
-              } else {
-                console.log('TOTP MFA preference enabled for user');
-              }
-            });
+      if (error.message?.includes('Invalid code')) {
+        userFriendlyMessage = 'Code mismatch. Please check that:\n• Your device time is correct\n• You entered the code correctly\n• You scanned the QR code properly\n• Try generating a new code if the previous one expired';
 
-            showSuccess('Two-factor authentication enabled');
-            try {
-              const email = cognitoUser.getUsername();
-              localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
-            } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
-            setMfaEnabled(true);
-            setMfaMethod('TOTP');
+        // For retry, we can re-setup TOTP
+        try {
+          await setupTotp();
+          showError('TOTP code mismatch — a new QR/secret was generated. Please re-scan and try again.');
+        } catch (_e) {
+          console.warn('Failed to re-setup TOTP after failure', _e);
+        }
+      }
 
-              // persist server-side
-              try {
-                await hotelAPI.updateUserProfile({ mfaEnabled: true, mfaMethod: 'TOTP' });
-                console.log('MFA status saved to database');
-              } catch (e) {
-                console.error('Failed to save MFA status to database:', e);
-                showError('2FA enabled but failed to save status. Please try again.');
-              }
+      setError(userFriendlyMessage);
+      throw error;
+    }
+  }, [hotelAPI, showSuccess, setMfaEnabled, setMfaMethod, clearMfaChallenge, setError, showError, setupTotp]);
 
-              clearMfaChallenge();
-              resolve(res);
-          } catch (e) {
-            console.error('Unexpected error after TOTP verify:', e);
-            clearMfaChallenge();
-            reject(e);
-          }
-        },
-        onFailure: async (err) => {
-          console.error('TOTP verification failed:', err);
-          let userFriendlyMessage = 'Failed to verify TOTP code';
-
-          // Provide specific guidance for common errors
-          if (err.code === 'EnableSoftwareTokenMFAException' || err.message?.includes('Code mismatch')) {
-            userFriendlyMessage = 'Code mismatch. Please check that:\n• Your device time is correct\n• You entered the code correctly\n• You scanned the QR code properly\n• Try generating a new code if the previous one expired';
-
-            // Try to re-associate a new secret so user can re-scan the QR code
-            try {
-              cognitoUser.associateSoftwareToken({
-                associateSecretCode: (secretCode) => {
-                  console.log('Re-associated TOTP secret for retry:', secretCode);
-                  setMfaChallenge((prev) => ({ ...(prev || {}), type: 'MFA_SETUP_TOTP', secretCode }));
-                  showError('TOTP code mismatch — a new QR/secret was generated. Please re-scan and try again.');
-                },
-                onFailure: (assocErr) => {
-                  console.error('Failed to re-associate TOTP secret:', assocErr);
-                },
-              });
-            } catch (_e) {
-              console.warn('Failed to initiate re-association after TOTP failure', _e);
-            }
-          } else if (err.message?.includes('InvalidParameterException')) {
-            userFriendlyMessage = 'Invalid code format. Please enter a 6-digit number.';
-          } else if (err.message?.includes('NotAuthorizedException')) {
-            userFriendlyMessage = 'Session expired. Please sign in again to setup 2FA.';
-          }
-
-          setError(userFriendlyMessage);
-          reject(err);
-        },
-      });
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cognitoUserRef, UserPool, showSuccess, setMfaEnabled, setMfaMethod, hotelAPI, clearMfaChallenge, setMfaChallenge, setError, showError]);
+  const verifyLoginTotp = useCallback(async (userCode) => {
+    try {
+      const response = await hotelAPI.verifyLoginTotpMfa(userCode);
+      if (response.verified) {
+        clearMfaChallenge();
+        return response;
+      } else {
+        throw new Error('Invalid code');
+      }
+    } catch (error) {
+      console.error('Login TOTP verification failed:', error);
+      setError('Invalid authenticator code');
+      throw error;
+    }
+  }, [hotelAPI, clearMfaChallenge, setError]);
 
   // Email MFA flows (secondary address)
   const setupEmailMfa = useCallback(async (secondaryEmail) => {
@@ -1037,6 +1000,7 @@ export const AuthProvider = ({ children }) => {
     submitMfaCode,
     setupTotp,
     verifyTotp,
+    verifyLoginTotp,
     clearMfaChallenge,
     completeMfa,
     completePreAuthLogin,
@@ -1070,6 +1034,7 @@ export const AuthProvider = ({ children }) => {
     submitMfaCode,
     setupTotp,
     verifyTotp,
+    verifyLoginTotp,
     clearMfaChallenge,
     completeMfa,
     completePreAuthLogin,

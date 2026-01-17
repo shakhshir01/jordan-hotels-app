@@ -7,7 +7,7 @@ import QRCode from 'qrcode';
 import { Shield, Smartphone, Mail, X, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function MfaModal() {
-  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, setupTotp, submitMfaCode, setupTotpMfa, verifyTotpMfa, login, completePreAuthLogin, setupEmailMfa, verifyEmailMfa, verifyLoginEmailMfa } = useAuth();
+  const { mfaChallenge, clearMfaChallenge, completeMfa, cognitoUserRef, verifyTotp, verifyLoginTotp, setupTotp, submitMfaCode, setupTotpMfa, verifyTotpMfa, login, completePreAuthLogin, setupEmailMfa, verifyEmailMfa, verifyLoginEmailMfa } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [code, setCode] = useState('');
@@ -114,11 +114,13 @@ export default function MfaModal() {
     try {
       if (mfaChallenge.type === 'TOTP_SETUP') {
         await verifyTotpMfa(code);
+      } else if (mfaChallenge.type === 'SOFTWARE_TOKEN_MFA') {
+        await verifyLoginTotp(code);
       } else {
         await verifyTotp(code);
       }
       setCode('');
-      // Modal will close automatically due to clearMfaChallenge() in verifyTotp
+      // Modal will close automatically due to clearMfaChallenge() in verify functions
     } catch (err) {
       showError(err?.message || 'Failed to verify TOTP');
     } finally {

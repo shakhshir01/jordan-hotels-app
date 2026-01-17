@@ -11,16 +11,19 @@ const {
 const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
+const { CognitoIdentityProviderClient, AdminSetUserMFAPreferenceCommand } = require("@aws-sdk/client-cognito-identity-provider");
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" });
 const docClient = DynamoDBDocumentClient.from(client);
 const ses = new SESClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const cognito = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION || "us-east-1" });
 const s3 = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
 
 const BOOKINGS_TABLE = process.env.BOOKINGS_TABLE || "Bookings";
 const USERS_TABLE = process.env.USERS_TABLE || "Users";
+const USER_POOL_ID = process.env.USER_POOL_ID;
 
 const defaultHeaders = {
   "Content-Type": "application/json",
@@ -802,6 +805,22 @@ async function disableMfa(userId, event) {
     console.log('Updating user in DynamoDB...');
     await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
 
+    // Disable in Cognito
+    if (USER_POOL_ID) {
+      try {
+        console.log('Disabling MFA in Cognito for user:', userId);
+        await cognito.send(new AdminSetUserMFAPreferenceCommand({
+          UserPoolId: USER_POOL_ID,
+          Username: userId,
+          SMSMfaSettings: { Enabled: false, PreferredMfa: false },
+          SoftwareTokenMfaSettings: { Enabled: false, PreferredMfa: false }
+        }));
+        console.log('MFA disabled in Cognito successfully');
+      } catch (cognitoError) {
+        console.error('Failed to disable MFA in Cognito:', cognitoError.message);
+      }
+    }
+
     console.log('MFA disabled successfully');
     return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ disabled: true }) };
   } catch (error) {
@@ -860,6 +879,22 @@ async function disableMfaByEmail(event) {
     };
 
     await docClient.send(new PutCommand({ TableName: USERS_TABLE, Item: updated }));
+
+    // Disable in Cognito
+    if (USER_POOL_ID) {
+      try {
+        console.log('Disabling MFA in Cognito for user:', userId);
+        await cognito.send(new AdminSetUserMFAPreferenceCommand({
+          UserPoolId: USER_POOL_ID,
+          Username: userId,
+          SMSMfaSettings: { Enabled: false, PreferredMfa: false },
+          SoftwareTokenMfaSettings: { Enabled: false, PreferredMfa: false }
+        }));
+        console.log('MFA disabled in Cognito successfully');
+      } catch (cognitoError) {
+        console.error('Failed to disable MFA in Cognito:', cognitoError.message);
+      }
+    }
 
     console.log('MFA disabled by email successfully for:', email);
     return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ disabled: true }) };
