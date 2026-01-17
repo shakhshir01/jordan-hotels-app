@@ -278,6 +278,10 @@ self.addEventListener('notificationclick', (event) => {
 self.addEventListener('message', (event) => {
   console.log('Message from client:', event.data);
 
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+
   if (event.data.type === 'CLEAR_CACHE') {
     caches.delete(event.data.cacheName);
   }

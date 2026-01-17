@@ -19,7 +19,7 @@ async function cleanupStaleServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   // Avoid reload loops.
-  const markerKey = 'visitjo_sw_cleanup_done_v2';
+  const markerKey = 'visitjo_sw_cleanup_done_v3';
   if (sessionStorage.getItem(markerKey)) return;
 
   try {
@@ -27,25 +27,35 @@ async function cleanupStaleServiceWorker() {
     let didUnregister = false;
 
     for (const registration of registrations) {
+      // Force unregister and skip waiting
+      if (registration.active) {
+        registration.active.postMessage({ type: 'SKIP_WAITING' });
+      }
       const ok = await registration.unregister();
       didUnregister = didUnregister || ok;
     }
 
-    // Clear old app caches that could contain stale HTML/JS.
+    // Clear ALL caches that could contain stale chunks
     if ('caches' in window) {
       const cacheNames = await caches.keys();
-      const visitJoCaches = cacheNames.filter((name) => name.startsWith('visitjo-'));
-      await Promise.all(visitJoCaches.map((name) => caches.delete(name)));
+      const staleCaches = cacheNames.filter((name) =>
+        name.includes('visitjo') ||
+        name.includes('workbox') ||
+        name.startsWith('vite-') ||
+        name.includes('-cache')
+      );
+      await Promise.all(staleCaches.map((name) => caches.delete(name)));
     }
 
     sessionStorage.setItem(markerKey, '1');
 
     if (didUnregister) {
-      // Reload once so the page is fetched without SW interference.
-      window.location.reload();
+      console.log('Service worker cleanup completed, reloading...');
+      // Small delay to ensure cleanup is complete
+      setTimeout(() => window.location.reload(), 100);
     }
-  } catch {
-    // Non-fatal; app should still boot.
+  } catch (error) {
+    console.warn('Service worker cleanup failed:', error);
   }
 }
 

@@ -16,38 +16,51 @@ import ChatBot from './components/ChatBot.jsx';
 import MfaModal from './components/MfaModal.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 
-// Pages
-const Home = React.lazy(() => import('./pages/home.jsx'));
-const HotelDetails = React.lazy(() => import('./pages/HotelDetails.jsx'));
-const SignUp = React.lazy(() => import('./pages/SignUp.jsx'));
-const Verify = React.lazy(() => import('./pages/Verify'));
-const Login = React.lazy(() => import('./pages/Login'));
-const AuthCallback = React.lazy(() => import('./pages/AuthCallback'));
-const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
-const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
-const Profile = React.lazy(() => import('./pages/Profile'));
-const Bookings = React.lazy(() => import('./pages/Bookings'));
-const Checkout = React.lazy(() => import('./pages/Checkout'));
-const AdminUpload = React.lazy(() => import('./pages/AdminUpload'));
-const Destinations = React.lazy(() => import('./pages/Destinations.jsx'));
+// Safe lazy loading with error recovery
+const lazyWithRetry = (importFunc) => {
+  return React.lazy(() =>
+    importFunc().catch((error) => {
+      console.warn('Failed to load chunk, attempting reload:', error);
+      // Force hard reload to bypass service worker cache
+      window.location.reload();
+      // Return a promise that never resolves to prevent further errors
+      return new Promise(() => {});
+    })
+  );
+};
 
-const Trends = React.lazy(() => import('./pages/Trends.jsx'));
-const Insights = React.lazy(() => import('./pages/Insights.jsx'));
-const TripPlanner = React.lazy(() => import('./pages/TripPlanner.jsx'));
-const Wishlist = React.lazy(() => import('./pages/Wishlist.jsx'));
-const Reviews = React.lazy(() => import('./pages/Reviews.jsx'));
-const Support = React.lazy(() => import('./pages/Support.jsx'));
-const About = React.lazy(() => import('./pages/About.jsx'));
-const Blog = React.lazy(() => import('./pages/Blog.jsx'));
-const BlogPost = React.lazy(() => import('./pages/BlogPost.jsx'));
-const Terms = React.lazy(() => import('./pages/Terms.jsx'));
-const Privacy = React.lazy(() => import('./pages/Privacy.jsx'));
-const NotFound = React.lazy(() => import('./pages/NotFound.jsx'));
-const SearchResults = React.lazy(() => import('./pages/SearchResults.jsx'));
-const DestinationDetails = React.lazy(() => import('./pages/DestinationDetails.jsx'));
-const DealsList = React.lazy(() => import('./pages/DealsList.jsx'));
-const FlightsSearch = React.lazy(() => import('./pages/FlightsSearch.jsx'));
-const CarsSearch = React.lazy(() => import('./pages/CarsSearch.jsx'));
+// Pages
+const Home = lazyWithRetry(() => import('./pages/home.jsx'));
+const HotelDetails = lazyWithRetry(() => import('./pages/HotelDetails.jsx'));
+const SignUp = lazyWithRetry(() => import('./pages/SignUp.jsx'));
+const Verify = lazyWithRetry(() => import('./pages/Verify'));
+const Login = lazyWithRetry(() => import('./pages/Login'));
+const AuthCallback = lazyWithRetry(() => import('./pages/AuthCallback'));
+const ForgotPassword = lazyWithRetry(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword'));
+const Profile = lazyWithRetry(() => import('./pages/Profile'));
+const Bookings = lazyWithRetry(() => import('./pages/Bookings'));
+const Checkout = lazyWithRetry(() => import('./pages/Checkout'));
+const AdminUpload = lazyWithRetry(() => import('./pages/AdminUpload'));
+const Destinations = lazyWithRetry(() => import('./pages/Destinations.jsx'));
+
+const Trends = lazyWithRetry(() => import('./pages/Trends.jsx'));
+const Insights = lazyWithRetry(() => import('./pages/Insights.jsx'));
+const TripPlanner = lazyWithRetry(() => import('./pages/TripPlanner.jsx'));
+const Wishlist = lazyWithRetry(() => import('./pages/Wishlist.jsx'));
+const Reviews = lazyWithRetry(() => import('./pages/Reviews.jsx'));
+const Support = lazyWithRetry(() => import('./pages/Support.jsx'));
+const About = lazyWithRetry(() => import('./pages/About.jsx'));
+const Blog = lazyWithRetry(() => import('./pages/Blog.jsx'));
+const BlogPost = lazyWithRetry(() => import('./pages/BlogPost.jsx'));
+const Terms = lazyWithRetry(() => import('./pages/Terms.jsx'));
+const Privacy = lazyWithRetry(() => import('./pages/Privacy.jsx'));
+const NotFound = lazyWithRetry(() => import('./pages/NotFound.jsx'));
+const SearchResults = lazyWithRetry(() => import('./pages/SearchResults.jsx'));
+const DestinationDetails = lazyWithRetry(() => import('./pages/DestinationDetails.jsx'));
+const DealsList = lazyWithRetry(() => import('./pages/DealsList.jsx'));
+const FlightsSearch = lazyWithRetry(() => import('./pages/FlightsSearch.jsx'));
+const CarsSearch = lazyWithRetry(() => import('./pages/CarsSearch.jsx'));
 const ExperiencesListing = React.lazy(() => import('./pages/ExperiencesListing.jsx'));
 const ExperienceBooking = React.lazy(() => import('./pages/ExperienceBooking.jsx'));
 const Gallery = React.lazy(() => import('./pages/Gallery.jsx'));
