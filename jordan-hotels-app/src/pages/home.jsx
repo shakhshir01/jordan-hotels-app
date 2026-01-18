@@ -558,24 +558,24 @@ function Home() {
           </div>
 
           {/* Enhanced Title - Optimized for mobile */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black font-display mb-6 sm:mb-8 tracking-tight leading-tight animate-slide-up px-2 sm:px-0">
-            <span className="block text-white drop-shadow-2xl mb-1 sm:mb-2 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">{t("home.hero.titleMain", "Discover Jordan's")}</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-6 sm:mb-8 tracking-tight leading-tight animate-slide-up px-2 sm:px-0">
+            <span className="block text-white drop-shadow-2xl mb-1 sm:mb-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">{t("home.hero.titleMain", "Discover Jordan's")}</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
               {t("home.hero.titleAccent", "Hidden Treasures")}
             </span>
           </h1>
 
           {/* Enhanced Subtitle - Better mobile typography */}
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto mb-8 sm:mb-12 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.3s' }}>
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-4xl mx-auto mb-8 sm:mb-12 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.3s' }}>
             {t("home.hero.subtitle", "From the ancient wonders of Petra to the healing waters of the Dead Sea, unlock unforgettable adventures with our handpicked collection of luxury hotels and authentic experiences. Your dream Jordan vacation starts here.")}
           </p>
 
           {/* Enhanced Search Bar - Optimized for mobile */}
-          <div className="max-w-4xl mx-auto mb-8 sm:mb-12 animate-slide-up px-4 sm:px-0" style={{ animationDelay: '0.6s' }}>
+          <div className="max-w-6xl mx-auto mb-8 sm:mb-12 animate-slide-up px-4 sm:px-0" style={{ animationDelay: '0.6s' }}>
             <div className="flex flex-col gap-3 sm:gap-4 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-3 sm:p-2 shadow-2xl">
               {/* Search input - Better mobile sizing */}
               <input
-                className="w-full px-4 sm:px-6 py-4 sm:py-4 bg-transparent text-white placeholder-white/60 outline-none text-base sm:text-lg md:text-xl rounded-2xl border-0 focus:ring-2 focus:ring-white/30 transition-all duration-300 min-h-[48px] sm:min-h-[56px]"
+                className="w-full px-4 sm:px-6 py-6 sm:py-6 bg-transparent text-white placeholder-white/60 outline-none text-lg sm:text-xl md:text-2xl rounded-2xl border-0 focus:ring-2 focus:ring-white/30 transition-all duration-300 min-h-[60px] sm:min-h-[72px]"
                 placeholder={t("home.hero.searchPlaceholder", "Search for luxury hotels in Petra, Wadi Rum, Dead Sea...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -667,7 +667,7 @@ function Home() {
       </section>
 
       {/* Filters Section */}
-      <section className="mb-12">
+      <section className="mb-12 mt-16">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8">
           <div className="flex items-center gap-4 flex-wrap">
             <button

@@ -1,5 +1,4 @@
 import React, { Suspense } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -75,16 +74,6 @@ const CityExperiences = React.lazy(() => import('./pages/CityExperiences.jsx'));
 
 const AppRoutes = React.memo(() => {
   const { user } = useAuth();
-
-  // Scroll to top on route change for better UX
-  const loc = useLocation();
-  React.useEffect(() => {
-    try {
-      window.scrollTo({ top: 80, left: 0, behavior: 'auto' });
-    } catch (_e) {
-      window.scrollTo(0, 80);
-    }
-  }, [loc.pathname]);
 
   return (
     <Routes>

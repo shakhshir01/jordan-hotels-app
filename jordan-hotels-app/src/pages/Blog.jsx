@@ -141,7 +141,7 @@ export default function Blog() {
 
       {/* Enhanced Content Sections */}
       <div className="relative -mt-32 z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 space-y-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 space-y-24 mt-16">
 
           {/* Featured Posts Section */}
           <section className="animate-fade-in-up pt-64">

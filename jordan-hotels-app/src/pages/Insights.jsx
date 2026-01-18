@@ -203,7 +203,7 @@ const Insights = () => {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 space-y-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 space-y-16 mt-16">
         {/* Loading / Error */}
         {loading && (
           <div className="flex justify-center py-16">
@@ -212,17 +212,17 @@ const Insights = () => {
         )}
         {!loading && error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
-            <span className="mt-0.5 text-red-600 dark:text-red-400 font-semibold text-sm">
-              Error
-            </span>
-            <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
-          </div>
-        )}
+          <span className="mt-0.5 text-red-600 dark:text-red-400 font-semibold text-sm">
+            Error
+          </span>
+          <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+        </div>
+      )}
 
-        {!loading && !error && (
-          <>
-            {/* Key stats */}
-            <section className="pt-64">
+      {!loading && !error && (
+        <>
+          {/* Key stats */}
+          <section className="pt-16">
               <h2 className="text-xl md:text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">
                 Jordan at a glance
               </h2>

@@ -135,13 +135,13 @@ export default function CityHotels() {
 
       {/* Content */}
       <div className="relative -mt-32 z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 mt-16">
 
           {/* Filters */}
           <div className="card-modern p-6 mb-8">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="flex flex-col sm:flex-row gap-4 items-center flex-1">
-                <div className="relative flex-1 max-w-md">
+                <div className="relative flex-1 max-w-lg">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <input
                     type="text"

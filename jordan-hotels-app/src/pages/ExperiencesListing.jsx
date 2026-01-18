@@ -122,7 +122,7 @@ export default function ExperiencesListing() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 mt-16">
         {loading && (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-purple-600" size={48} />
@@ -149,7 +149,7 @@ export default function ExperiencesListing() {
 
         {!loading && items && items.length > 0 && (
           <>
-            <p>Found {items.length} experiences</p>
+            <p className="mt-8">Found {items.length} experiences</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {items.map((experience) => (
                 <article

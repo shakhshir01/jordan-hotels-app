@@ -228,7 +228,7 @@ export default function Gallery() {
       </section>
 
       {/* Enhanced Gallery Content */}
-      <div className="relative -mt-32 z-20">
+      <div className="relative -mt-16 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32">
           {loading ? (
             <div className="animate-fade-in-up">
@@ -236,7 +236,7 @@ export default function Gallery() {
             </div>
           ) : (
             <div
-              className="relative animate-fade-in-up"
+              className="relative animate-fade-in-up mt-24"
               style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
             >
               {virtualItems.map((virtualItem) => {
@@ -255,7 +255,7 @@ export default function Gallery() {
                   >
                     <div className="card-modern overflow-hidden hover:shadow-premium transition-all duration-500 hover:-translate-y-1 animate-fade-in-up">
                       {/* Enhanced Hotel Header */}
-                      <div className="bg-gradient-to-r from-jordan-blue via-jordan-teal to-jordan-emerald text-white p-8 lg:p-10">
+                      <div className="bg-gradient-to-r from-jordan-blue via-jordan-teal to-jordan-emerald text-white p-10 lg:p-12">
                         <div className="flex items-start justify-between gap-6">
                           <div className="flex-1">
                             <h2 className="text-3xl lg:text-4xl font-black mb-3 leading-tight">{hotelName}</h2>
@@ -286,7 +286,7 @@ export default function Gallery() {
                       </div>
 
                       {/* Enhanced Images Grid */}
-                      <div className="p-8 lg:p-10">
+                      <div className="p-10 lg:p-12">
                         <div className="flex items-center gap-3 mb-8">
                           <Eye className="w-6 h-6 text-jordan-blue" />
                           <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">Gallery Images</h3>

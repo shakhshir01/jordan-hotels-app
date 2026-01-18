@@ -85,49 +85,10 @@ export default function About() {
 
       {/* Enhanced Content Sections */}
       <div className="relative -mt-32 z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 space-y-24">
-
-          {/* Core Values Section */}
-          <section className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            <div className="group card-modern p-8 lg:p-10 hover:shadow-premium transition-all duration-500 hover:-translate-y-2 animate-fade-in-up">
-              <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-jordan-blue to-jordan-teal rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Heart className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-4 group-hover:text-jordan-blue transition-colors duration-300">
-                {t('pages.about.cards.localFirst.title', 'Local First Approach')}
-              </h3>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                {t('pages.about.cards.localFirst.body', 'We partner directly with local businesses and artisans, ensuring that every booking supports the Jordanian economy and preserves authentic cultural experiences.')}
-              </p>
-            </div>
-
-            <div className="group card-modern p-8 lg:p-10 hover:shadow-premium transition-all duration-500 hover:-translate-y-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-jordan-rose to-jordan-gold rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Award className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-4 group-hover:text-jordan-rose transition-colors duration-300">
-                {t('pages.about.cards.curated.title', 'Expertly Curated')}
-              </h3>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                {t('pages.about.cards.curated.body', 'Every hotel, experience, and destination in our collection is personally vetted by our team of local experts who know Jordan inside and out.')}
-              </p>
-            </div>
-
-            <div className="group card-modern p-8 lg:p-10 hover:shadow-premium transition-all duration-500 hover:-translate-y-2 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-              <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-jordan-emerald to-jordan-teal rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-4 group-hover:text-jordan-emerald transition-colors duration-300">
-                {t('pages.about.cards.planning.title', 'Seamless Planning')}
-              </h3>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                {t('pages.about.cards.planning.body', 'From the moment you book until you return home, our dedicated concierge team ensures every detail of your Jordan adventure is perfect.')}
-              </p>
-            </div>
-          </section>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-32 space-y-24 mt-16">
 
           {/* Mission & Vision Section */}
-          <section className="grid lg:grid-cols-2 gap-16 items-center pt-16">
+          <section className="grid lg:grid-cols-2 gap-16 items-center pt-16 mt-28">
             <div className="space-y-8 animate-slide-in-left">
               <div>
                 <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 mb-6 leading-tight">

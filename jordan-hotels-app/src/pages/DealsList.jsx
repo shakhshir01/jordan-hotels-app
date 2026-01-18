@@ -148,7 +148,7 @@ export default function DealsList() {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24 mt-16">
         {loading && (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-blue-600" size={48} />
@@ -170,7 +170,7 @@ export default function DealsList() {
         {!loading && hotels.length > 0 && (
           <div className="space-y-12">
             {/* Deals Spotlight */}
-            <section className="text-center pt-64">
+            <section className="text-center pt-16">
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 mb-4">
                 {t('pages.dealsList.spotlight.title', 'Premium Deals You Can\'t Miss')}
               </h2>
