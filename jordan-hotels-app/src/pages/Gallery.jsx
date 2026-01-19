@@ -135,7 +135,7 @@ export default function Gallery() {
   }, [rowVirtualizer]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
       <Seo
         title="Jordan Hotel Gallery - Visual Tour of Luxury Accommodations | VisitJo"
         description="Explore stunning visual galleries of Jordan's finest hotels. From Petra luxury resorts to Dead Sea spas, see what your stay will look like before you book."

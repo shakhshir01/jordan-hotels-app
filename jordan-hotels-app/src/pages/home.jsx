@@ -516,44 +516,44 @@ function Home() {
         <meta property="og:url" content="https://visitjo.com/" />
         <link rel="canonical" href="https://visitjo.com/" />
       </Helmet>
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-light-hero dark:bg-dark-hero">
         {/* Premium Multi-layered Background */}
-        <div className="absolute inset-0 bg-hero-luxury animate-gradient-shift"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-jordan-blue/20 to-transparent"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30"></div>
+        <div className="absolute inset-0 bg-light-premium dark:bg-ocean-depths animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-jordan-blue/10 via-jordan-teal/5 to-jordan-rose/10 dark:from-black/30 dark:via-jordan-blue/15 dark:to-jordan-teal/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/10 dark:from-black/60 dark:via-transparent dark:to-black/20"></div>
 
         {/* Enhanced Animated Mesh Background */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-r from-white/8 to-jordan-gold/6 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-jordan-rose/12 to-jordan-gold/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/4 w-72 h-72 bg-gradient-to-r from-jordan-teal/10 to-jordan-emerald/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
-          <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-gradient-to-r from-jordan-purple/8 to-jordan-blue/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/3 right-1/3 w-56 h-56 bg-gradient-to-r from-jordan-emerald/7 to-jordan-teal/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute bottom-1/4 left-1/3 w-48 h-48 bg-gradient-to-r from-jordan-sand/6 to-jordan-gold/4 rounded-full blur-3xl animate-float" style={{ animationDelay: '5s' }}></div>
+          <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-r from-jordan-gold/20 to-jordan-rose/15 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-jordan-teal/18 to-jordan-emerald/12 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-72 h-72 bg-gradient-to-r from-jordan-purple/16 to-jordan-blue/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-gradient-to-r from-jordan-amber/14 to-jordan-gold/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/3 right-1/3 w-56 h-56 bg-gradient-to-r from-jordan-coral/12 to-jordan-rose/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute bottom-1/4 left-1/3 w-48 h-48 bg-gradient-to-r from-jordan-emerald/10 to-jordan-teal/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '5s' }}></div>
         </div>
 
         {/* Premium Floating Geometric Shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-16 left-16 w-6 h-6 bg-gradient-to-r from-white/25 to-jordan-gold/20 rotate-45 animate-float shadow-lg" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute top-32 right-20 w-8 h-8 bg-gradient-to-r from-jordan-gold/35 to-jordan-rose/25 rounded-full animate-float shadow-lg" style={{ animationDelay: '1.5s' }}></div>
-          <div className="absolute bottom-24 left-24 w-5 h-5 bg-gradient-to-r from-jordan-rose/30 to-jordan-teal/20 rotate-12 animate-float shadow-lg" style={{ animationDelay: '2.5s' }}></div>
-          <div className="absolute bottom-32 right-32 w-7 h-7 bg-gradient-to-r from-jordan-teal/25 to-jordan-emerald/20 rounded-full animate-float shadow-lg" style={{ animationDelay: '3.5s' }}></div>
-          <div className="absolute top-24 right-1/4 w-6 h-6 bg-gradient-to-r from-jordan-emerald/35 to-jordan-purple/25 rotate-12 animate-float shadow-lg" style={{ animationDelay: '4.5s' }}></div>
-          <div className="absolute bottom-16 left-1/4 w-7 h-7 bg-gradient-to-r from-jordan-purple/30 to-jordan-blue/20 rounded-full animate-float shadow-lg" style={{ animationDelay: '1.2s' }}></div>
+          <div className="absolute top-16 left-16 w-6 h-6 bg-gradient-to-r from-jordan-gold/40 to-jordan-rose/30 rotate-45 animate-float shadow-lg" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute top-32 right-20 w-8 h-8 bg-gradient-to-r from-jordan-teal/35 to-jordan-emerald/25 rounded-full animate-float shadow-lg" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute bottom-24 left-24 w-5 h-5 bg-gradient-to-r from-jordan-purple/30 to-jordan-blue/20 rotate-12 animate-float shadow-lg" style={{ animationDelay: '2.5s' }}></div>
+          <div className="absolute bottom-32 right-32 w-7 h-7 bg-gradient-to-r from-jordan-amber/25 to-jordan-gold/20 rounded-full animate-float shadow-lg" style={{ animationDelay: '3.5s' }}></div>
+          <div className="absolute top-24 right-1/4 w-6 h-6 bg-gradient-to-r from-jordan-coral/35 to-jordan-rose/25 rotate-12 animate-float shadow-lg" style={{ animationDelay: '4.5s' }}></div>
+          <div className="absolute bottom-16 left-1/4 w-7 h-7 bg-gradient-to-r from-jordan-emerald/30 to-jordan-teal/20 rounded-full animate-float shadow-lg" style={{ animationDelay: '1.2s' }}></div>
 
           {/* Additional premium shapes */}
           <div className="absolute top-1/4 right-1/3 w-4 h-4 bg-gradient-to-r from-jordan-sand/25 to-jordan-gold/20 rotate-45 animate-float shadow-md" style={{ animationDelay: '3.2s' }}></div>
-          <div className="absolute bottom-1/2 left-1/5 w-5 h-5 bg-gradient-to-r from-jordan-coral/30 to-jordan-rose/20 rounded-full animate-float shadow-md" style={{ animationDelay: '2.8s' }}></div>
+          <div className="absolute bottom-1/2 left-1/5 w-5 h-5 bg-gradient-to-r from-jordan-purple/30 to-jordan-blue/20 rounded-full animate-float shadow-md" style={{ animationDelay: '2.8s' }}></div>
         </div>
 
         {/* Enhanced Animated Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-gradient-to-r from-white/50 to-jordan-gold/40 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '0s' }}></div>
-          <div className="absolute top-3/4 right-1/4 w-2 h-2 bg-gradient-to-r from-jordan-gold/70 to-jordan-rose/50 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-3/4 w-2 h-2 bg-gradient-to-r from-jordan-rose/60 to-jordan-teal/40 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute bottom-1/4 left-1/2 w-2 h-2 bg-gradient-to-r from-jordan-teal/50 to-jordan-emerald/30 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute top-2/3 right-1/5 w-1.5 h-1.5 bg-gradient-to-r from-jordan-emerald/60 to-jordan-purple/40 rounded-full animate-pulse-glow shadow-md" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute bottom-2/3 left-2/3 w-1.5 h-1.5 bg-gradient-to-r from-jordan-purple/50 to-jordan-blue/30 rounded-full animate-pulse-glow shadow-md" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-gradient-to-r from-jordan-gold/70 to-jordan-rose/50 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '0s' }}></div>
+          <div className="absolute top-3/4 right-1/4 w-2 h-2 bg-gradient-to-r from-jordan-teal/80 to-jordan-emerald/60 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-3/4 w-2 h-2 bg-gradient-to-r from-jordan-purple/70 to-jordan-blue/50 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-1/4 left-1/2 w-2 h-2 bg-gradient-to-r from-jordan-amber/60 to-jordan-gold/40 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-2/3 right-1/5 w-1.5 h-1.5 bg-gradient-to-r from-jordan-coral/70 to-jordan-rose/50 rounded-full animate-pulse-glow shadow-md" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute bottom-2/3 left-2/3 w-1.5 h-1.5 bg-gradient-to-r from-jordan-emerald/60 to-jordan-teal/40 rounded-full animate-pulse-glow shadow-md" style={{ animationDelay: '1.5s' }}></div>
         </div>
 
         {/* Subtle Mesh Gradient Overlay */}
@@ -561,9 +561,9 @@ function Home() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Premium Badge with Enhanced Styling */}
-          <div className="inline-flex items-center gap-3 px-8 py-4 mb-10 bg-card-premium backdrop-blur-2xl border border-white/30 rounded-full text-white/95 text-sm font-bold uppercase tracking-widest shadow-premium animate-fade-in-up">
+          <div className="inline-flex items-center gap-3 px-8 py-4 mb-10 bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/30 rounded-full text-black dark:text-white/95 text-sm font-bold uppercase tracking-widest shadow-premium animate-fade-in-up">
             <div className="w-3 h-3 bg-gradient-to-r from-jordan-gold to-jordan-rose rounded-full animate-pulse-glow shadow-lg"></div>
-            <span className="text-gradient bg-gradient-to-r from-jordan-gold via-white to-jordan-rose bg-clip-text text-transparent">
+            <span className="text-gradient bg-gradient-to-r from-jordan-gold via-black dark:via-white to-jordan-rose bg-clip-text text-transparent">
               {t("home.hero.kicker", "Award-Winning Jordan Experiences")}
             </span>
             <div className="w-3 h-3 bg-gradient-to-r from-jordan-rose to-jordan-gold rounded-full animate-pulse-glow shadow-lg"></div>
@@ -571,7 +571,7 @@ function Home() {
 
           {/* Premium Title with Enhanced Typography */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-8 sm:mb-10 tracking-tight leading-tight animate-slide-up-fast px-2 sm:px-0">
-            <span className="block text-white drop-shadow-2xl mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight">
+            <span className="block text-black dark:text-white drop-shadow-2xl mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight">
               {t("home.hero.titleMain", "Discover Jordan's")}
             </span>
             <span className="block text-transparent bg-clip-text bg-text-gradient bg-400% animate-gradient-flow drop-shadow-2xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-tight font-extrabold">
@@ -580,24 +580,24 @@ function Home() {
           </h1>
 
           {/* Premium Subtitle with Better Spacing and Typography */}
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto mb-10 sm:mb-14 text-white/90 leading-relaxed font-light animate-fade-in-up drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.2s' }}>
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto mb-10 sm:mb-14 text-black dark:text-white/90 leading-relaxed font-light animate-fade-in-up drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.2s' }}>
             {t("home.hero.subtitle", "From the ancient wonders of Petra to the healing waters of the Dead Sea, unlock unforgettable adventures with our handpicked collection of luxury hotels and authentic experiences. Your dream Jordan vacation starts here.")}
           </p>
 
           {/* Premium Search Bar with Enhanced Styling */}
           <div className="max-w-7xl mx-auto mb-10 sm:mb-16 animate-slide-up-slow px-4 sm:px-0" style={{ animationDelay: '0.4s' }}>
-            <div className="flex flex-col gap-4 sm:gap-5 bg-card-premium backdrop-blur-2xl border border-white/30 rounded-3xl p-4 sm:p-3 shadow-premium hover:shadow-floating transition-all duration-500">
+            <div className="flex flex-col gap-4 sm:gap-5 bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/30 rounded-3xl p-4 sm:p-3 shadow-premium hover:shadow-floating transition-all duration-500">
               {/* Premium Search Input */}
               <div className="relative">
                 <input
-                  className="w-full px-6 sm:px-8 py-7 sm:py-8 bg-transparent text-white placeholder-white/60 outline-none text-xl sm:text-2xl md:text-3xl rounded-2xl border-0 focus:ring-2 focus:ring-white/40 transition-all duration-500 min-h-[70px] sm:min-h-[80px] font-light"
+                  className="w-full px-6 sm:px-8 py-7 sm:py-8 bg-transparent text-black dark:text-white placeholder-black/60 dark:placeholder-white/60 outline-none text-xl sm:text-2xl md:text-3xl rounded-2xl border-0 focus:ring-2 focus:ring-black/20 dark:focus:ring-white/40 transition-all duration-500 min-h-[70px] sm:min-h-[80px] font-light"
                   placeholder={t("home.hero.searchPlaceholder", "Search for luxury hotels in Petra, Wadi Rum, Dead Sea...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <Search size={24} className="text-white/50" />
+                  <Search size={24} className="text-black/50 dark:text-white/50" />
                 </div>
               </div>
 
@@ -610,7 +610,7 @@ function Home() {
                   aria-label="Sort by recommended"
                   className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
                     sortBy === 'recommended'
-                      ? 'bg-gradient-to-r from-jordan-gold to-jordan-rose text-white shadow-premium'
+                      ? 'bg-gradient-to-r from-jordan-gold via-jordan-amber to-jordan-rose text-white shadow-glow-gold'
                       : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
                   }`}
                 >
@@ -623,7 +623,7 @@ function Home() {
                   aria-label="Sort by highest rated"
                   className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
                     sortBy === 'rating'
-                      ? 'bg-gradient-to-r from-jordan-teal to-jordan-emerald text-white shadow-premium'
+                      ? 'bg-gradient-to-r from-jordan-emerald via-jordan-teal to-jordan-blue text-white shadow-glow-blue'
                       : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
                   }`}
                 >
@@ -636,7 +636,7 @@ function Home() {
                   aria-label="Sort by price low to high"
                   className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
                     sortBy === 'price-low'
-                      ? 'bg-gradient-to-r from-jordan-blue to-jordan-teal text-white shadow-premium'
+                      ? 'bg-gradient-to-r from-jordan-purple via-jordan-blue to-jordan-teal text-white shadow-glow-purple'
                       : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
                   }`}
                 >
@@ -649,7 +649,7 @@ function Home() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 aria-label="Sort results"
-                className="hidden sm:block btn-secondary px-6 py-3 rounded-2xl hover-lift font-semibold min-w-0 w-full sm:w-auto text-sm sm:text-base shadow-md border border-white/20 bg-white/5 backdrop-blur-sm"
+                className="hidden sm:block btn-secondary px-6 py-3 rounded-2xl hover-lift font-semibold min-w-0 w-full sm:w-auto text-sm sm:text-base shadow-md border border-white/20 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all duration-300"
               >
                 <option value="recommended">✨ {t('home.sort.recommended', 'Recommended')}</option>
                 <option value="rating">⭐ {t('home.sort.highestRated', 'Highest Rated')}</option>
@@ -661,7 +661,7 @@ function Home() {
                 type="button"
                 onClick={handleSearch}
                 aria-label="Find stays"
-                className="px-10 py-5 bg-button-gradient hover:bg-button-hover text-white font-bold rounded-2xl shadow-premium hover:shadow-floating transition-all duration-500 flex items-center justify-center gap-4 transform hover:scale-105 active:scale-95 min-h-[64px] text-lg font-semibold border border-white/20"
+                className="px-10 py-5 bg-gradient-to-r from-jordan-gold via-jordan-amber to-jordan-rose hover:from-jordan-rose hover:via-jordan-gold hover:to-jordan-amber text-white font-bold rounded-2xl shadow-glow-gold hover:shadow-glow-rose transition-all duration-500 flex items-center justify-center gap-4 transform hover:scale-105 active:scale-95 min-h-[64px] text-lg font-semibold border border-white/20"
               >
                 <Search size={24} />
                 <span className="hidden sm:inline">{t("home.hero.findStays", "Discover Amazing Hotels")}</span>

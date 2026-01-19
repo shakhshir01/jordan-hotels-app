@@ -242,6 +242,31 @@
       "title": "Offres spéciales",
       "subtitle": "Réductions exclusives sur les hôtels sélectionnés."
     },
+    "blog": {
+      "hero": {
+        "kicker": "Lire",
+        "title": "Blog",
+        "subtitle": "Conseils de voyage, destinations et histoires de Jordanie."
+      },
+      "read": "Lire",
+      "readMore": "Lire la suite",
+      "readFullStory": "Lire l'histoire complète",
+      "backToBlog": "Retour au blog"
+    },
+    "wishlist": {
+      "title": "Liste de souhaits",
+      "subtitle": "Sauvegardez vos hôtels et expériences préférés.",
+      "itemsSaved": "{{count}} Aventure sauvegardée",
+      "itemsSaved_other": "{{count}} Aventures sauvegardées",
+      "empty": {
+        "title": "Votre liste de souhaits est vide",
+        "body": "Commencez à explorer les destinations et sauvegardez vos favoris.",
+        "cta": "Explorer les destinations"
+      },
+      "remove": "Retirer de la liste",
+      "savedOn": "Sauvegardé le {{date}}",
+      "viewDetails": "Voir les détails"
+    },
     "login": {
       "title": "Bienvenue",
       "subtitle": "Connectez-vous à votre compte VisitJo",

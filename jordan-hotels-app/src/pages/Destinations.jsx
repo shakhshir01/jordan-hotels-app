@@ -148,7 +148,7 @@ export default function Destinations() {
   const destinations = destinationsData;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
       <Seo
         title="Explore Jordan Destinations - Petra, Wadi Rum, Dead Sea & More"
         description="Discover Jordan's most incredible destinations. From Petra's ancient wonders to Wadi Rum's desert majesty, explore the best places to visit in Jordan."

@@ -19,7 +19,23 @@ export const WishlistProvider = ({ children }) => {
     try {
       const saved = localStorage.getItem('visitjo_wishlist');
       if (saved) {
-        setWishlist(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        console.log('Loaded wishlist from localStorage:', parsed.length, 'items');
+        
+        // Remove duplicates based on id and hotelId
+        const unique = parsed.filter((item, index, self) => 
+          index === self.findIndex((t) => t.id === item.id || (t.hotelId && t.hotelId === item.hotelId))
+        );
+        
+        console.log('After deduplication:', unique.length, 'items');
+        
+        setWishlist(unique);
+        
+        // Save the cleaned version back to localStorage if duplicates were found
+        if (unique.length !== parsed.length) {
+          console.log('Found and removed', parsed.length - unique.length, 'duplicates');
+          localStorage.setItem('visitjo_wishlist', JSON.stringify(unique));
+        }
       }
     } catch (error) {
       console.error('Error loading wishlist:', error);
@@ -41,8 +57,8 @@ export const WishlistProvider = ({ children }) => {
 
   const addToWishlist = (item) => {
     setWishlist((prev) => {
-      // Check if item already exists
-      const exists = prev.find((w) => w.id === item.id);
+      // Check if item already exists (more robust check)
+      const exists = prev.find((w) => w.id === item.id || (w.hotelId && w.hotelId === item.hotelId));
       if (exists) {
         return prev;
       }
@@ -70,6 +86,15 @@ export const WishlistProvider = ({ children }) => {
     setWishlist([]);
   };
 
+  const cleanupDuplicates = () => {
+    setWishlist((prev) => {
+      const unique = prev.filter((item, index, self) => 
+        index === self.findIndex((t) => t.id === item.id || (t.hotelId && t.hotelId === item.hotelId))
+      );
+      return unique;
+    });
+  };
+
   const value = {
     wishlist,
     addToWishlist,
@@ -77,6 +102,7 @@ export const WishlistProvider = ({ children }) => {
     isInWishlist,
     toggleWishlist,
     clearWishlist,
+    cleanupDuplicates,
     loading,
   };
 

@@ -111,7 +111,7 @@ const Insights = () => {
   }, [hotels]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
       <Seo
         title="Jordan Travel Insights - Data-Driven Hotel Analysis | VisitJo"
         description="Discover data-driven insights about Jordan's hotel market. Compare destinations, ratings, and prices to make informed travel decisions."

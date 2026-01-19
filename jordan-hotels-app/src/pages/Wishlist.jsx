@@ -9,12 +9,12 @@ import Seo from '../components/Seo.jsx';
 import { Heart, Star, MapPin, Sparkles, Eye } from 'lucide-react';
 
 export default function Wishlist() {
-  const { wishlist, removeFromWishlist } = useWishlist();
+  const { wishlist, removeFromWishlist, cleanupDuplicates } = useWishlist();
   const { t, i18n } = useTranslation();
 
   if (wishlist.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <div className="text-8xl mb-8">💭</div>
@@ -47,7 +47,7 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
       <Seo
         title="Your Wishlist - Save Your Dream Jordan Hotels & Experiences"
         description="Keep track of your favorite Jordan hotels and experiences. Save properties you love and plan your perfect trip to Petra, Wadi Rum, Dead Sea, and more."
@@ -60,7 +60,7 @@ export default function Wishlist() {
         <div className="text-center mb-16 pt-16">
           <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-gradient-to-r from-jordan-rose to-jordan-gold text-white text-sm font-bold rounded-full shadow-lg">
             <Heart className="w-5 h-5" />
-            {wishlist.length} {t('pages.wishlist.itemsSaved', { count: wishlist.length, defaultValue: 'Saved Adventures' })}
+            {t('pages.wishlist.itemsSaved', { count: wishlist.length })}
             <Heart className="w-5 h-5" />
           </div>
 
@@ -70,6 +70,17 @@ export default function Wishlist() {
           <p className="text-xl sm:text-2xl font-medium text-slate-700 dark:text-slate-200 max-w-3xl mx-auto leading-relaxed">
             {t('pages.wishlist.subtitle', 'Carefully curated places that captured your heart. Turn these dreams into unforgettable memories.')}
           </p>
+          
+          {/* Cleanup button - only show if there might be issues */}
+          <div className="mt-6">
+            <button
+              onClick={cleanupDuplicates}
+              className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+              title="Remove any duplicate items from your wishlist"
+            >
+              Clean Up Duplicates
+            </button>
+          </div>
         </div>
 
         {/* Enhanced Wishlist Grid */}

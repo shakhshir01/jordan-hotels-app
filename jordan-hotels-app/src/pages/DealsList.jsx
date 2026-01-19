@@ -56,7 +56,7 @@ export default function DealsList() {
   if (loading) return <div className="p-24 text-center">{t('pages.dealsList.loading')}</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
       <Seo
         title="Exclusive Hotel Deals in Jordan - Up to 35% Off Luxury Hotels"
         description="Discover amazing hotel deals in Jordan. Save up to 35% on luxury accommodations in Petra, Wadi Rum, Dead Sea, and Amman. Limited time offers on premium properties."

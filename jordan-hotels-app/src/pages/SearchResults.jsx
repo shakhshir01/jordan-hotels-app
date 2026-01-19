@@ -17,6 +17,7 @@ function SearchResults() {
 
   const [hotels, setHotels] = useState([]);
   const [nextCursor, setNextCursor] = useState(null);
+  const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
@@ -86,10 +87,13 @@ function SearchResults() {
 
       // Filter for top-rated hotels if requested
       if (topRated) {
-        items = items
+        const allTopRated = (Array.isArray(first?.hotels) ? first.hotels : [])
           .filter(hotel => hotel.rating && typeof hotel.rating === 'number' && hotel.rating >= 4.5)
-          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-          .slice(0, 10); // Only top 10 highly-rated hotels
+          .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        items = allTopRated.slice(0, 10); // Only top 10 highly-rated hotels
+        setTotalResults(allTopRated.length); // Total top-rated hotels available
+      } else {
+        setTotalResults(first?.total || items.length);
       }
 
       setHotels(items);
@@ -172,10 +176,10 @@ function SearchResults() {
   const hasHotels = useMemo(() => Array.isArray(hotels) && hotels.length > 0, [hotels]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-cool dark:bg-dark-cool">
       <Seo
         title={`Hotel Search Results${term ? ` for ${term}` : ''} - VisitJo`}
-        description={`Find the best hotels${term ? ` in ${term}` : ' in Jordan'}. Browse ${hotels.length} available properties with real-time pricing and authentic reviews.`}
+        description={`Find the best hotels${term ? ` in ${term}` : ' in Jordan'}. Browse ${totalResults} available properties with real-time pricing and authentic reviews.`}
         canonicalUrl={`https://visitjo.com/search${term ? `?q=${encodeURIComponent(term)}` : ''}`}
         keywords={`Jordan hotels${term ? `, ${term} hotels` : ''}, hotel booking, accommodation, travel`}
       />
@@ -186,7 +190,7 @@ function SearchResults() {
               Your Perfect Jordan Stay Awaits
             </h1>
             <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 leading-relaxed">
-              {hasHotels ? `Discover ${hotels.length} exceptional hotels` : 'Discover amazing hotels'} for <span className="font-semibold text-slate-900 dark:text-slate-100">"{term || "Jordan"}"</span>
+              {hasHotels ? `Discover ${totalResults} exceptional hotels` : 'Discover amazing hotels'} for <span className="font-semibold text-slate-900 dark:text-slate-100">"{term || "Jordan"}"</span>
             </p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">

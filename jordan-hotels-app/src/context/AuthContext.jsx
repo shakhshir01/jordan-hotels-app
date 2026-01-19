@@ -26,23 +26,132 @@ export const AuthProvider = ({ children }) => {
   const cognitoUserRef = React.useRef(null);
   const forgotPasswordUserRef = React.useRef(null);
 
-  const setUserAndProfileFromEmail = useCallback((email) => {
-    const derived = deriveNameFromEmail(email);
-    const saved = loadSavedProfile(email);
+  // Debug function to check current user attributes
+  const debugCurrentUser = useCallback(async () => {
+    try {
+      const currentUser = await Auth.currentAuthenticatedUser();
+      console.log('Current authenticated user:', currentUser);
+      console.log('Current user attributes:', currentUser.attributes);
+      console.log('Current username:', currentUser.username);
+    } catch (error) {
+      console.log('No current user or error:', error);
+    }
+  }, []);
 
-    const nextProfile = {
-      email: derived.email,
-      firstName: saved?.firstName || derived.firstName,
-      lastName: saved?.lastName || derived.lastName,
-      displayName:
-        (saved?.firstName || saved?.lastName)
-          ? [saved?.firstName, saved?.lastName].filter(Boolean).join(' ')
-          : derived.displayName,
-      hasCustomName: Boolean(saved?.hasCustomName),
-    };
+  // Expose debug function for testing
+  React.useEffect(() => {
+    window.debugCurrentUser = debugCurrentUser;
+  }, [debugCurrentUser]);
 
-    setUser({ email: derived.email });
-    setUserProfile(nextProfile);
+  const setUserAndProfileFromEmail = useCallback(async (emailOrUser) => {
+    // Handle both email string and Amplify user object
+    let email, attributes = {};
+    
+    if (typeof emailOrUser === 'string') {
+      email = emailOrUser;
+    } else {
+      // It's an Amplify user object
+      const amplifyUser = emailOrUser;
+      attributes = amplifyUser.attributes || {};
+      // For OAuth users, prioritize email from attributes over username
+      email = attributes.email || amplifyUser.username;
+    }
+    
+    // Debug: Log all attributes to see what's available
+    console.log('User attributes received:', attributes);
+    console.log('Username:', email);
+    
+    // For OAuth users, try to get name from attributes
+    // Check multiple possible attribute names that different providers might use
+    const givenName = attributes.given_name || attributes['custom:firstName'] || attributes.firstName || attributes.firstname;
+    const familyName = attributes.family_name || attributes['custom:lastName'] || attributes.lastName || attributes.lastname;
+    let fullName = attributes.name || attributes.fullName || attributes.displayName;
+    
+    // Also check for Google-specific attributes
+    const googleName = attributes['identities'] ? 
+      attributes.identities.find(id => id.providerName === 'Google')?.name : null;
+    
+    // For Google OAuth, if we don't have name attributes, try to extract from email
+    let hasOAuthName = givenName || familyName || fullName || googleName;
+    
+    // Special handling for Google OAuth - if username looks like a Google ID, don't use it
+    const isGoogleId = email && email.startsWith('Google ') && email.match(/^\w+ \d+$/);
+    if (isGoogleId && !hasOAuthName) {
+      // For Google users without name attributes, derive from email if possible
+      const emailPart = attributes.email || '';
+      if (emailPart.includes('@')) {
+        const localPart = emailPart.split('@')[0];
+        // Try to make a display name from email local part
+        const displayFromEmail = localPart.replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        hasOAuthName = true;
+        fullName = displayFromEmail;
+      }
+    }
+    
+    if (hasOAuthName) {
+      // Use OAuth-provided names
+      const firstName = givenName || (fullName ? fullName.split(' ')[0] : '') || (googleName ? googleName.split(' ')[0] : '');
+      const lastName = familyName || (fullName && fullName.split(' ').length > 1 ? fullName.split(' ').slice(1).join(' ') : '') || (googleName && googleName.split(' ').length > 1 ? googleName.split(' ').slice(1).join(' ') : '');
+      const displayName = [firstName, lastName].filter(Boolean).join(' ') || fullName || googleName || email.split('@')[0];
+      
+      const profile = {
+        email,
+        firstName,
+        lastName,
+        displayName,
+        hasCustomName: true, // Mark as having OAuth-provided name
+      };
+      
+      // Save to localStorage for persistence
+      saveProfile(email, profile);
+      
+      // Also save to database if we have names to save
+      try {
+        await hotelAPI.updateUserProfile({
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+        });
+      } catch (error) {
+        console.warn('Failed to save OAuth profile to database:', error);
+        // Continue anyway - localStorage will preserve the name
+      }
+      
+      setUser({ email });
+      setUserProfile(profile);
+    } else {
+      // Fall back to email-derived names
+      const derived = deriveNameFromEmail(email);
+      const saved = loadSavedProfile(email);
+
+      // Check if saved profile has a Google ID as display name and try to fix it
+      if (saved?.displayName && saved.displayName.match(/^Google \d+$/)) {
+        console.log('Detected Google ID as display name, attempting to fix');
+        // Try to derive a better name from email
+        const emailPart = attributes.email || email;
+        if (emailPart.includes('@')) {
+          const localPart = emailPart.split('@')[0];
+          const displayFromEmail = localPart.replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          saved.displayName = displayFromEmail;
+          saved.firstName = displayFromEmail.split(' ')[0] || displayFromEmail;
+          saved.lastName = displayFromEmail.split(' ').slice(1).join(' ') || '';
+          saveProfile(email, saved);
+        }
+      }
+
+      const nextProfile = {
+        email: derived.email,
+        firstName: saved?.firstName || derived.firstName,
+        lastName: saved?.lastName || derived.lastName,
+        displayName:
+          (saved?.firstName || saved?.lastName)
+            ? [saved?.firstName, saved?.lastName].filter(Boolean).join(' ')
+            : derived.displayName,
+        hasCustomName: Boolean(saved?.hasCustomName),
+      };
+
+      setUser({ email: derived.email });
+      setUserProfile(nextProfile);
+    }
   }, []);
 
   // Check if user is already logged in on mount
@@ -54,14 +163,11 @@ export const AuthProvider = ({ children }) => {
           const amplifyUser = await Auth.currentAuthenticatedUser();
           if (amplifyUser) {
             console.log('Found existing Amplify user on mount:', amplifyUser);
-            const email = amplifyUser.attributes?.email || amplifyUser.username;
-            if (email) {
-              setUserAndProfileFromEmail(email);
-              // Set auth token from Amplify session
-              const session = await Auth.currentSession();
-              const idToken = session.getIdToken().getJwtToken();
-              setAuthToken(idToken);
-            }
+            await setUserAndProfileFromEmail(amplifyUser);
+            // Set auth token from Amplify session
+            const session = await Auth.currentSession();
+            const idToken = session.getIdToken().getJwtToken();
+            setAuthToken(idToken);
             setLoading(false);
             return;
           }

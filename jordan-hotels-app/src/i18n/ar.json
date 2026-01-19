@@ -310,6 +310,8 @@
         "subtitle": "نصائح سفر ووجهات وقصص من الأردن."
       },
       "read": "اقرأ",
+      "readMore": "اقرأ المزيد",
+      "readFullStory": "اقرأ القصة الكاملة",
       "backToBlog": "العودة إلى المدونة"
     },
     "reviews": {
@@ -336,8 +338,8 @@
     "wishlist": {
       "title": "المفضلة",
       "subtitle": "احفظ فنادقك وتجاربك المفضلة.",
-      "itemsSaved": "{{count}} عنصر محفوظ",
-      "itemsSaved_other": "{{count}} عناصر محفوظة",
+      "itemsSaved": "{{count}} مغامرة محفوظة",
+      "itemsSaved_other": "{{count}} مغامرات محفوظة",
       "empty": {
         "title": "قائمة المفضلة فارغة",
         "body": "ابدأ باستكشاف الوجهات واحفظ ما يعجبك.",

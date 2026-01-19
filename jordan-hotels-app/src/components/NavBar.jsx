@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
-import { MapPin, Camera, Tag, TrendingUp, BarChart3, MessageSquare, Image, HelpCircle, Accessibility } from "lucide-react";
+import { MapPin, Camera, Tag, TrendingUp, BarChart3, MessageSquare, Image, HelpCircle, Settings, Heart } from "lucide-react";
 
 const Navbar = ({ onAccessibilityClick }) => {
   const { user, userProfile, logout } = useAuth();
@@ -125,6 +125,15 @@ const Navbar = ({ onAccessibilityClick }) => {
               <HelpCircle size={16} />
               {t("nav.support", "Support")}
             </Link>
+            {user && (
+              <Link
+                to="/wishlist"
+                className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-rose font-medium transition-all duration-300 text-sm hover:scale-105"
+              >
+                <Heart size={16} />
+                {t("nav.wishlist", "Wishlist")}
+              </Link>
+            )}
           </div>
 
           {/* Desktop Actions */}
@@ -134,7 +143,7 @@ const Navbar = ({ onAccessibilityClick }) => {
               aria-label={t('accessibility.settings', 'Accessibility Settings')}
               className="p-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue dark:hover:text-jordan-teal transition-colors duration-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              <Accessibility size={20} />
+              <Settings size={20} />
             </button>
             <ThemeToggle />
             <LanguageSwitcher />
@@ -247,6 +256,12 @@ const Navbar = ({ onAccessibilityClick }) => {
                   <HelpCircle size={20} />
                   {t("nav.support", "Support")}
                 </Link>
+                {user && (
+                  <Link to="/wishlist" onClick={closeMobile} className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-rose hover:bg-jordan-rose/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95">
+                    <Heart size={20} />
+                    {t("nav.wishlist", "Wishlist")}
+                  </Link>
+                )}
               </div>
 
               <div className="border-t border-gray-200 dark:border-slate-700 my-4" />

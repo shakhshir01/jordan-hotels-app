@@ -94,9 +94,15 @@ export default {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'hero-pattern': "url('/patterns/hero.svg')",
-        'luxury-gradient': 'linear-gradient(to right, #003580, #0f3d66)',
-        'desert-gradient': 'linear-gradient(to bottom right, #d67d61, #caa472)',
-        'jordan-sunset': 'linear-gradient(to bottom, #003580, #d67d61, #caa472)',
+        'luxury-gradient': 'linear-gradient(135deg, #003580 0%, #0f3d66 25%, #1e293b 50%, #0f172a 75%, #003580 100%)',
+        'hero-luxury': 'linear-gradient(135deg, #001122 0%, #003580 20%, #0f3d66 40%, #1e293b 60%, #0f172a 80%, #001122 100%)',
+        'desert-gradient': 'linear-gradient(135deg, #d67d61 0%, #caa472 30%, #8b7355 60%, #6b5a45 100%)',
+        'jordan-sunset': 'linear-gradient(135deg, #003580 0%, #d67d61 25%, #caa472 50%, #8b7355 75%, #6b5a45 100%)',
+        'ocean-depths': 'linear-gradient(135deg, #001122 0%, #003580 20%, #0f3d66 40%, #1e293b 60%, #0f172a 80%, #001122 100%)',
+        'royal-nights': 'linear-gradient(135deg, #1e1b4b 0%, #312e81 25%, #4c1d95 50%, #7c3aed 75%, #1e1b4b 100%)',
+        'emerald-dreams': 'linear-gradient(135deg, #064e3b 0%, #065f46 25%, #047857 50%, #059669 75%, #064e3b 100%)',
+        'golden-horizon': 'linear-gradient(135deg, #92400e 0%, #b45309 25%, #d97706 50%, #f59e0b 75%, #92400e 100%)',
+        'text-gradient': 'linear-gradient(135deg, #f59e0b 0%, #d97706 25%, #caa472 50%, #d67d61 75%, #f59e0b 100%)',
         'dark-luxury': 'linear-gradient(to right, #1e293b, #0f172a, #1e293b)',
         'glass-morphism': 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
         'premium-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -109,6 +115,16 @@ export default {
         'glass-card': 'linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05))',
         'glass-card-dark': 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))',
         'mesh-gradient': 'radial-gradient(at 40% 20%, hsla(28,100%,74%,1) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355,100%,93%,1) 0px, transparent 50%), radial-gradient(at 80% 50%, hsla(340,100%,76%,1) 0px, transparent 50%), radial-gradient(at 0% 100%, hsla(22,100%,77%,1) 0px, transparent 50%), radial-gradient(at 80% 100%, hsla(242,100%,70%,1) 0px, transparent 50%), radial-gradient(at 0% 0%, hsla(343,100%,76%,1) 0px, transparent 50%)',
+        // Light mode backgrounds
+        'light-hero': 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%)',
+        'light-premium': 'linear-gradient(135deg, #ffffff 0%, #f8fafc 25%, #f1f5f9 50%, #e2e8f0 75%, #cbd5e1 100%)',
+        'light-warm': 'linear-gradient(135deg, #fefcfb 0%, #fef7ed 25%, #fef3c7 50%, #fde68a 75%, #fcd34d 100%)',
+        'light-cool': 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #bae6fd 50%, #7dd3fc 75%, #38bdf8 100%)',
+        // Dark mode backgrounds
+        'dark-hero': 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%)',
+        'dark-premium': 'linear-gradient(135deg, #1e293b 0%, #334155 25%, #475569 50%, #64748b 75%, #94a3b8 100%)',
+        'dark-warm': 'linear-gradient(135deg, #1c1917 0%, #292524 25%, #3f3f46 50%, #525252 75%, #737373 100%)',
+        'dark-cool': 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%)',
       },
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
@@ -279,6 +295,12 @@ export default {
       },
       backdropBlur: {
         xs: '2px',
+      },
+      backgroundImage: {
+        'card-premium': 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08))',
+        'card-premium-dark': 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+        'button-gradient': 'linear-gradient(135deg, #003580, #0f3d66)',
+        'button-hover': 'linear-gradient(135deg, #0f3d66, #003580)',
       },
     },
   },

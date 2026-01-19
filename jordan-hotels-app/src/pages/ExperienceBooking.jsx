@@ -233,7 +233,7 @@ const ExperienceBooking = () => {
 
   if (orderComplete) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 py-12">
+      <div className="min-h-screen bg-light-premium dark:bg-dark-premium py-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 text-center">
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -271,7 +271,7 @@ const ExperienceBooking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 py-12">
+    <div className="min-h-screen bg-light-premium dark:bg-dark-premium py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Experience Details */}

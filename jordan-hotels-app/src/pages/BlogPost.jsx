@@ -9,44 +9,149 @@ const BLOG_CONTENT = {
     meta: "Everything you need to know for your perfect Petra visit",
     metaAr: "كل ما تحتاجه لزيارة البتراء المثالية",
     content: `
-      <div class='prose prose-lg max-w-none'>
-        <p class='lead'>Petra, the ancient Nabatean city carved into rose-red cliffs, is one of the world's most spectacular archaeological sites. This comprehensive guide will help you make the most of your visit to this UNESCO World Heritage Site.</p>
+      <div class='prose prose-lg max-w-none text-slate-800 dark:text-slate-200'>
+        <p class='lead text-xl font-medium text-slate-700 dark:text-slate-300 mb-8 leading-relaxed'>Petra, the ancient Nabatean city carved into rose-red cliffs, is one of the world's most spectacular archaeological sites. This comprehensive guide will help you make the most of your visit to this UNESCO World Heritage Site.</p>
 
-        <h2>Best Time to Visit Petra</h2>
-        <p>The ideal time to visit Petra is during the cooler months from October to April. Summer temperatures can exceed 40°C (104°F), making the extensive walking quite challenging. Early morning visits (before 9 AM) or late afternoon are best to avoid the midday heat and crowds.</p>
+        <div class='bg-gradient-to-r from-jordan-rose/10 to-jordan-gold/10 p-6 rounded-xl mb-8 border-l-4 border-jordan-rose'>
+          <h2 class='text-2xl font-bold text-jordan-rose mb-4 flex items-center gap-2'>
+            <span class='w-2 h-2 bg-jordan-rose rounded-full'></span>
+            Best Time to Visit Petra
+          </h2>
+          <p class='text-slate-700 dark:text-slate-300 leading-relaxed'>The ideal time to visit Petra is during the cooler months from October to April. Summer temperatures can exceed 40°C (104°F), making the extensive walking quite challenging. Early morning visits (before 9 AM) or late afternoon are best to avoid the midday heat and crowds.</p>
+        </div>
 
-        <h2>Ticket Options and Pricing</h2>
-        <ul>
-          <li><strong>One Day Ticket:</strong> 50 JOD (approximately $70 USD) - includes access to most sites</li>
-          <li><strong>Two Day Ticket:</strong> 55 JOD - allows re-entry over two consecutive days</li>
-          <li><strong>Petra by Night:</strong> 17 JOD - magical evening experience with candlelit pathways</li>
-        </ul>
+        <div class='bg-gradient-to-r from-jordan-blue/10 to-jordan-teal/10 p-6 rounded-xl mb-8 border-l-4 border-jordan-blue'>
+          <h2 class='text-2xl font-bold text-jordan-blue mb-4 flex items-center gap-2'>
+            <span class='w-2 h-2 bg-jordan-blue rounded-full'></span>
+            Ticket Options and Pricing
+          </h2>
+          <div class='grid md:grid-cols-1 gap-4'>
+            <div class='bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700'>
+              <div class='flex items-center justify-between mb-2'>
+                <span class='font-semibold text-jordan-blue'>One Day Ticket</span>
+                <span class='text-lg font-bold text-jordan-gold'>50 JOD</span>
+              </div>
+              <p class='text-sm text-slate-600 dark:text-slate-400'>approximately $70 USD - includes access to most sites</p>
+            </div>
+            <div class='bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700'>
+              <div class='flex items-center justify-between mb-2'>
+                <span class='font-semibold text-jordan-blue'>Two Day Ticket</span>
+                <span class='text-lg font-bold text-jordan-gold'>55 JOD</span>
+              </div>
+              <p class='text-sm text-slate-600 dark:text-slate-400'>allows re-entry over two consecutive days</p>
+            </div>
+            <div class='bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700'>
+              <div class='flex items-center justify-between mb-2'>
+                <span class='font-semibold text-jordan-blue'>Petra by Night</span>
+                <span class='text-lg font-bold text-jordan-gold'>17 JOD</span>
+              </div>
+              <p class='text-sm text-slate-600 dark:text-slate-400'>magical evening experience with candlelit pathways</p>
+            </div>
+          </div>
+        </div>
 
-        <h2>Essential Routes to Explore</h2>
-        <h3>The Main Siq Route (2-3 hours)</h3>
-        <p>Start with the iconic walk through the Siq, a 1.2km narrow gorge that leads to the Treasury. This route takes about 2-3 hours round trip and covers the most famous sights.</p>
+        <div class='bg-gradient-to-r from-jordan-teal/10 to-jordan-blue/10 p-6 rounded-xl mb-8 border-l-4 border-jordan-teal'>
+          <h2 class='text-2xl font-bold text-jordan-teal mb-6 flex items-center gap-2'>
+            <span class='w-2 h-2 bg-jordan-teal rounded-full'></span>
+            Essential Routes to Explore
+          </h2>
 
-        <h3>The Monastery Trail (2 hours)</h3>
-        <p>For the adventurous, climb 800 steps to reach the Monastery, Petra's largest monument. The views from the top are breathtaking and worth every step.</p>
+          <div class='space-y-6'>
+            <div class='bg-white dark:bg-slate-800 p-5 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700'>
+              <div class='flex items-start gap-4'>
+                <div class='w-12 h-12 bg-jordan-gold rounded-full flex items-center justify-center flex-shrink-0 mt-1'>
+                  <span class='text-white font-bold text-lg'>1</span>
+                </div>
+                <div>
+                  <h3 class='text-xl font-bold text-slate-900 dark:text-slate-100 mb-2'>The Main Siq Route (2-3 hours)</h3>
+                  <p class='text-slate-700 dark:text-slate-300 leading-relaxed'>Start with the iconic walk through the Siq, a 1.2km narrow gorge that leads to the Treasury. This route takes about 2-3 hours round trip and covers the most famous sights.</p>
+                </div>
+              </div>
+            </div>
 
-        <h3>High Places Routes</h3>
-        <p>Explore the sacrificial altars and royal tombs on the hills surrounding Petra. These routes offer stunning panoramic views but require good fitness and sturdy shoes.</p>
+            <div class='bg-white dark:bg-slate-800 p-5 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700'>
+              <div class='flex items-start gap-4'>
+                <div class='w-12 h-12 bg-jordan-rose rounded-full flex items-center justify-center flex-shrink-0 mt-1'>
+                  <span class='text-white font-bold text-lg'>2</span>
+                </div>
+                <div>
+                  <h3 class='text-xl font-bold text-slate-900 dark:text-slate-100 mb-2'>The Monastery Trail (2 hours)</h3>
+                  <p class='text-slate-700 dark:text-slate-300 leading-relaxed'>For the adventurous, climb 800 steps to reach the Monastery, Petra's largest monument. The views from the top are breathtaking and worth every step.</p>
+                </div>
+              </div>
+            </div>
 
-        <h2>Practical Tips</h2>
-        <ul>
-          <li>Wear comfortable walking shoes - you'll cover 4-8km depending on your route</li>
-          <li>Bring plenty of water, especially in summer</li>
-          <li>Hire a guide for deeper insights into Nabatean history</li>
-          <li>Consider a horse or donkey for the initial approach to the Siq</li>
-          <li>Visit early morning to avoid crowds and heat</li>
-        </ul>
+            <div class='bg-white dark:bg-slate-800 p-5 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700'>
+              <div class='flex items-start gap-4'>
+                <div class='w-12 h-12 bg-jordan-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1'>
+                  <span class='text-white font-bold text-lg'>3</span>
+                </div>
+                <div>
+                  <h3 class='text-xl font-bold text-slate-900 dark:text-slate-100 mb-2'>High Places Routes</h3>
+                  <p class='text-slate-700 dark:text-slate-300 leading-relaxed'>Explore the sacrificial altars and royal tombs on the hills surrounding Petra. These routes offer stunning panoramic views but require good fitness and sturdy shoes.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <h2>Where to Stay Near Petra</h2>
-        <p>Petra is located in a valley, so most accommodation is in the nearby town of Wadi Musa. Options range from budget guesthouses to luxury resorts. For the ultimate experience, consider staying in a cave hotel carved into the surrounding hills.</p>
+        <div class='bg-gradient-to-r from-jordan-gold/10 to-jordan-rose/10 p-6 rounded-xl mb-8 border-l-4 border-jordan-gold'>
+          <h2 class='text-2xl font-bold text-jordan-gold mb-6 flex items-center gap-2'>
+            <span class='w-2 h-2 bg-jordan-gold rounded-full'></span>
+            Practical Tips
+          </h2>
+          <div class='grid md:grid-cols-2 gap-4'>
+            <div class='flex items-start gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700'>
+              <div class='w-6 h-6 bg-jordan-blue rounded-full flex items-center justify-center flex-shrink-0 mt-0.5'>
+                <span class='text-white text-xs'>✓</span>
+              </div>
+              <p class='text-sm text-slate-700 dark:text-slate-300'>Wear comfortable walking shoes - you'll cover 4-8km depending on your route</p>
+            </div>
+            <div class='flex items-start gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700'>
+              <div class='w-6 h-6 bg-jordan-blue rounded-full flex items-center justify-center flex-shrink-0 mt-0.5'>
+                <span class='text-white text-xs'>✓</span>
+              </div>
+              <p class='text-sm text-slate-700 dark:text-slate-300'>Bring plenty of water, especially in summer</p>
+            </div>
+            <div class='flex items-start gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700'>
+              <div class='w-6 h-6 bg-jordan-blue rounded-full flex items-center justify-center flex-shrink-0 mt-0.5'>
+                <span class='text-white text-xs'>✓</span>
+              </div>
+              <p class='text-sm text-slate-700 dark:text-slate-300'>Hire a guide for deeper insights into Nabatean history</p>
+            </div>
+            <div class='flex items-start gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700'>
+              <div class='w-6 h-6 bg-jordan-blue rounded-full flex items-center justify-center flex-shrink-0 mt-0.5'>
+                <span class='text-white text-xs'>✓</span>
+              </div>
+              <p class='text-sm text-slate-700 dark:text-slate-300'>Consider a horse or donkey for the initial approach to the Siq</p>
+            </div>
+            <div class='flex items-start gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700'>
+              <div class='w-6 h-6 bg-jordan-blue rounded-full flex items-center justify-center flex-shrink-0 mt-0.5'>
+                <span class='text-white text-xs'>✓</span>
+              </div>
+              <p class='text-sm text-slate-700 dark:text-slate-300'>Visit early morning to avoid crowds and heat</p>
+            </div>
+          </div>
+        </div>
 
-        <div class='bg-amber-50 p-4 rounded-lg my-6'>
-          <h3 class='text-amber-800 font-semibold'>Pro Tip</h3>
-          <p class='text-amber-700'>Book your Petra tickets online in advance to skip the lines at the entrance. The site can get crowded, especially during peak tourist season.</p>
+        <div class='bg-gradient-to-r from-jordan-teal/10 to-jordan-blue/10 p-6 rounded-xl mb-8 border-l-4 border-jordan-teal'>
+          <h2 class='text-2xl font-bold text-jordan-teal mb-4 flex items-center gap-2'>
+            <span class='w-2 h-2 bg-jordan-teal rounded-full'></span>
+            Where to Stay Near Petra
+          </h2>
+          <p class='text-slate-700 dark:text-slate-300 leading-relaxed mb-4'>Petra is located in a valley, so most accommodation is in the nearby town of Wadi Musa. Options range from budget guesthouses to luxury resorts. For the ultimate experience, consider staying in a cave hotel carved into the surrounding hills.</p>
+        </div>
+
+        <div class='bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 p-6 rounded-xl border-l-4 border-amber-400 mb-8'>
+          <div class='flex items-start gap-3'>
+            <div class='w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1'>
+              <span class='text-white font-bold'>💡</span>
+            </div>
+            <div>
+              <h3 class='text-lg font-bold text-amber-800 dark:text-amber-200 mb-2'>Pro Tip</h3>
+              <p class='text-amber-700 dark:text-amber-300 leading-relaxed'>Book your Petra tickets online in advance to skip the lines at the entrance. The site can get crowded, especially during peak tourist season.</p>
+            </div>
+          </div>
         </div>
       </div>
     `,

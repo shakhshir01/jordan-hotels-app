@@ -86,7 +86,7 @@ export default function CityHotels() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-cool dark:bg-dark-cool">
       <Seo
         title={`Hotels in ${cityDisplayName} - Best Accommodations | VisitJo`}
         description={getCityDescription(cityDisplayName)}

@@ -434,7 +434,7 @@ const getHotelsFromStatic = ({ q = "", cursor = "", limit = 30 } = {}) => {
   const hotels = filteredHotels.slice(startIndex, endIndex);
   const nextCursor = endIndex < filteredHotels.length ? String(endIndex) : null;
 
-  return { hotels, nextCursor };
+  return { hotels, nextCursor, total: filteredHotels.length };
 };
 
 // Fallback function to fetch hotels from Xotelo API directly

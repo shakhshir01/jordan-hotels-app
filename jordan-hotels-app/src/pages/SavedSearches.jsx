@@ -37,7 +37,7 @@ const SavedSearches = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
       <Seo
         title="Saved Searches - Your Personal Jordan Travel Discovery | VisitJo"
         description="Access your saved hotel searches and continue exploring Jordan's finest accommodations. Never lose track of your favorite travel discoveries."

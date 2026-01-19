@@ -7,7 +7,7 @@ export default function About() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
       <Seo
         title="About VisitJo - Your Authentic Jordan Travel Guide"
         description="Learn about VisitJo's mission to provide authentic Jordan travel experiences. Discover our commitment to showcasing Jordan's hidden gems and warm hospitality."
@@ -16,14 +16,14 @@ export default function About() {
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-light-hero dark:bg-dark-hero">
         {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-light-premium dark:bg-ocean-depths animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 dark:from-black/60 via-transparent to-transparent"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Enhanced Badge */}
-          <div className="inline-flex items-center gap-3 px-8 py-4 mb-12 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full text-white/90 text-sm font-bold uppercase tracking-widest shadow-2xl animate-fade-in">
+          <div className="inline-flex items-center gap-3 px-8 py-4 mb-12 bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/30 rounded-full text-black dark:text-white/90 text-sm font-bold uppercase tracking-widest shadow-2xl animate-fade-in">
             <Crown className="w-5 h-5 text-jordan-gold" />
             {t('pages.about.kicker', 'Authentic Jordanian Hospitality')}
             <Crown className="w-5 h-5 text-jordan-gold" />
@@ -31,14 +31,14 @@ export default function About() {
 
           {/* Enhanced Title */}
           <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black font-display mb-8 tracking-tight leading-tight animate-slide-up">
-            <span className="block text-white drop-shadow-2xl mb-2">{t("pages.about.titleMain", "Your Gateway to")}</span>
+            <span className="block text-black dark:text-white drop-shadow-2xl mb-2">{t("pages.about.titleMain", "Your Gateway to")}</span>
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl">
               {t("pages.about.titleAccent", "Extraordinary Experiences")}
             </span>
           </h1>
 
           {/* Enhanced Subtitle */}
-          <p className="text-xl sm:text-2xl lg:text-3xl max-w-5xl mx-auto mb-16 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
+          <p className="text-xl sm:text-2xl lg:text-3xl max-w-5xl mx-auto mb-16 text-black dark:text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
             {t('pages.about.intro', 'We\'re not just another booking platform. We\'re your trusted local experts, passionate storytellers, and dedicated hosts who believe that every traveler deserves to experience the real Jordan - the hidden gems, the authentic moments, and the genuine connections that transform ordinary trips into lifelong memories.')}
           </p>
 

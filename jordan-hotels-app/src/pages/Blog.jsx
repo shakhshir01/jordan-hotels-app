@@ -47,7 +47,7 @@ export default function Blog() {
   const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
       <Seo
         title="Jordan Travel Blog - Tips, Guides & Stories from VisitJo"
         description="Read expert travel guides, tips, and stories about Jordan. From Petra to Wadi Rum, get insider knowledge for your Jordan adventure."
@@ -187,7 +187,7 @@ export default function Blog() {
                     to={`/blog/${post.slug}`}
                     className="inline-flex items-center gap-3 btn-primary px-6 py-3 text-lg font-bold rounded-2xl hover-lift group-hover:scale-105 transition-all duration-300"
                   >
-                    Read Full Story
+                    {t('pages.blog.readFullStory', 'Read Full Story')}
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                   </Link>
                 </article>
@@ -236,7 +236,7 @@ export default function Blog() {
                     to={`/blog/${post.slug}`}
                     className="inline-flex items-center gap-2 text-jordan-blue font-bold hover:text-jordan-teal transition-colors duration-300 group-hover:translate-x-1 transform"
                   >
-                    Read More
+                    {t('pages.blog.readMore', 'Read More')}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </article>

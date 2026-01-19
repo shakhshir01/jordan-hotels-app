@@ -30,7 +30,7 @@ export default function ExperiencesListing() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
       <Seo
         title="Jordan Experiences - Authentic Adventures & Cultural Tours"
         description="Discover authentic Jordanian experiences. From Petra tours to Wadi Rum safaris, Dead Sea spas to Red Sea diving. Create unforgettable memories in Jordan."

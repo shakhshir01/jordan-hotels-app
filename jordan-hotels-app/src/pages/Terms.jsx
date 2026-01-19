@@ -4,7 +4,7 @@ export default function Terms() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-slate-900 dark:via-emerald-900/20 dark:to-teal-900/20">
+    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
         <div className="glass-card rounded-3xl p-10 space-y-8 bg-gradient-to-br from-white to-green-50/50 dark:from-slate-800 dark:to-green-900/20 shadow-2xl border border-green-200/50 dark:border-green-700/50">
           <header className="text-center pt-16">

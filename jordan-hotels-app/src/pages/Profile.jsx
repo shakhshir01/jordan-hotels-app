@@ -280,7 +280,7 @@ const Profile = () => {
   const totalSpent = bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-purple-900/20 dark:to-pink-900/20 py-12">
+    <div className="min-h-screen bg-light-premium dark:bg-dark-premium py-12">
       <div className="max-w-4xl mx-auto px-4">
         {/* Profile Card */}
         <div className="glass-card card-modern p-8 mb-8 animate-fade-in bg-gradient-to-br from-white to-blue-50 dark:from-slate-800 dark:to-blue-900/20 rounded-3xl shadow-2xl border border-blue-200/50 dark:border-blue-700/50">

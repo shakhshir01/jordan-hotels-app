@@ -4,7 +4,7 @@ export default function Privacy() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-indigo-900/20 dark:to-purple-900/20">
+    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
         <div className="glass-card rounded-3xl p-10 space-y-8 bg-gradient-to-br from-white to-blue-50/50 dark:from-slate-800 dark:to-blue-900/20 shadow-2xl border border-blue-200/50 dark:border-blue-700/50">
           <header className="text-center pt-16">
