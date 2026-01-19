@@ -783,14 +783,14 @@ function Home() {
           </div>
         ) : (
           <div className="space-y-8">
-            <header className="flex flex-col gap-2">
-              <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-slate-900 dark:text-slate-50">
-                {isLocationBased ? "Exclusive Recommendations Near You" : "Jordan's Finest Accommodations"}
+            <header className="flex flex-col gap-2 ml-4">
+              <h2 className="text-3xl sm:text-4xl font-black font-display tracking-tight text-slate-900 dark:text-slate-50">
+                {isLocationBased ? "Exclusive Recommendations Near You" : "Recommended Hotels"}
               </h2>
               <p className="page-subtitle">
                 {isLocationBased
                   ? "Handpicked luxury stays and authentic experiences tailored to your location"
-                  : "Discover world-class hotels, boutique resorts, and unique stays across Jordan's most spectacular destinations"}
+                  : "Explore our curated selection of premium accommodations"}
               </p>
             </header>
 
