@@ -135,11 +135,11 @@ export default function Gallery() {
   }, [rowVirtualizer]);
 
   return (
-    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
+    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Seo
         title="Jordan Hotel Gallery - Visual Tour of Luxury Accommodations | VisitJo"
         description="Explore stunning visual galleries of Jordan's finest hotels. From Petra luxury resorts to Dead Sea spas, see what your stay will look like before you book."
-        canonicalUrl="https://visitjo.com/gallery"
+        canonicalUrl="https://vist-jo.com/gallery"
         keywords="Jordan hotel gallery, hotel photos, luxury accommodations Jordan, Petra hotels, Dead Sea resorts, Wadi Rum camps"
       />
 
@@ -186,37 +186,6 @@ export default function Gallery() {
             Take a visual journey through our handpicked hotels and resorts across Jordan. See exactly what your luxury experience will look like.
           </p>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Camera className="w-8 h-8 text-jordan-blue" />
-                10K+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Hotel Images</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <MapPin className="w-8 h-8 text-jordan-teal" />
-                25+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Star className="w-8 h-8 text-jordan-rose" />
-                4.9★
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Average Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Heart className="w-8 h-8 text-jordan-gold" />
-                750+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Verified Hotels</div>
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -253,7 +222,7 @@ export default function Gallery() {
                     ref={(el) => measureElement(el)}
                     data-index={virtualItem.index}
                   >
-                    <div className="card-modern overflow-hidden hover:shadow-premium transition-all duration-500 hover:-translate-y-1 animate-fade-in-up">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200">
                       {/* Enhanced Hotel Header */}
                       <div className="bg-gradient-to-r from-jordan-blue via-jordan-teal to-jordan-emerald text-white p-10 lg:p-12">
                         <div className="flex items-start justify-between gap-6">
@@ -297,7 +266,7 @@ export default function Gallery() {
 
                         {hotel.images && hotel.images.length > 0 ? (
                           <div className="relative">
-                            <div className="relative rounded-2xl overflow-hidden shadow-floating hover:shadow-premium transition-all duration-500">
+                            <div className="relative rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200">
                               <div className="relative bg-slate-200 overflow-hidden aspect-[16/9]">
                                 <OptimizedImage
                                   src={hotel.images[currentImageIndices[hotel.id] || 0]}

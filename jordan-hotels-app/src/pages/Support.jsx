@@ -1,3 +1,5 @@
+/// <reference path="../types/globals.d.ts" />
+
 import { useTranslation } from 'react-i18next';
 import { MessageCircle, Mail, Phone, Clock, Shield, Users, Zap, Heart, Sparkles, Headphones, CheckCircle, ArrowRight } from 'lucide-react';
 import Seo from '../components/Seo.jsx';
@@ -27,7 +29,7 @@ export default function Support() {
     {
       icon: Heart,
       q: t('support.faq.problem.q', 'Something is wrong with my stay—what should I do?'),
-      a: t('support.faq.problem.a', 'First, speak to the property directly so they can resolve it quickly. If you still need help, contact VisitJo support with your booking ID.'),
+      a: t('support.faq.problem.a', 'First, speak to the property directly so they can resolve it quickly. If you still need help, contact Visit-Jo support with your booking ID.'),
       category: 'During Stay'
     },
   ];
@@ -73,7 +75,7 @@ export default function Support() {
             event_label: 'Contact Form'
           });
         }
-        window.location.href = 'mailto:support@visitjo.com';
+        window.location.href = 'mailto:support@vist-jo.com';
       }
     },
     {
@@ -104,12 +106,12 @@ export default function Support() {
   };
 
   return (
-    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
+    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Seo
-        title="VisitJo Support Center - 24/7 Help for Your Jordan Trip"
+        title="Visit-Jo Support Center - 24/7 Help for Your Jordan Trip"
         description="Get instant support for your Jordan travel plans. Our expert team is here 24/7 to help with bookings, cancellations, and any questions about your trip."
-        canonicalUrl="https://visitjo.com/support"
-        keywords="VisitJo support, Jordan travel help, booking assistance, travel support, customer service"
+        canonicalUrl="https://vist-jo.com/support"
+        keywords="Visit-Jo support, Jordan travel help, booking assistance, travel support, customer service"
         structuredData={[faqStructuredData]}
       />
 
@@ -156,37 +158,6 @@ export default function Support() {
             {t('support.hero.subtitle', 'Have questions? We have answers. Let us help you make your trip seamless.')}
           </p>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Clock className="w-8 h-8 text-jordan-blue" />
-                24/7
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Support Available</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <CheckCircle className="w-8 h-8 text-jordan-teal" />
-                2hrs
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Average Response</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Users className="w-8 h-8 text-jordan-rose" />
-                50K+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Issues Resolved</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Heart className="w-8 h-8 text-jordan-gold" />
-                4.9★
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Satisfaction Rate</div>
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -214,7 +185,7 @@ export default function Support() {
 
             <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
               {SUPPORT_CHANNELS.map((channel, index) => (
-                <article key={channel.title} className="group card-modern p-8 lg:p-10 hover:shadow-premium transition-all duration-500 hover:-translate-y-2 animate-fade-in-up" style={{ animationDelay: `${0.2 * index}s` }}>
+                <article key={channel.title} className="group bg-white dark:bg-gray-800 rounded-lg p-6 lg:p-8 shadow-md hover:shadow-lg transition-shadow duration-200" style={{ animationDelay: `${0.2 * index}s` }}>
                   <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-jordan-blue to-jordan-teal rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                     <channel.icon className="w-8 h-8 text-white" />
                   </div>
@@ -252,7 +223,7 @@ export default function Support() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 px-4 lg:px-0">
               {FAQ.map((item, index) => (
-                <article key={item.q} className="group card-modern p-6 lg:p-8 hover:shadow-floating transition-all duration-500 hover:-translate-y-1 animate-fade-in-up min-h-[200px] lg:min-h-[220px]" style={{ animationDelay: `${0.1 * index}s` }}>
+                <article key={item.q} className="group bg-white dark:bg-gray-800 rounded-lg p-4 lg:p-6 shadow-sm hover:shadow-md transition-shadow duration-200 min-h-[180px] lg:min-h-[200px]" style={{ animationDelay: `${0.1 * index}s` }}>
                   <div className="flex items-start gap-4 mb-4">
                     <div className="flex-shrink-0 w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-jordan-gold/20 to-jordan-rose/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <item.icon className="w-6 h-6 lg:w-7 lg:h-7 text-jordan-gold" />

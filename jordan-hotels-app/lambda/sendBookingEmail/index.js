@@ -10,8 +10,8 @@ const ses = new SESClient({ region: process.env.AWS_REGION || "us-east-1" });
 
 const ALLOWED_ORIGINS = new Set([
   "https://main.d1ewsonl19kjj7.amplifyapp.com",
-  "https://www.visit-jo.com",
-  "https://visit-jo.com",
+  "https://www.VISIT-JO.com",
+  "https://VISIT-JO.com",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
@@ -65,7 +65,7 @@ const bookingConfirmationTemplate = (data) => `
         </div>
         
         <div class="footer">
-          <p>&copy; 2026 VisitJo - Jordan Hotels. All rights reserved.</p>
+          <p>&copy; 2026 VISIT-JO - Jordan Hotels. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -74,7 +74,7 @@ const bookingConfirmationTemplate = (data) => `
 
 const sendEmail = async (email, subject, htmlContent) => {
   const params = {
-    Source: process.env.SES_EMAIL_FROM || 'no-reply@visit-jo.com',
+    Source: process.env.SES_EMAIL_FROM || 'no-reply@VISIT-JO.com',
     Destination: {
       ToAddresses: [email],
     },

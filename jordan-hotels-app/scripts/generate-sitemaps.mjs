@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Dynamic Sitemap Generator for VisitJo
+ * Dynamic Sitemap Generator for VISIT-JO
  * Generates sitemaps for hotels and destinations
  */
 
@@ -14,27 +14,27 @@ const __dirname = path.dirname(__filename);
 
 // Static URLs that are always included
 const STATIC_URLS = [
-  { loc: 'https://visitjo.com/', priority: '1.0', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/hotels', priority: '0.9', changefreq: 'daily' },
-  { loc: 'https://visitjo.com/experiences', priority: '0.9', changefreq: 'daily' },
-  { loc: 'https://visitjo.com/deals', priority: '0.9', changefreq: 'daily' },
-  { loc: 'https://visitjo.com/destinations', priority: '0.8', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/about', priority: '0.6', changefreq: 'monthly' },
-  { loc: 'https://visitjo.com/blog', priority: '0.7', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/support', priority: '0.5', changefreq: 'monthly' },
-  { loc: 'https://visitjo.com/privacy', priority: '0.3', changefreq: 'yearly' },
-  { loc: 'https://visitjo.com/terms', priority: '0.3', changefreq: 'yearly' },
+  { loc: 'https://VISIT-JO.com/', priority: '1.0', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/hotels', priority: '0.9', changefreq: 'daily' },
+  { loc: 'https://VISIT-JO.com/experiences', priority: '0.9', changefreq: 'daily' },
+  { loc: 'https://VISIT-JO.com/deals', priority: '0.9', changefreq: 'daily' },
+  { loc: 'https://VISIT-JO.com/destinations', priority: '0.8', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/about', priority: '0.6', changefreq: 'monthly' },
+  { loc: 'https://VISIT-JO.com/blog', priority: '0.7', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/support', priority: '0.5', changefreq: 'monthly' },
+  { loc: 'https://VISIT-JO.com/privacy', priority: '0.3', changefreq: 'yearly' },
+  { loc: 'https://VISIT-JO.com/terms', priority: '0.3', changefreq: 'yearly' },
 ];
 
 // Destination URLs
 const DESTINATION_URLS = [
-  { loc: 'https://visitjo.com/destinations/petra', priority: '0.8', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/destinations/wadi-rum', priority: '0.8', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/destinations/dead-sea', priority: '0.8', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/destinations/amman', priority: '0.8', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/destinations/aqaba', priority: '0.7', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/destinations/jerash', priority: '0.7', changefreq: 'weekly' },
-  { loc: 'https://visitjo.com/destinations/madaba', priority: '0.7', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/destinations/petra', priority: '0.8', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/destinations/wadi-rum', priority: '0.8', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/destinations/dead-sea', priority: '0.8', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/destinations/amman', priority: '0.8', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/destinations/aqaba', priority: '0.7', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/destinations/jerash', priority: '0.7', changefreq: 'weekly' },
+  { loc: 'https://VISIT-JO.com/destinations/madaba', priority: '0.7', changefreq: 'weekly' },
 ];
 
 function generateSitemapXML(urls) {
@@ -56,7 +56,7 @@ ${urlElements}
 
 function generateHotelSitemap(hotels) {
   const hotelUrls = hotels.map(hotel => ({
-    loc: `https://visitjo.com/hotels/${hotel.id}`,
+    loc: `https://VISIT-JO.com/hotels/${hotel.id}`,
     priority: '0.6',
     changefreq: 'weekly'
   }));
@@ -107,7 +107,7 @@ async function generateSitemaps() {
   if (hotels.length > 0) {
     hotels.slice(0, 100).forEach(hotel => { // Limit to 100 most important hotels
       allUrls.push({
-        loc: `https://visitjo.com/hotels/${hotel.id || hotel.hotelId}`,
+        loc: `https://VISIT-JO.com/hotels/${hotel.id || hotel.hotelId}`,
         priority: '0.6',
         changefreq: 'weekly'
       });

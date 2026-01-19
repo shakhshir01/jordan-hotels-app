@@ -1,7 +1,7 @@
-# VisitJo - 27 Features Completed ✅
+# VISIT-JO - 27 Features Completed ✅
 
 ## Overview
-Successfully implemented comprehensive feature set for the VisitJo hotel booking platform. All features are production-ready with proper error handling, security, and documentation.
+Successfully implemented comprehensive feature set for the VISIT-JO hotel booking platform. All features are production-ready with proper error handling, security, and documentation.
 
 ## Features Completed (27/30)
 
@@ -197,7 +197,7 @@ npm run build
 For testing without backend:
 ```javascript
 // In browser console:
-localStorage.setItem('visitjo.useMocks', '1');
+localStorage.setItem('VISIT-JO.useMocks', '1');
 location.reload();
 ```
 

@@ -22,7 +22,7 @@ $env:GOOGLE_CLIENT_SECRET = '...'
 $env:GOOGLE_CLIENT_SECRET = '...'
 
 # Run the helper (it will prompt for missing values):
-.\deploy.ps1 -StackName visitjo-cognito-federation -AWSProfile default -UserPoolId us-east-1_T5vYoBi0N -CallbackURLs 'https://app.example.com/auth/callback' -LogoutURLs 'https://app.example.com/'
+.\deploy.ps1 -StackName VISIT-JO-cognito-federation -AWSProfile default -UserPoolId us-east-1_T5vYoBi0N -CallbackURLs 'https://app.example.com/auth/callback' -LogoutURLs 'https://app.example.com/'
 ```
 
 Notes

@@ -39,9 +39,9 @@ function Reviews() {
   return (
     <div className="min-h-screen bg-light-cool dark:bg-dark-cool">
       <Seo
-        title="Jordan Hotel Reviews - Authentic Guest Experiences | VisitJo"
+        title="Jordan Hotel Reviews - Authentic Guest Experiences | VISIT-JO"
         description="Read genuine reviews from travelers who have experienced Jordan's finest hotels. Verified reviews with photos and detailed insights to help you choose the perfect stay."
-        canonicalUrl="https://visitjo.com/reviews"
+        canonicalUrl="https://VISIT-JO.com/reviews"
         keywords="Jordan hotel reviews, guest experiences, verified reviews, Jordan travel reviews, hotel ratings"
       />
 
@@ -55,7 +55,7 @@ function Reviews() {
               <div className="max-w-4xl mx-auto text-center">
                 <Quote className="w-16 h-16 text-jordan-gold mx-auto mb-8 opacity-50" />
                 <blockquote className="text-xl sm:text-2xl lg:text-3xl font-light text-slate-700 dark:text-slate-200 italic leading-relaxed mb-8">
-                  "VisitJo's review system gave us the confidence to choose the perfect hotel for our honeymoon in Petra. The detailed reviews with photos helped us visualize exactly what to expect. It was absolutely perfect!"
+                  "VISIT-JO's review system gave us the confidence to choose the perfect hotel for our honeymoon in Petra. The detailed reviews with photos helped us visualize exactly what to expect. It was absolutely perfect!"
                 </blockquote>
                 <div className="flex items-center justify-center gap-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-jordan-gold to-jordan-rose rounded-full flex items-center justify-center">

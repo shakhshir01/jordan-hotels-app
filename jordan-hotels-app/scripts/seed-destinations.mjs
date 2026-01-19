@@ -65,7 +65,7 @@ const destinations = [
 ];
 
 async function seedDestinations() {
-  const tableName = process.env.DESTINATIONS_TABLE || "visitjo-backend-2-DestinationsTable-3IJ67D885I23";
+  const tableName = process.env.DESTINATIONS_TABLE || "VISIT-JO-backend-2-DestinationsTable-3IJ67D885I23";
 
   const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 

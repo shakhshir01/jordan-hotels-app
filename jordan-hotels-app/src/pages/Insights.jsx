@@ -113,9 +113,9 @@ const Insights = () => {
   return (
     <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
       <Seo
-        title="Jordan Travel Insights - Data-Driven Hotel Analysis | VisitJo"
+        title="Jordan Travel Insights - Data-Driven Hotel Analysis | VISIT-JO"
         description="Discover data-driven insights about Jordan's hotel market. Compare destinations, ratings, and prices to make informed travel decisions."
-        canonicalUrl="https://visitjo.com/insights"
+        canonicalUrl="https://VISIT-JO.com/insights"
         keywords="Jordan hotel insights, travel data, hotel analysis, destination comparison, Jordan travel statistics"
       />
 

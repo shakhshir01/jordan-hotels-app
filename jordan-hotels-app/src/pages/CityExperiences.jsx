@@ -211,11 +211,11 @@ export default function CityExperiences() {
   const categories = ['all', 'Cultural', 'Adventure', 'Food', 'Wellness'];
 
   return (
-    <div className="min-h-screen bg-light-cool dark:bg-dark-cool">
+    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Seo
         title={`Best Tours & Experiences in ${cityDisplayName} | VisitJo`}
         description={getCityDescription(cityDisplayName)}
-        canonicalUrl={`https://visitjo.com/cities/${city}/experiences`}
+        canonicalUrl={`https://vist-jo.com/cities/${city}/experiences`}
         keywords={`tours in ${cityDisplayName}, ${cityDisplayName} experiences, ${cityDisplayName} activities, Jordan tours, ${cityDisplayName} adventures`}
       />
 
@@ -287,7 +287,7 @@ export default function CityExperiences() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {filteredExperiences.map((experience) => (
-                    <div key={experience.id} className="card-modern overflow-hidden hover:shadow-premium transition-all duration-300 hover:-translate-y-1">
+                    <div key={experience.id} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200">
                       <div className="relative aspect-[4/3] overflow-hidden">
                         <OptimizedImage
                           src={experience.image || FALLBACK_IMG}
@@ -364,7 +364,7 @@ export default function CityExperiences() {
                   <Link
                     key={otherCity}
                     to={`/cities/${encodeURIComponent(otherCity)}/experiences`}
-                    className="group card-modern p-6 hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
+                    className="group bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-jordan-blue to-jordan-teal flex items-center justify-center group-hover:scale-110 transition-transform">

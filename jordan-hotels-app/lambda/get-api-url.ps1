@@ -1,5 +1,5 @@
 param(
-  [string]$StackName = 'visitjo-backend',
+  [string]$StackName = 'VISIT-JO-backend',
   [string]$Region = 'us-east-1'
 )
 

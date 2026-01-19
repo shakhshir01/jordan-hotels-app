@@ -202,7 +202,7 @@ export const AuthProvider = ({ children }) => {
                       (async () => {
                         try {
                           // First check localStorage for immediate UI update
-                          const stored = localStorage.getItem(`visitjo.mfaEnabled.${email}`);
+                          const stored = localStorage.getItem(`visit-jo.mfaEnabled.${email}`);
                           if (stored === '1') {
                             setMfaEnabled(true);
                             setMfaMethod('TOTP'); // Assume TOTP if we don't know
@@ -216,17 +216,17 @@ export const AuthProvider = ({ children }) => {
                             // explicitly triggered (logout flow, new session, etc.).
                             setMfaEnabled(true);
                             setMfaMethod(profile.mfaMethod || 'TOTP');
-                            localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+                            localStorage.setItem(`visit-jo.mfaEnabled.${email}`, '1');
                           } else if (stored === '1' && !profile?.mfaEnabled) {
                             // Database says disabled, update localStorage
-                            localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
+                            localStorage.removeItem(`visit-jo.mfaEnabled.${email}`);
                             setMfaEnabled(false);
                             setMfaMethod(null);
                           }
                         } catch (_e) {
                           console.warn('Failed reading MFA status', _e);
                           // Fallback to localStorage only
-                          const stored = localStorage.getItem(`visitjo.mfaEnabled.${email}`);
+                          const stored = localStorage.getItem(`visit-jo.mfaEnabled.${email}`);
                           if (stored === '1') {
                             setMfaEnabled(true);
                             setMfaMethod('TOTP'); // Assume TOTP if we don't know
@@ -431,8 +431,8 @@ export const AuthProvider = ({ children }) => {
           if (mfaEnabled) {
             setMfaEnabled(true);
             setMfaMethod(mfaMethod || 'TOTP');
-            localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
-            localStorage.setItem(`visitjo.mfaMethod.${email}`, mfaMethod || 'TOTP');
+            localStorage.setItem(`visit-jo.mfaEnabled.${email}`, '1');
+            localStorage.setItem(`visit-jo.mfaMethod.${email}`, mfaMethod || 'TOTP');
 
             if (mfaMethod === 'EMAIL') {
               // For email MFA, send a verification code to the secondary email
@@ -469,8 +469,8 @@ export const AuthProvider = ({ children }) => {
 
             setMfaEnabled(false);
             setMfaMethod(null);
-            localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
-            localStorage.removeItem(`visitjo.mfaMethod.${email}`);
+            localStorage.removeItem(`visit-jo.mfaEnabled.${email}`);
+            localStorage.removeItem(`visit-jo.mfaMethod.${email}`);
             setError(null);
             showSuccess(`Welcome back, ${email}!`);
             resolve({ success: true });
@@ -537,7 +537,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       const email = cognitoUserRef.current?.getUsername?.() || null;
-      if (email) localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
+      if (email) localStorage.removeItem(`visit-jo.mfaEnabled.${email}`);
     } catch (_e) {
       console.warn('Ignored during logout cleanup', _e);
     }
@@ -559,8 +559,8 @@ export const AuthProvider = ({ children }) => {
     setUserAndProfileFromEmail(email);
     setMfaEnabled(true);
     setMfaMethod('EMAIL');
-    localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
-    localStorage.setItem(`visitjo.mfaMethod.${email}`, 'EMAIL');
+    localStorage.setItem(`visit-jo.mfaEnabled.${email}`, '1');
+    localStorage.setItem(`visit-jo.mfaMethod.${email}`, 'EMAIL');
     setError(null);
     // Success message handled by caller
   }, [setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, setError, user?.email]);
@@ -604,7 +604,7 @@ export const AuthProvider = ({ children }) => {
           setUserAndProfileFromEmail(cognitoUser.getUsername());
           try {
             const email = cognitoUser.getUsername();
-            localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+            localStorage.setItem(`visit-jo.mfaEnabled.${email}`, '1');
           } catch (_e) { console.warn('Ignored during login token set', _e); }
           setMfaEnabled(true);
           // Set the correct MFA method based on the type used
@@ -659,7 +659,7 @@ export const AuthProvider = ({ children }) => {
         showSuccess('Two-factor authentication enabled');
         try {
           const email = cognitoUserRef.current?.getUsername?.() || user?.email;
-          if (email) localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+          if (email) localStorage.setItem(`visit-jo.mfaEnabled.${email}`, '1');
         } catch (_e) { console.warn('Ignored while persisting MFA state', _e); }
         setMfaEnabled(true);
         setMfaMethod('TOTP');
@@ -762,7 +762,7 @@ export const AuthProvider = ({ children }) => {
       const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
       try {
         const email = cognitoUser?.getUsername?.() || user?.email;
-        if (email) localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+        if (email) localStorage.setItem(`visit-jo.mfaEnabled.${email}`, '1');
       } catch (_e) { console.warn('Ignored while persisting local MFA flag', _e); }
       setMfaEnabled(true);
       setMfaMethod('TOTP');
@@ -791,7 +791,7 @@ export const AuthProvider = ({ children }) => {
       const cognitoUser = cognitoUserRef.current || UserPool?.getCurrentUser();
       try {
         const email = cognitoUser?.getUsername?.() || user?.email;
-        if (email) localStorage.setItem(`visitjo.mfaEnabled.${email}`, '1');
+        if (email) localStorage.setItem(`visit-jo.mfaEnabled.${email}`, '1');
       } catch (_e) { console.warn('Ignored while persisting local MFA flag', _e); }
       setMfaEnabled(true);
       setMfaMethod('EMAIL');
@@ -925,7 +925,7 @@ export const AuthProvider = ({ children }) => {
       // Update local state
       const email = cognitoUser.getUsername?.() || user?.email;
       if (email) {
-        localStorage.removeItem(`visitjo.mfaEnabled.${email}`);
+        localStorage.removeItem(`visit-jo.mfaEnabled.${email}`);
       }
       setMfaEnabled(false);
       setMfaMethod(null);

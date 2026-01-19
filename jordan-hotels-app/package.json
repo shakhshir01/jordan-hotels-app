@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && npm run generate-sitemaps",
+    "build:analyze": "vite build --sourcemap && npx vite-bundle-analyzer dist",
+    "build:fast": "vite build --mode development",
     "prepare": "node scripts/husky-install.cjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -17,6 +19,9 @@
     "test:coverage": "vitest --coverage",
     "analyze": "vite build --sourcemap && echo 'open dist for analysis'",
     "audit": "npm audit --audit-level=moderate",
+    "audit:fix": "npm audit fix",
+    "clean": "rm -rf dist node_modules/.vite",
+    "type-check": "tsc --noEmit",
     "generate-sitemaps": "node scripts/generate-sitemaps.mjs",
     "deploy:aws": "bash lambda/deploy-and-seed.sh",
     "deploy:aws:windows": "powershell -ExecutionPolicy Bypass -File lambda\\deploy-and-seed.ps1"
@@ -32,12 +37,14 @@
     "amazon-cognito-identity-js": "^6.3.16",
     "aws-amplify": "^5.3.29",
     "aws-rum-web": "^1.25.0",
-    "axios": "^1.13.2",
+    "buffer": "^6.0.3",
+    "process": "^0.11.10",
+    "axios": "^1.7.9",
     "cheerio": "^1.1.2",
     "dotenv": "^16.4.5",
     "i18next": "^25.7.3",
     "leaflet": "^1.9.4",
-    "lucide-react": "^0.518.0",
+    "lucide-react": "^0.469.0",
     "node-fetch": "^3.3.2",
     "otplib": "^12.0.1",
     "p-limit": "^7.2.0",
@@ -79,6 +86,7 @@
     "vite": "^7.3.0",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-pwa": "^1.2.0",
+    "vite-plugin-imagemin": "^0.6.1",
     "vitest": "^1.6.1"
   },
   "overrides": {
@@ -86,7 +94,8 @@
     "micromatch": "4.0.8"
   },
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "lint-staged": {
     "*.+(js|jsx|ts|tsx)": [

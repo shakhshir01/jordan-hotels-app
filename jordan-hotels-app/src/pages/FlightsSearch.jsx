@@ -47,11 +47,11 @@ export default function FlightsSearch() {
   };
 
   return (
-    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
+    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Seo
         title="Search Flights to Jordan - Book Cheap Flights | VisitJo"
         description="Find and book cheap flights to Jordan. Search flights to Amman, Aqaba, and all major Jordanian destinations. Best prices guaranteed."
-        canonicalUrl="https://visitjo.com/flights"
+        canonicalUrl="https://vist-jo.com/flights"
         keywords="flights to Jordan, cheap flights Jordan, Amman flights, Aqaba flights, book flights Jordan"
       />
 
@@ -98,37 +98,6 @@ export default function FlightsSearch() {
             Discover amazing flight deals to Jordan's most spectacular destinations. Book with confidence and start your adventure.
           </p>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Plane className="w-8 h-8 text-jordan-blue" />
-                500+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Daily Flights</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <MapPin className="w-8 h-8 text-jordan-teal" />
-                25+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Star className="w-8 h-8 text-jordan-rose" />
-                4.8★
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Customer Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Sparkles className="w-8 h-8 text-jordan-gold" />
-                24/7
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Support</div>
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -186,7 +155,7 @@ export default function FlightsSearch() {
                       placeholder="Origin city or airport"
                       value={origin}
                       onChange={(e) => setOrigin(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 glass-card border border-slate-200 dark:border-slate-700 rounded-2xl focus:border-jordan-blue focus:ring-2 focus:ring-jordan-blue/20 outline-none text-slate-900 dark:text-slate-100 transition-all duration-300 hover:shadow-floating"
+                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 dark:text-gray-100 transition-colors duration-200"
                       required
                     />
                   </div>
@@ -216,7 +185,7 @@ export default function FlightsSearch() {
                       placeholder="Destination city or airport"
                       value={dest}
                       onChange={(e) => setDest(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 glass-card border border-slate-200 dark:border-slate-700 rounded-2xl focus:border-jordan-blue focus:ring-2 focus:ring-jordan-blue/20 outline-none text-slate-900 dark:text-slate-100 transition-all duration-300 hover:shadow-floating"
+                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 dark:text-gray-100 transition-colors duration-200"
                       required
                     />
                   </div>
@@ -246,7 +215,7 @@ export default function FlightsSearch() {
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full pl-12 pr-4 py-4 glass-card border border-slate-200 dark:border-slate-700 rounded-2xl focus:border-jordan-blue focus:ring-2 focus:ring-jordan-blue/20 outline-none text-slate-900 dark:text-slate-100 transition-all duration-300 hover:shadow-floating"
+                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 dark:text-gray-100 transition-colors duration-200"
                       required
                     />
                   </div>
@@ -262,7 +231,7 @@ export default function FlightsSearch() {
                     <select
                       value={passengers}
                       onChange={(e) => setPassengers(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 glass-card border border-slate-200 dark:border-slate-700 rounded-2xl focus:border-jordan-blue focus:ring-2 focus:ring-jordan-blue/20 outline-none text-slate-900 dark:text-slate-100 transition-all duration-300 hover:shadow-floating appearance-none"
+                      className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-gray-900 dark:text-gray-100 transition-colors duration-200 appearance-none"
                     >
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
                         <option key={num} value={num.toString()}>{num} Passenger{num > 1 ? 's' : ''}</option>
@@ -340,7 +309,7 @@ export default function FlightsSearch() {
                   {results.map((flight, index) => (
                     <article
                       key={flight.id || index}
-                      className="card-modern p-6 lg:p-8 hover:shadow-premium transition-all duration-500 hover:-translate-y-1 animate-fade-in-up"
+                      className="bg-white dark:bg-gray-800 rounded-lg p-4 lg:p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
                       style={{ animationDelay: `${0.1 * index}s` }}
                     >
                       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">

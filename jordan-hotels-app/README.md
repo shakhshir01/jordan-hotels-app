@@ -1,4 +1,4 @@
-# VisitJo - Jordan Hotels Booking App
+# Visit-Jo - Jordan Hotels Booking App
 
 A modern React application for discovering and booking hotels across Jordan. Built with Vite, Tailwind CSS, and AWS Cognito authentication.
 
@@ -93,7 +93,7 @@ To enable the chatbot, you must provide a Google Gemini API key in your environm
 
 ### ⚙️ User Preferences & Profile Images
 
-VisitJo supports dynamic user preferences that update the UI immediately and persist to AWS. Users can customize:
+Visit-Jo supports dynamic user preferences that update the UI immediately and persist to AWS. Users can customize:
 
 - **Currency**: JOD, USD, EUR, GBP
 - **Language**: English, French, German, Arabic (with i18n support)

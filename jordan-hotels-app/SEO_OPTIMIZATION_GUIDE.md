@@ -1,7 +1,7 @@
-# SEO Optimization Guide for VisitJo
+# SEO Optimization Guide for VISIT-JO
 
 ## Overview
-VisitJo has been comprehensively optimized for search engines to attract users from all countries, with a focus on international travel to Jordan.
+VISIT-JO has been comprehensively optimized for search engines to attract users from all countries, with a focus on international travel to Jordan.
 
 ## SEO Features Implemented
 
@@ -40,7 +40,7 @@ VisitJo has been comprehensively optimized for search engines to attract users f
 - Trust signals and social proof
 
 #### Hotel Details Pages
-- Dynamic titles: "{Hotel Name} | VisitJo"
+- Dynamic titles: "{Hotel Name} | VISIT-JO"
 - Hotel-specific structured data (Hotel schema)
 - Review and rating integration
 - Location-based keywords
@@ -132,7 +132,7 @@ VisitJo has been comprehensively optimized for search engines to attract users f
 <Seo
   title="Page Title"
   description="Page description"
-  canonicalUrl="https://visitjo.com/page"
+  canonicalUrl="https://VISIT-JO.com/page"
   keywords="keyword1, keyword2"
   breadcrumbs={[{ name: "Home", url: "/" }, { name: "Page", url: "/page" }]}
   jsonLd={structuredData}

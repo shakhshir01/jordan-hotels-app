@@ -23,7 +23,7 @@ export default function MfaModal() {
         setSecret(secretCode);
         const username = cognitoUserRef.current?.getUsername?.() || 'user';
         const label = encodeURIComponent(`${username}`);
-        const issuer = encodeURIComponent('VisitJo');
+        const issuer = encodeURIComponent('Visit-Jo');
         const otpauth = `otpauth://totp/${label}?secret=${secretCode}&issuer=${issuer}`;
         QRCode.toDataURL(otpauth)
           .then((url) => {
@@ -232,7 +232,7 @@ export default function MfaModal() {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50" role="dialog" aria-modal="true" aria-labelledby="mfa-modal-title">
       <div className="surface max-w-lg w-full mx-4 animate-in fade-in-0 zoom-in-95 duration-300">
         {/* Header */}
         <div className="relative p-8 pb-6">
@@ -253,7 +253,7 @@ export default function MfaModal() {
             <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
               {getIcon()}
             </div>
-            <h2 className="page-title text-center text-slate-900 dark:text-slate-50 mb-2">
+            <h2 id="mfa-modal-title" className="page-title text-center text-slate-900 dark:text-slate-50 mb-2">
               {getTitle()}
             </h2>
             <p className="page-subtitle text-center">

@@ -185,8 +185,8 @@ export const offlineManager = {
  */
 export const generateManifest = (options = {}) => {
   return {
-    name: options.name || 'VisitJo - Jordan Hotels Booking',
-    short_name: options.shortName || 'VisitJo',
+    name: options.name || 'Visit-Jo - Jordan Hotels Booking',
+    short_name: options.shortName || 'Visit-Jo',
     description: options.description || 'Book hotels in Jordan with ease',
     start_url: options.startUrl || '/',
     scope: options.scope || '/',

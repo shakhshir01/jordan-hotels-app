@@ -70,7 +70,7 @@ export async function initCloudWatchRum() {
     const rumModule = await import('aws-rum-web');
     const AwsRum = rumModule?.AwsRum;
     if (!AwsRum) return;
-    window.__visitjo_rum = new AwsRum(applicationId, appVersion, region, config);
+    window.__VISITJO_rum = new AwsRum(applicationId, appVersion, region, config);
   } catch {
     // Non-fatal; app should still boot even if RUM fails.
   }

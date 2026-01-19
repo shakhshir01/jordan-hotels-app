@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usage: STACK=visitjo-backend REGION=us-east-1 ./get-api-url.sh
-STACK=${STACK:-visitjo-backend}
+# Usage: STACK=VISIT-JO-backend REGION=us-east-1 ./get-api-url.sh
+STACK=${STACK:-VISIT-JO-backend}
 REGION=${REGION:-us-east-1}
 
 echo "Fetching API URL from CloudFormation stack '$STACK' in region $REGION..."

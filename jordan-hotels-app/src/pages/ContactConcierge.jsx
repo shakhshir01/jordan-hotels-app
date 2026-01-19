@@ -56,7 +56,7 @@ export default function ContactConcierge() {
                 <span className="text-2xl mr-3">✉️</span>
                 <div className="flex-1">
                   <p className="font-bold text-slate-900 dark:text-slate-100">Email</p>
-                  <p className="text-slate-600 dark:text-slate-400">concierge@visitjo.com</p>
+                  <p className="text-slate-600 dark:text-slate-400">concierge@VISIT-JO.com</p>
                 </div>
               </div>
               <div className="flex items-start">

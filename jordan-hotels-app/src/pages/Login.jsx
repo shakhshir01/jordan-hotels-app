@@ -1,3 +1,5 @@
+/// <reference path="../types/globals.d.ts" />
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
@@ -119,7 +121,7 @@ const Login = () => {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="absolute right-3 top-3 text-slate-600 hover:text-slate-900"
+              className="absolute right-3 top-3 text-slate-600 hover:text-slate-900 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>

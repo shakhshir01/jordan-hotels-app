@@ -13,8 +13,8 @@ export class DeploymentPipeline {
   constructor(options = {}) {
     this.environments = {
       development: { url: 'http://localhost:5174', type: 'local' },
-      staging: { url: options.stagingUrl || 'https://staging.visitjo.com', type: 'staging' },
-      production: { url: options.productionUrl || 'https://visitjo.com', type: 'production' },
+      staging: { url: options.stagingUrl || 'https://staging.VISIT-JO.com', type: 'staging' },
+      production: { url: options.productionUrl || 'https://VISIT-JO.com', type: 'production' },
     };
 
     this.currentEnv = 'development';

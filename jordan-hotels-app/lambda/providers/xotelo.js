@@ -82,7 +82,7 @@ export async function fetchXoteloListPage({
   const url = `https://data.xotelo.com/api/list?location_key=${encodeURIComponent(locationKey)}&limit=${encodeURIComponent(limit)}&offset=${encodeURIComponent(offset)}&sort=${encodeURIComponent(sort)}`;
   const res = await fetch(url, {
     headers: {
-      "User-Agent": "VisitJo/1.0 (+https://visitjo.com)",
+      "User-Agent": "VISIT-JO/1.0 (+https://VISIT-JO.com)",
       "Accept": "application/json",
     },
   });

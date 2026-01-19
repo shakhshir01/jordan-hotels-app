@@ -88,8 +88,8 @@ export default function Privacy() {
           <footer className="text-center pt-8 border-t border-slate-200 dark:border-slate-700">
             <p className="text-slate-500 dark:text-slate-400 text-sm">
               If you have any questions about this Privacy Policy, please contact us at{' '}
-              <a href="mailto:privacy@visitjo.com" className="text-blue-600 hover:text-blue-700 font-semibold">
-                privacy@visitjo.com
+              <a href="mailto:privacy@VISIT-JO.com" className="text-blue-600 hover:text-blue-700 font-semibold">
+                privacy@VISIT-JO.com
               </a>
             </p>
           </footer>

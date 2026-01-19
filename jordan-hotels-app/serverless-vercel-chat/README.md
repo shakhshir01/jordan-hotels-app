@@ -1,4 +1,4 @@
-Deploying the VisitJo Chat function to Vercel or Netlify
+Deploying the VISIT-JO Chat function to Vercel or Netlify
 
 Overview
 - This folder contains a minimal serverless chat proxy suitable for Vercel (Serverless Functions) or Netlify Functions.

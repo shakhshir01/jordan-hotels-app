@@ -17,7 +17,7 @@ export const WishlistProvider = ({ children }) => {
   // Load wishlist from localStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('visitjo_wishlist');
+      const saved = localStorage.getItem('VISIT-JO_wishlist');
       if (saved) {
         const parsed = JSON.parse(saved);
         console.log('Loaded wishlist from localStorage:', parsed.length, 'items');
@@ -34,7 +34,7 @@ export const WishlistProvider = ({ children }) => {
         // Save the cleaned version back to localStorage if duplicates were found
         if (unique.length !== parsed.length) {
           console.log('Found and removed', parsed.length - unique.length, 'duplicates');
-          localStorage.setItem('visitjo_wishlist', JSON.stringify(unique));
+          localStorage.setItem('VISIT-JO_wishlist', JSON.stringify(unique));
         }
       }
     } catch (error) {
@@ -48,7 +48,7 @@ export const WishlistProvider = ({ children }) => {
   useEffect(() => {
     if (!loading) {
       try {
-        localStorage.setItem('visitjo_wishlist', JSON.stringify(wishlist));
+        localStorage.setItem('VISIT-JO_wishlist', JSON.stringify(wishlist));
       } catch (error) {
         console.error('Error saving wishlist:', error);
       }

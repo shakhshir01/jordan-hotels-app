@@ -1,3 +1,5 @@
+/// <reference path="../types/globals.d.ts" />
+
 import axios from "axios";
 import { XOTELO_JORDAN_HOTELS } from "./xoteloJordanHotelsData.js";
 import { sanitizeHotelImageUrls, GENERIC_HOTEL_FALLBACK_IMAGES, getGenericHotelFallbackImage } from "../utils/hotelImageFallback";
@@ -115,6 +117,27 @@ export const setAuthToken = (token) => {
   }
 };
 
+// Retry utility for failed requests
+const retryRequest = async (requestFn, maxRetries = 2, delay = 1000) => {
+  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+    try {
+      return await requestFn();
+    } catch (error) {
+      const isRetryableError = error.code === 'ERR_NETWORK' ||
+                              error.response?.status >= 500 ||
+                              error.response?.status === 429;
+
+      if (attempt > maxRetries || !isRetryableError) {
+        throw error;
+      }
+
+      console.warn(`Request failed (attempt ${attempt}/${maxRetries + 1}), retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      delay *= 2; // Exponential backoff
+    }
+  }
+};
+
 let lastAuthError = null;
 
 const isAuthError = (status, message) => {
@@ -137,26 +160,53 @@ apiClient.interceptors.response.use(
     const dataMessage = error.response?.data?.message || error.response?.data || null;
     const errorMessage = dataMessage || error.message || "An error occurred";
 
-    // Handle CORS errors specifically - don't throw for CORS issues in development
+    // Handle network/CORS errors with better user feedback
     if (error.code === 'ERR_NETWORK' || error.message?.includes('CORS') ||
         error.message?.includes('Network Error') || status === 0) {
-      console.warn('CORS/Network error detected, enabling mock mode for this request');
-      // For CORS errors, return a resolved promise with mock data instead of rejecting
-      return Promise.resolve({
-        data: { mock: true, message: 'CORS error - using mock data' },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: error.config
-      });
+      console.warn('Network/CORS error detected');
+      // Return a proper error instead of mock data for better error handling
+      return Promise.reject(new Error('Network connection error. Please check your internet connection and try again.'));
+    }
+
+    // Provide user-friendly error messages based on HTTP status
+    let userFriendlyMessage = errorMessage;
+
+    switch (status) {
+      case 400:
+        userFriendlyMessage = 'Invalid request. Please check your input and try again.';
+        break;
+      case 401:
+        userFriendlyMessage = 'Authentication required. Please log in and try again.';
+        break;
+      case 403:
+        userFriendlyMessage = 'Access denied. You don\'t have permission to perform this action.';
+        break;
+      case 404:
+        userFriendlyMessage = 'The requested resource was not found.';
+        break;
+      case 429:
+        userFriendlyMessage = 'Too many requests. Please wait a moment and try again.';
+        break;
+      case 500:
+        userFriendlyMessage = 'Server error. Please try again later.';
+        break;
+      case 502:
+      case 503:
+      case 504:
+        userFriendlyMessage = 'Service temporarily unavailable. Please try again later.';
+        break;
+      default:
+        if (!userFriendlyMessage || userFriendlyMessage === 'An error occurred') {
+          userFriendlyMessage = 'Something went wrong. Please try again.';
+        }
     }
 
     if (isAuthError(status, errorMessage)) {
-      lastAuthError = `API Authentication error: ${errorMessage}`;
+      lastAuthError = `Authentication error: ${userFriendlyMessage}`;
       return Promise.reject(new Error(lastAuthError));
     }
 
-    return Promise.reject(new Error(errorMessage));
+    return Promise.reject(new Error(userFriendlyMessage));
   }
 );
 
@@ -434,7 +484,7 @@ const getHotelsFromStatic = ({ q = "", cursor = "", limit = 30 } = {}) => {
   const hotels = filteredHotels.slice(startIndex, endIndex);
   const nextCursor = endIndex < filteredHotels.length ? String(endIndex) : null;
 
-  return { hotels, nextCursor, total: filteredHotels.length };
+  return { hotels, nextCursor };
 };
 
 // Fallback function to fetch hotels from Xotelo API directly
@@ -443,7 +493,7 @@ const fetchXoteloFallback = async (limit = 100) => {
     const url = `https://data.xotelo.com/api/list?location_key=g293985&limit=${limit}&sort=best_value`;
     const response = await fetch(url, {
       headers: {
-        "User-Agent": "VisitJo/1.0 (+https://visitjo.com)",
+        "User-Agent": "Visit-Jo/1.0 (+https://vist-jo.com)",
         "Accept": "application/json",
       },
     });

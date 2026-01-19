@@ -6,7 +6,7 @@ export const getPriceComparison = (hotelName, basePrice) => {
   const hotelsComPrice = Math.round(basePrice * (1 + (Math.random() - 0.5) * variance));
 
   return {
-    visitJo: basePrice,
+    'Visit-Jo': basePrice,
     expedia: expediaPrice,
     booking: bookingPrice,
     hotelscom: hotelsComPrice,

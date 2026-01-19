@@ -1,5 +1,5 @@
 Param(
-	[string]$StackName = $(if ($env:VISITJO_STACK_NAME) { $env:VISITJO_STACK_NAME } else { "VisitJo" }),
+	[string]$StackName = $(if ($env:VISIT-JO_STACK_NAME) { $env:VISIT-JO_STACK_NAME } else { "VISIT-JO" }),
 	[string]$Region = $(if ($env:AWS_REGION) { $env:AWS_REGION } elseif ($env:AWS_DEFAULT_REGION) { $env:AWS_DEFAULT_REGION } else { "us-east-1" })
 )
 

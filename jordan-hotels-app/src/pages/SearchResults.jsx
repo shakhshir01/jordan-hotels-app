@@ -17,7 +17,6 @@ function SearchResults() {
 
   const [hotels, setHotels] = useState([]);
   const [nextCursor, setNextCursor] = useState(null);
-  const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
@@ -87,13 +86,10 @@ function SearchResults() {
 
       // Filter for top-rated hotels if requested
       if (topRated) {
-        const allTopRated = (Array.isArray(first?.hotels) ? first.hotels : [])
+        items = items
           .filter(hotel => hotel.rating && typeof hotel.rating === 'number' && hotel.rating >= 4.5)
-          .sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        items = allTopRated.slice(0, 10); // Only top 10 highly-rated hotels
-        setTotalResults(allTopRated.length); // Total top-rated hotels available
-      } else {
-        setTotalResults(first?.total || items.length);
+          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+          .slice(0, 10); // Only top 10 highly-rated hotels
       }
 
       setHotels(items);
@@ -176,21 +172,21 @@ function SearchResults() {
   const hasHotels = useMemo(() => Array.isArray(hotels) && hotels.length > 0, [hotels]);
 
   return (
-    <div className="min-h-screen bg-light-cool dark:bg-dark-cool">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Seo
         title={`Hotel Search Results${term ? ` for ${term}` : ''} - VisitJo`}
-        description={`Find the best hotels${term ? ` in ${term}` : ' in Jordan'}. Browse ${totalResults} available properties with real-time pricing and authentic reviews.`}
-        canonicalUrl={`https://visitjo.com/search${term ? `?q=${encodeURIComponent(term)}` : ''}`}
+        description={`Find the best hotels${term ? ` in ${term}` : ' in Jordan'}. Browse ${hotels.length} available properties with real-time pricing and authentic reviews.`}
+        canonicalUrl={`https://vist-jo.com/search${term ? `?q=${encodeURIComponent(term)}` : ''}`}
         keywords={`Jordan hotels${term ? `, ${term} hotels` : ''}, hotel booking, accommodation, travel`}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black gradient-text mb-2">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-2">
               Your Perfect Jordan Stay Awaits
             </h1>
             <p className="text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-200 leading-relaxed">
-              {hasHotels ? `Discover ${totalResults} exceptional hotels` : 'Discover amazing hotels'} for <span className="font-semibold text-slate-900 dark:text-slate-100">"{term || "Jordan"}"</span>
+              {hasHotels ? `Discover ${hotels.length} exceptional hotels` : 'Discover amazing hotels'} for <span className="font-semibold text-slate-900 dark:text-slate-100">"{term || "Jordan"}"</span>
             </p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -210,7 +206,7 @@ function SearchResults() {
           <section className="card-modern">
             <div className="p-6 sm:p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl sm:text-2xl font-black gradient-text">
+                <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
                   Saved Searches
                 </h2>
               </div>
@@ -280,7 +276,7 @@ function SearchResults() {
             {/* Hotels */}
             {hasHotels && (
               <section>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 gradient-text">Hotels</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 text-gray-900 dark:text-white">Hotels</h2>
                 {error && (
                   <div className="mb-6 glass-card rounded-2xl p-4 border border-amber-200/50 bg-amber-50/50 dark:bg-amber-900/20">
                     <p className="text-amber-800 dark:text-amber-200 text-sm font-medium">
@@ -340,7 +336,7 @@ function SearchResults() {
                           )}
                           {h.price && (
                             <div className="text-right">
-                              <span className="text-2xl font-black gradient-text">{h.price}</span>
+                              <span className="text-2xl font-black text-green-600">{h.price}</span>
                               <span className="text-sm text-slate-500 dark:text-slate-400 font-medium ml-1">JOD</span>
                               <p className="text-xs text-slate-500 dark:text-slate-400">per night</p>
                             </div>

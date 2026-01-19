@@ -43,7 +43,7 @@ Resources:
   FederatedUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      ClientName: visitjo-federated-client
+      ClientName: VISIT-JO-federated-client
       UserPoolId: !Ref UserPoolId
       AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthFlows:

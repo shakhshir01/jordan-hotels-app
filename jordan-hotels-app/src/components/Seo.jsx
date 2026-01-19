@@ -12,9 +12,9 @@ const Seo = ({
   structuredData = [],
   breadcrumbs = []
 }) => {
-  const fullTitle = title ? `${title} | VisitJo` : 'VisitJo | Discover Jordan\'s Best Hotels & Experiences';
+  const fullTitle = title ? `${title} | VISIT-JO` : 'VISIT-JO | Discover Jordan\'s Best Hotels & Experiences';
   const metaDescription = description || 'Book authentic hotels, explore ancient wonders, and create unforgettable memories in Jordan. From Petra to Wadi Rum, your adventure starts here.';
-  const metaImage = image || 'https://visitjo.com/og-image.jpg';
+  const metaImage = image || 'https://VISIT-JO.com/og-image.jpg';
   const metaKeywords = keywords || 'Jordan hotels, Jordan travel, Petra, Wadi Rum, Dead Sea, Amman hotels, Jordan experiences, Jordan booking';
 
   // Combine all structured data
@@ -43,7 +43,7 @@ const Seo = ({
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
       <meta name="keywords" content={metaKeywords} />
-      <meta name="author" content="VisitJo" />
+      <meta name="author" content="VISIT-JO" />
       <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1'} />
 
       {/* Canonical URL */}
@@ -53,9 +53,9 @@ const Seo = ({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={metaDescription} />
       <meta property="og:image" content={metaImage} />
-      <meta property="og:url" content={canonicalUrl || 'https://visitjo.com'} />
+      <meta property="og:url" content={canonicalUrl || 'https://VISIT-JO.com'} />
       <meta property="og:type" content={type} />
-      <meta property="og:site_name" content="VisitJo" />
+      <meta property="og:site_name" content="VISIT-JO" />
       <meta property="og:locale" content="en_US" />
 
       {/* Twitter Card */}

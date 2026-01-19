@@ -19783,7 +19783,7 @@ export const XOTELO_JORDAN_HOTELS = [
       "https://cf.bstatic.com/xdata/images/hotel/max1024x768/615101871.jpg?k=6d7421783e01316b797f02f5a26db6199c64733a9bcf5ee67816b718120084bc&amp;o=&amp;hp=1",
       "https://lp-cms-production.imgix.net/2023-05/shutterstock576672586.jpg?fit=crop&amp;ar=1:1&amp;w=1200&amp;auto=format&amp;q=75",
       "https://cdn.getyourguide.com/img/tour/586d3902ee634949.jpeg/145.jpg",
-      "https://international.visitjordan.com/content/images/hotel-img.jpg",
+      "https://international.VISIT-JOrdan.com/content/images/hotel-img.jpg",
       "https://wanderlustwelsh.com/wp-content/uploads/2024/09/oval-plaza-jerash-1024x683.jpg",
       "https://mir-s3-cdn-cf.behance.net/projects/404/08685c181972991.Y3JvcCwxMzgwLDEwODAsMjcwLDA.jpg",
       "https://egyptunitedtours.com/wp-content/uploads/2024/01/the-Ruins-of-Jerash-1024x768.webp"
@@ -46365,7 +46365,7 @@ export const XOTELO_JORDAN_HOTELS = [
       "https://c8.alamy.com/comp/2M7K5FM/view-over-the-south-gate-in-jerash-city-jordan-middle-east-2M7K5FM.jpg",
       "https://c8.alamy.com/comp/EPFCK4/ruins-at-jerash-jordan-south-theater-and-view-of-modern-city-EPFCK4.jpg",
       "https://cf.bstatic.com/xdata/images/hotel/max1024x768/565592510.jpg?k=bb0756e76dd5f470d16c0dbfa45f1a39232f7ce982a0cf1d95f64c977c3f10f3&amp;o=&amp;hp=1",
-      "https://www.seetheholyland.net/wp-content/uploads/©-Visit-Jordan-Jerash-City-Walls-1.jpg",
+      "https://www.seetheholyland.net/wp-content/uploads/©-VISIT-JOrdan-Jerash-City-Walls-1.jpg",
       "https://i.pinimg.com/originals/7b/89/85/7b898503b0dc5a376b4765fdc6d2e487.jpg",
       "https://i0.wp.com/jordantraveler.com/wp-content/uploads/2023/04/Facts-About-Jerash-South-Theatre.jpg?ssl=1"
     ],
@@ -47060,7 +47060,7 @@ export const XOTELO_JORDAN_HOTELS = [
       "https://media-cdn.tripadvisor.com/media/photo-s/1b/39/61/d5/jerash-ruins-jerash-jordan.jpg",
       "https://cf.bstatic.com/xdata/images/hotel/max1024x768/184342485.jpg?k=913f8beb1fb5631ab66e95265eeef7482835c11cd15aa5e23395a4203ea49150&amp;o=&amp;hp=1",
       "https://pvt.jo/uploads/filemanager/Photos/Hotels in Jerash/1955.jpg",
-      "https://jerash.visitjordan.com/Uploads/Media/images/0F9A1638.jpg",
+      "https://jerash.VISIT-JOrdan.com/Uploads/Media/images/0F9A1638.jpg",
       "https://farm5.staticflickr.com/4172/34594275205_d3698ec3d1_b.jpg",
       "https://elmundoporrecorrer.com/wp-content/uploads/2022/04/Jerash-jordania-hotel-640x480.jpg.webp"
     ],
@@ -68397,7 +68397,7 @@ export const XOTELO_JORDAN_HOTELS = [
       "https://cf.bstatic.com/xdata/images/hotel/max1024x768/489723682.jpg?k=014460737d8a6cea0db593779a1486808202786ed32346cc4d70ae15a036f120&amp;o=&amp;hp=1",
       "https://cf.bstatic.com/xdata/images/hotel/max1024x768/470508474.jpg?k=d9a217c91e365ff19b640681bb229674cad982edba2c6c59bdc76818ba61459c&amp;o=&amp;hp=1",
       "https://cf.bstatic.com/xdata/images/hotel/max1024x768/523390462.jpg?k=4752f70aa57b6b52fbc8f0241b1ff730c546ee7fe298f0674c9ca12b4b53362a&amp;o=&amp;hp=1",
-      "https://jerash.visitjordan.com/uploads/sites/images/d04209f8-77f3-4206-8e27-30c65bbfaeed.jpg",
+      "https://jerash.VISIT-JOrdan.com/uploads/sites/images/d04209f8-77f3-4206-8e27-30c65bbfaeed.jpg",
       "https://i0.wp.com/www.touristjordan.com/wp-content/uploads/2019/02/Do-I-need-a-guide-in-Wadi-Rum-2-scaled.jpg?resize=1536%2C864&amp;ssl=1"
     ],
     "description": "",
@@ -79402,7 +79402,7 @@ export const XOTELO_JORDAN_HOTELS = [
       "https://umayyad.eu/sites/default/files/styles/md_slider_49_bg/public/Qasr al Hallabat_shutterstock_73134865_rsz_text.jpg?itok=gek47nCl",
       "https://live.staticflickr.com/5741/22023662631_dfaa16087c_o.jpg",
       "https://jordan.gov.jo/EBV4.0/Root_Storage/AR/الزرقاء.png",
-      "https://en.visitjordan.com/uploads/attractions/1025a57d-017e-4000-b0f4-dd4ab30fd394.jpg",
+      "https://en.VISIT-JOrdan.com/uploads/attractions/1025a57d-017e-4000-b0f4-dd4ab30fd394.jpg",
       "https://egyptunitedtours.com/wp-content/uploads/2024/02/Zarqa-City-scaled.webp",
       "https://egyptunitedtours.com/wp-content/uploads/2024/02/Zarqa-Museum-1024x765.webp",
       "https://egyptunitedtours.com/wp-content/uploads/2024/02/hiking-1024x680.webp",

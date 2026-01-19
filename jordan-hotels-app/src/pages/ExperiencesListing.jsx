@@ -30,7 +30,7 @@ export default function ExperiencesListing() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Seo
         title="Jordan Experiences - Authentic Adventures & Cultural Tours"
         description="Discover authentic Jordanian experiences. From Petra tours to Wadi Rum safaris, Dead Sea spas to Red Sea diving. Create unforgettable memories in Jordan."
@@ -40,78 +40,39 @@ export default function ExperiencesListing() {
 
       {/* Enhanced Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Dynamic Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-jordan-emerald via-jordan-teal to-jordan-blue animate-gradient-shift"></div>
+        {/* Simple Background */}
+        <div className="absolute inset-0 bg-green-600"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
 
-        {/* Animated Mesh Background */}
+        {/* Clean Background */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 right-10 w-80 h-80 bg-jordan-gold/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-jordan-rose/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
-          <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-jordan-teal/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-        </div>
-
-        {/* Floating Geometric Shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-16 left-16 w-6 h-6 bg-white/20 rotate-45 animate-float" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute top-32 right-20 w-8 h-8 bg-jordan-gold/30 rounded-full animate-float" style={{ animationDelay: '1.5s' }}></div>
-          <div className="absolute bottom-24 left-24 w-5 h-5 bg-jordan-rose/25 rotate-12 animate-float" style={{ animationDelay: '2.5s' }}></div>
-          <div className="absolute bottom-32 right-32 w-7 h-7 bg-jordan-teal/20 rounded-full animate-float" style={{ animationDelay: '3.5s' }}></div>
+          <div className="absolute top-20 left-10 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/3 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Enhanced Badge */}
-          <div className="inline-flex items-center gap-3 px-8 py-4 mb-12 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full text-white/90 text-sm font-bold uppercase tracking-widest shadow-2xl animate-fade-in">
-            <Sparkles className="w-5 h-5 text-jordan-gold" />
+          {/* Simple Badge */}
+          <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white text-sm font-semibold uppercase tracking-wide animate-fade-in">
+            <Sparkles className="w-5 h-5" />
             {t('pages.experiences.hero.kicker', 'Unforgettable Moments')}
-            <Sparkles className="w-5 h-5 text-jordan-gold" />
+            <Sparkles className="w-5 h-5" />
           </div>
 
-          {/* Enhanced Title */}
-          <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black font-display mb-8 tracking-tight leading-tight animate-slide-up">
-            <span className="block text-white drop-shadow-2xl mb-2">{t("pages.experiences.hero.titleMain", "Go Beyond the")}</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl">
+          {/* Simple Title */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-6 sm:mb-8 tracking-tight leading-tight animate-slide-up px-2 sm:px-0">
+            <span className="block text-white drop-shadow-2xl mb-1 sm:mb-2">
+              {t("pages.experiences.hero.titleMain", "Go Beyond the")}
+            </span>
+            <span className="block text-white drop-shadow-2xl">
               {t("pages.experiences.hero.titleAccent", "Ordinary")}
             </span>
           </h1>
 
-          {/* Enhanced Subtitle */}
-          <p className="text-xl sm:text-2xl lg:text-3xl max-w-5xl mx-auto mb-16 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
+          {/* Simple Subtitle */}
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-4xl mx-auto mb-12 sm:mb-16 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.3s' }}>
             {t('pages.experiences.hero.subtitle', 'Don\'t just visit Jordan—live it. From Bedouin tea in the desert to diving in the Red Sea, create memories that last a lifetime.')}
           </p>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Compass className="w-8 h-8 text-jordan-gold" />
-                25+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Camera className="w-8 h-8 text-jordan-rose" />
-                50+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Experiences</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Star className="w-8 h-8 text-jordan-gold" />
-                4.9★
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Avg Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Heart className="w-8 h-8 text-jordan-teal" />
-                10K+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Happy Travelers</div>
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -165,10 +126,10 @@ export default function ExperiencesListing() {
                         alt={experience.title}
                         className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                         sizes="100vw"
-                        style={{ background: 'linear-gradient(to bottom right, #a78bfa, #f472b6, #fb923c)' }}
+                        style={{ background: '#f3f4f6' }}
                       />
                     ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                      <div className="h-full w-full bg-gray-400 flex items-center justify-center">
                         <span className="text-4xl">✨</span>
                       </div>
                     )}

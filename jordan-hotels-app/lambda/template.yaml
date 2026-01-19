@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: VisitJo SAM template — API, Lambdas, DynamoDB, S3, Secrets Manager (updated)
+Description: VISIT-JO SAM template — API, Lambdas, DynamoDB, S3, Secrets Manager (updated)
 
 Globals:
   Function:
@@ -41,7 +41,7 @@ Resources:
       # (attached to the RestApi) using valid parameter keys and reference the
       # generated RestApi from the SAM transform.
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
 
@@ -107,7 +107,7 @@ Resources:
         SSEEnabled: true
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -129,7 +129,7 @@ Resources:
         SSEEnabled: true
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -151,7 +151,7 @@ Resources:
         SSEEnabled: true
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -173,7 +173,7 @@ Resources:
         SSEEnabled: true
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -204,7 +204,7 @@ Resources:
         SSEEnabled: true
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -226,7 +226,7 @@ Resources:
         SSEEnabled: true
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -250,7 +250,7 @@ Resources:
               SSEAlgorithm: AES256
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -277,7 +277,7 @@ Resources:
         LogFilePrefix: access-logs/
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -289,11 +289,11 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      Description: Stripe secret for VisitJo (store STRIPE_SECRET here)
+      Description: Stripe secret for VISIT-JO (store STRIPE_SECRET here)
       KmsKeyId: alias/aws/secretsmanager
       Tags:
         - Key: App
-          Value: VisitJo
+          Value: VISIT-JO
         - Key: ManagedBy
           Value: SAM
         - Key: Stack
@@ -341,7 +341,7 @@ Resources:
       Handler: getHotels/index.handler
       CodeUri: getHotels/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -364,7 +364,7 @@ Resources:
       Handler: getHotelById/index.handler
       CodeUri: getHotelById/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -387,7 +387,7 @@ Resources:
       Handler: search/index.handler
       CodeUri: search/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -414,7 +414,7 @@ Resources:
       Handler: destinations/index.handler
       CodeUri: destinations/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -443,7 +443,7 @@ Resources:
       Handler: deals/index.handler
       CodeUri: deals/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -472,7 +472,7 @@ Resources:
       Handler: experiences/index.handler
       CodeUri: experiences/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -501,7 +501,7 @@ Resources:
       Handler: bookings/index.handler
       CodeUri: bookings/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -524,7 +524,7 @@ Resources:
       Handler: createCheckoutSession/index.handler
       CodeUri: createCheckoutSession/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -549,7 +549,7 @@ Resources:
       Handler: createPaymentIntent/index.handler
       CodeUri: createPaymentIntent/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -574,7 +574,7 @@ Resources:
       Handler: getSignedUrl/index.handler
       CodeUri: getSignedUrl/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -597,7 +597,7 @@ Resources:
       Handler: user/index.handler
       CodeUri: user/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -607,9 +607,9 @@ Resources:
         Variables:
           BOOKINGS_TABLE: !Ref BookingsTable
           USERS_TABLE: !Ref UsersTable
-          SES_EMAIL_FROM: no-reply@visit-jo.com
-          SES_FROM_EMAIL: no-reply@visit-jo.com
-          DOMAIN: visit-jo.com
+          SES_EMAIL_FROM: no-reply@VISIT-JO.com
+          SES_FROM_EMAIL: no-reply@VISIT-JO.com
+          DOMAIN: VISIT-JO.com
       Events:
         ApiUserProfileGet:
           Type: Api
@@ -698,7 +698,7 @@ Resources:
       Handler: sendBookingEmail/index.handler
       CodeUri: sendBookingEmail/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:
@@ -706,8 +706,8 @@ Resources:
         - !Ref LambdaRolePolicy
       Environment:
         Variables:
-          SES_EMAIL_FROM: no-reply@visit-jo.com
-          SES_FROM_EMAIL: no-reply@visit-jo.com
+          SES_EMAIL_FROM: no-reply@VISIT-JO.com
+          SES_FROM_EMAIL: no-reply@VISIT-JO.com
           FRONTEND_URL: https://main.d1ewsonl19kjj7.amplifyapp.com
       Events:
         ApiSendBookingEmail:
@@ -723,7 +723,7 @@ Resources:
       Handler: chat/index.handler
       CodeUri: chat/
       Tags:
-        App: VisitJo
+        App: VISIT-JO
         ManagedBy: SAM
         Stack: !Ref AWS::StackName
       Policies:

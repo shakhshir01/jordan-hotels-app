@@ -12,7 +12,7 @@ const FALLBACK_IMG =
   <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
     <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
     <rect width="100%" height="100%" fill="url(#g)"/>
-    <text x="50%" y="50%" fill="rgba(255,255,255,.9)" font-family="Arial" font-size="32" text-anchor="middle" dominant-baseline="middle">VisitJo Hotel</text>
+    <text x="50%" y="50%" fill="rgba(255,255,255,.9)" font-family="Arial" font-size="32" text-anchor="middle" dominant-baseline="middle">VISIT-JO Hotel</text>
   </svg>`);
 
 /** @param {{hotel:any,i18nLanguage?:string,viewLabel?:string,preferences:any}} props */

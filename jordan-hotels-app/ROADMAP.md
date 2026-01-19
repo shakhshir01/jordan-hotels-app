@@ -1,4 +1,4 @@
-# VisitJo — Prioritized Improvement Backlog (Jan 2026)
+# VISIT-JO — Prioritized Improvement Backlog (Jan 2026)
 
 This backlog is ordered by **impact on conversion + trust + performance** first (the things that make Expedia/Booking “feel premium”), then by implementation risk.
 

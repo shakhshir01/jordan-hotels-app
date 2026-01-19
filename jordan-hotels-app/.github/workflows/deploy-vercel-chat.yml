@@ -1,4 +1,4 @@
-name: Deploy VisitJo Chat to Vercel
+name: Deploy VISIT-JO Chat to Vercel
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
-        with:
+        with
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-args: '--prod'
           working-directory: 'serverless-vercel-chat'

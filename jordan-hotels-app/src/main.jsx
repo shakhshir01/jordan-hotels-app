@@ -1,3 +1,13 @@
+// Polyfills for AWS Amplify compatibility
+// import { Buffer } from 'buffer';
+import process from 'process';
+
+// Make polyfills available globally
+if (typeof globalThis !== 'undefined') {
+  // globalThis.Buffer = Buffer;
+  globalThis.process = process;
+}
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
@@ -19,7 +29,7 @@ async function cleanupStaleServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
 
   // Avoid reload loops.
-  const markerKey = 'visitjo_sw_cleanup_done_v3';
+  const markerKey = 'VISIT-JO_sw_cleanup_done_v3';
   if (sessionStorage.getItem(markerKey)) return;
 
   try {
@@ -39,7 +49,7 @@ async function cleanupStaleServiceWorker() {
     if ('caches' in window) {
       const cacheNames = await caches.keys();
       const staleCaches = cacheNames.filter((name) =>
-        name.includes('visitjo') ||
+        name.includes('VISIT-JO') ||
         name.includes('workbox') ||
         name.startsWith('vite-') ||
         name.includes('-cache')

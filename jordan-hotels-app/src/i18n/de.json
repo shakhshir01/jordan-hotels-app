@@ -190,7 +190,7 @@
     "contact": "Kontakt",
     "privacy": "Datenschutzrichtlinie",
     "terms": "Allgemeine Geschäftsbedingungen",
-    "copyright": "VisitJo. Alle Rechte vorbehalten.",
+    "copyright": "Visit-Jo. Alle Rechte vorbehalten.",
     "brandDescription": "Premium-Reiseentdeckungs- und Buchungserlebnisse für Jordanien - verbinden Sie sich mit den besten Unterkünften, Erlebnissen und Zielen.",
     "explore": "Entdecken",
     "plan": "Planen",
@@ -270,7 +270,7 @@
     },
     "login": {
       "title": "Willkommen",
-      "subtitle": "Melden Sie sich bei Ihrem VisitJo-Konto an",
+      "subtitle": "Melden Sie sich bei Ihrem Visit-Jo-Konto an",
       "passwordPlaceholder": "Geben Sie Ihr Passwort ein",
       "signingIn": "Anmeldung...",
       "invalidCredentials": "Ungültige E-Mail oder Passwort. Bitte versuchen Sie es erneut.",
@@ -279,7 +279,7 @@
       "continueWithFacebook": "Mit Facebook fortfahren"
     },
     "signup": {
-      "title": "VisitJo beitreten",
+      "title": "Visit-Jo beitreten",
       "subtitle": "Erstellen Sie Ihr Konto für unglaubliche Unterkünfte",
       "passwordPlaceholder": "Min. 8 Zeichen, 1 Großbuchstabe, 1 Zahl",
       "confirmPasswordPlaceholder": "Passwort erneut eingeben",
@@ -333,7 +333,7 @@
     "skipToNavigation": "Zur Navigation springen"
   },
   "seo": {
-    "metaTitle": "VisitJo - Hotels und Erlebnisse in Jordanien",
+    "metaTitle": "Visit-Jo - Hotels und Erlebnisse in Jordanien",
     "metaDescription": "Entdecken Sie die besten Hotels und Erlebnisse in Jordanien. Buchen Sie Ihren idealen Aufenthalt in Petra, dem Toten Meer, Wadi Rum und mehr.",
     "keywords": "Jordanien, Hotels, Petra, Totes Meer, Wadi Rum, Reisen, Buchungen"
   }

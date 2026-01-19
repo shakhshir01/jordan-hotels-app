@@ -25,7 +25,7 @@ class Logger {
     this.logToConsole = typeof options.logToConsole === 'function' ? options.logToConsole : undefined;
     this.logToServer = options.logToServer !== false;
     this.serverUrl = options.serverUrl || '/api/logs';
-    this.appName = options.appName || 'VisitJo';
+    this.appName = options.appName || 'Visit-Jo';
     this.userId = options.userId || null;
     this.sessionId = this.generateSessionId();
     this.logs = [];
@@ -323,7 +323,7 @@ export const logger = new Logger({
   minLevel: LogLevel.DEBUG,
   logToConsole: true,
   logToServer: true,
-  appName: 'VisitJo',
+  appName: 'Visit-Jo',
 });
 
 /**

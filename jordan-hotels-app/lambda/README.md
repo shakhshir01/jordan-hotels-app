@@ -64,7 +64,7 @@ sam build --template-file lambda/sam-template.yaml
 sam deploy --guided --template-file .aws-sam/build/template.yaml
 
 # or deploy non-interactively (after guided deploy saved parameters):
-sam deploy --template-file .aws-sam/build/template.yaml --stack-name visitjo-backend --capabilities CAPABILITY_IAM
+sam deploy --template-file .aws-sam/build/template.yaml --stack-name VISIT-JO-backend --capabilities CAPABILITY_IAM
 ```
 
 Notes:

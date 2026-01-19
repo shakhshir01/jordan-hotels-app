@@ -31,10 +31,10 @@
 cd jordan-hotels-app/lambda
 
 # Package the updated template
-sam package --template-file sam-template.yaml --output-template-file packaged-new.yaml --s3-bucket visitjo-sam-deploy-1768258668990-9051
+sam package --template-file sam-template.yaml --output-template-file packaged-new.yaml --s3-bucket VISIT-JO-sam-deploy-1768258668990-9051
 
 # Deploy the updated stack
-sam deploy --template-file packaged-new.yaml --stack-name visitjo-backend-2 --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset
+sam deploy --template-file packaged-new.yaml --stack-name VISIT-JO-backend-2 --capabilities CAPABILITY_NAMED_IAM --no-confirm-changeset
 ```
 
 ### Step 2: Update Runtime Configuration
@@ -43,7 +43,7 @@ After deployment, check the new API Gateway URL:
 
 ```bash
 # Get the new API URL from CloudFormation outputs
-aws cloudformation describe-stacks --stack-name visitjo-backend-2 --query 'Stacks[0].Outputs[?OutputKey==`ApiUrl`].OutputValue' --output text
+aws cloudformation describe-stacks --stack-name VISIT-JO-backend-2 --query 'Stacks[0].Outputs[?OutputKey==`ApiUrl`].OutputValue' --output text
 ```
 
 Update `public/runtime-config.js` with the new API URL if it changed:
@@ -114,7 +114,7 @@ If issues persist after deployment:
 2. **Redeploy with original template:**
    ```bash
    cd lambda
-   sam deploy --template-file sam-template.yaml --stack-name visitjo-backend-2 --capabilities CAPABILITY_NAMED_IAM
+   sam deploy --template-file sam-template.yaml --stack-name VISIT-JO-backend-2 --capabilities CAPABILITY_NAMED_IAM
    ```
 
 3. **Frontend changes are backward compatible** - they add error handling without breaking existing functionality

@@ -6,47 +6,49 @@ export default function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
-      {/* Background Pattern */}
+    <footer className="relative bg-gray-900 text-white">
+      {/* Simple Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }} />
       </div>
 
-      {/* Floating Elements */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-jordan-gold/5 rounded-full blur-3xl animate-float"></div>
-      <div className="absolute bottom-20 right-10 w-40 h-40 bg-jordan-rose/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Content */}
         <div className="py-16 lg:py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            {/* Brand Section */}
+            {/* Premium Brand Section */}
             <div className="lg:col-span-2">
-              <Link to="/" className="inline-block mb-6">
-                <span className="text-3xl lg:text-4xl font-black font-display tracking-tighter bg-gradient-to-r from-jordan-blue to-jordan-teal bg-clip-text text-transparent hover:from-jordan-teal hover:to-jordan-blue transition-all duration-300">
-                  VISITJO
+              <Link to="/" className="group inline-block mb-6">
+                <span className="text-3xl lg:text-4xl font-black font-display tracking-tighter bg-gradient-to-r from-blue-400 via-purple-400 to-blue-500 bg-clip-text text-transparent group-hover:from-blue-300 group-hover:via-purple-300 group-hover:to-blue-400 transition-all duration-300 transform group-hover:scale-105">
+                  Visit-Jo
                 </span>
+                <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 mt-1 group-hover:w-16 transition-all duration-300"></div>
               </Link>
-              <p className="text-slate-300 text-base leading-relaxed mb-6 max-w-md">
-                {t("footer.description", "Discover the wonders of Jordan with personalized travel experiences, authentic local insights, and unforgettable adventures.")}
+              <p className="text-slate-300 text-lg leading-relaxed mb-6 max-w-md font-medium">
+                🌟 {t("footer.description", "Discover the wonders of Jordan with personalized travel experiences, authentic local insights, and unforgettable adventures.")}
               </p>
-              <p className="text-slate-300 text-sm leading-relaxed mb-8 max-w-md">
-                {t("footer.description", "Your gateway to the Kingdom of Time. We curate the finest stays and experiences to help you discover the authentic soul of Jordan.")}
+              <p className="text-slate-400 text-base leading-relaxed mb-8 max-w-md">
+                🏛️ {t("footer.description", "Your gateway to the Kingdom of Time. We curate the finest stays and experiences to help you discover the authentic soul of Jordan.")}
               </p>
 
-              {/* Newsletter Signup */}
-              <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
-                <h4 className="text-lg font-semibold mb-3">Stay Updated</h4>
-                <p className="text-slate-400 text-sm mb-4">Get exclusive deals and travel tips</p>
+              {/* Premium Newsletter Signup */}
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
+                <h4 className="text-xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">📧 Stay Updated</h4>
+                <p className="text-gray-300 text-sm mb-4">✨ Get exclusive deals and insider travel tips</p>
                 <div className="flex gap-3">
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-jordan-gold/50 focus:border-jordan-gold/50 transition-all duration-300"
+                    aria-label="Email address for newsletter"
+                    className="flex-1 px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-gray-700 transition-all duration-300 min-h-[48px] backdrop-blur-sm"
                   />
-                  <button onClick={(e) => { e.preventDefault(); showInfo('Newsletter signup coming soon!'); }} className="px-6 py-3 bg-gradient-to-r from-jordan-gold to-jordan-rose hover:from-jordan-rose hover:to-jordan-gold text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
+                  <button
+                    onClick={(e) => { e.preventDefault(); showInfo('Newsletter signup coming soon!'); }}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 min-h-[48px] transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+                    aria-label="Subscribe to newsletter"
+                  >
                     Subscribe
                   </button>
                 </div>
@@ -58,13 +60,15 @@ export default function Footer() {
               <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-jordan-blue to-jordan-teal bg-clip-text text-transparent">
                 {t("footer.quickLinks", "Quick Links")}
               </h3>
-              <ul className="space-y-4">
-                <li><Link to="/destinations" className="text-slate-300 hover:text-jordan-blue transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.destinations")}</Link></li>
-                <li><Link to="/experiences" className="text-slate-300 hover:text-jordan-rose transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.experiences")}</Link></li>
-                <li><Link to="/deals" className="text-slate-300 hover:text-jordan-gold transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.deals")}</Link></li>
-                <li><Link to="/blog" className="text-slate-300 hover:text-jordan-teal transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.blog")}</Link></li>
-                <li><Link to="/gallery" className="text-slate-300 hover:text-jordan-blue transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.gallery")}</Link></li>
-              </ul>
+              <nav aria-label="Quick links">
+                <ul className="space-y-4">
+                  <li><Link to="/destinations" className="text-slate-300 hover:text-blue-400 focus:text-blue-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.destinations")}</Link></li>
+                  <li><Link to="/experiences" className="text-slate-300 hover:text-purple-400 focus:text-purple-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.experiences")}</Link></li>
+                  <li><Link to="/deals" className="text-slate-300 hover:text-orange-400 focus:text-orange-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.deals")}</Link></li>
+                  <li><Link to="/blog" className="text-slate-300 hover:text-teal-400 focus:text-teal-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.blog")}</Link></li>
+                  <li><Link to="/gallery" className="text-slate-300 hover:text-blue-400 focus:text-blue-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.gallery")}</Link></li>
+                </ul>
+              </nav>
             </div>
 
             {/* Support */}
@@ -72,13 +76,15 @@ export default function Footer() {
               <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-jordan-rose to-jordan-gold bg-clip-text text-transparent">
                 {t("footer.support", "Support")}
               </h3>
-              <ul className="space-y-4">
-                <li><Link to="/support" className="text-slate-300 hover:text-jordan-gold transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.support")}</Link></li>
-                <li><Link to="/about" className="text-slate-300 hover:text-jordan-rose transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.about")}</Link></li>
-                <li><Link to="/privacy" className="text-slate-300 hover:text-jordan-teal transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.privacy")}</Link></li>
-                <li><Link to="/terms" className="text-slate-300 hover:text-jordan-blue transition-all duration-300 hover:translate-x-1 inline-block">{t("nav.terms")}</Link></li>
-                <li><Link to="/contact" className="text-slate-300 hover:text-jordan-gold transition-all duration-300 hover:translate-x-1 inline-block">Contact Us</Link></li>
-              </ul>
+              <nav aria-label="Support links">
+                <ul className="space-y-4">
+                  <li><Link to="/support" className="text-slate-300 hover:text-orange-400 focus:text-orange-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.support")}</Link></li>
+                  <li><Link to="/about" className="text-slate-300 hover:text-pink-400 focus:text-pink-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.about")}</Link></li>
+                  <li><Link to="/privacy" className="text-slate-300 hover:text-teal-400 focus:text-teal-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.privacy")}</Link></li>
+                  <li><Link to="/terms" className="text-slate-300 hover:text-blue-400 focus:text-blue-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">{t("nav.terms")}</Link></li>
+                  <li><Link to="/contact" className="text-slate-300 hover:text-orange-400 focus:text-orange-400 transition-all duration-300 hover:translate-x-1 focus:translate-x-1 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded px-2 py-1 inline-block">Contact Us</Link></li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
@@ -86,7 +92,7 @@ export default function Footer() {
         {/* Bottom */}
         <div className="mt-8 pt-8 border-t border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-400 text-sm">
-            © {new Date().getFullYear()} VisitJo. {t("footer.rights", "All rights reserved.")}
+            © {new Date().getFullYear()} Visit-Jo. {t("footer.rights", "All rights reserved.")}
           </p>
           <div className="flex items-center gap-4">
             <a href="#" className="text-slate-400 hover:text-white transition-colors">

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const WISHLIST_KEY = 'visitjo_wishlist';
+const WISHLIST_KEY = 'VISIT-JO_wishlist';
 
 export const useWishlist = () => {
   const [wishlist, setWishlist] = useState(() => {

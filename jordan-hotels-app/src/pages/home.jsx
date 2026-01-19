@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { MapPin, Search, Star, AlertCircle, Loader2, Eye, Wifi, Car, Utensils, Filter, X, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { MapPin, Search, Star, AlertCircle, Loader2, Eye, Wifi, Car, Utensils, Filter, X, SlidersHorizontal } from "lucide-react";
 import { hotelAPI } from "../services/api";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
@@ -178,11 +178,11 @@ const HotelCard = React.memo(function HotelCard(props = {}) {
   };
 
   return (
-    <article 
-      className="group relative card-modern overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 focus:outline-none focus:ring-4 focus:ring-jordan-blue/30 focus:shadow-2xl focus:-translate-y-1 touch-manipulation"
+    <article
+      className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl hover:-translate-y-2 active:scale-95 transition-all duration-300 cursor-pointer border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-lg focus:-translate-y-1 touch-manipulation"
       tabIndex={0}
       role="button"
-      aria-label={`View details for ${hotelName}`}
+      aria-label={`View details for ${hotelName} in ${hotel.location}. Rated ${hotel.rating} stars. From ${hotel.price} JOD per night.`}
       onKeyDown={handleKeyDown}
     >
       {/* Enhanced Image Container - Optimized for mobile */}
@@ -201,101 +201,88 @@ const HotelCard = React.memo(function HotelCard(props = {}) {
         
         {/* Enhanced Overlay - Reduced motion on mobile */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 sm:duration-500" />
+
+      {/* Mobile Touch Feedback */}
+      <div className="absolute inset-0 bg-black/10 opacity-0 active:opacity-100 transition-opacity duration-150 sm:hidden" />
         
-        {/* Enhanced Badges - Better mobile sizing */}
-        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex flex-col gap-1.5 sm:gap-2">
+        {/* Simple Badges */}
+        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex flex-col gap-2 z-10">
           {hotel.rating >= 4.5 && (
-            <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white text-xs sm:text-sm font-bold rounded-full shadow-lg animate-pulse-glow backdrop-blur-sm border border-white/20">
+            <div className="px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-full shadow-md">
               🔥 Popular
             </div>
           )}
           {hotel.price < 50 && (
-            <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs sm:text-sm font-bold rounded-full shadow-lg backdrop-blur-sm border border-white/20">
+            <div className="px-3 py-1.5 bg-green-500 text-white text-xs font-bold rounded-full shadow-md">
               💰 Best Deal
             </div>
           )}
         </div>
         
-        {/* Enhanced Rating Badge - Optimized positioning */}
-        <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 flex items-center gap-2 bg-black/50 text-white text-xs sm:text-sm font-semibold rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5 backdrop-blur-sm shadow-md border border-white/10" aria-hidden="true">
-          <Star size={12} className="text-amber-400 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
-          <span className="ml-1">{hotel.rating}</span>
+        {/* Simple Rating Badge */}
+        <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 flex items-center gap-1 bg-black/70 text-white text-xs font-semibold rounded-full px-2.5 py-1 shadow-md" aria-hidden="true">
+          <Star size={12} className="text-yellow-400 fill-current" aria-hidden="true" />
+          <span>{hotel.rating}</span>
         </div>
         <span className="sr-only">Rating: {hotel.rating} out of 5</span>
         
-        {/* Preview Action Button - Always visible on mobile */}
+        {/* Simple Preview Button */}
         <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <a
             href={`/hotels/${hotel.id}#photos`}
             aria-label={`Preview photos for ${hotelName}`}
-            className="inline-flex items-center justify-center bg-white/95 backdrop-blur-xl rounded-full p-2.5 sm:p-3 shadow-lg hover:scale-105 focus:outline-none focus:ring-4 focus:ring-jordan-blue/30 transition-transform duration-200 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px]"
+            className="inline-flex items-center justify-center bg-white rounded-full p-2.5 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 min-w-[40px] min-h-[40px]"
           >
-            <Eye size={16} className="text-slate-900 sm:w-4.5 sm:h-4.5" />
+            <Eye size={16} className="text-gray-900" />
           </a>
         </div>
       </div>
 
-      {/* Enhanced Content - Optimized for mobile */}
-      <div className="p-4 sm:p-6 lg:p-8">
-        {/* Title and Location - Better mobile spacing */}
+      {/* Simple Content Area */}
+      <div className="p-4 sm:p-6">
+        {/* Title and Location */}
         <div className="mb-3 sm:mb-4">
-          <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1.5 sm:mb-2 leading-tight line-clamp-2 group-hover:text-jordan-blue dark:group-hover:text-jordan-blue transition-colors duration-300">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
             {hotelName}
           </h3>
-          <div className="flex items-center gap-1.5 sm:gap-2 text-slate-600 dark:text-slate-300">
-            <MapPin size={16} className="text-jordan-rose flex-shrink-0 sm:w-4.5 sm:h-4.5" />
-            <span className="font-medium truncate text-xs sm:text-sm lg:text-base">{hotel.location}</span>
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+            <MapPin size={16} className="flex-shrink-0" />
+            <span className="font-medium truncate text-sm sm:text-base">{hotel.location}</span>
           </div>
         </div>
 
-        {/* Enhanced Amenities - Better mobile layout */}
+        {/* Simple Amenities */}
         <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 flex-wrap">
-          <div
-            role="img"
-            aria-label="WiFi available"
-            className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-700 dark:text-slate-100 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full hover:bg-jordan-blue/10 hover:text-jordan-blue transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50 min-w-[36px] min-h-[36px] sm:min-w-[44px] sm:min-h-[44px]"
-          >
-            <Wifi size={14} className="sm:w-4.5 sm:h-4.5" aria-hidden="true" />
-            <span className="sr-only">WiFi available</span>
-            <span className="hidden sm:inline font-medium">WiFi</span>
+          <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+            <Wifi size={14} aria-hidden="true" />
+            <span className="hidden sm:inline">WiFi</span>
           </div>
-          <div
-            role="img"
-            aria-label="Parking available"
-            className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-700 dark:text-slate-100 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50 min-w-[36px] min-h-[36px] sm:min-w-[44px] sm:min-h-[44px]"
-          >
-            <Car size={14} className="sm:w-4.5 sm:h-4.5" aria-hidden="true" />
-            <span className="sr-only">Parking available</span>
-            <span className="hidden sm:inline font-medium">Parking</span>
+          <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+            <Car size={14} aria-hidden="true" />
+            <span className="hidden sm:inline">Parking</span>
           </div>
-          <div
-            role="img"
-            aria-label="Restaurant on site"
-            className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-700 dark:text-slate-100 bg-slate-50 dark:bg-slate-700 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:text-orange-600 transition-all duration-300 cursor-default backdrop-blur-sm border border-slate-200/50 dark:border-slate-600/50 min-w-[36px] min-h-[36px] sm:min-w-[44px] sm:min-h-[44px]"
-          >
-            <Utensils size={14} className="sm:w-4.5 sm:h-4.5" aria-hidden="true" />
-            <span className="sr-only">Restaurant on site</span>
-            <span className="hidden sm:inline font-medium">Restaurant</span>
+          <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+            <Utensils size={14} aria-hidden="true" />
+            <span className="hidden sm:inline">Restaurant</span>
           </div>
         </div>
 
-        {/* Enhanced Price and CTA - Better mobile layout */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-slate-200/50 dark:border-slate-600/50">
+        {/* Simple Price and CTA Section */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
           <div className="flex-1">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-slate-100 mb-0.5 sm:mb-1">
-              From <span className="gradient-text">{formatPrice(hotel.price, preferences.currency)}</span>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+              From {formatPrice(hotel.price, preferences.currency)}
             </div>
-            <div className="text-slate-500 dark:text-slate-400 font-medium text-xs sm:text-sm">per night • Free cancellation</div>
+            <div className="text-gray-600 dark:text-gray-400 text-sm">
+              per night • Free cancellation
+            </div>
           </div>
           <Link
             to={`/hotels/${hotel.id}`}
-            className="group/btn inline-flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-gradient-to-r from-jordan-blue to-jordan-teal hover:from-jordan-teal hover:to-jordan-blue text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 touch-manipulation min-h-[48px] sm:min-h-[56px] w-full sm:w-auto text-sm sm:text-base"
+            className="inline-flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 touch-manipulation min-h-[48px] sm:min-h-[56px] w-full sm:w-auto"
           >
-            <Eye size={18} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+            <Eye size={18} className="sm:w-5 sm:h-5" />
             <span>{viewLabel}</span>
-            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 transform group-hover/btn:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
           </Link>
         </div>
       </div>
@@ -510,114 +497,159 @@ function Home() {
       <Helmet>
         <title>VisitJo | Discover Jordan's Best Hotels & Experiences</title>
         <meta name="description" content="Book authentic hotels, explore ancient wonders, and create unforgettable memories in Jordan. From Petra to Wadi Rum, your adventure starts here." />
-        <meta property="og:title" content="VisitJo | Discover Jordan's Best Hotels & Experiences" />
+        <meta property="og:title" content="Visit-Jo | Discover Jordan's Best Hotels & Experiences" />
         <meta property="og:description" content="Book authentic hotels, explore ancient wonders, and create unforgettable memories in Jordan. From Petra to Wadi Rum, your adventure starts here." />
-        <meta property="og:image" content="https://visitjo.com/og-image.jpg" />
-        <meta property="og:url" content="https://visitjo.com/" />
-        <link rel="canonical" href="https://visitjo.com/" />
+        <meta property="og:image" content="https://vist-jo.com/og-image.jpg" />
+        <meta property="og:url" content="https://vist-jo.com/" />
+        <link rel="canonical" href="https://vist-jo.com/" />
       </Helmet>
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-jordan-blue via-jordan-teal to-jordan-emerald dark:from-jordan-blue dark:via-jordan-teal dark:to-jordan-emerald">
-        {/* Enhanced Multi-layered Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-jordan-gold/20 via-jordan-amber/15 to-jordan-rose/25 dark:from-jordan-gold/30 dark:via-jordan-amber/25 dark:to-jordan-rose/35"></div>
-        <div className="absolute inset-0 bg-gradient-to-tl from-jordan-purple/10 via-jordan-coral/5 to-jordan-emerald/15 dark:from-jordan-purple/20 dark:via-jordan-coral/15 dark:to-jordan-emerald/25"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20 dark:from-black/70 dark:via-transparent dark:to-black/30"></div>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Clean Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
-        {/* Enhanced Animated Mesh Background */}
+        {/* Simple Background Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-r from-jordan-gold/30 to-jordan-rose/25 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-jordan-teal/25 to-jordan-emerald/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/4 w-72 h-72 bg-gradient-to-r from-jordan-purple/25 to-jordan-blue/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
-          <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-gradient-to-r from-jordan-amber/20 to-jordan-gold/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/3 right-1/3 w-56 h-56 bg-gradient-to-r from-jordan-coral/25 to-jordan-rose/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute bottom-1/4 left-1/3 w-48 h-48 bg-gradient-to-r from-jordan-emerald/20 to-jordan-teal/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '5s' }}></div>
+          <div className="absolute top-20 left-10 w-80 h-80 bg-white/5 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/3 rounded-full blur-3xl animate-float animation-delay-2000"></div>
         </div>
 
-        {/* Premium Floating Geometric Shapes */}
+        {/* Simple Floating Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-16 left-16 w-6 h-6 bg-gradient-to-r from-jordan-gold/50 to-jordan-rose/40 rotate-45 animate-float shadow-lg" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute top-32 right-20 w-8 h-8 bg-gradient-to-r from-jordan-teal/45 to-jordan-emerald/35 rounded-full animate-float shadow-lg" style={{ animationDelay: '1.5s' }}></div>
-          <div className="absolute bottom-24 left-24 w-5 h-5 bg-gradient-to-r from-jordan-purple/40 to-jordan-blue/30 rotate-12 animate-float shadow-lg" style={{ animationDelay: '2.5s' }}></div>
-          <div className="absolute bottom-32 right-32 w-7 h-7 bg-gradient-to-r from-jordan-amber/35 to-jordan-gold/25 rounded-full animate-float shadow-lg" style={{ animationDelay: '3.5s' }}></div>
-          <div className="absolute top-24 right-1/4 w-6 h-6 bg-gradient-to-r from-jordan-coral/45 to-jordan-rose/35 rotate-12 animate-float shadow-lg" style={{ animationDelay: '4.5s' }}></div>
-          <div className="absolute bottom-16 left-1/4 w-7 h-7 bg-gradient-to-r from-jordan-emerald/40 to-jordan-teal/30 rounded-full animate-float shadow-lg" style={{ animationDelay: '1.2s' }}></div>
-
-          {/* Additional premium shapes */}
-          <div className="absolute top-1/4 right-1/3 w-4 h-4 bg-gradient-to-r from-jordan-sand/30 to-jordan-gold/25 rotate-45 animate-float shadow-md" style={{ animationDelay: '3.2s' }}></div>
-          <div className="absolute bottom-1/2 left-1/5 w-5 h-5 bg-gradient-to-r from-jordan-purple/35 to-jordan-blue/25 rounded-full animate-float shadow-md" style={{ animationDelay: '2.8s' }}></div>
-        </div>
-
-        {/* Enhanced Animated Particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-gradient-to-r from-jordan-gold/80 to-jordan-rose/60 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '0s' }}></div>
-          <div className="absolute top-3/4 right-1/4 w-2 h-2 bg-gradient-to-r from-jordan-teal/85 to-jordan-emerald/70 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-3/4 w-2 h-2 bg-gradient-to-r from-jordan-purple/80 to-jordan-blue/60 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute bottom-1/4 left-1/2 w-2 h-2 bg-gradient-to-r from-jordan-amber/70 to-jordan-gold/50 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute top-2/3 right-1/5 w-1.5 h-1.5 bg-gradient-to-r from-jordan-coral/80 to-jordan-rose/60 rounded-full animate-pulse-glow shadow-md" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute bottom-2/3 left-2/3 w-1.5 h-1.5 bg-gradient-to-r from-jordan-emerald/70 to-jordan-teal/50 rounded-full animate-pulse-glow shadow-md" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute top-16 left-16 w-6 h-6 bg-white/20 rotate-45"></div>
+          <div className="absolute top-32 right-20 w-8 h-8 bg-white/15 rounded-full"></div>
+          <div className="absolute bottom-24 left-24 w-5 h-5 bg-white/10 rotate-12"></div>
         </div>
 
         {/* Subtle Mesh Gradient Overlay */}
         <div className="absolute inset-0 bg-mesh-gradient opacity-20"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Premium Badge with Enhanced Styling */}
-          <div className="inline-flex items-center gap-3 px-8 py-4 mb-10 bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/30 rounded-full text-black dark:text-white/95 text-sm font-bold uppercase tracking-widest shadow-premium animate-fade-in-up">
-            <div className="w-3 h-3 bg-gradient-to-r from-jordan-gold to-jordan-rose rounded-full animate-pulse-glow shadow-lg"></div>
-            <span className="text-gradient bg-gradient-to-r from-jordan-gold via-black dark:via-white to-jordan-rose bg-clip-text text-transparent">
-              {t("home.hero.kicker", "Award-Winning Jordan Experiences")}
-            </span>
-            <div className="w-3 h-3 bg-gradient-to-r from-jordan-rose to-jordan-gold rounded-full animate-pulse-glow shadow-lg"></div>
+          {/* Premium Badge */}
+          <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-gradient-to-r from-amber-400/20 to-orange-400/20 backdrop-blur-sm border border-amber-300/30 rounded-full text-white text-sm font-semibold uppercase tracking-wide animate-fade-in shadow-lg">
+            <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+            {t("home.hero.kicker", "🏆 Award-Winning Jordan Experiences")}
+            <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
           </div>
 
-          {/* Premium Title with Enhanced Typography */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-8 sm:mb-10 tracking-tight leading-tight animate-slide-up-fast px-2 sm:px-0">
-            <span className="block text-black dark:text-white drop-shadow-2xl mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight">
-              {t("home.hero.titleMain", "Jordan")}
+          {/* Premium Title */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-6 sm:mb-8 tracking-tight leading-tight animate-slide-up px-2 sm:px-0">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-amber-100 to-orange-100 drop-shadow-2xl mb-1 sm:mb-2">
+              {t("home.hero.titleMain", "Discover Jordan's")}
             </span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-amber to-jordan-rose bg-400% animate-gradient-flow drop-shadow-2xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-tight font-extrabold">
-              {t("home.hero.titleInfinite", "Awakens")}
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-orange-200 to-red-200 drop-shadow-2xl">
+              {t("home.hero.titleAccent", "Hidden Treasures")}
             </span>
           </h1>
 
-          {/* Premium Subtitle with Better Spacing and Typography */}
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto mb-10 sm:mb-14 text-black dark:text-white/90 leading-relaxed font-light animate-fade-in-up drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.2s' }}>
-            {t("home.hero.subtitle", "Where ancient wonders meet modern luxury. Experience the perfect blend of Jordan's rich heritage and contemporary elegance.")}
+          {/* Enhanced Subtitle */}
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto mb-8 sm:mb-12 text-white/95 leading-relaxed font-light animate-fade-in drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.3s' }}>
+            {t("home.hero.subtitle", "From the ancient wonders of Petra to the healing waters of the Dead Sea, unlock unforgettable adventures with Visit-Jo's handpicked collection of luxury hotels and authentic experiences. Your dream Jordan vacation starts here.")}
           </p>
 
-          {/* Premium Search Bar with Enhanced Styling */}
-          <div className="max-w-7xl mx-auto mb-10 sm:mb-16 animate-slide-up-slow px-4 sm:px-0" style={{ animationDelay: '0.4s' }}>
-            <div className="flex flex-col gap-4 sm:gap-5 bg-gradient-to-r from-white/95 via-jordan-cream/90 to-white/95 dark:from-slate-900/95 dark:via-slate-800/90 dark:to-slate-900/95 backdrop-blur-2xl border border-jordan-gold/30 dark:border-jordan-gold/40 rounded-3xl p-4 sm:p-3 shadow-premium hover:shadow-floating transition-all duration-500">
+          {/* Simple Search Bar */}
+          <div className="max-w-6xl mx-auto mb-8 sm:mb-12 animate-slide-up px-4 sm:px-0" style={{ animationDelay: '0.6s' }}>
+            <div className="flex flex-col gap-3 sm:gap-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-3 sm:p-2 shadow-lg">
               {/* Premium Search Input */}
               <div className="relative">
                 <input
-                  className="w-full px-6 sm:px-8 py-7 sm:py-8 bg-transparent text-black dark:text-white placeholder-black/60 dark:placeholder-white/60 outline-none text-xl sm:text-2xl md:text-3xl rounded-2xl border-0 focus:ring-2 focus:ring-black/20 dark:focus:ring-white/40 transition-all duration-500 min-h-[70px] sm:min-h-[80px] font-light"
-                  placeholder={t("home.hero.searchPlaceholder", "Where in Jordan? (e.g. Petra, Dead Sea, Wadi Rum)")}
+                  type="search"
+                  role="searchbox"
+                  aria-label={t("home.hero.searchPlaceholder", "Search for luxury hotels in Petra, Wadi Rum, Dead Sea...")}
+                  className="w-full px-6 sm:px-8 py-7 sm:py-8 bg-transparent text-white placeholder-white/60 outline-none text-xl sm:text-2xl md:text-3xl rounded-2xl border-0 focus:ring-2 focus:ring-white/40 transition-all duration-500 min-h-[70px] sm:min-h-[80px] font-light"
+                  placeholder={t("home.hero.searchPlaceholder", "Search for luxury hotels in Petra, Wadi Rum, Dead Sea...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  autoComplete="off"
+                  spellCheck="false"
                 />
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <Search size={24} className="text-black/50 dark:text-white/50" />
+                  <Search size={24} className="text-white/50" />
                 </div>
               </div>
 
+              {/* Premium Mobile Sort Controls */}
+              <div className="sm:hidden flex gap-3 w-full px-1">
+                <button
+                  type="button"
+                  aria-pressed={sortBy === 'recommended'}
+                  onClick={() => setSortBy('recommended')}
+                  aria-label="Sort by recommended"
+                  className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
+                    sortBy === 'recommended'
+                      ? 'bg-gradient-to-r from-jordan-gold to-jordan-rose text-white shadow-premium'
+                      : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
+                  }`}
+                >
+                  ✨ {t('home.sort.recommended', 'Recommended')}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={sortBy === 'rating'}
+                  onClick={() => setSortBy('rating')}
+                  aria-label="Sort by highest rated"
+                  className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
+                    sortBy === 'rating'
+                      ? 'bg-gradient-to-r from-jordan-teal to-jordan-emerald text-white shadow-premium'
+                      : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
+                  }`}
+                >
+                  ⭐ {t('home.sort.highestRated', 'Highest Rated')}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={sortBy === 'price-low'}
+                  onClick={() => setSortBy('price-low')}
+                  aria-label="Sort by price low to high"
+                  className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
+                    sortBy === 'price-low'
+                      ? 'bg-gradient-to-r from-jordan-blue to-jordan-teal text-white shadow-premium'
+                      : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
+                  }`}
+                >
+                  💰 {t('home.sort.priceLow', 'Price: Low to High')}
+                </button>
+              </div>
+
+              {/* Premium Desktop Sort Select */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                aria-label="Sort results"
+                className="hidden sm:block btn-secondary px-6 py-3 rounded-2xl hover-lift font-semibold min-w-0 w-full sm:w-auto text-sm sm:text-base shadow-md border border-white/20 bg-white/5 backdrop-blur-sm"
+              >
+                <option value="recommended">✨ {t('home.sort.recommended', 'Recommended')}</option>
+                <option value="rating">⭐ {t('home.sort.highestRated', 'Highest Rated')}</option>
+                <option value="price-low">💰 {t('home.sort.priceLow', 'Price: Low to High')}</option>
+              </select>
+
+              {/* Premium CTA Button */}
               <button
                 type="button"
                 onClick={handleSearch}
                 aria-label="Find stays"
-                className="px-10 py-5 bg-gradient-to-r from-jordan-gold via-jordan-amber to-jordan-rose hover:from-jordan-rose hover:via-jordan-gold hover:to-jordan-amber text-white font-bold rounded-2xl shadow-glow-gold hover:shadow-glow-rose transition-all duration-500 flex items-center justify-center gap-4 transform hover:scale-105 active:scale-95 min-h-[64px] text-lg font-semibold border border-jordan-gold/30"
+                className="px-8 py-4 bg-gradient-to-r from-amber-400 to-orange-500 text-blue-900 font-bold rounded-xl shadow-lg hover:shadow-xl hover:shadow-amber-500/25 transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-105 active:scale-95 min-h-[56px] border-2 border-white/20"
               >
-                <Search size={24} />
-                <span className="hidden sm:inline">{t("home.hero.findStays", "FIND")}</span>
-                <span className="sm:hidden">FIND</span>
+                <Search size={20} className="text-blue-800" />
+                <span className="hidden sm:inline">{t("home.hero.findStays", "✨ Find Your Perfect Stay")}</span>
+                <span className="sm:hidden">🔍 Search</span>
               </button>
             </div>
           </div>
 
-
         </div>
 
-
+        {/* Premium Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="bg-white/95 backdrop-blur-xl border border-white/30 rounded-2xl p-4 shadow-premium hover:shadow-floating transition-all duration-300 cursor-pointer group">
+            <div className="w-8 h-12 border-2 border-white/40 rounded-full flex justify-center relative overflow-hidden">
+              <div className="w-1.5 h-4 bg-gradient-to-b from-jordan-gold to-jordan-rose rounded-full mt-2 animate-pulse-glow"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <div className="text-white/60 text-xs font-medium mt-2 text-center uppercase tracking-wider">Scroll</div>
+          </div>
+        </div>
       </section>
 
       {/* Filters Section */}
@@ -639,21 +671,7 @@ function Home() {
               )}
             </button>
 
-            {/* Sort Dropdown */}
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer"
-              >
-                <option value="recommended">Recommended</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-                <option value="name">Name A-Z</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
-            </div>
+            {/* Sort control removed from this toolbar to avoid duplication with search bar */}
           </div>
 
           {(priceRange[0] > 0 || priceRange[1] < 500 || minRating > 0 || selectedAmenities.length > 0) && (
@@ -775,51 +793,49 @@ function Home() {
       )}
 
       <div className="pb-14">
-      
-
         {loading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-blue-600" size={48} />
           </div>
         ) : (
           <div className="space-y-8">
-            <header className="flex flex-col gap-2 ml-4">
-              <h2 className="text-3xl sm:text-4xl font-black font-display tracking-tight text-slate-900 dark:text-slate-50">
-                {isLocationBased ? "Exclusive Recommendations Near You" : "Recommended Hotels"}
+            <header className="flex flex-col gap-3 mb-8 text-center sm:text-left">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 dark:from-white dark:via-blue-100 dark:to-purple-100 bg-clip-text text-transparent">
+                {isLocationBased ? "🏨 Exclusive Recommendations Near You" : "🌟 Jordan's Finest Accommodations"}
               </h2>
-              <p className="page-subtitle">
+              <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl">
                 {isLocationBased
-                  ? "Handpicked luxury stays and authentic experiences tailored to your location"
-                  : "Explore our curated selection of premium accommodations"}
+                  ? "✨ Handpicked stays tailored to your location with Visit-Jo's expert curation"
+                  : "🏆 Discover world-class hotels across Jordan's spectacular destinations, personally vetted by our travel experts"}
               </p>
             </header>
 
-            {filteredAndSortedHotels.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="max-w-md mx-auto">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                    No hotels match your filters
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-6">
-                    Try adjusting your filters to see more options.
-                  </p>
-                  <button
-                    onClick={clearFilters}
-                    className="btn-primary px-6 py-3 rounded-2xl hover-lift font-semibold"
-                  >
-                    Clear all filters
-                  </button>
-                </div>
+            <HotelsVirtualizedGrid
+              key={filteredAndSortedHotels.length}
+              hotels={filteredAndSortedHotels}
+              viewLabel={viewLabel}
+              i18nLanguage={i18n.language}
+              preferences={preferences}
+            />
+
+            {filteredAndSortedHotels.length === 0 && hotels.length > 0 && (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🔍</div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                  No hotels match your current filters
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 mb-4">
+                  Try broadening your search criteria to discover amazing Jordanian hospitality
+                </p>
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  aria-label="Clear all filters"
+                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors min-h-[44px] flex items-center justify-center"
+                >
+                  Clear all filters
+                </button>
               </div>
-            ) : (
-              <HotelsVirtualizedGrid
-                key={filteredAndSortedHotels.length}
-                hotels={filteredAndSortedHotels}
-                viewLabel={viewLabel}
-                i18nLanguage={i18n.language}
-                preferences={preferences}
-              />
             )}
           </div>
         )}

@@ -3,18 +3,18 @@ import { useEffect } from 'react';
 export const useSEO = ({ title, description, image, url, type = 'website' }) => {
   useEffect(() => {
     // Update document title
-    document.title = title || 'VisitJo - Jordan Hotels';
+    document.title = title || 'Visit-Jo - Jordan Hotels';
 
     // Update meta tags
-    updateMetaTag('description', description || 'Book the best hotels in Jordan with VisitJo. Find great deals and read reviews.');
-    updateMetaTag('og:title', title || 'VisitJo - Jordan Hotels');
-    updateMetaTag('og:description', description || 'Book the best hotels in Jordan with VisitJo.');
-    updateMetaTag('og:image', image || 'https://visitjo.com/og-image.jpg');
+    updateMetaTag('description', description || 'Book the best hotels in Jordan with Visit-Jo. Find great deals and read reviews.');
+    updateMetaTag('og:title', title || 'Visit-Jo - Jordan Hotels');
+    updateMetaTag('og:description', description || 'Book the best hotels in Jordan with Visit-Jo.');
+    updateMetaTag('og:image', image || 'https://Visit-Jo.com/og-image.jpg');
     updateMetaTag('og:url', url || window.location.href);
     updateMetaTag('og:type', type);
-    updateMetaTag('twitter:title', title || 'VisitJo - Jordan Hotels');
-    updateMetaTag('twitter:description', description || 'Book the best hotels in Jordan with VisitJo.');
-    updateMetaTag('twitter:image', image || 'https://visitjo.com/og-image.jpg');
+    updateMetaTag('twitter:title', title || 'Visit-Jo - Jordan Hotels');
+    updateMetaTag('twitter:description', description || 'Book the best hotels in Jordan with Visit-Jo.');
+    updateMetaTag('twitter:image', image || 'https://Visit-Jo.com/og-image.jpg');
     updateMetaTag('twitter:card', 'summary_large_image');
 
     // Structured data for hotels

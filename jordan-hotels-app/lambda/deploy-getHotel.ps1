@@ -1,6 +1,6 @@
 # PowerShell helper to build and deploy the getHotelById Lambda + API using SAM
 param(
-  [string]$StackName = 'visitjo-backend',
+  [string]$StackName = 'VISIT-JO-backend',
   [string]$S3Bucket = '',
   [string]$Region = 'us-east-1'
 )

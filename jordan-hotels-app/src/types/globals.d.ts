@@ -17,7 +17,8 @@ declare global {
     __VISITJO_RUNTIME_CONFIG__?: any;
     paypal?: any;
     gtag?: (...args: any[]) => void;
-    __visitjo_rum?: any;
+    openChatBot?: () => void;
+    __VISIT-JO_rum?: any;
     [key: string]: any;
   }
 }

@@ -7,72 +7,43 @@ export default function About() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Seo
-        title="About VisitJo - Your Authentic Jordan Travel Guide"
-        description="Learn about VisitJo's mission to provide authentic Jordan travel experiences. Discover our commitment to showcasing Jordan's hidden gems and warm hospitality."
-        canonicalUrl="https://visitjo.com/about"
-        keywords="about VisitJo, Jordan travel company, authentic travel, Jordan tourism, travel platform"
+        title="About Visit-Jo - Your Authentic Jordan Travel Guide"
+        description="Learn about Visit-Jo's mission to provide authentic Jordan travel experiences. Discover our commitment to showcasing Jordan's hidden gems and warm hospitality."
+        canonicalUrl="https://vist-jo.com/about"
+        keywords="about Visit-Jo, Jordan travel company, authentic travel, Jordan tourism, travel platform"
       />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-light-hero dark:bg-dark-hero">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background */}
-        <div className="absolute inset-0 bg-light-premium dark:bg-ocean-depths animate-gradient-shift"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 dark:from-black/60 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-blue-800"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Enhanced Badge */}
-          <div className="inline-flex items-center gap-3 px-8 py-4 mb-12 bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/30 rounded-full text-black dark:text-white/90 text-sm font-bold uppercase tracking-widest shadow-2xl animate-fade-in">
-            <Crown className="w-5 h-5 text-jordan-gold" />
-            {t('pages.about.kicker', 'Authentic Jordanian Hospitality')}
-            <Crown className="w-5 h-5 text-jordan-gold" />
+          {/* Premium Badge */}
+          <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-gradient-to-r from-amber-400/20 to-orange-400/20 backdrop-blur-sm border border-amber-300/30 rounded-full text-white text-sm font-semibold uppercase tracking-wide animate-fade-in shadow-lg">
+            <Crown className="w-5 h-5 text-amber-400" />
+            {t('pages.about.kicker', '👑 Authentic Jordanian Hospitality')}
+            <Crown className="w-5 h-5 text-amber-400" />
           </div>
 
-          {/* Enhanced Title */}
-          <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black font-display mb-8 tracking-tight leading-tight animate-slide-up">
-            <span className="block text-black dark:text-white drop-shadow-2xl mb-2">{t("pages.about.titleMain", "Your Gateway to")}</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl">
+          {/* Premium Title */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-6 sm:mb-8 tracking-tight leading-tight animate-slide-up px-2 sm:px-0">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-amber-100 to-orange-100 drop-shadow-2xl mb-1 sm:mb-2">
+              {t("pages.about.titleMain", "Your Gateway to")}
+            </span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-orange-200 to-red-200 drop-shadow-2xl">
               {t("pages.about.titleAccent", "Extraordinary Experiences")}
             </span>
           </h1>
 
           {/* Enhanced Subtitle */}
-          <p className="text-xl sm:text-2xl lg:text-3xl max-w-5xl mx-auto mb-16 text-black dark:text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
-            {t('pages.about.intro', 'We\'re not just another booking platform. We\'re your trusted local experts, passionate storytellers, and dedicated hosts who believe that every traveler deserves to experience the real Jordan - the hidden gems, the authentic moments, and the genuine connections that transform ordinary trips into lifelong memories.')}
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto mb-12 sm:mb-16 text-white/95 leading-relaxed font-light animate-fade-in drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.3s' }}>
+            {t('pages.about.intro', '🌟 We\'re not just another booking platform. We\'re your trusted local experts, passionate storytellers, and dedicated hosts who believe that every traveler deserves to experience the real Jordan - the hidden gems, the authentic moments, and the genuine connections that transform ordinary trips into Visit-Jo unforgettable memories.')}
           </p>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Gem className="w-8 h-8 text-jordan-gold" />
-                750+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Verified Hotels</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <MapPin className="w-8 h-8 text-jordan-rose" />
-                25+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Star className="w-8 h-8 text-jordan-gold" />
-                4.9★
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Guest Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Users className="w-8 h-8 text-jordan-teal" />
-                50K+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Happy Travelers</div>
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -111,8 +82,8 @@ export default function About() {
                     { icon: Shield, text: t('pages.about.focus.items.3', '100% satisfaction guarantee') },
                     { icon: Heart, text: t('pages.about.focus.items.4', 'Sustainable tourism practices') }
                   ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-4 p-4 rounded-2xl bg-gradient-to-r from-white/50 to-white/30 dark:from-slate-800/50 dark:to-slate-700/30 backdrop-blur-sm border border-white/20 dark:border-slate-600/20 hover:shadow-floating transition-all duration-300">
-                      <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-jordan-gold to-jordan-rose rounded-xl flex items-center justify-center">
+                    <li key={index} className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
+                      <div className="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
                         <item.icon className="w-5 h-5 text-white" />
                       </div>
                       <span className="text-slate-700 dark:text-slate-200 font-medium leading-relaxed">{item.text}</span>
@@ -123,7 +94,7 @@ export default function About() {
             </div>
 
             <div className="animate-slide-in-right">
-              <div className="card-modern p-8 lg:p-10 bg-gradient-to-br from-jordan-blue/5 to-jordan-teal/5 dark:from-jordan-blue/10 dark:to-jordan-teal/10">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 lg:p-8 shadow-md">
                 <div className="flex items-center gap-3 mb-6">
                   <Star className="w-6 h-6 text-jordan-gold" />
                   <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100">
@@ -137,7 +108,7 @@ export default function About() {
                   </blockquote>
 
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-jordan-gold to-jordan-rose rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
                       <span className="text-white font-bold text-lg">S</span>
                     </div>
                     <div>
@@ -146,22 +117,6 @@ export default function About() {
                     </div>
                   </div>
 
-                  <div className="pt-6 border-t border-slate-200/50 dark:border-slate-600/50">
-                    <div className="flex items-center justify-between">
-                      <div className="text-center">
-                        <div className="text-3xl font-black text-jordan-gold">4.9</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">Average Rating</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-black text-jordan-blue">50K+</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">Happy Travelers</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-black text-jordan-rose">750+</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">Verified Hotels</div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

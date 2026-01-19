@@ -3,13 +3,15 @@
  * Handles caching, offline support, and background sync
  */
 
-const CACHE_NAME = 'visitjo-v4';
-const RUNTIME_CACHE = 'visitjo-runtime-v4';
-const API_CACHE = 'visitjo-api-v4';
+const CACHE_NAME = 'Visit-Jo-v4';
+const RUNTIME_CACHE = 'Visit-Jo-runtime-v4';
+const API_CACHE = 'Visit-Jo-api-v4';
 
 const ASSETS_TO_CACHE = [
+  '/',
   '/manifest.json',
   '/favicon.png',
+  '/offline.html',
 ];
 
 /**
@@ -137,6 +139,11 @@ async function networkFirstStrategy(request) {
 
     // Return offline page if available
     if (request.headers.get('accept').includes('text/html')) {
+      const offlineResponse = await caches.match('/offline.html');
+      if (offlineResponse) {
+        return offlineResponse;
+      }
+      // Fallback to index.html if offline.html is not cached
       return caches.match('/index.html');
     }
 
@@ -226,7 +233,7 @@ self.addEventListener('push', (event) => {
   console.log('Push notification received');
 
   let notificationData = {
-    title: 'VisitJo',
+    title: 'Visit-Jo',
     body: 'You have a new notification',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/badge-72x72.png',

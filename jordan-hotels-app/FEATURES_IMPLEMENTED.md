@@ -1,4 +1,4 @@
-# VisitJo - Feature Implementation Guide
+# VISIT-JO - Feature Implementation Guide
 
 ## ✅ Implemented Features (1-13)
 

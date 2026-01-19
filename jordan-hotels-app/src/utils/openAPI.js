@@ -1,17 +1,17 @@
 /**
  * OpenAPI/Swagger Documentation
- * Complete API specification for VisitJo
+ * Complete API specification for VISIT-JO
  */
 
 export const openAPISpec = {
   openapi: '3.0.0',
   info: {
-    title: 'VisitJo Hotel Booking API',
-    description: 'RESTful API for the VisitJo hotel booking platform',
+    title: 'VISIT-JO Hotel Booking API',
+    description: 'RESTful API for the VISIT-JO hotel booking platform',
     version: '1.0.0',
     contact: {
-      name: 'VisitJo Support',
-      url: 'https://visitjo.com',
+      name: 'VISIT-JO Support',
+      url: 'https://VISIT-JO.com',
       email: 'khaledshakhshir2133@gmail.com',
     },
     license: {
@@ -21,11 +21,11 @@ export const openAPISpec = {
   },
   servers: [
     {
-      url: 'https://api.visitjo.com/v1',
+      url: 'https://api.VISIT-JO.com/v1',
       description: 'Production',
     },
     {
-      url: 'https://staging-api.visitjo.com/v1',
+      url: 'https://staging-api.VISIT-JO.com/v1',
       description: 'Staging',
     },
     {

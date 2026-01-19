@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: VisitJo - Update template that deploys Lambdas and API. Reuses existing S3/DynamoDB/API when provided.
+Description: VISIT-JO - Update template that deploys Lambdas and API. Reuses existing S3/DynamoDB/API when provided.
 
 Parameters:
   ExistingBucketName:
@@ -42,7 +42,7 @@ Resources:
     Type: AWS::S3::Bucket
     Condition: !Not [UseExistingBucket]
     Properties:
-      BucketName: !Sub "visitjo-user-images-${AWS::AccountId}-${AWS::Region}"
+      BucketName: !Sub "VISIT-JO-user-images-${AWS::AccountId}-${AWS::Region}"
       CorsConfiguration:
         CorsRules:
           - AllowedOrigins: !Ref AllowedOrigins
@@ -66,7 +66,7 @@ Resources:
     Type: AWS::DynamoDB::Table
     Condition: !Not [UseExistingTable]
     Properties:
-      TableName: !Sub "VisitJo-UserProfiles-${AWS::AccountId}-${AWS::Region}"
+      TableName: !Sub "VISIT-JO-UserProfiles-${AWS::AccountId}-${AWS::Region}"
       AttributeDefinitions:
         - AttributeName: userId
           AttributeType: S
@@ -78,11 +78,11 @@ Resources:
         SSEEnabled: true
     DeletionPolicy: Retain
 
-  VisitJoApi:
+  VISIT-JOApi:
     Type: AWS::Serverless::Api
     Condition: !Not [UseExistingApi]
     Properties:
-      Name: VisitJoApi
+      Name: VISIT-JOApi
       StageName: prod
       Cors: 
         AllowMethods: "OPTIONS,GET,PUT,POST"
@@ -98,7 +98,7 @@ Resources:
   PresignFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: visitjo-presign-upload
+      FunctionName: VISIT-JO-presign-upload
       Handler: index.handler
       CodeUri: ../presign-upload/
       Environment:
@@ -119,12 +119,12 @@ Resources:
             Properties:
               Path: /uploads/signed-url
               Method: post
-              RestApiId: !Ref VisitJoApi
+              RestApiId: !Ref VISIT-JOApi
 
   UserProfileFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: visitjo-user-profile
+      FunctionName: VISIT-JO-user-profile
       Handler: index.handler
       CodeUri: ../user-profile/
       Environment:
@@ -148,18 +148,18 @@ Resources:
             Properties:
               Path: /user/profile
               Method: get
-              RestApiId: !Ref VisitJoApi
+              RestApiId: !Ref VISIT-JOApi
           PutUserProfileApi:
             Type: Api
             Properties:
               Path: /user/profile
               Method: put
-              RestApiId: !Ref VisitJoApi
+              RestApiId: !Ref VISIT-JOApi
 
 Outputs:
   ApiUrl:
     Description: "Base URL for API"
-    Value: !If [UseExistingApi, !Sub "https://${ExistingApiId}.execute-api.${AWS::Region}.amazonaws.com/prod", !Sub "https://${VisitJoApi}.execute-api.${AWS::Region}.amazonaws.com/prod"]
+    Value: !If [UseExistingApi, !Sub "https://${ExistingApiId}.execute-api.${AWS::Region}.amazonaws.com/prod", !Sub "https://${VISIT-JOApi}.execute-api.${AWS::Region}.amazonaws.com/prod"]
   BucketName:
     Description: S3 bucket name for user images
     Value: !If [UseExistingBucket, !Ref ExistingBucketName, !Ref UserImagesBucket]

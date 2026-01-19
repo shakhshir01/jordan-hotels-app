@@ -165,8 +165,15 @@ function App() {
             <WishlistProvider>
             <Suspense
               fallback={
-                <div className="flex justify-center py-10">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                  <div className="text-center">
+                    <div className="relative mb-6">
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto"></div>
+                      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-purple-500 animate-spin mx-auto" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+                    </div>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">✨ Loading Visit-Jo</h2>
+                    <p className="text-gray-600">Preparing your travel experience...</p>
+                  </div>
                 </div>
               }
             >

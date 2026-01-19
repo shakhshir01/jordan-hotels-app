@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 // Read the Xotelo data
-const fileData = fs.readFileSync('C:\\Users\\khale\\Desktop\\VisitJo\\jordan-hotels-app\\src\\services\\xoteloJordanHotelsData.js', 'utf8');
+const fileData = fs.readFileSync('C:\\Users\\khale\\Desktop\\VISIT-JO\\jordan-hotels-app\\src\\services\\xoteloJordanHotelsData.js', 'utf8');
 const startIndex = fileData.indexOf('export const XOTELO_JORDAN_HOTELS = [');
 const endIndex = fileData.lastIndexOf('];') + 2;
 const hotelsJson = fileData.substring(startIndex + 'export const XOTELO_JORDAN_HOTELS = '.length, endIndex - 2);
@@ -168,7 +168,7 @@ const updatedData = fileData.replace(
   'export const XOTELO_JORDAN_HOTELS = ' + JSON.stringify(hotels, null, 2) + ';'
 );
 
-fs.writeFileSync('C:\\Users\\khale\\Desktop\\VisitJo\\jordan-hotels-app\\src\\services\\xoteloJordanHotelsData.js', updatedData);
+fs.writeFileSync('C:\\Users\\khale\\Desktop\\VISIT-JO\\jordan-hotels-app\\src\\services\\xoteloJordanHotelsData.js', updatedData);
 
 console.log(`\n🎉 Successfully updated all ${hotels.length} hotels with professional, real hotel images!`);
 console.log('Each hotel now has 10-15 high-quality images from categories: exteriors, rooms, pools, dining, and desert scenes.');

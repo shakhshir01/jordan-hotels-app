@@ -4,7 +4,7 @@ async function run() {
   console.log('Invoking bookings handler (POST stub)');
   const event = {
     httpMethod: 'POST',
-    headers: { Origin: 'https://www.visit-jo.com' },
+    headers: { Origin: 'https://vist-jo.com' },
     body: JSON.stringify({ hotelId: 'h_test', userId: 'u_test' }),
     path: '/bookings'
   };

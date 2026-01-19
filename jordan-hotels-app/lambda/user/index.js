@@ -157,12 +157,12 @@ async function handler(event) {
         headers: defaultHeaders,
         body: JSON.stringify([
           {
-            id: "blog-welcome-visitjo",
-            title: "Welcome to VisitJo - Your Jordan Travel Companion",
-            slug: "welcome-to-visitjo",
+            id: "blog-welcome-VISIT-JO",
+            title: "Welcome to VISIT-JO - Your Jordan Travel Companion",
+            slug: "welcome-to-VISIT-JO",
             excerpt: "Discover the best of Jordan with our comprehensive travel platform",
-            content: "Welcome to VisitJo, your ultimate guide to exploring the wonders of Jordan...",
-            author: "VisitJo Team",
+            content: "Welcome to VISIT-JO, your ultimate guide to exploring the wonders of Jordan...",
+            author: "VISIT-JO Team",
             publishedAt: new Date().toISOString(),
             tags: ["welcome", "travel", "jordan"],
             image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=1200",
@@ -412,7 +412,7 @@ async function sendEmail(toAddress, subject, textBody, htmlBody) {
     return true; // Pretend it was sent successfully
   }
 
-  const from = process.env.SES_FROM_EMAIL || process.env.SENDER_EMAIL || `no-reply@${process.env.DOMAIN || 'visit-jo.com'}`;
+  const from = process.env.SES_FROM_EMAIL || process.env.SENDER_EMAIL || `no-reply@${process.env.DOMAIN || 'VISIT-JO.com'}`;
   const params = {
     Destination: { ToAddresses: [toAddress] },
     Message: {
@@ -420,7 +420,7 @@ async function sendEmail(toAddress, subject, textBody, htmlBody) {
         Text: { Data: textBody || '' },
         Html: { Data: htmlBody || textBody || '' },
       },
-      Subject: { Data: subject || 'VisitJO verification' },
+      Subject: { Data: subject || 'VISIT-JO verification' },
     },
     Source: from,
   };
@@ -482,9 +482,9 @@ async function setupEmailMfa(userId, event) {
     // send email (best-effort)
     const sent = await sendEmail(
       secondaryEmail,
-      'VisitJO verification code',
-      `Your VisitJO verification code is: ${code}`,
-      `<p>Your VisitJO verification code is: <strong>${code}</strong></p>`
+      'VISIT-JO verification code',
+      `Your VISIT-JO verification code is: ${code}`,
+      `<p>Your VISIT-JO verification code is: <strong>${code}</strong></p>`
     );
 
     return { statusCode: 200, headers: defaultHeaders, body: JSON.stringify({ sent: !!sent }) };
@@ -582,9 +582,9 @@ async function sendLoginMfaCode(event) {
     console.log('LOGIN VERIFICATION CODE:', code); // Always log for debugging
     const sent = await sendEmail(
       email,
-      'VisitJO Login Verification',
-      `Your VisitJO login verification code is: ${code}`,
-      `<p>Your VisitJO login verification code is: <strong>${code}</strong></p><p>This code will expire in 15 minutes.</p>`
+      'VISIT-JO Login Verification',
+      `Your VISIT-JO login verification code is: ${code}`,
+      `<p>Your VISIT-JO login verification code is: <strong>${code}</strong></p><p>This code will expire in 15 minutes.</p>`
     );
     console.log('sendEmail returned:', sent);
 
@@ -650,16 +650,16 @@ async function setupTotpMfa(userId, event) {
   try {
     // Generate TOTP secret
     const secret = speakeasy.generateSecret({
-      name: 'VisitJo',
-      issuer: 'VisitJo',
+      name: 'VISIT-JO',
+      issuer: 'VISIT-JO',
       length: 32
     });
 
     // Generate QR code
     const otpauthUrl = speakeasy.otpauthURL({
       secret: secret.ascii,
-      label: 'VisitJo',
-      issuer: 'VisitJo',
+      label: 'VISIT-JO',
+      issuer: 'VISIT-JO',
       encoding: 'ascii'
     });
 

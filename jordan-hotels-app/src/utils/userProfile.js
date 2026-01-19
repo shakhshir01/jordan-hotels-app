@@ -1,4 +1,4 @@
-const STORAGE_PREFIX = 'visitjo.userProfile.';
+const STORAGE_PREFIX = 'VISIT-JO.userProfile.';
 
 const isUuidLike = (value) =>
   typeof value === 'string' &&

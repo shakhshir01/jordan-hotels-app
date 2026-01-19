@@ -1,7 +1,7 @@
 // Multi-language Support
 export const translations = {
   en: {
-    header: 'Welcome to VisitJo',
+    header: 'Welcome to Visit-Jo',
     search: 'Search Hotels',
     destinations: 'Destinations',
     bookings: 'My Bookings',
@@ -23,7 +23,7 @@ export const translations = {
     accessibility: 'Accessibility',
   },
   ar: {
-    header: 'مرحبا بك في VisitJo',
+    header: 'مرحبا بك في Visit-Jo',
     search: 'ابحث عن الفنادق',
     destinations: 'الوجهات',
     bookings: 'حجوزاتي',

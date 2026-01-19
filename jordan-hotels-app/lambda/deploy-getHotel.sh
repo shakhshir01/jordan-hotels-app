@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-STACK_NAME=${STACK_NAME:-visitjo-backend}
+STACK_NAME=${STACK_NAME:-VISIT-JO-backend}
 S3_BUCKET=${S3_BUCKET:-}
 REGION=${REGION:-us-east-1}
 

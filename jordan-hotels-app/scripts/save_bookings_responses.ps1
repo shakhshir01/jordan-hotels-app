@@ -33,9 +33,9 @@ $optionsOut = Join-Path $baseOut "bookings-options.txt"
 $getOut = Join-Path $baseOut "bookings-get.txt"
 $postOut = Join-Path $baseOut "bookings-post.txt"
 
-$hdr = @{ Origin = 'https://www.visit-jo.com' }
+$hdr = @{ Origin = 'https://vist-jo.com' }
 SaveReq -method OPTIONS -hdr $hdr -body $null -out $optionsOut
 SaveReq -method GET -hdr $hdr -body $null -out $getOut
-$hdr2 = @{ Origin = 'https://www.visit-jo.com'; 'Content-Type' = 'application/json' }
+$hdr2 = @{ Origin = 'https://vist-jo.com'; 'Content-Type' = 'application/json' }
 SaveReq -method POST -hdr $hdr2 -body '{}' -out $postOut
 Write-Output "Saved to files: $optionsOut, $getOut, $postOut"

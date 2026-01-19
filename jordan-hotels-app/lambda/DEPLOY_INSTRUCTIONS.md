@@ -8,7 +8,7 @@ Prerequisites
 - An S3 bucket in `us-east-1` for SAM artifacts (create one if needed):
 
 ```bash
-aws s3 mb s3://your-visitjo-sam-bucket --region us-east-1
+aws s3 mb s3://your-VISIT-JO-sam-bucket --region us-east-1
 ```
 
 1) Build the SAM package
@@ -29,13 +29,13 @@ sam deploy --guided --template-file .aws-sam/build/template.yaml
 Non-interactive (after --guided has saved parameters):
 
 ```bash
-sam deploy --template-file .aws-sam/build/template.yaml --stack-name visitjo-backend --s3-bucket your-visitjo-sam-bucket --capabilities CAPABILITY_IAM --region us-east-1
+sam deploy --template-file .aws-sam/build/template.yaml --stack-name VISIT-JO-backend --s3-bucket your-VISIT-JO-sam-bucket --capabilities CAPABILITY_IAM --region us-east-1
 ```
 
 If you want the API to use a Cognito User Pool for authentication, pass the `CognitoUserPoolArn` parameter during deploy (replace the ARN):
 
 ```bash
-sam deploy --template-file .aws-sam/build/template.yaml --stack-name visitjo-backend --s3-bucket your-visitjo-sam-bucket --capabilities CAPABILITY_IAM --region us-east-1 --parameter-overrides CognitoUserPoolArn=arn:aws:cognito-idp:us-east-1:497339097084:userpool/your_pool_id
+sam deploy --template-file .aws-sam/build/template.yaml --stack-name VISIT-JO-backend --s3-bucket your-VISIT-JO-sam-bucket --capabilities CAPABILITY_IAM --region us-east-1 --parameter-overrides CognitoUserPoolArn=arn:aws:cognito-idp:us-east-1:497339097084:userpool/your_pool_id
 ```
 
 3) Get the API ID and URL from CloudFormation outputs
@@ -43,7 +43,7 @@ sam deploy --template-file .aws-sam/build/template.yaml --stack-name visitjo-bac
 List stack outputs:
 
 ```bash
-aws cloudformation describe-stacks --stack-name visitjo-backend --region us-east-1 --query 'Stacks[0].Outputs' --output json
+aws cloudformation describe-stacks --stack-name VISIT-JO-backend --region us-east-1 --query 'Stacks[0].Outputs' --output json
 ```
 
 If you used the Console to deploy, you can also find the API URL in the CloudFormation stack Outputs or in the API Gateway console under Stages.

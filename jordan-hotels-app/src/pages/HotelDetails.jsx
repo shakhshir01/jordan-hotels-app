@@ -1,3 +1,5 @@
+/// <reference path="../types/globals.d.ts" />
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, Star, CheckCircle, Wifi, Coffee, Car, Loader2, AlertCircle, X, ArrowRight } from 'lucide-react';
@@ -20,7 +22,7 @@ const FALLBACK_IMG =
   <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000">
     <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#d67d61"/></linearGradient></defs>
     <rect width="100%" height="100%" fill="url(#g)"/>
-    <text x="50%" y="50%" fill="rgba(255,255,255,.92)" font-family="Arial" font-size="56" text-anchor="middle" dominant-baseline="middle">VisitJo Hotel</text>
+    <text x="50%" y="50%" fill="rgba(255,255,255,.92)" font-family="Arial" font-size="56" text-anchor="middle" dominant-baseline="middle">Visit-Jo Hotel</text>
   </svg>`);
 
 const normalizeHotel = (raw) => {
@@ -236,7 +238,7 @@ function HotelDetails() {
 
   const hotelName = getHotelDisplayName(hotel, i18n.language);
 
-  const canonicalUrl = `https://visitjo.com${location.pathname}`;
+  const canonicalUrl = `${window.location.origin}${location.pathname}`;
   const descriptionText = (() => {
     const raw = String(hotel?.description || hotel?.summary || '').trim();
     if (raw) return raw.length > 160 ? `${raw.slice(0, 157)}...` : raw;
@@ -288,57 +290,16 @@ function HotelDetails() {
     ],
   };
 
-  // Handle loading and error states
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-light-cool dark:bg-dark-cool flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="animate-spin text-blue-600 mx-auto mb-4" size={48} />
-          <p className="text-slate-600 dark:text-slate-400">Loading hotel details...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Handle error states - return proper 404 for SEO
-  if (error || !hotel) {
-    return (
-      <div className="min-h-screen bg-light-cool dark:bg-dark-cool">
-        <Seo
-          title="Hotel Not Found | VisitJo"
-          description="The hotel you're looking for could not be found. Discover amazing accommodations in Jordan instead."
-          canonicalUrl={`https://visitjo.com${location.pathname}`}
-          noindex={true}
-        />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center max-w-md mx-auto px-4">
-            <div className="text-8xl mb-6">🏨</div>
-            <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-4">Hotel Not Found</h1>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              {error || "The hotel you're looking for doesn't exist or has been removed."}
-            </p>
-            <Link
-              to="/hotels"
-              className="btn-primary inline-block"
-            >
-              Browse All Hotels
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-section pb-24 lg:pb-8">
       <Seo
-        title={`${hotelName} | VisitJo`}
+        title={`${hotelName} | Visit-Jo`}
         description={descriptionText}
         canonicalUrl={canonicalUrl}
         jsonLd={jsonLdGraph}
         breadcrumbs={[
-          { name: 'Home', url: 'https://visitjo.com' },
-          { name: 'Hotels', url: 'https://visitjo.com/hotels' },
+          { name: 'Home', url: 'https://vist-jo.com' },
+          { name: 'Hotels', url: 'https://vist-jo.com/hotels' },
           { name: hotelName, url: canonicalUrl }
         ]}
       />
@@ -457,8 +418,8 @@ function HotelDetails() {
                 )}
 
                 {/* Price Breakdown */}
-                <div className="glass-card rounded-2xl p-6 border border-white/20">
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-6 text-lg">💰 Price Breakdown</h3>
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-6 text-lg">💰 Price Breakdown</h3>
                   {(() => {
                     const breakdown = calculatePriceBreakdown();
                     return (
@@ -481,7 +442,7 @@ function HotelDetails() {
                         </div>
                         <div className="border-t border-slate-200/70 dark:border-slate-700/60 pt-4 mt-4 flex justify-between items-center">
                           <span className="font-black text-slate-900 dark:text-slate-100 text-xl">Total</span>
-                          <span className="font-black gradient-text text-2xl">{formatPrice(breakdown.total, preferences.currency)}</span>
+                          <span className="font-bold text-blue-600 text-2xl">{formatPrice(breakdown.total, preferences.currency)}</span>
                         </div>
                       </div>
                     );
@@ -534,21 +495,21 @@ function HotelDetails() {
         </div>
       )}
 
-      {/* Premium Breadcrumbs */}
-      <nav className="bg-card-premium backdrop-blur-2xl border border-white/30 rounded-3xl p-5 sm:p-6 mb-10 shadow-premium">
-        <div className="flex items-center gap-3 text-sm sm:text-base">
-          <Link to="/" className="text-jordan-blue hover:text-jordan-teal dark:text-jordan-blue dark:hover:text-jordan-teal transition-all duration-300 font-semibold hover:scale-105 transform">
+      {/* Simple Breadcrumbs */}
+      <nav className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-8 shadow-sm">
+        <div className="flex items-center gap-2 text-sm">
+          <Link to="/" className="text-blue-600 hover:text-blue-700 transition-colors duration-300 font-medium">
             {t('nav.home')}
           </Link>
-          <span className="text-slate-400 dark:text-slate-500">•</span>
+          <span className="text-gray-400">•</span>
           <Link
             to={`/destinations/${encodeURIComponent(hotel.location)}`}
-            className="text-slate-600 dark:text-slate-300 hover:text-jordan-blue dark:hover:text-jordan-teal transition-all duration-300 font-medium hover:scale-105 transform"
+            className="text-gray-600 hover:text-blue-600 transition-colors duration-300 font-medium"
           >
             {hotel.location}
           </Link>
-          <span className="text-slate-400 dark:text-slate-500">•</span>
-          <span className="text-transparent bg-clip-text bg-text-gradient font-bold animate-gradient-flow">{hotelName}</span>
+          <span className="text-gray-400">•</span>
+          <span className="text-gray-900 dark:text-white font-bold">{hotelName}</span>
         </div>
       </nav>
 
@@ -566,13 +527,13 @@ function HotelDetails() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-8 mb-8">
             <div className="flex-1">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
-                <span className="text-transparent bg-clip-text bg-text-gradient animate-gradient-flow">{hotelName}</span>
+                <span className="text-gray-900 dark:text-white">{hotelName}</span>
               </h1>
               <p className="text-lg sm:text-xl md:text-2xl text-slate-600 dark:text-slate-300 flex items-center gap-3 sm:gap-4 mb-8">
-                <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-jordan-rose flex-shrink-0" />
+                <MapPin className="w-6 h-6 text-gray-500 flex-shrink-0" />
                 <Link
                   to={`/destinations/${encodeURIComponent(hotel.location)}`}
-                  className="font-semibold hover:text-jordan-blue dark:hover:text-jordan-teal transition-all duration-300 hover:scale-105 transform"
+                  className="font-semibold hover:text-blue-600 transition-colors duration-300"
                 >
                   {hotel.location}, {t('hotelDetails.location.country')}
                 </Link>
@@ -584,7 +545,7 @@ function HotelDetails() {
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6 mb-8 sm:mb-10">
-            <div className="inline-flex items-center gap-3 sm:gap-4 px-6 py-4 sm:px-8 sm:py-5 rounded-3xl bg-gradient-to-r from-jordan-gold via-amber-400 to-jordan-rose text-white font-bold shadow-premium animate-pulse-glow min-h-[56px] border border-white/20">
+            <div className="inline-flex items-center gap-3 px-4 py-3 rounded-lg bg-yellow-400 text-black font-bold shadow-md min-h-[48px]">
               <Star size={20} className="sm:w-6 sm:h-6" fill="currentColor" />
               <span className="text-lg sm:text-xl font-extrabold">{hotel.rating}</span>
             </div>
@@ -593,14 +554,14 @@ function HotelDetails() {
             <span className="text-base sm:text-lg text-jordan-emerald font-bold">Award-Winning Property</span>
           </div>
 
-          <section className="bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-3xl overflow-hidden shadow-premium">
+          <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
             <div className="p-8 sm:p-10 lg:p-12">
               <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-10 leading-tight">
-                <span className="text-transparent bg-clip-text bg-text-gradient animate-gradient-flow">Premium Amenities</span>
+                <span className="text-gray-900 dark:text-white">Premium Amenities</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-gradient-to-r from-blue-50/80 to-jordan-blue/20 dark:from-blue-900/30 dark:to-jordan-blue/10 hover:shadow-floating transition-all duration-500 group touch-manipulation min-h-[100px] sm:min-h-[120px] border border-white/20 hover:border-jordan-blue/30">
-                  <div className="bg-gradient-to-r from-jordan-blue to-blue-600 p-4 sm:p-5 lg:p-6 rounded-3xl shadow-premium group-hover:shadow-floating transition-all duration-500 flex-shrink-0 group-hover:scale-110 transform">
+                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors duration-200 min-h-[100px] sm:min-h-[120px] border border-blue-200 dark:border-blue-700 hover:border-blue-300">
+                  <div className="bg-blue-500 p-3 sm:p-4 rounded-lg shadow-md flex-shrink-0">
                     <Wifi className="text-white sm:w-7 sm:h-7 lg:w-8 lg:h-8" size={24} />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -608,8 +569,8 @@ function HotelDetails() {
                     <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">{t('hotelDetails.offers.wifi.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-gradient-to-r from-emerald-50/80 to-jordan-emerald/20 dark:from-emerald-900/30 dark:to-jordan-emerald/10 hover:shadow-floating transition-all duration-500 group touch-manipulation min-h-[100px] sm:min-h-[120px] border border-white/20 hover:border-jordan-emerald/30">
-                  <div className="bg-gradient-to-r from-jordan-emerald to-green-600 p-4 sm:p-5 lg:p-6 rounded-3xl shadow-premium group-hover:shadow-floating transition-all duration-500 flex-shrink-0 group-hover:scale-110 transform">
+                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200 min-h-[100px] sm:min-h-[120px] border border-green-200 dark:border-green-700 hover:border-green-300">
+                  <div className="bg-green-500 p-3 sm:p-4 rounded-lg shadow-md flex-shrink-0">
                     <Coffee className="text-white sm:w-7 sm:h-7 lg:w-8 lg:h-8" size={24} />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -617,8 +578,8 @@ function HotelDetails() {
                     <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">{t('hotelDetails.offers.breakfast.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-gradient-to-r from-purple-50/80 to-jordan-purple/20 dark:from-purple-900/30 dark:to-jordan-purple/10 hover:shadow-floating transition-all duration-500 group touch-manipulation min-h-[100px] sm:min-h-[120px] border border-white/20 hover:border-jordan-purple/30">
-                  <div className="bg-gradient-to-r from-jordan-purple to-purple-600 p-4 sm:p-5 lg:p-6 rounded-3xl shadow-premium group-hover:shadow-floating transition-all duration-500 flex-shrink-0 group-hover:scale-110 transform">
+                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200 min-h-[100px] sm:min-h-[120px] border border-purple-200 dark:border-purple-700 hover:border-purple-300">
+                  <div className="bg-purple-500 p-3 sm:p-4 rounded-lg shadow-md flex-shrink-0">
                     <Car className="text-white sm:w-7 sm:h-7 lg:w-8 lg:h-8" size={28} />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -626,8 +587,8 @@ function HotelDetails() {
                     <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">{t('hotelDetails.offers.parking.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-gradient-to-r from-rose-50/80 to-jordan-rose/20 dark:from-rose-900/30 dark:to-jordan-rose/10 hover:shadow-floating transition-all duration-500 group touch-manipulation min-h-[100px] sm:min-h-[120px] border border-white/20 hover:border-jordan-rose/30">
-                  <div className="bg-gradient-to-r from-jordan-rose to-rose-600 p-4 sm:p-5 lg:p-6 rounded-3xl shadow-premium group-hover:shadow-floating transition-all duration-500 flex-shrink-0 group-hover:scale-110 transform">
+                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 min-h-[100px] sm:min-h-[120px] border border-red-200 dark:border-red-700 hover:border-red-300">
+                  <div className="bg-red-500 p-3 sm:p-4 rounded-lg shadow-md flex-shrink-0">
                     <CheckCircle className="text-white sm:w-7 sm:h-7 lg:w-8 lg:h-8" size={28} />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -639,10 +600,10 @@ function HotelDetails() {
             </div>
           </section>
 
-          <section className="bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-3xl overflow-hidden shadow-premium">
+          <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
             <div className="p-8 sm:p-10 lg:p-12">
               <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-8 leading-tight">
-                <span className="text-transparent bg-clip-text bg-text-gradient animate-gradient-flow">About This Property</span>
+                <span className="text-gray-900 dark:text-white">About This Property</span>
               </h3>
               <div className="prose prose-lg dark:prose-invert max-w-none">
                 <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg sm:text-xl mb-8 font-medium">
@@ -687,11 +648,11 @@ function HotelDetails() {
         </div>
 
         {/* Premium Booking Sidebar - Desktop Only */}
-        <aside className="hidden lg:block bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/10 lg:sticky lg:top-24 h-fit rounded-3xl shadow-premium overflow-hidden">
+        <aside className="hidden lg:block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 lg:sticky lg:top-24 h-fit rounded-lg shadow-sm overflow-hidden">
           <div className="p-8 sm:p-10 lg:p-12">
             <div className="mb-10 text-center">
               <div className="inline-flex items-end gap-4 mb-4">
-                <span className="text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-text-gradient animate-gradient-flow">{hotel.price}</span>
+                <span className="text-6xl lg:text-7xl font-black text-gray-900 dark:text-white">{hotel.price}</span>
                 <span className="text-lg font-bold text-slate-500 dark:text-slate-400 pb-2">JOD</span>
               </div>
               <p className="text-lg text-slate-600 dark:text-slate-300 font-semibold">/{t('hotels.perNight')}</p>
@@ -699,10 +660,10 @@ function HotelDetails() {
               <div className="w-16 h-1 bg-gradient-to-r from-jordan-gold to-jordan-rose mx-auto mt-4 rounded-full"></div>
             </div>
 
-            <form onSubmit={handleBooking} className="space-y-8">
+            <form onSubmit={handleBooking} className="space-y-6">
               {/* Check-in Date */}
               <div>
-                <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                <label className="block text-base font-bold text-slate-900 dark:text-white mb-4">
                   {t('hotelDetails.booking.checkIn')}
                 </label>
                 <input
@@ -710,14 +671,14 @@ function HotelDetails() {
                   value={checkInDate}
                   onChange={(e) => setCheckInDate(e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium"
+                  className="w-full px-5 py-5 bg-white/95 dark:bg-slate-800/60 backdrop-blur-sm border border-white/30 dark:border-slate-600/50 rounded-3xl focus:ring-2 focus:ring-jordan-gold/50 focus:border-jordan-gold/50 transition-all duration-500 text-slate-900 dark:text-white font-semibold text-lg shadow-sm hover:shadow-md"
                   required
                 />
               </div>
 
               {/* Check-out Date */}
               <div>
-                <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                <label className="block text-base font-bold text-slate-900 dark:text-white mb-4">
                   {t('hotelDetails.booking.checkOut')}
                 </label>
                 <input
@@ -725,20 +686,20 @@ function HotelDetails() {
                   value={checkOutDate}
                   onChange={(e) => setCheckOutDate(e.target.value)}
                   min={checkInDate || new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium"
+                  className="w-full px-5 py-5 bg-white/95 dark:bg-slate-800/60 backdrop-blur-sm border border-white/30 dark:border-slate-600/50 rounded-3xl focus:ring-2 focus:ring-jordan-gold/50 focus:border-jordan-gold/50 transition-all duration-500 text-slate-900 dark:text-white font-semibold text-lg shadow-sm hover:shadow-md"
                   required
                 />
               </div>
 
               {/* Number of Guests */}
               <div>
-                <label className="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
+                <label className="block text-base font-bold text-slate-900 dark:text-white mb-4">
                   {t('hotelDetails.booking.guests')}
                 </label>
                 <select
                   value={guests}
                   onChange={(e) => setGuests(e.target.value)}
-                  className="w-full px-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-slate-900 dark:text-slate-100 font-medium"
+                  className="w-full px-5 py-5 bg-white/95 dark:bg-slate-800/60 backdrop-blur-sm border border-white/30 dark:border-slate-600/50 rounded-3xl focus:ring-2 focus:ring-jordan-gold/50 focus:border-jordan-gold/50 transition-all duration-500 text-slate-900 dark:text-white font-semibold text-lg shadow-sm hover:shadow-md appearance-none"
                 >
                   <option value="1">{t('hotelDetails.booking.guestCount', { count: 1 })}</option>
                   <option value="2">{t('hotelDetails.booking.guestCount', { count: 2 })}</option>
@@ -827,36 +788,40 @@ function HotelDetails() {
               <button
                 type="submit"
                 disabled={bookingLoading || !checkInDate}
-                className="btn-primary w-full py-5 text-lg font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed hover-lift touch-manipulation"
+                className="w-full py-6 text-xl font-bold rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-colors duration-200 active:scale-95 min-h-[64px]"
               >
                 {bookingLoading ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <Loader2 size={20} className="animate-spin" />
-                    {t('hotelDetails.booking.bookingLoading')}
+                  <div className="flex items-center justify-center gap-4">
+                    <Loader2 size={24} className="animate-spin" />
+                    <span className="font-extrabold">{t('hotelDetails.booking.bookingLoading')}</span>
                   </div>
                 ) : (
-                  <span>{t('hotelDetails.booking.reserveNow')}</span>
+                  <span className="font-extrabold">{t('hotelDetails.booking.reserveNow')}</span>
                 )}
               </button>
 
-              <p className="text-center text-slate-500 dark:text-slate-400 text-sm font-medium">
-                🔒 {t('hotelDetails.booking.noChargeYet')}
+              <p className="text-center text-slate-500 dark:text-slate-400 text-base font-semibold mt-4 flex items-center justify-center gap-2">
+                <span className="text-jordan-emerald text-lg">🔒</span>
+                <span>{t('hotelDetails.booking.noChargeYet')}</span>
               </p>
             </form>
           </div>
         </aside>
       </div>
 
-      {/* Related Destinations */}
-      <section className="mt-16 mb-8">
-        <div className="card-modern p-8">
-          <h2 className="text-3xl font-black mb-8 gradient-text text-center">
-            {t('hotelDetails.relatedDestinations.title', 'Explore More Jordan Destinations')}
-          </h2>
-          <p className="text-center text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-            {t('hotelDetails.relatedDestinations.subtitle', 'Discover other incredible places in Jordan for your next adventure')}
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Premium Related Destinations */}
+      <section className="mt-20 mb-12">
+        <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-3xl p-10 sm:p-12 lg:p-16 shadow-premium">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 leading-tight">
+              <span className="text-gray-900 dark:text-white">Explore More Destinations</span>
+            </h2>
+            <p className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 font-medium max-w-3xl mx-auto leading-relaxed">
+              Discover other incredible places in Jordan for your next unforgettable adventure
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
             {['Petra', 'Amman', 'Dead Sea', 'Wadi Rum', 'Aqaba'].filter(dest => dest !== hotel.location).slice(0, 3).map((destination) => {
               // Map destination names to their search query format
               const destinationQueryMap = {
@@ -872,17 +837,17 @@ function HotelDetails() {
                 <Link
                   key={destination}
                   to={`/search?destination=${encodeURIComponent(destinationQuery)}&topRated=true`}
-                  className="group card-modern p-6 hover:shadow-premium transition-all duration-300 hover:-translate-y-1"
+                  className="group bg-white/95 dark:bg-slate-800/50 backdrop-blur-xl border border-white/20 dark:border-slate-600/30 p-8 rounded-3xl hover:shadow-floating transition-all duration-500 hover:-translate-y-2 hover:scale-105"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-jordan-blue to-jordan-teal flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <MapPin className="w-6 h-6 text-white" />
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-jordan-blue to-jordan-teal flex items-center justify-center group-hover:scale-110 transition-all duration-500 shadow-premium group-hover:shadow-floating">
+                      <MapPin className="w-8 h-8 text-white" />
                     </div>
-                    <div>
-                      <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-jordan-blue transition-colors">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-xl sm:text-2xl text-slate-900 dark:text-white group-hover:text-jordan-blue dark:group-hover:text-jordan-teal transition-colors duration-300 mb-2">
                         {destination}
                       </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-300">
+                      <p className="text-base text-slate-600 dark:text-slate-300 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300 leading-relaxed">
                         {t(`destinations.${destination.toLowerCase().replace(' ', '')}.desc`, 'Explore this amazing destination')}
                       </p>
                     </div>
@@ -891,13 +856,14 @@ function HotelDetails() {
               );
             })}
           </div>
-          <div className="text-center mt-8">
+
+          <div className="text-center">
             <Link
               to="/destinations"
-              className="btn-secondary inline-flex items-center gap-2"
+              className="inline-flex items-center gap-4 px-8 py-4 bg-button-gradient hover:bg-button-hover text-white font-bold rounded-3xl shadow-premium hover:shadow-floating transition-all duration-500 transform hover:scale-105 active:scale-95 border border-white/20 text-lg"
             >
-              {t('hotelDetails.relatedDestinations.viewAll', 'View All Destinations')}
-              <ArrowRight className="w-4 h-4" />
+              <span className="font-extrabold">View All Destinations</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
           </div>
         </div>

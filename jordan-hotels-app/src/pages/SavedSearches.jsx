@@ -37,11 +37,11 @@ const SavedSearches = () => {
   };
 
   return (
-    <div className="min-h-screen bg-light-premium dark:bg-dark-premium">
+    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Seo
         title="Saved Searches - Your Personal Jordan Travel Discovery | VisitJo"
         description="Access your saved hotel searches and continue exploring Jordan's finest accommodations. Never lose track of your favorite travel discoveries."
-        canonicalUrl="https://visitjo.com/saved-searches"
+        canonicalUrl="https://vist-jo.com/saved-searches"
         keywords="saved searches, Jordan travel, hotel searches, travel planning, Jordan hotels"
       />
 
@@ -88,37 +88,6 @@ const SavedSearches = () => {
             Don't lose track of your inspiration. Quickly return to your favorite ideas, from Petra weekends to Red Sea escapes.
           </p>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Search className="w-8 h-8 text-jordan-blue" />
-                {saved.length}
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Saved Searches</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <MapPin className="w-8 h-8 text-jordan-teal" />
-                25+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Star className="w-8 h-8 text-jordan-rose" />
-                4.9★
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Avg Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Heart className="w-8 h-8 text-jordan-gold" />
-                750+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Hotels Found</div>
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -185,7 +154,7 @@ const SavedSearches = () => {
                   {saved.map((search, index) => (
                     <article
                       key={search.id}
-                      className="group card-modern p-6 hover:shadow-premium transition-all duration-500 hover:-translate-y-1 animate-fade-in-up"
+                      className="group bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
                       style={{ animationDelay: `${0.1 * index}s` }}
                     >
                       <div className="flex items-center justify-between gap-6">

@@ -46,7 +46,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const systemPrompt = `You are an assistant for VisitJo, a hotel booking site. Respond in JSON only with the following keys: \n- text: a short natural-language reply to the user.\n- hotels: an array of hotel ids (strings) that match recommendations (can be empty).\n- suggestions: an array of objects with {text, link} for suggested next actions.\nReturn valid JSON and nothing else.`;
+    const systemPrompt = `You are an assistant for VISIT-JO, a hotel booking site. Respond in JSON only with the following keys: \n- text: a short natural-language reply to the user.\n- hotels: an array of hotel ids (strings) that match recommendations (can be empty).\n- suggestions: an array of objects with {text, link} for suggested next actions.\nReturn valid JSON and nothing else.`;
 
     const messages = [
       { role: 'system', content: systemPrompt },

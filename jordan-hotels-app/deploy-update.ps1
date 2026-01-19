@@ -1,7 +1,7 @@
 # Deployment script to update the existing stack without creating duplicates
 # Usage: .\deploy-update.ps1
 
-$StackName = "visitjo-backend-cors"
+$StackName = "VISIT-JO-backend-cors"
 $Region = "us-east-1"
 
 Write-Host "🚀 Starting deployment for stack: $StackName"

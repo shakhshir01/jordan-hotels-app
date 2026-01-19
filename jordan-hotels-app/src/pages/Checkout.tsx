@@ -392,7 +392,7 @@ const Checkout = () => {
         title="Secure Checkout - Complete Your Jordan Hotel Booking"
         description="Complete your secure hotel booking in Jordan. Safe payment processing with multiple options including credit card and PayPal."
         noindex={true}
-        canonicalUrl="https://visitjo.com/checkout"
+        canonicalUrl="https://VISIT-JO.com/checkout"
       />
       {/* Hero Section */}
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 shadow-2xl mb-16 mx-6">

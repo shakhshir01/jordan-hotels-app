@@ -47,88 +47,49 @@ export default function Blog() {
   const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
 
   return (
-    <div className="min-h-screen bg-light-warm dark:bg-dark-warm">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Seo
         title="Jordan Travel Blog - Tips, Guides & Stories from VisitJo"
         description="Read expert travel guides, tips, and stories about Jordan. From Petra to Wadi Rum, get insider knowledge for your Jordan adventure."
-        canonicalUrl="https://visitjo.com/blog"
+        canonicalUrl="https://vist-jo.com/blog"
         keywords="Jordan travel blog, Petra guide, Wadi Rum camps, Amman food, Jordan travel tips, travel stories"
       />
 
       {/* Enhanced Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Dynamic Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-jordan-blue via-jordan-teal to-jordan-rose animate-gradient-shift"></div>
+        {/* Simple Background */}
+        <div className="absolute inset-0 bg-purple-600"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
 
-        {/* Animated Mesh Background */}
+        {/* Clean Background */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 right-10 w-80 h-80 bg-jordan-gold/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-jordan-rose/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
-          <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-jordan-teal/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-        </div>
-
-        {/* Floating Geometric Shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-16 left-16 w-6 h-6 bg-white/20 rotate-45 animate-float" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute top-32 right-20 w-8 h-8 bg-jordan-gold/30 rounded-full animate-float" style={{ animationDelay: '1.5s' }}></div>
-          <div className="absolute bottom-24 left-24 w-5 h-5 bg-jordan-rose/25 rotate-12 animate-float" style={{ animationDelay: '2.5s' }}></div>
-          <div className="absolute bottom-32 right-32 w-7 h-7 bg-jordan-teal/20 rounded-full animate-float" style={{ animationDelay: '3.5s' }}></div>
+          <div className="absolute top-20 left-10 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/3 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Enhanced Badge */}
-          <div className="inline-flex items-center gap-3 px-8 py-4 mb-12 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full text-white/90 text-sm font-bold uppercase tracking-widest shadow-2xl animate-fade-in">
-            <BookOpen className="w-5 h-5 text-jordan-gold" />
+          {/* Simple Badge */}
+          <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white text-sm font-semibold uppercase tracking-wide animate-fade-in">
+            <BookOpen className="w-5 h-5" />
             {t('pages.blog.hero.kicker', 'Travel Inspiration')}
-            <BookOpen className="w-5 h-5 text-jordan-gold" />
+            <BookOpen className="w-5 h-5" />
           </div>
 
-          {/* Enhanced Title */}
-          <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black font-display mb-8 tracking-tight leading-tight animate-slide-up">
-            <span className="block text-white drop-shadow-2xl mb-2">{t("pages.blog.hero.titleMain", "Stories from")}</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl">
+          {/* Simple Title */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-6 sm:mb-8 tracking-tight leading-tight animate-slide-up px-2 sm:px-0">
+            <span className="block text-white drop-shadow-2xl mb-1 sm:mb-2">
+              {t("pages.blog.hero.titleMain", "Stories from")}
+            </span>
+            <span className="block text-white drop-shadow-2xl">
               {t("pages.blog.hero.titleAccent", "Jordan")}
             </span>
           </h1>
 
-          {/* Enhanced Subtitle */}
-          <p className="text-xl sm:text-2xl lg:text-3xl max-w-5xl mx-auto mb-16 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg" style={{ animationDelay: '0.3s' }}>
+          {/* Simple Subtitle */}
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-4xl mx-auto mb-12 sm:mb-16 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.3s' }}>
             {t('pages.blog.hero.subtitle', 'Expert guides, hidden gems, and local secrets to help you plan your perfect trip.')}
           </p>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <MapPin className="w-8 h-8 text-jordan-blue" />
-                25+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Camera className="w-8 h-8 text-jordan-rose" />
-                100+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Travel Stories</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Coffee className="w-8 h-8 text-jordan-gold" />
-                50K+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Readers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Star className="w-8 h-8 text-jordan-teal" />
-                4.9★
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Satisfaction</div>
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -156,38 +117,44 @@ export default function Blog() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
               {POSTS.filter(post => post.featured).map((post) => (
-                <article key={post.slug} className="group card-modern p-8 lg:p-10 hover:shadow-premium transition-all duration-500 hover:-translate-y-2 animate-fade-in-up">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="text-4xl">{post.image}</div>
-                    <div>
-                      <span className="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-jordan-gold/20 to-jordan-rose/20 text-jordan-gold font-semibold text-sm rounded-full">
+                <article key={post.slug} className="group bg-white dark:bg-gray-800 rounded-xl p-6 lg:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700 hover:-translate-y-2">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 p-4 rounded-xl">
+                      <div className="text-5xl">{post.image}</div>
+                    </div>
+                    <div className="flex-1">
+                      <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold text-sm rounded-full shadow-lg">
                         <Sparkles className="w-4 h-4" />
                         {post.category}
                       </span>
-                      <div className="flex items-center gap-2 mt-2 text-sm text-slate-500 dark:text-slate-400">
-                        <Clock className="w-4 h-4" />
-                        {post.readTime}
+                      <div className="flex items-center gap-2 mt-3 text-sm text-slate-500 dark:text-slate-400">
+                        <Clock className="w-4 h-4 text-blue-500" />
+                        <span className="font-medium">{post.readTime}</span>
+                        <span className="text-gray-300 dark:text-gray-600">•</span>
+                        <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium">Featured</span>
                       </div>
                     </div>
                   </div>
 
-                  <h3 className="text-2xl lg:text-3xl font-black text-slate-900 dark:text-slate-100 mb-4 group-hover:text-jordan-blue transition-colors duration-300 leading-tight">
+                  <h3 className="text-2xl lg:text-3xl font-black text-slate-900 dark:text-slate-100 mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 leading-tight">
                     {isArabic ? post.titleAr : post.title}
                   </h3>
 
-                  <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed text-lg">
                     {post.excerpt}
                   </p>
 
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 italic">
-                    {isArabic ? post.metaAr : post.meta}
-                  </p>
+                  <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg mb-6">
+                    <p className="text-sm text-slate-600 dark:text-slate-300 italic font-medium">
+                      {isArabic ? post.metaAr : post.meta}
+                    </p>
+                  </div>
 
                   <Link
                     to={`/blog/${post.slug}`}
-                    className="inline-flex items-center gap-3 btn-primary px-6 py-3 text-lg font-bold rounded-2xl hover-lift group-hover:scale-105 transition-all duration-300"
+                    className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
                   >
-                    {t('pages.blog.readFullStory', 'Read Full Story')}
+                    Read Full Story
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                   </Link>
                 </article>
@@ -206,38 +173,42 @@ export default function Blog() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {POSTS.map((post, index) => (
-                <article key={post.slug} className="group card-modern p-6 hover:shadow-floating transition-all duration-500 hover:-translate-y-1 animate-fade-in-up" style={{ animationDelay: `${0.1 * index}s` }}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-3xl">{post.image}</div>
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-jordan-teal/20 to-jordan-blue/20 text-jordan-teal font-medium text-xs rounded-full">
+                <article key={post.slug} className="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-700 hover:-translate-y-1" style={{ animationDelay: `${0.1 * index}s` }}>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-3 rounded-xl">
+                      <div className="text-4xl">{post.image}</div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-medium text-xs rounded-full shadow-md">
                       <Clock className="w-3 h-3" />
                       {post.readTime}
                     </span>
                   </div>
 
-                  <div className="mb-4">
-                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-jordan-gold/10 to-jordan-rose/10 text-jordan-gold font-semibold text-sm rounded-full mb-3">
+                  <div className="mb-6">
+                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 text-orange-700 dark:text-orange-300 font-semibold text-sm rounded-full mb-4 border border-orange-200 dark:border-orange-700">
                       {post.category}
                     </span>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-3 group-hover:text-jordan-blue transition-colors duration-300 leading-tight">
+                    <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-3 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-300 leading-tight line-clamp-2">
                       {isArabic ? post.titleAr : post.title}
                     </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 mb-4 line-clamp-2">
+                    <p className="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed line-clamp-3">
                       {post.excerpt}
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 italic">
-                      {isArabic ? post.metaAr : post.meta}
-                    </p>
+                    <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
+                      <p className="text-xs text-slate-600 dark:text-slate-300 italic font-medium">
+                        {isArabic ? post.metaAr : post.meta}
+                      </p>
+                    </div>
                   </div>
 
                   <Link
                     to={`/blog/${post.slug}`}
-                    className="inline-flex items-center gap-2 text-jordan-blue font-bold hover:text-jordan-teal transition-colors duration-300 group-hover:translate-x-1 transform"
+                    className="inline-flex items-center gap-2 text-green-600 dark:text-green-400 font-bold hover:text-green-700 dark:hover:text-green-300 transition-all duration-300 group-hover:translate-x-2 transform"
                   >
-                    {t('pages.blog.readMore', 'Read More')}
-                    <ArrowRight className="w-4 h-4" />
+                    Read More
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </Link>
                 </article>
               ))}

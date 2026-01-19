@@ -57,11 +57,11 @@ export default function InsureTrip() {
   ];
 
   return (
-    <div className="min-h-screen bg-light-cool dark:bg-dark-cool">
+    <div className="min-h-screen bg-gradient-to-br from-premium-50 via-luxury-50 to-premium-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Seo
         title="Jordan Travel Insurance - Protect Your Trip | VisitJo"
         description="Get comprehensive travel insurance for your Jordan adventure. Coverage for trip cancellations, medical emergencies, and more. Peace of mind for your Petra and Wadi Rum journey."
-        canonicalUrl="https://visitjo.com/insurance"
+        canonicalUrl="https://vist-jo.com/insurance"
         keywords="Jordan travel insurance, trip protection, medical coverage, travel insurance Jordan, Petra insurance"
       />
 
@@ -108,37 +108,6 @@ export default function InsureTrip() {
             Protect your Jordan adventure with comprehensive coverage. From Petra explorations to Dead Sea relaxation, travel with confidence.
           </p>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Users className="w-8 h-8 text-jordan-blue" />
-                50K+
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Trips Protected</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <CheckCircle className="w-8 h-8 text-jordan-teal" />
-                99.9%
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Claim Success Rate</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Clock className="w-8 h-8 text-jordan-rose" />
-                24/7
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Emergency Support</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black text-white mb-2 flex items-center justify-center gap-2">
-                <Award className="w-8 h-8 text-jordan-gold" />
-                4.8★
-              </div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Customer Rating</div>
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -168,8 +137,8 @@ export default function InsureTrip() {
               {plans.map((plan, index) => (
                 <article
                   key={plan.id}
-                  className={`group relative card-modern p-8 lg:p-10 hover:shadow-premium transition-all duration-500 hover:-translate-y-2 animate-fade-in-up ${
-                    plan.popular ? 'ring-2 ring-jordan-gold shadow-premium' : ''
+                  className={`group relative bg-white dark:bg-gray-800 rounded-lg p-6 lg:p-8 shadow-md hover:shadow-lg transition-shadow duration-200 ${
+                    plan.popular ? 'ring-2 ring-yellow-400 shadow-lg' : ''
                   }`}
                   style={{ animationDelay: `${0.2 * index}s` }}
                 >
@@ -212,8 +181,8 @@ export default function InsureTrip() {
                     onClick={() => setSelected(plan.id)}
                     className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 hover-lift ${
                       selected === plan.id
-                        ? 'bg-gradient-to-r from-jordan-gold to-jordan-rose text-white shadow-premium'
-                        : 'bg-gradient-to-r from-jordan-blue to-jordan-teal text-white hover:shadow-floating'
+                        ? 'bg-orange-600 hover:bg-orange-700 text-white shadow-md'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md'
                     }`}
                   >
                     {selected === plan.id ? 'Selected' : 'Select Plan'}
@@ -235,7 +204,7 @@ export default function InsureTrip() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="card-modern p-8 text-center group hover:shadow-floating transition-all duration-500 hover:-translate-y-1">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                 <MapPin className="w-12 h-12 text-jordan-blue mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-3">Local Expertise</h3>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -243,7 +212,7 @@ export default function InsureTrip() {
                 </p>
               </div>
 
-              <div className="card-modern p-8 text-center group hover:shadow-floating transition-all duration-500 hover:-translate-y-1">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                 <Plane className="w-12 h-12 text-jordan-teal mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-3">24/7 Support</h3>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -251,7 +220,7 @@ export default function InsureTrip() {
                 </p>
               </div>
 
-              <div className="card-modern p-8 text-center group hover:shadow-floating transition-all duration-500 hover:-translate-y-1">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                 <Sparkles className="w-12 h-12 text-jordan-gold mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-3">Quick Claims</h3>
                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed">

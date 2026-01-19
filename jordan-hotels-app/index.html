@@ -7,9 +7,10 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="VisitJo" />
+    <meta name="apple-mobile-web-app-title" content="Visit-Jo" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="robots" content="index,follow" />
+    <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-VCBH27T8F9"></script>
@@ -26,61 +27,65 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 
     <!-- Performance optimizations -->
-    <link rel="dns-prefetch" href="//api.visit-jo.com" />
-    <link rel="dns-prefetch" href="//images.visit-jo.com" />
-    <link rel="preconnect" href="https://api.visit-jo.com" crossorigin />
-    <link rel="preconnect" href="https://images.visit-jo.com" crossorigin />
+    <link rel="dns-prefetch" href="//api.vist-jo.com" />
+    <link rel="dns-prefetch" href="//images.vist-jo.com" />
+    <link rel="preconnect" href="https://api.vist-jo.com" crossorigin />
+    <link rel="preconnect" href="https://images.vist-jo.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="//www.googletagmanager.com" />
     <link rel="dns-prefetch" href="//www.google-analytics.com" />
 
-    <meta name="description" content="VisitJo — Your ultimate guide to Jordan's best hotels, experiences, and travel deals. Book authentic stays, explore Petra, Wadi Rum, and more with local insights." />
+    <!-- Preload critical resources -->
+    <link rel="modulepreload" href="/src/main.jsx" />
+    <link rel="modulepreload" href="/src/App.jsx" />
+
+    <meta name="description" content="Visit-Jo — Your ultimate guide to Jordan's best hotels, experiences, and travel deals. Book authentic stays, explore Petra, Wadi Rum, and more with local insights." />
     <meta name="keywords" content="Jordan hotels, Jordan travel, Petra, Wadi Rum, Dead Sea, Amman hotels, Jordan experiences, Jordan booking" />
-    <meta name="author" content="VisitJo" />
+    <meta name="author" content="Visit-Jo" />
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://www.visit-jo.com/" />
+    <link rel="canonical" href="https://vist-jo.com/" />
 
     <!-- Hreflang for internationalization -->
-    <link rel="alternate" hreflang="en" href="https://www.visit-jo.com/" />
-    <link rel="alternate" hreflang="ar" href="https://www.visit-jo.com/ar/" />
-    <link rel="alternate" hreflang="x-default" href="https://www.visit-jo.com/" />
+    <link rel="alternate" hreflang="en" href="https://vist-jo.com/" />
+    <link rel="alternate" hreflang="ar" href="https://vist-jo.com/ar/" />
+    <link rel="alternate" hreflang="x-default" href="https://vist-jo.com/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="VisitJo | Discover Jordan's Best Hotels & Experiences" />
+    <meta property="og:title" content="Visit-Jo | Discover Jordan's Best Hotels & Experiences" />
     <meta property="og:description" content="Book authentic hotels, explore ancient wonders, and create unforgettable memories in Jordan. From Petra to Wadi Rum, your adventure starts here." />
-    <meta property="og:site_name" content="VisitJo" />
-    <meta property="og:url" content="https://www.visit-jo.com/" />
-    <meta property="og:image" content="https://www.visit-jo.com/og-image.jpg" />
+    <meta property="og:site_name" content="Visit-Jo" />
+    <meta property="og:url" content="https://vist-jo.com/" />
+    <meta property="og:image" content="https://vist-jo.com/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="VisitJo - Jordan Travel & Hotels" />
+    <meta property="og:image:alt" content="Visit-Jo - Jordan Travel & Hotels" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="VisitJo | Discover Jordan's Best Hotels & Experiences" />
+    <meta property="twitter:title" content="Visit-Jo | Discover Jordan's Best Hotels & Experiences" />
     <meta property="twitter:description" content="Book authentic hotels, explore ancient wonders, and create unforgettable memories in Jordan. From Petra to Wadi Rum, your adventure starts here." />
-    <meta property="twitter:image" content="https://www.visit-jo.com/og-image.jpg" />
-    <meta property="twitter:image:alt" content="VisitJo - Jordan Travel & Hotels" />
+    <meta property="twitter:image" content="https://vist-jo.com/og-image.jpg" />
+    <meta property="twitter:image:alt" content="Visit-Jo - Jordan Travel & Hotels" />
 
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "VisitJo",
-      "url": "https://www.visit-jo.com",
-      "logo": "https://www.visit-jo.com/logo.png",
+      "name": "Visit-Jo",
+      "url": "https://vist-jo.com",
+      "logo": "https://vist-jo.com/logo.png",
       "description": "Your ultimate guide to Jordan's best hotels, experiences, and travel deals.",
       "foundingDate": "2024",
       "sameAs": [
-        "https://www.facebook.com/visitjo",
-        "https://www.instagram.com/visitjo",
-        "https://www.twitter.com/visitjo"
+        "https://www.facebook.com/vist-jo",
+        "https://www.instagram.com/vist-jo",
+        "https://www.twitter.com/vist-jo"
       ],
       "contactPoint": {
         "@type": "ContactPoint",
@@ -101,16 +106,16 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "VisitJo",
-      "url": "https://www.visit-jo.com",
+      "name": "Visit-Jo",
+      "url": "https://vist-jo.com",
       "description": "Book authentic hotels, explore ancient wonders, and create unforgettable memories in Jordan.",
       "publisher": {
         "@type": "Organization",
-        "name": "VisitJo"
+        "name": "Visit-Jo"
       },
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://www.visit-jo.com/search?q={search_term_string}",
+        "target": "https://vist-jo.com/search?q={search_term_string}",
         "query-input": "required name=search_term_string"
       },
       "inLanguage": ["en", "ar"]
@@ -121,9 +126,9 @@
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
-      "name": "VisitJo",
+      "name": "Visit-Jo",
       "description": "Jordan's premier hotel booking and travel experience platform",
-      "url": "https://www.visit-jo.com",
+      "url": "https://vist-jo.com",
       "telephone": "+962-6-1234567",
       "address": {
         "@type": "PostalAddress",
@@ -143,13 +148,15 @@
       "priceRange": "$$"
     }
     </script>
-
-    <meta name="theme-color" content="#0b1220" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
     <link rel="shortcut icon" type="image/png" href="/favicon.png" />
-    <link rel="manifest" href="/manifest.json?v=20260117-02" type="application/manifest+json" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="manifest" href="/manifest.json" type="application/manifest+json" />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-    <title>VisitJo | Discover Jordan's Best Hotels & Experiences</title>
+    <title>Visit-Jo | Discover Jordan's Best Hotels & Experiences</title>
     <script>window.global = window;</script>
     <script src="/runtime-config.js"></script>
   </head>

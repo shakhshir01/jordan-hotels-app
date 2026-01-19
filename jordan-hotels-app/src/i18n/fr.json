@@ -190,7 +190,7 @@
     "contact": "Contact",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions générales",
-    "copyright": "VisitJo. Tous droits réservés.",
+    "copyright": "Visit-Jo. Tous droits réservés.",
     "brandDescription": "Expériences de découverte et de réservation de voyages premium pour la Jordanie - vous connecter aux meilleurs séjours, expériences et destinations.",
     "explore": "Explorer",
     "plan": "Planifier",
@@ -270,7 +270,7 @@
     },
     "login": {
       "title": "Bienvenue",
-      "subtitle": "Connectez-vous à votre compte VisitJo",
+      "subtitle": "Connectez-vous à votre compte Visit-Jo",
       "passwordPlaceholder": "Entrez votre mot de passe",
       "signingIn": "Connexion...",
       "invalidCredentials": "Email ou mot de passe invalide. Veuillez réessayer.",
@@ -279,7 +279,7 @@
       "continueWithFacebook": "Continuer avec Facebook"
     },
     "signup": {
-      "title": "Rejoignez VisitJo",
+      "title": "Rejoignez Visit-Jo",
       "subtitle": "Créez votre compte pour réserver des séjours incroyables",
       "passwordPlaceholder": "Min. 8 caractères, 1 majuscule, 1 chiffre",
       "confirmPasswordPlaceholder": "Retaper le mot de passe",
@@ -333,7 +333,7 @@
     "skipToNavigation": "Aller à la navigation"
   },
   "seo": {
-    "metaTitle": "VisitJo - Hôtels et expériences en Jordanie",
+    "metaTitle": "Visit-Jo - Hôtels et expériences en Jordanie",
     "metaDescription": "Découvrez les meilleurs hôtels et expériences en Jordanie. Réservez votre séjour idéal à Pétra, la Mer Morte, Wadi Rum et plus.",
     "keywords": "Jordanie, hôtels, Pétra, Mer Morte, Wadi Rum, voyages, réservations"
   }

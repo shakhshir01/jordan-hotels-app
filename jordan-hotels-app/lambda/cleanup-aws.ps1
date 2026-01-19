@@ -1,5 +1,5 @@
 Param(
-  [string]$StackName = $(if ($env:VISITJO_STACK_NAME) { $env:VISITJO_STACK_NAME } else { "VisitJo" }),
+  [string]$StackName = $(if ($env:VISIT-JO_STACK_NAME) { $env:VISIT-JO_STACK_NAME } else { "VISIT-JO" }),
   [string]$Region = $(if ($env:AWS_REGION) { $env:AWS_REGION } elseif ($env:AWS_DEFAULT_REGION) { $env:AWS_DEFAULT_REGION } else { "us-east-1" }),
   [switch]$Force
 )
@@ -111,21 +111,21 @@ if ($lambdaObj -and $lambdaObj.Functions) {
 }
 
 $candidateLambda = $allLambda | Where-Object {
-  $_ -match '^(VisitJo-|visitjo-backend-|getHotels$|getHotelById$|getSignedUrl$|createCheckoutSession$|bookings$|user$|destinations$|deals$|experiences$|search$|sendBookingEmail$)'
+  $_ -match '^(VISIT-JO-|VISIT-JO-backend-|getHotels$|getHotelById$|getSignedUrl$|createCheckoutSession$|bookings$|user$|destinations$|deals$|experiences$|search$|sendBookingEmail$)'
 }
 
 $apiOut = aws apigateway get-rest-apis --region $Region --output json
 $apiObj = Try-Json $apiOut
 $allApis = @()
 if ($apiObj -and $apiObj.items) { $allApis = $apiObj.items }
-$candidateApis = $allApis | Where-Object { $_.name -in @('VisitJo','VisitJoApi','HotelsApi') }
+$candidateApis = $allApis | Where-Object { $_.name -in @('VISIT-JO','VISIT-JOApi','HotelsApi') }
 
 $tableOut = aws dynamodb list-tables --region $Region --output json
 $tableObj = Try-Json $tableOut
 $allTables = @()
 if ($tableObj -and $tableObj.TableNames) { $allTables = $tableObj.TableNames }
 $candidateTables = $allTables | Where-Object {
-  $_ -match '^(VisitJo-|visitjo-backend-)|(\bhotels\b|\bbookings\b|\busers\b|\bdestinations\b|\bdeals\b|\bexperiences\b)$'
+  $_ -match '^(VISIT-JO-|VISIT-JO-backend-)|(\bhotels\b|\bbookings\b|\busers\b|\bdestinations\b|\bdeals\b|\bexperiences\b)$'
 }
 
 $stacksToDelete = New-Object System.Collections.Generic.HashSet[string]

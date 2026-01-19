@@ -22,7 +22,7 @@ export class ConfigManager {
     const nodeEnv = import.meta.env.MODE;
     const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 
-    if (nodeEnv === 'production' || hostname.includes('visitjo.com')) {
+    if (nodeEnv === 'production' || hostname.includes('VISIT-JO.com')) {
       return 'production';
     }
 
@@ -38,7 +38,7 @@ export class ConfigManager {
    */
   loadConfig() {
     const baseConfig = {
-      appName: 'VisitJo',
+      appName: 'VISIT-JO',
       appVersion: '1.0.0',
       logLevel: 'info',
     };
@@ -53,16 +53,16 @@ export class ConfigManager {
         corsEnabled: true,
       },
       staging: {
-        api: 'https://staging-api.visitjo.com',
-        wsUrl: 'wss://staging-api.visitjo.com',
+        api: 'https://staging-api.VISIT-JO.com',
+        wsUrl: 'wss://staging-api.VISIT-JO.com',
         stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
         logLevel: 'info',
         enableDevTools: false,
         corsEnabled: false,
       },
       production: {
-        api: 'https://api.visitjo.com',
-        wsUrl: 'wss://api.visitjo.com',
+        api: 'https://api.VISIT-JO.com',
+        wsUrl: 'wss://api.VISIT-JO.com',
         stripePublicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
         logLevel: 'warn',
         enableDevTools: false,

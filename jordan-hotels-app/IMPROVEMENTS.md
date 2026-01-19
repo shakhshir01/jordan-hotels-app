@@ -1,4 +1,4 @@
-# VisitJo Project Improvements Summary
+# VISIT-JO Project Improvements Summary
 
 ## Overview
 Complete refactoring and enhancement of the Jordan hotels booking application with focus on security, architecture, validation, and user experience.

@@ -12,7 +12,6 @@
     "trends": "Trends",
     "insights": "Insights",
     "experiences": "Experiences",
-    "tripPlanner": "Trip Planner",
     "deals": "Deals",
     "blog": "Blog",
     "reviews": "Reviews",
@@ -164,7 +163,7 @@
     "contact": "Contact",
     "privacy": "Privacy Policy",
     "terms": "Terms & Conditions",
-    "copyright": "VisitJo. All rights reserved.",
+    "copyright": "Visit-Jo. All rights reserved.",
     "brandDescription": "Premium travel discovery and booking experiences for Jordan—connecting you with the best stays, experiences, and destinations.",
     "explore": "Explore",
     "plan": "Plan",
@@ -177,7 +176,7 @@
   "chat": {
     "ui": {
       "open": "Open chat",
-      "title": "VisitJo Travel Assistant",
+      "title": "Visit-Jo Travel Assistant",
       "placeholder": "Ask me about hotels...",
       "tip": "Tip: avoid sharing card numbers or sensitive data in chat.",
       "askHuman": "Ask for human",
@@ -185,7 +184,7 @@
       "escalate": "I’ve flagged this conversation for a human agent. In a live setup, this would create a support ticket with your last messages and contact details."
     },
     "greeting": {
-      "default": "Hello! Welcome to VisitJo! I'm your travel assistant. How can I help you find the perfect hotel today?"
+      "default": "Hello! Welcome to Visit-Jo! I'm your travel assistant. How can I help you find the perfect hotel today?"
     },
     "smalltalk": {
       "howAreYou": "I'm doing great — thanks for asking. Tell me where you want to stay (Petra, Amman, Aqaba, Dead Sea, Wadi Rum) and what vibe you want (luxury, budget, spa, adventure)."
@@ -260,12 +259,12 @@
       },
       "problem": {
         "q": "Something is wrong with my stay—what should I do?",
-        "a": "First, speak to the property directly so they can resolve it quickly. If you still need help, contact VisitJo support with your booking ID."
+        "a": "First, speak to the property directly so they can resolve it quickly. If you still need help, contact Visit-Jo support with your booking ID."
       }
     },
     "chat": {
       "title": "Chat with an assistant",
-      "body": "Use the blue chat bubble in the bottom‑right corner to start a conversation with the VisitJo travel assistant. Ask about bookings, destinations, or how policies work.",
+      "body": "Use the blue chat bubble in the bottom‑right corner to start a conversation with the Visit-Jo travel assistant. Ask about bookings, destinations, or how policies work.",
       "note": "In a production setup, this can be connected to a live‑agent system so that complex issues are handed over to a human."
     },
     "email": {
@@ -325,9 +324,8 @@
         "subtitle": "Travel tips, destinations, and stories from Jordan."
       },
       "read": "Read",
-      "readMore": "Read More",
-      "readFullStory": "Read Full Story",
-      "backToBlog": "Back to Blog"
+      "backToBlog": "Back to Blog",
+      "readMore": "Read More Articles"
     },
     "reviews": {
       "hero": {
@@ -353,8 +351,8 @@
     "wishlist": {
       "title": "Wishlist",
       "subtitle": "Save your favorite hotels and experiences.",
-      "itemsSaved": "{{count}} Saved Adventure",
-      "itemsSaved_other": "{{count}} Saved Adventures",
+      "itemsSaved": "{{count}} item saved",
+      "itemsSaved_other": "{{count}} items saved",
       "empty": {
         "title": "Your wishlist is empty",
         "body": "Start exploring destinations and save your favorites.",
@@ -375,8 +373,7 @@
       "dayNumber": "Day {{number}}",
       "deleteDay": "Delete day",
       "destinationPlaceholder": "Destination",
-      "autoSaved": "Auto-saved to browser",
-      "autoSavedAccount": "Auto-saved to your account"
+      "notesPlaceholder": "Notes"
     },
     "privacy": {
       "kicker": "PRIVACY",
@@ -412,7 +409,7 @@
     "terms": {
       "kicker": "TERMS",
       "title": "Terms & Conditions",
-      "intro": "By using VisitJo you agree to the following terms.",
+      "intro": "By using Visit-Jo you agree to the following terms.",
       "sections": {
         "1": {
           "title": "Using the service",
@@ -436,7 +433,7 @@
         },
         "5": {
           "title": "Limitation of liability",
-          "body": "VisitJo is provided as‑is; we’re not liable for indirect damages related to use of the service."
+          "body": "Visit-Jo is provided as‑is; we're not liable for indirect damages related to use of the service."
         },
         "6": {
           "title": "Changes",
@@ -444,7 +441,7 @@
         },
         "7": {
           "title": "Third‑party content & trademarks",
-          "body": "Hotel names, trademarks, and other brand identifiers belong to their respective owners. Prices, availability, and descriptions may be provided by third‑party sources and can change; VisitJo is not affiliated with or endorsed by the listed hotels unless explicitly stated."
+          "body": "Hotel names, trademarks, and other brand identifiers belong to their respective owners. Prices, availability, and descriptions may be provided by third‑party sources and can change; Visit-Jo is not affiliated with or endorsed by the listed hotels unless explicitly stated."
         }
       }
     },
@@ -478,13 +475,13 @@
       },
       "reviews": {
         "title": "Trusted by Travelers Worldwide",
-        "body1": "Join thousands of satisfied travelers who have discovered Jordan's magic through VisitJo. Our 4.9-star rating reflects our dedication to creating perfect travel experiences.",
+        "body1": "Join thousands of satisfied travelers who have discovered Jordan's magic through Visit-Jo. Our 4.9-star rating reflects our dedication to creating perfect travel experiences.",
         "body2": "Your feedback shapes our journey. Share your thoughts and help us continue improving the way the world experiences Jordan."
       }
     },
     "login": {
       "title": "Welcome Back",
-      "subtitle": "Sign in to your VisitJo account",
+      "subtitle": "Sign in to your Visit-Jo account",
       "passwordPlaceholder": "Enter your password",
       "signingIn": "Signing in...",
       "invalidCredentials": "Invalid email or password. Please try again.",
@@ -493,7 +490,7 @@
       "continueWithFacebook": "Continue with Facebook"
     },
     "signup": {
-      "title": "Join VisitJo",
+      "title": "Join Visit-Jo",
       "subtitle": "Create your account to book amazing stays",
       "passwordPlaceholder": "Min. 8 chars, 1 uppercase, 1 number",
       "confirmPasswordPlaceholder": "Re-enter password",

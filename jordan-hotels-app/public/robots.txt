@@ -30,4 +30,4 @@ Allow: *.webp
 Crawl-delay: 1
 
 # Sitemap
-Sitemap: https://visitjo.com/sitemap.xml
+Sitemap: https://vist-jo.com/sitemap.xml

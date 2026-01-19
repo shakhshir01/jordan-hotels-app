@@ -1,5 +1,5 @@
 param(
-  [string]$StackName = "visitjo-cognito-federation",
+  [string]$StackName = "VISIT-JO-cognito-federation",
   [string]$AWSProfile = "",
   [string]$UserPoolId = "",
   [string]$CallbackURLs = "",

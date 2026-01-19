@@ -1,6 +1,6 @@
 {
-  "name": "VisitJo - Jordan Travel Guide",
-  "short_name": "VisitJo",
+  "name": "Visit-Jo - Jordan Travel Guide",
+  "short_name": "Visit-Jo",
   "description": "Your ultimate guide to Jordan's best hotels, experiences, and travel deals. Discover amazing destinations, book accommodations, and explore authentic Jordanian culture.",
   "start_url": "/",
   "display": "standalone",
@@ -10,7 +10,7 @@
   "scope": "/",
   "lang": "en",
   "dir": "ltr",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "categories": [
     "travel",
     "lifestyle",
@@ -19,13 +19,19 @@
   "icons": [
     {
       "src": "/favicon.png",
-      "sizes": "32x32",
+      "sizes": "16x16 32x32 48x48",
       "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "/favicon.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
@@ -39,7 +45,7 @@
       "icons": [
         {
           "src": "/favicon.png",
-          "sizes": "32x32"
+          "sizes": "192x192"
         }
       ]
     },
@@ -51,7 +57,7 @@
       "icons": [
         {
           "src": "/favicon.png",
-          "sizes": "32x32"
+          "sizes": "192x192"
         }
       ]
     },
@@ -63,12 +69,11 @@
       "icons": [
         {
           "src": "/favicon.png",
-          "sizes": "32x32"
+          "sizes": "192x192"
         }
       ]
     }
   ],
   "related_applications": [],
-  "prefer_related_applications": false,
-  "screenshots": []
+  "prefer_related_applications": false
 }
