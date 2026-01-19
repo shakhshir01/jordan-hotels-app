@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
       ...(mode === 'production' ? [VitePWA({
         registerType: 'autoUpdate',
         workbox: {
-          maximumFileSizeToCacheInBytes: 2 * 1024 * 1024, // Reduced to 2 MB
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // Increased to 5 MB
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'], // Removed heavy assets
           runtimeCaching: [
             {
