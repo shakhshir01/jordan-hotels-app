@@ -10,8 +10,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "lib": ["es2020", "dom"],
-    "types": ["vite/client"]
+    "lib": ["es2020", "dom"]
   },
   "include": ["src/**/*"],
   "exclude": [
