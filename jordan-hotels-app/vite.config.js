@@ -28,6 +28,8 @@ export default defineConfig(({ mode }) => {
   const apiTarget = normalizeBaseUrl(env.VITE_API_GATEWAY_URL) || getRuntimeApiTarget();
 
   const normalizeId = (id) => String(id || '').replace(/\\/g, '/')
+  // allow disabling pre-compression (useful on hosting that mishandles .br/.gz headers)
+  const enablePrecompression = mode === 'production' && env.VITE_DISABLE_PRECOMPRESSION !== 'true';
 
   return {
     resolve: {
@@ -47,9 +49,6 @@ export default defineConfig(({ mode }) => {
       global: 'globalThis',
       module: { exports: {} },
     },
-    // allow disabling pre-compression (useful on hosting that mishandles .br/.gz headers)
-    const enablePrecompression = mode === 'production' && env.VITE_DISABLE_PRECOMPRESSION !== 'true';
-
     plugins: [
       react(),
       // Temporarily disable PWA to avoid conflicts
