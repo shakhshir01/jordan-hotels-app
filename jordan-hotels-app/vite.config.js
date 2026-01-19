@@ -52,7 +52,9 @@ export default defineConfig(({ mode }) => {
       // Only enable PWA in production builds
       ...(mode === 'production' ? [VitePWA({
         registerType: 'autoUpdate',
+        manifest: false, // Disable auto-generated manifest since we have a custom one
         workbox: {
+          inlineWorkboxRuntime: true, // Inline workbox runtime to avoid import issues
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // Increased to 5 MB
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'], // Removed heavy assets
           runtimeCaching: [
