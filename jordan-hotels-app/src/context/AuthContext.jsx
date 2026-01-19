@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import { Auth } from 'aws-amplify';
 import { UserPool } from '../authConfig';
@@ -6,11 +6,7 @@ import { setAuthToken, hotelAPI } from '../services/api';
 import { showSuccess, showError } from '../services/toastService';
 import { deriveNameFromEmail, loadSavedProfile, saveProfile } from '../utils/userProfile';
 
-const AuthContext = (typeof window !== 'undefined' && window.AuthContext) || createContext(null);
-
-if (typeof window !== 'undefined') {
-  window.AuthContext = AuthContext;
-}
+const AuthContext = createContext(null);
 
 export { AuthContext };
 
@@ -23,25 +19,8 @@ export const AuthProvider = ({ children }) => {
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [mfaMethod, setMfaMethod] = useState(null);
   const [pendingSecondaryEmail, setPendingSecondaryEmail] = useState(null);
-  const cognitoUserRef = React.useRef(null);
-  const forgotPasswordUserRef = React.useRef(null);
-
-  // Debug function to check current user attributes
-  const debugCurrentUser = useCallback(async () => {
-    try {
-      const currentUser = await Auth.currentAuthenticatedUser();
-      console.log('Current authenticated user:', currentUser);
-      console.log('Current user attributes:', currentUser.attributes);
-      console.log('Current username:', currentUser.username);
-    } catch (error) {
-      console.log('No current user or error:', error);
-    }
-  }, []);
-
-  // Expose debug function for testing
-  React.useEffect(() => {
-    window.debugCurrentUser = debugCurrentUser;
-  }, [debugCurrentUser]);
+  const cognitoUserRef = useRef(null);
+  const forgotPasswordUserRef = useRef(null);
 
   const setUserAndProfileFromEmail = useCallback(async (emailOrUser) => {
     // Handle both email string and Amplify user object
@@ -157,6 +136,12 @@ export const AuthProvider = ({ children }) => {
   // Check if user is already logged in on mount
   useEffect(() => {
     const checkAuth = async () => {
+      // Wait for Amplify to be configured
+      if (typeof window !== 'undefined' && !window.amplifyConfigured) {
+        setLoading(false);
+        return;
+      }
+
       try {
         // First check Amplify OAuth authentication
         try {
@@ -371,7 +356,7 @@ export const AuthProvider = ({ children }) => {
         }
       });
     });
-  }, [setUserAndProfileFromEmail]);
+  }, []);
 
   const login = useCallback(async (email, password) => {
     return new Promise((resolve, reject) => {
@@ -563,7 +548,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem(`visit-jo.mfaMethod.${email}`, 'EMAIL');
     setError(null);
     // Success message handled by caller
-  }, [setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, setError, user?.email]);
+  }, [setUserAndProfileFromEmail, setMfaEnabled, setMfaMethod, setError]);
 
   const clearMfaChallenge = useCallback(() => {
     setMfaChallenge(null);
@@ -697,7 +682,7 @@ export const AuthProvider = ({ children }) => {
       setError(userFriendlyMessage);
       throw error;
     }
-  }, [showSuccess, setMfaEnabled, setMfaMethod, clearMfaChallenge, setError, showError, setupTotp]);
+  }, [setMfaEnabled, setMfaMethod, clearMfaChallenge, setError, setupTotp, user]);
 
   const verifyLoginTotp = useCallback(async (userCode) => {
     try {
@@ -713,7 +698,7 @@ export const AuthProvider = ({ children }) => {
       setError('Invalid authenticator code');
       throw error;
     }
-  }, [hotelAPI, clearMfaChallenge, setError]);
+  }, [clearMfaChallenge, setError]);
 
   // Email MFA flows (secondary address)
   const setupEmailMfa = useCallback(async (secondaryEmail) => {
@@ -739,7 +724,7 @@ export const AuthProvider = ({ children }) => {
       throw e;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, cognitoUserRef, setError, showError, setPendingSecondaryEmail, hotelAPI, showSuccess]);
+  }, [user, cognitoUserRef, setError, showError, setPendingSecondaryEmail, showSuccess]);
 
   const setupTotpMfa = useCallback(async () => {
     try {
@@ -882,7 +867,7 @@ export const AuthProvider = ({ children }) => {
       if (hasValidSession) {
         // Check current MFA preferences before disabling
         try {
-          const currentMfaPrefs = await new Promise((resolve) => {
+          await new Promise((resolve) => {
             cognitoUser.getUserMfaPreference((err, smsSettings, totpSettings) => {
               if (err) {
                 console.warn('Could not get current MFA preferences:', err);
@@ -898,7 +883,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Try to disable MFA in Cognito for both SMS and TOTP
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve, _reject) => {
           cognitoUser.setUserMfaPreference(
             null, // SMS MFA - set to null to disable
             null, // TOTP MFA - set to null to disable

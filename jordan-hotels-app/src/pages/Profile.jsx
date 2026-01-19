@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { usePreferences } from '../context/PreferencesContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -92,7 +92,7 @@ const Profile = () => {
     phone: '',
   });
 
-  const loadUserProfile = React.useCallback(async () => {
+  const loadUserProfile = useCallback(async () => {
     console.log('Loading user profile, user:', user);
     try {
       setLoading(true);
@@ -150,7 +150,7 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, userProfile?.firstName, userProfile?.hasCustomName, userProfile?.lastName, userProfile?.avatarUrl]);
+  }, [user, userProfile?.firstName, userProfile?.hasCustomName, userProfile?.lastName]);
 
   useEffect(() => {
     if (!user) {
@@ -230,7 +230,7 @@ const Profile = () => {
 
   // Inline component to choose enable method
   function Enable2FaChooser({ setupTotp }) {
-    const [loading, setLoading] = React.useState(false);
+    const [loading, setLoading] = useState(false);
     const startTotp = async () => {
       console.log('Starting TOTP setup from Profile...');
       try {

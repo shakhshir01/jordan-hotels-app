@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import hotelsService from "../services/hotelsService";
-import { Link, useNavigate } from "react-router-dom";
-import getDefaultBookingData from "../utils/bookingDefaults";
-import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import WishlistButton from "../components/WishlistButton";
 import { createHotelImageOnErrorHandler } from "../utils/hotelImageFallback";
 import { useTranslation } from "react-i18next";
@@ -15,8 +13,6 @@ import { Sparkles, Clock, Zap, Crown, Star, MapPin, TrendingDown, Gift, Loader2 
 export default function DealsList() {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const { user } = useAuth();
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -43,15 +39,6 @@ export default function DealsList() {
     };
     loadHotels();
   }, []);
-
-  const handleClaimDeal = (hotel, discount) => {
-    if (!user) {
-      navigate('/login', { state: { returnUrl: '/deals' } });
-      return;
-    }
-    const bookingData = getDefaultBookingData();
-    navigate('/checkout', { state: { hotelId: hotel?.id, hotel, discount, bookingData } });
-  };
 
   if (loading) return <div className="p-24 text-center">{t('pages.dealsList.loading')}</div>;
 

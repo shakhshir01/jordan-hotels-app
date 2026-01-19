@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { MapPin, Plus, Trash2, Clock, Hotel, Camera, Plane, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MapPin, Plus, Trash2, Clock, Hotel, Camera, Plane, Sparkles, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -243,6 +243,16 @@ function TripPlanner() {
 
   return (
     <div className="min-h-screen">
+      {isLoading && (
+        <div className="fixed inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin text-jordan-blue mx-auto mb-4" />
+            <p className="text-slate-600 dark:text-slate-400 font-medium">
+              {t('pages.tripPlanner.loading', 'Loading your itinerary...')}
+            </p>
+          </div>
+        </div>
+      )}
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-500 shadow-2xl mb-16 mx-6">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative px-4 sm:px-6 py-20 md:py-24 text-center text-white max-w-4xl mx-auto">
@@ -491,4 +501,4 @@ function TripPlanner() {
   );
 }
 
-export default React.memo(TripPlanner);
+export default TripPlanner;

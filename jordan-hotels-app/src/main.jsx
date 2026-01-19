@@ -8,8 +8,8 @@ if (typeof globalThis !== 'undefined') {
   globalThis.process = process;
 }
 
-import React from "react";
-import ReactDOM from "react-dom/client";
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App.jsx";
@@ -91,66 +91,72 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 // CloudWatch RUM (safe no-op unless env vars are set)
 initCloudWatchRum();
 
-// Amplify (Analytics/Auth/etc) init
-initAmplify();
+// Initialize app asynchronously
+async function initApp() {
+  // Amplify (Analytics/Auth/etc) init - await to ensure it's configured before app renders
+  await initAmplify();
 
-// Preload critical images for better performance
-preloadCriticalImages();
+  // Preload critical images for better performance
+  preloadCriticalImages();
 
-// Runtime image optimizer: ensure images without attributes get lazy loading
-function installImageRuntimeOptimizations() {
-  try {
-    const applyAttrs = (img) => {
-      if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
-      if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
-      if (!img.hasAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'low');
-    };
+  // Runtime image optimizer: ensure images without attributes get lazy loading
+  function installImageRuntimeOptimizations() {
+    try {
+      const applyAttrs = (img) => {
+        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+        if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+        if (!img.hasAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'low');
+      };
 
-    const processAll = () => {
-      document.querySelectorAll('img:not([loading])').forEach(applyAttrs);
-      document.querySelectorAll('img[loading="eager"]').forEach((i) => i.setAttribute('loading', 'eager'));
-    };
+      const processAll = () => {
+        document.querySelectorAll('img:not([loading])').forEach(applyAttrs);
+        document.querySelectorAll('img[loading="eager"]').forEach((i) => i.setAttribute('loading', 'eager'));
+      };
 
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      requestAnimationFrame(processAll);
-    } else {
-      window.addEventListener('DOMContentLoaded', processAll, { once: true });
-    }
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        requestAnimationFrame(processAll);
+      } else {
+        window.addEventListener('DOMContentLoaded', processAll, { once: true });
+      }
 
-    // Catch images added later (e.g., dynamic content)
-    const mo = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-          for (let i = 0; i < m.addedNodes.length; i++) {
-            const n = m.addedNodes[i];
-            if (n.nodeType === 1) {
-              /** @type {Element} */
-              const el = /** @type {Element} */ (n);
-              if (el.tagName === 'IMG') {
-                /** @type {HTMLImageElement} */
-                applyAttrs(/** @type {HTMLImageElement} */ (el));
+      // Catch images added later (e.g., dynamic content)
+      const mo = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+            for (let i = 0; i < m.addedNodes.length; i++) {
+              const n = m.addedNodes[i];
+              if (n.nodeType === 1) {
+                /** @type {Element} */
+                const el = /** @type {Element} */ (n);
+                if (el.tagName === 'IMG') {
+                  /** @type {HTMLImageElement} */
+                  applyAttrs(/** @type {HTMLImageElement} */ (el));
+                }
+                const imgs = el.querySelectorAll ? el.querySelectorAll('img') : [];
+                if (imgs && imgs.forEach) imgs.forEach((img) => applyAttrs(/** @type {HTMLImageElement} */ (img)));
               }
-              const imgs = el.querySelectorAll ? el.querySelectorAll('img') : [];
-              if (imgs && imgs.forEach) imgs.forEach((img) => applyAttrs(/** @type {HTMLImageElement} */ (img)));
             }
           }
-        }
-    });
-    mo.observe(document.documentElement || document, { childList: true, subtree: true });
-  } catch {
-    // Non-fatal — skip optimization if any browser quirk
+      });
+      mo.observe(document.documentElement || document, { childList: true, subtree: true });
+    } catch {
+      // Non-fatal — skip optimization if any browser quirk
+    }
   }
+
+  installImageRuntimeOptimizations();
+
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    <React.StrictMode>
+      <HelmetProvider>
+        <BrowserRouter>
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
+        </BrowserRouter>
+      </HelmetProvider>
+    </React.StrictMode>
+  );
 }
 
-installImageRuntimeOptimizations();
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <BrowserRouter>
-        <ErrorBoundary>
-          <App />
-        </ErrorBoundary>
-      </BrowserRouter>
-    </HelmetProvider>
-  </React.StrictMode>
-);
+// Call the async init function
+initApp();

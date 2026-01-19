@@ -111,30 +111,9 @@ apiClient.interceptors.request.use((config) => {
 // Export function to set auth token (used by AuthContext)
 export const setAuthToken = (token) => {
   if (token) {
-    apiClient.defaults.headers.Authorization = `Bearer ${token}`;
+    apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
   } else {
-    delete apiClient.defaults.headers.Authorization;
-  }
-};
-
-// Retry utility for failed requests
-const retryRequest = async (requestFn, maxRetries = 2, delay = 1000) => {
-  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
-    try {
-      return await requestFn();
-    } catch (error) {
-      const isRetryableError = error.code === 'ERR_NETWORK' ||
-                              error.response?.status >= 500 ||
-                              error.response?.status === 429;
-
-      if (attempt > maxRetries || !isRetryableError) {
-        throw error;
-      }
-
-      console.warn(`Request failed (attempt ${attempt}/${maxRetries + 1}), retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 2; // Exponential backoff
-    }
+    delete apiClient.defaults.headers.common.Authorization;
   }
 };
 

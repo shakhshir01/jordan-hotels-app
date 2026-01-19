@@ -1,9 +1,10 @@
-import React, {
+import {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
+  memo,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -17,7 +18,6 @@ import { haversineKm } from "../utils/geo";
 import OptimizedImage from "../components/OptimizedImage";
 import { usePreferences } from "../context/PreferencesContext";
 import { formatPrice } from "../utils/hotelPricing";
-import { useDebounce } from "../hooks/useDebounce";
 
 const JORDAN_PLACES = [
   { name: "Amman", lat: 31.9539, lon: 35.9106 },
@@ -163,7 +163,7 @@ const useResponsiveColumns = () => {
 };
 
 /** @param {{hotel:any,i18nLanguage?:string,viewLabel?:string,preferences:any}} props */
-const HotelCard = React.memo(function HotelCard(props = {}) {
+const HotelCard = memo(function HotelCard(props = {}) {
   const { hotel, i18nLanguage, viewLabel, preferences } = /** @type {{hotel:any,i18nLanguage?:string,viewLabel?:string,preferences:any}} */ (props);
   const hotelName = useMemo(
     () => getHotelDisplayName(hotel, i18nLanguage),
@@ -845,4 +845,4 @@ function Home() {
   );
 }
 
-export default React.memo(Home);
+export default memo(Home);

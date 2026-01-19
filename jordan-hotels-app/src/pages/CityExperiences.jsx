@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Star, ArrowLeft, Clock, Users, Calendar, Camera } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import OptimizedImage from '../components/OptimizedImage';
 import Seo from '../components/Seo.jsx';
 
@@ -16,7 +15,6 @@ const FALLBACK_IMG =
 
 export default function CityExperiences() {
   const { city } = useParams();
-  const { t } = useTranslation();
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('all');

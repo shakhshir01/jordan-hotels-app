@@ -18,7 +18,7 @@ declare global {
     paypal?: any;
     gtag?: (...args: any[]) => void;
     openChatBot?: () => void;
-    __VISIT-JO_rum?: any;
+    "__VISIT-JO_rum"?: any;
     [key: string]: any;
   }
 }

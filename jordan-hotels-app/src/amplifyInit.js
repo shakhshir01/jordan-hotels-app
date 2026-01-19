@@ -43,6 +43,11 @@ export async function initAmplify() {
           allowGuestUsers: true
         }
       });
+
+      // Mark as configured
+      if (typeof window !== 'undefined') {
+        window.amplifyConfigured = true;
+      }
     } else {
       // If no amplifyconfiguration.json was found, attempt to bootstrap
       // a minimal Amplify config from the runtime `window.__VISITJO_RUNTIME_CONFIG__`.
@@ -79,6 +84,11 @@ export async function initAmplify() {
               allowGuestUsers: true
             }
           });
+
+          // Mark as configured
+          if (typeof window !== 'undefined') {
+            window.amplifyConfigured = true;
+          }
         }
       } catch (_e) {
         // ignore bootstrap errors

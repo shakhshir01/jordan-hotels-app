@@ -5,7 +5,7 @@ import { hotelAPI } from "../services/api";
 import { useTranslation } from "react-i18next";
 import { getHotelDisplayName } from "../utils/hotelLocalization";
 import OptimizedImage from "../components/OptimizedImage";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 
 export default function DestinationDetails() {
   const { id } = useParams();

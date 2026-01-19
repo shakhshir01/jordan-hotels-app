@@ -18,9 +18,9 @@ jobs:
           node-version: 18
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
+        uses: amondnet/vercel-action@v25
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          zeit-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-args: '--prod'
           working-directory: 'serverless-vercel-chat'
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}

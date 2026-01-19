@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Star, ArrowLeft, Filter, Search } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { hotelAPI } from '../services/api';
 import OptimizedImage from '../components/OptimizedImage';
 import Seo from '../components/Seo.jsx';
@@ -17,7 +16,6 @@ const FALLBACK_IMG =
 
 export default function CityHotels() {
   const { city } = useParams();
-  const { t } = useTranslation();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

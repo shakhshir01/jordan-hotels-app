@@ -3,12 +3,24 @@
  * WCAG 2.1 Level AA compliance
  */
 
-import React from 'react';
+import * as React from 'react';
+
+interface KeyboardNavigationOptions {
+  loop?: boolean;
+  activateOnEnter?: boolean;
+  activateOnSpace?: boolean;
+  autoFocus?: boolean;
+}
+
+interface FocusTrapOptions {
+  returnFocusOnDeactivate?: boolean;
+  initialFocusRef?: React.RefObject<HTMLElement>;
+}
 
 /**
  * Keyboard Navigation Hook with Enhanced Features
  */
-export const useKeyboardNavigation = (items, onSelect, options = {}) => {
+export const useKeyboardNavigation = (items, onSelect, options: KeyboardNavigationOptions = {}) => {
   const {
     loop = true,
     activateOnEnter = true,
@@ -70,7 +82,7 @@ export const useKeyboardNavigation = (items, onSelect, options = {}) => {
 /**
  * Enhanced Focus Trap for Modals with Better Accessibility
  */
-export const useFocusTrap = (ref, options = {}) => {
+export const useFocusTrap = (ref, options: FocusTrapOptions = {}) => {
   const { returnFocusOnDeactivate = true, initialFocusRef } = options;
 
   React.useEffect(() => {
