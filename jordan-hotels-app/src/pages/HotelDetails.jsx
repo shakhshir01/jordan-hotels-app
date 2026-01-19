@@ -500,21 +500,21 @@ function HotelDetails() {
         </div>
       )}
 
-      {/* Modern Breadcrumbs */}
-      <nav className="glass-card rounded-2xl p-4 mb-8 shadow-glow">
-        <div className="flex items-center gap-2 text-sm">
-          <Link to="/" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors font-medium">
+      {/* Premium Breadcrumbs */}
+      <nav className="bg-card-premium backdrop-blur-2xl border border-white/30 rounded-3xl p-5 sm:p-6 mb-10 shadow-premium">
+        <div className="flex items-center gap-3 text-sm sm:text-base">
+          <Link to="/" className="text-jordan-blue hover:text-jordan-teal dark:text-jordan-blue dark:hover:text-jordan-teal transition-all duration-300 font-semibold hover:scale-105 transform">
             {t('nav.home')}
           </Link>
-          <span className="text-slate-400">/</span>
+          <span className="text-slate-400 dark:text-slate-500">•</span>
           <Link
             to={`/destinations/${encodeURIComponent(hotel.location)}`}
-            className="text-slate-600 dark:text-slate-300 hover:text-jordan-blue transition-colors"
+            className="text-slate-600 dark:text-slate-300 hover:text-jordan-blue dark:hover:text-jordan-teal transition-all duration-300 font-medium hover:scale-105 transform"
           >
             {hotel.location}
           </Link>
-          <span className="text-slate-400">/</span>
-          <span className="gradient-text font-semibold">{hotelName}</span>
+          <span className="text-slate-400 dark:text-slate-500">•</span>
+          <span className="text-transparent bg-clip-text bg-text-gradient font-bold animate-gradient-flow">{hotelName}</span>
         </div>
       </nav>
 
@@ -529,14 +529,16 @@ function HotelDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
         {/* Left Column: Info */}
         <div className="lg:col-span-2 space-y-10">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-8 mb-8">
             <div className="flex-1">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 gradient-text leading-tight">{hotelName}</h1>
-              <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 flex items-center gap-2 sm:gap-3 mb-6">
-                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
+                <span className="text-transparent bg-clip-text bg-text-gradient animate-gradient-flow">{hotelName}</span>
+              </h1>
+              <p className="text-lg sm:text-xl md:text-2xl text-slate-600 dark:text-slate-300 flex items-center gap-3 sm:gap-4 mb-8">
+                <MapPin className="w-6 h-6 sm:w-7 sm:h-7 text-jordan-rose flex-shrink-0" />
                 <Link
                   to={`/destinations/${encodeURIComponent(hotel.location)}`}
-                  className="font-medium hover:text-jordan-blue transition-colors"
+                  className="font-semibold hover:text-jordan-blue dark:hover:text-jordan-teal transition-all duration-300 hover:scale-105 transform"
                 >
                   {hotel.location}, {t('hotelDetails.location.country')}
                 </Link>
@@ -547,68 +549,94 @@ function HotelDetails() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className="inline-flex items-center gap-2 sm:gap-3 px-4 py-2 sm:px-5 sm:py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold shadow-glow animate-pulse-glow min-h-[44px]">
-              <Star size={16} className="sm:w-5 sm:h-5" fill="currentColor" />
-              <span className="text-base sm:text-lg">{hotel.rating}</span>
+          <div className="flex items-center gap-4 sm:gap-6 mb-8 sm:mb-10">
+            <div className="inline-flex items-center gap-3 sm:gap-4 px-6 py-4 sm:px-8 sm:py-5 rounded-3xl bg-gradient-to-r from-jordan-gold via-amber-400 to-jordan-rose text-white font-bold shadow-premium animate-pulse-glow min-h-[56px] border border-white/20">
+              <Star size={20} className="sm:w-6 sm:h-6" fill="currentColor" />
+              <span className="text-lg sm:text-xl font-extrabold">{hotel.rating}</span>
             </div>
-            <span className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium">({reviews.length} {t('hotels.reviews')})</span>
+            <span className="text-base sm:text-lg text-slate-500 dark:text-slate-400 font-semibold">({reviews.length} {t('hotels.reviews')})</span>
+            <div className="w-2 h-2 bg-gradient-to-r from-jordan-gold to-jordan-rose rounded-full animate-pulse"></div>
+            <span className="text-base sm:text-lg text-jordan-emerald font-bold">Award-Winning Property</span>
           </div>
 
-          <section className="card-modern">
-            <div className="p-6 sm:p-8 lg:p-10">
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-8 gradient-text">{t('hotelDetails.offers.title')}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
-                <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 p-3 sm:p-4 lg:p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-glow transition-all duration-300 group touch-manipulation min-h-[80px] sm:min-h-[100px]">
-                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2.5 sm:p-3 lg:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
-                    <Wifi className="text-white sm:w-6 sm:h-6" size={20} />
+          <section className="bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-3xl overflow-hidden shadow-premium">
+            <div className="p-8 sm:p-10 lg:p-12">
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-10 leading-tight">
+                <span className="text-transparent bg-clip-text bg-text-gradient animate-gradient-flow">Premium Amenities</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-gradient-to-r from-blue-50/80 to-jordan-blue/20 dark:from-blue-900/30 dark:to-jordan-blue/10 hover:shadow-floating transition-all duration-500 group touch-manipulation min-h-[100px] sm:min-h-[120px] border border-white/20 hover:border-jordan-blue/30">
+                  <div className="bg-gradient-to-r from-jordan-blue to-blue-600 p-4 sm:p-5 lg:p-6 rounded-3xl shadow-premium group-hover:shadow-floating transition-all duration-500 flex-shrink-0 group-hover:scale-110 transform">
+                    <Wifi className="text-white sm:w-7 sm:h-7 lg:w-8 lg:h-8" size={24} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base lg:text-lg truncate">{t('hotelDetails.offers.wifi.title')}</p>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.wifi.subtitle')}</p>
+                    <p className="font-bold text-slate-900 dark:text-white text-base sm:text-lg lg:text-xl truncate group-hover:text-jordan-blue dark:group-hover:text-jordan-teal transition-colors duration-300">{t('hotelDetails.offers.wifi.title')}</p>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">{t('hotelDetails.offers.wifi.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 p-3 sm:p-4 lg:p-6 rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-glow transition-all duration-300 group touch-manipulation min-h-[80px] sm:min-h-[100px]">
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-2.5 sm:p-3 lg:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
-                    <Coffee className="text-white sm:w-6 sm:h-6" size={20} />
+                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-gradient-to-r from-emerald-50/80 to-jordan-emerald/20 dark:from-emerald-900/30 dark:to-jordan-emerald/10 hover:shadow-floating transition-all duration-500 group touch-manipulation min-h-[100px] sm:min-h-[120px] border border-white/20 hover:border-jordan-emerald/30">
+                  <div className="bg-gradient-to-r from-jordan-emerald to-green-600 p-4 sm:p-5 lg:p-6 rounded-3xl shadow-premium group-hover:shadow-floating transition-all duration-500 flex-shrink-0 group-hover:scale-110 transform">
+                    <Coffee className="text-white sm:w-7 sm:h-7 lg:w-8 lg:h-8" size={24} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base lg:text-lg truncate">{t('hotelDetails.offers.breakfast.title')}</p>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.breakfast.subtitle')}</p>
+                    <p className="font-bold text-slate-900 dark:text-white text-base sm:text-lg lg:text-xl truncate group-hover:text-jordan-emerald dark:group-hover:text-green-300 transition-colors duration-300">{t('hotelDetails.offers.breakfast.title')}</p>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">{t('hotelDetails.offers.breakfast.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 hover:shadow-glow transition-all duration-300 group">
-                  <div className="bg-gradient-to-r from-purple-500 to-violet-600 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
-                    <Car className="text-white" size={24} />
+                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-gradient-to-r from-purple-50/80 to-jordan-purple/20 dark:from-purple-900/30 dark:to-jordan-purple/10 hover:shadow-floating transition-all duration-500 group touch-manipulation min-h-[100px] sm:min-h-[120px] border border-white/20 hover:border-jordan-purple/30">
+                  <div className="bg-gradient-to-r from-jordan-purple to-purple-600 p-4 sm:p-5 lg:p-6 rounded-3xl shadow-premium group-hover:shadow-floating transition-all duration-500 flex-shrink-0 group-hover:scale-110 transform">
+                    <Car className="text-white sm:w-7 sm:h-7 lg:w-8 lg:h-8" size={28} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">{t('hotelDetails.offers.parking.title')}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.parking.subtitle')}</p>
+                    <p className="font-bold text-slate-900 dark:text-white text-base sm:text-lg lg:text-xl truncate group-hover:text-jordan-purple dark:group-hover:text-purple-300 transition-colors duration-300">{t('hotelDetails.offers.parking.title')}</p>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">{t('hotelDetails.offers.parking.subtitle')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-5 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 hover:shadow-glow transition-all duration-300 group">
-                  <div className="bg-gradient-to-r from-pink-500 to-rose-600 p-3 sm:p-4 rounded-2xl shadow-lg group-hover:shadow-glow transition-all duration-300 flex-shrink-0">
-                    <CheckCircle className="text-white" size={24} />
+                <div className="flex items-center gap-4 sm:gap-5 lg:gap-6 p-6 sm:p-7 lg:p-8 rounded-3xl bg-gradient-to-r from-rose-50/80 to-jordan-rose/20 dark:from-rose-900/30 dark:to-jordan-rose/10 hover:shadow-floating transition-all duration-500 group touch-manipulation min-h-[100px] sm:min-h-[120px] border border-white/20 hover:border-jordan-rose/30">
+                  <div className="bg-gradient-to-r from-jordan-rose to-rose-600 p-4 sm:p-5 lg:p-6 rounded-3xl shadow-premium group-hover:shadow-floating transition-all duration-500 flex-shrink-0 group-hover:scale-110 transform">
+                    <CheckCircle className="text-white sm:w-7 sm:h-7 lg:w-8 lg:h-8" size={28} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg truncate">{t('hotelDetails.offers.frontDesk.title')}</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('hotelDetails.offers.frontDesk.subtitle')}</p>
+                    <p className="font-bold text-slate-900 dark:text-white text-base sm:text-lg lg:text-xl truncate group-hover:text-jordan-rose dark:group-hover:text-rose-300 transition-colors duration-300">{t('hotelDetails.offers.frontDesk.title')}</p>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">{t('hotelDetails.offers.frontDesk.subtitle')}</p>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="card-modern">
-            <div className="p-6 sm:p-8 lg:p-10">
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black mb-6 gradient-text">{t('hotelDetails.about.title')}</h3>
+          <section className="bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-3xl overflow-hidden shadow-premium">
+            <div className="p-8 sm:p-10 lg:p-12">
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-8 leading-tight">
+                <span className="text-transparent bg-clip-text bg-text-gradient animate-gradient-flow">About This Property</span>
+              </h3>
               <div className="prose prose-lg dark:prose-invert max-w-none">
-                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-base sm:text-lg mb-6">
+                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg sm:text-xl mb-8 font-medium">
                   {hotel.description || t('hotelDetails.about.fallbackDescription')}
                 </p>
-                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-base sm:text-lg">
+                <p className="text-slate-700 dark:text-slate-200 leading-relaxed text-lg sm:text-xl font-medium">
                   {t('hotelDetails.about.extra')}
                 </p>
+              </div>
+              <div className="mt-10 pt-8 border-t border-white/20 dark:border-white/10">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-jordan-blue dark:text-jordan-teal mb-2">5★</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Guest Rating</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-jordan-emerald dark:text-green-400 mb-2">24/7</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Concierge</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-jordan-gold dark:text-amber-400 mb-2">120</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Rooms</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-jordan-rose dark:text-rose-400 mb-2">2010</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Established</div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -624,16 +652,17 @@ function HotelDetails() {
           </section>
         </div>
 
-        {/* Right Column: Booking Sidebar - Desktop Only */}
-        <aside className="hidden lg:block card-modern lg:sticky lg:top-24 h-fit">
-          <div className="p-6 sm:p-8 lg:p-10">
-            <div className="mb-8">
-              <div className="flex justify-between items-end mb-3 gap-3">
-                <span className="text-5xl lg:text-6xl font-black gradient-text">{hotel.price}</span>
-                <span className="text-base font-semibold text-slate-500 dark:text-slate-400">JOD</span>
+        {/* Premium Booking Sidebar - Desktop Only */}
+        <aside className="hidden lg:block bg-card-premium dark:bg-card-premium-dark backdrop-blur-2xl border border-white/30 dark:border-white/10 lg:sticky lg:top-24 h-fit rounded-3xl shadow-premium overflow-hidden">
+          <div className="p-8 sm:p-10 lg:p-12">
+            <div className="mb-10 text-center">
+              <div className="inline-flex items-end gap-4 mb-4">
+                <span className="text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-text-gradient animate-gradient-flow">{hotel.price}</span>
+                <span className="text-lg font-bold text-slate-500 dark:text-slate-400 pb-2">JOD</span>
               </div>
-              <p className="text-base text-slate-600 dark:text-slate-300 font-medium">/{t('hotels.perNight')}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{t('hotelDetails.booking.averagePrice')}</p>
+              <p className="text-lg text-slate-600 dark:text-slate-300 font-semibold">/{t('hotels.perNight')}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 font-medium">{t('hotelDetails.booking.averagePrice')}</p>
+              <div className="w-16 h-1 bg-gradient-to-r from-jordan-gold to-jordan-rose mx-auto mt-4 rounded-full"></div>
             </div>
 
             <form onSubmit={handleBooking} className="space-y-8">

@@ -517,79 +517,102 @@ function Home() {
         <link rel="canonical" href="https://visitjo.com/" />
       </Helmet>
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Enhanced Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-jordan-blue via-jordan-teal to-jordan-rose animate-gradient-shift"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        {/* Premium Multi-layered Background */}
+        <div className="absolute inset-0 bg-hero-luxury animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-jordan-blue/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30"></div>
 
-        {/* Animated Mesh Background */}
+        {/* Enhanced Animated Mesh Background */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-jordan-gold/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-jordan-rose/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
-          <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-jordan-teal/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/3 right-1/3 w-56 h-56 bg-jordan-emerald/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute bottom-1/4 left-1/3 w-40 h-40 bg-jordan-purple/4 rounded-full blur-3xl animate-float" style={{ animationDelay: '5s' }}></div>
+          <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-r from-white/8 to-jordan-gold/6 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-jordan-rose/12 to-jordan-gold/8 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/4 w-72 h-72 bg-gradient-to-r from-jordan-teal/10 to-jordan-emerald/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-gradient-to-r from-jordan-purple/8 to-jordan-blue/6 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/3 right-1/3 w-56 h-56 bg-gradient-to-r from-jordan-emerald/7 to-jordan-teal/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute bottom-1/4 left-1/3 w-48 h-48 bg-gradient-to-r from-jordan-sand/6 to-jordan-gold/4 rounded-full blur-3xl animate-float" style={{ animationDelay: '5s' }}></div>
         </div>
 
-        {/* Floating Geometric Shapes */}
+        {/* Premium Floating Geometric Shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-16 left-16 w-4 h-4 bg-white/20 rotate-45 animate-float" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute top-32 right-20 w-6 h-6 bg-jordan-gold/30 rounded-full animate-float" style={{ animationDelay: '1.5s' }}></div>
-          <div className="absolute bottom-24 left-24 w-3 h-3 bg-jordan-rose/25 rotate-12 animate-float" style={{ animationDelay: '2.5s' }}></div>
-          <div className="absolute bottom-32 right-32 w-5 h-5 bg-jordan-teal/20 rounded-full animate-float" style={{ animationDelay: '3.5s' }}></div>
-          <div className="absolute top-24 right-1/4 w-4 h-4 bg-jordan-emerald/30 rotate-12 animate-float" style={{ animationDelay: '4.5s' }}></div>
-          <div className="absolute bottom-16 left-1/4 w-5 h-5 bg-jordan-purple/25 rounded-full animate-float" style={{ animationDelay: '1.2s' }}></div>
+          <div className="absolute top-16 left-16 w-6 h-6 bg-gradient-to-r from-white/25 to-jordan-gold/20 rotate-45 animate-float shadow-lg" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute top-32 right-20 w-8 h-8 bg-gradient-to-r from-jordan-gold/35 to-jordan-rose/25 rounded-full animate-float shadow-lg" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute bottom-24 left-24 w-5 h-5 bg-gradient-to-r from-jordan-rose/30 to-jordan-teal/20 rotate-12 animate-float shadow-lg" style={{ animationDelay: '2.5s' }}></div>
+          <div className="absolute bottom-32 right-32 w-7 h-7 bg-gradient-to-r from-jordan-teal/25 to-jordan-emerald/20 rounded-full animate-float shadow-lg" style={{ animationDelay: '3.5s' }}></div>
+          <div className="absolute top-24 right-1/4 w-6 h-6 bg-gradient-to-r from-jordan-emerald/35 to-jordan-purple/25 rotate-12 animate-float shadow-lg" style={{ animationDelay: '4.5s' }}></div>
+          <div className="absolute bottom-16 left-1/4 w-7 h-7 bg-gradient-to-r from-jordan-purple/30 to-jordan-blue/20 rounded-full animate-float shadow-lg" style={{ animationDelay: '1.2s' }}></div>
+
+          {/* Additional premium shapes */}
+          <div className="absolute top-1/4 right-1/3 w-4 h-4 bg-gradient-to-r from-jordan-sand/25 to-jordan-gold/20 rotate-45 animate-float shadow-md" style={{ animationDelay: '3.2s' }}></div>
+          <div className="absolute bottom-1/2 left-1/5 w-5 h-5 bg-gradient-to-r from-jordan-coral/30 to-jordan-rose/20 rounded-full animate-float shadow-md" style={{ animationDelay: '2.8s' }}></div>
         </div>
 
-        {/* Animated Particles */}
+        {/* Enhanced Animated Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white/40 rounded-full animate-pulse-glow" style={{ animationDelay: '0s' }}></div>
-          <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-jordan-gold/60 rounded-full animate-pulse-glow" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-jordan-rose/50 rounded-full animate-pulse-glow" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-jordan-teal/40 rounded-full animate-pulse-glow" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-gradient-to-r from-white/50 to-jordan-gold/40 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '0s' }}></div>
+          <div className="absolute top-3/4 right-1/4 w-2 h-2 bg-gradient-to-r from-jordan-gold/70 to-jordan-rose/50 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-3/4 w-2 h-2 bg-gradient-to-r from-jordan-rose/60 to-jordan-teal/40 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-1/4 left-1/2 w-2 h-2 bg-gradient-to-r from-jordan-teal/50 to-jordan-emerald/30 rounded-full animate-pulse-glow shadow-lg" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute top-2/3 right-1/5 w-1.5 h-1.5 bg-gradient-to-r from-jordan-emerald/60 to-jordan-purple/40 rounded-full animate-pulse-glow shadow-md" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute bottom-2/3 left-2/3 w-1.5 h-1.5 bg-gradient-to-r from-jordan-purple/50 to-jordan-blue/30 rounded-full animate-pulse-glow shadow-md" style={{ animationDelay: '1.5s' }}></div>
         </div>
+
+        {/* Subtle Mesh Gradient Overlay */}
+        <div className="absolute inset-0 bg-mesh-gradient opacity-20"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Enhanced Badge */}
-          <div className="inline-flex items-center gap-2 px-6 py-3 mb-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full text-white/90 text-sm font-semibold uppercase tracking-widest shadow-2xl animate-fade-in">
-            <div className="w-2 h-2 bg-jordan-gold rounded-full animate-pulse"></div>
-            {t("home.hero.kicker", "Award-Winning Jordan Experiences")}
-            <div className="w-2 h-2 bg-jordan-gold rounded-full animate-pulse"></div>
+          {/* Premium Badge with Enhanced Styling */}
+          <div className="inline-flex items-center gap-3 px-8 py-4 mb-10 bg-card-premium backdrop-blur-2xl border border-white/30 rounded-full text-white/95 text-sm font-bold uppercase tracking-widest shadow-premium animate-fade-in-up">
+            <div className="w-3 h-3 bg-gradient-to-r from-jordan-gold to-jordan-rose rounded-full animate-pulse-glow shadow-lg"></div>
+            <span className="text-gradient bg-gradient-to-r from-jordan-gold via-white to-jordan-rose bg-clip-text text-transparent">
+              {t("home.hero.kicker", "Award-Winning Jordan Experiences")}
+            </span>
+            <div className="w-3 h-3 bg-gradient-to-r from-jordan-rose to-jordan-gold rounded-full animate-pulse-glow shadow-lg"></div>
           </div>
 
-          {/* Enhanced Title - Optimized for mobile */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-6 sm:mb-8 tracking-tight leading-tight animate-slide-up px-2 sm:px-0">
-            <span className="block text-white drop-shadow-2xl mb-1 sm:mb-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">{t("home.hero.titleMain", "Discover Jordan's")}</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-jordan-gold via-jordan-rose to-jordan-gold bg-300% animate-gradient-flow drop-shadow-2xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+          {/* Premium Title with Enhanced Typography */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black font-display mb-8 sm:mb-10 tracking-tight leading-tight animate-slide-up-fast px-2 sm:px-0">
+            <span className="block text-white drop-shadow-2xl mb-2 sm:mb-3 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight">
+              {t("home.hero.titleMain", "Discover Jordan's")}
+            </span>
+            <span className="block text-transparent bg-clip-text bg-text-gradient bg-400% animate-gradient-flow drop-shadow-2xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-tight font-extrabold">
               {t("home.hero.titleAccent", "Hidden Treasures")}
             </span>
           </h1>
 
-          {/* Enhanced Subtitle - Better mobile typography */}
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-4xl mx-auto mb-8 sm:mb-12 text-white/90 leading-relaxed font-light animate-fade-in drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.3s' }}>
+          {/* Premium Subtitle with Better Spacing and Typography */}
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto mb-10 sm:mb-14 text-white/90 leading-relaxed font-light animate-fade-in-up drop-shadow-lg px-4 sm:px-0" style={{ animationDelay: '0.2s' }}>
             {t("home.hero.subtitle", "From the ancient wonders of Petra to the healing waters of the Dead Sea, unlock unforgettable adventures with our handpicked collection of luxury hotels and authentic experiences. Your dream Jordan vacation starts here.")}
           </p>
 
-          {/* Enhanced Search Bar - Optimized for mobile */}
-          <div className="max-w-6xl mx-auto mb-8 sm:mb-12 animate-slide-up px-4 sm:px-0" style={{ animationDelay: '0.6s' }}>
-            <div className="flex flex-col gap-3 sm:gap-4 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-3 sm:p-2 shadow-2xl">
-              {/* Search input - Better mobile sizing */}
-              <input
-                className="w-full px-4 sm:px-6 py-6 sm:py-6 bg-transparent text-white placeholder-white/60 outline-none text-lg sm:text-xl md:text-2xl rounded-2xl border-0 focus:ring-2 focus:ring-white/30 transition-all duration-300 min-h-[60px] sm:min-h-[72px]"
-                placeholder={t("home.hero.searchPlaceholder", "Search for luxury hotels in Petra, Wadi Rum, Dead Sea...")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
+          {/* Premium Search Bar with Enhanced Styling */}
+          <div className="max-w-7xl mx-auto mb-10 sm:mb-16 animate-slide-up-slow px-4 sm:px-0" style={{ animationDelay: '0.4s' }}>
+            <div className="flex flex-col gap-4 sm:gap-5 bg-card-premium backdrop-blur-2xl border border-white/30 rounded-3xl p-4 sm:p-3 shadow-premium hover:shadow-floating transition-all duration-500">
+              {/* Premium Search Input */}
+              <div className="relative">
+                <input
+                  className="w-full px-6 sm:px-8 py-7 sm:py-8 bg-transparent text-white placeholder-white/60 outline-none text-xl sm:text-2xl md:text-3xl rounded-2xl border-0 focus:ring-2 focus:ring-white/40 transition-all duration-500 min-h-[70px] sm:min-h-[80px] font-light"
+                  placeholder={t("home.hero.searchPlaceholder", "Search for luxury hotels in Petra, Wadi Rum, Dead Sea...")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                />
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <Search size={24} className="text-white/50" />
+                </div>
+              </div>
 
-              {/* Mobile segmented control - Better touch targets */}
+              {/* Premium Mobile Sort Controls */}
               <div className="sm:hidden flex gap-3 w-full px-1">
                 <button
                   type="button"
                   aria-pressed={sortBy === 'recommended'}
                   onClick={() => setSortBy('recommended')}
                   aria-label="Sort by recommended"
-                  className={`flex-1 text-sm px-3 py-3 rounded-2xl transition-all duration-200 min-h-[44px] font-medium ${sortBy === 'recommended' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
+                    sortBy === 'recommended'
+                      ? 'bg-gradient-to-r from-jordan-gold to-jordan-rose text-white shadow-premium'
+                      : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
+                  }`}
                 >
                   ✨ {t('home.sort.recommended', 'Recommended')}
                 </button>
@@ -598,7 +621,11 @@ function Home() {
                   aria-pressed={sortBy === 'rating'}
                   onClick={() => setSortBy('rating')}
                   aria-label="Sort by highest rated"
-                  className={`flex-1 text-sm px-3 py-3 rounded-2xl transition-all duration-200 min-h-[44px] font-medium ${sortBy === 'rating' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
+                    sortBy === 'rating'
+                      ? 'bg-gradient-to-r from-jordan-teal to-jordan-emerald text-white shadow-premium'
+                      : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
+                  }`}
                 >
                   ⭐ {t('home.sort.highestRated', 'Highest Rated')}
                 </button>
@@ -607,63 +634,46 @@ function Home() {
                   aria-pressed={sortBy === 'price-low'}
                   onClick={() => setSortBy('price-low')}
                   aria-label="Sort by price low to high"
-                  className={`flex-1 text-sm px-3 py-3 rounded-2xl transition-all duration-200 min-h-[44px] font-medium ${sortBy === 'price-low' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`flex-1 text-sm px-4 py-4 rounded-2xl transition-all duration-300 min-h-[48px] font-semibold shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
+                    sortBy === 'price-low'
+                      ? 'bg-gradient-to-r from-jordan-blue to-jordan-teal text-white shadow-premium'
+                      : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
+                  }`}
                 >
                   💰 {t('home.sort.priceLow', 'Price: Low to High')}
                 </button>
               </div>
 
-              {/* Desktop select */}
+              {/* Premium Desktop Sort Select */}
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 aria-label="Sort results"
-                className="hidden sm:block btn-secondary px-4 py-2 sm:py-3 rounded-2xl hover-lift font-semibold min-w-0 w-full sm:w-auto text-sm sm:text-base"
+                className="hidden sm:block btn-secondary px-6 py-3 rounded-2xl hover-lift font-semibold min-w-0 w-full sm:w-auto text-sm sm:text-base shadow-md border border-white/20 bg-white/5 backdrop-blur-sm"
               >
                 <option value="recommended">✨ {t('home.sort.recommended', 'Recommended')}</option>
                 <option value="rating">⭐ {t('home.sort.highestRated', 'Highest Rated')}</option>
                 <option value="price-low">💰 {t('home.sort.priceLow', 'Price: Low to High')}</option>
               </select>
 
+              {/* Premium CTA Button */}
               <button
                 type="button"
                 onClick={handleSearch}
                 aria-label="Find stays"
-                className="px-8 py-4 bg-gradient-to-r from-jordan-gold to-jordan-rose hover:from-jordan-rose hover:to-jordan-gold text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-105 active:scale-95 min-h-[56px]"
+                className="px-10 py-5 bg-button-gradient hover:bg-button-hover text-white font-bold rounded-2xl shadow-premium hover:shadow-floating transition-all duration-500 flex items-center justify-center gap-4 transform hover:scale-105 active:scale-95 min-h-[64px] text-lg font-semibold border border-white/20"
               >
                 <Search size={24} />
-                <span className="hidden sm:inline text-lg font-semibold">{t("home.hero.findStays", "Discover Amazing Hotels")}</span>
+                <span className="hidden sm:inline">{t("home.hero.findStays", "Discover Amazing Hotels")}</span>
+                <span className="sm:hidden">Search</span>
               </button>
             </div>
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in" style={{ animationDelay: '0.9s' }}>
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-black text-white mb-2">750+</div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Verified Hotels</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-black text-white mb-2">25+</div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Destinations</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-black text-white mb-2">4.9★</div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Guest Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-black text-white mb-2">50K+</div>
-              <div className="text-white/70 text-sm sm:text-base font-medium">Happy Travelers</div>
-            </div>
-          </div>
+
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
-          </div>
-        </div>
+
       </section>
 
       {/* Filters Section */}

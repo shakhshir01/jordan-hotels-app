@@ -254,7 +254,7 @@ export default function ChatBot() {
 
       {/* Enhanced Chat Window */}
       {isOpen && (
-        <div className="fixed inset-x-2 sm:inset-x-4 bottom-16 sm:bottom-20 sm:right-6 sm:left-auto w-[calc(100vw-1rem)] sm:w-auto max-w-sm mx-auto sm:mx-0 h-[calc(100vh-8rem)] sm:h-[36rem] glass-card rounded-3xl shadow-2xl z-50 flex flex-col max-w-sm mx-auto sm:mx-0 border border-white/30 backdrop-blur-2xl">
+        <div className="fixed inset-x-2 sm:inset-x-4 bottom-16 sm:bottom-20 sm:right-6 sm:left-auto w-[calc(100vw-1rem)] sm:w-auto max-w-lg mx-auto sm:mx-0 h-[calc(100vh-8rem)] sm:h-[48rem] glass-card rounded-3xl shadow-2xl z-50 flex flex-col max-w-lg mx-auto sm:mx-0 border border-white/30 backdrop-blur-2xl">
           {/* Enhanced Header */}
           <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-white p-5 rounded-t-3xl flex-shrink-0 shadow-xl relative overflow-hidden">
             {/* Background Pattern */}
