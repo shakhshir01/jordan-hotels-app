@@ -47,7 +47,7 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       global: 'globalThis',
-      module: { exports: {} },
+      // don't inject a fake `module` object — some libs detect it and alter runtime
     },
     plugins: [
       react(),
