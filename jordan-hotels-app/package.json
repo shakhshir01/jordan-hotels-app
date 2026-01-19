@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "@aws-amplify/analytics": "^6.5.15",
+    "@aws-amplify/auth": "^5.3.29",
+    "@aws-amplify/core": "^5.3.29",
     "@aws-sdk/client-dynamodb": "^3.965.0",
     "@aws-sdk/lib-dynamodb": "^3.965.0",
     "@google/generative-ai": "^0.11.0",
