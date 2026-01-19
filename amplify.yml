@@ -10,7 +10,7 @@ applications:
             - npm ci --include=dev
         build:
           commands:
-            - echo "VITE_DISABLE_PRECOMPRESSION=true" >> .env.build
+            - export VITE_DISABLE_PRECOMPRESSION=true
             - npm run build
       artifacts:
         baseDirectory: dist
