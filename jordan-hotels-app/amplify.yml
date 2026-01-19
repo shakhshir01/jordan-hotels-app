@@ -24,8 +24,8 @@ frontend:
     - source: /registerSW.js
       target: /registerSW.js
       status: 200
-    - source: /workbox-78ef5c9b.js
-      target: /workbox-78ef5c9b.js
+    - source: /workbox-66610c77.js
+      target: /workbox-66610c77.js
       status: 200
 customHeaders:
 customHeaders:
