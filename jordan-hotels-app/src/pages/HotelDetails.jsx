@@ -236,7 +236,7 @@ function HotelDetails() {
 
   const hotelName = getHotelDisplayName(hotel, i18n.language);
 
-  const canonicalUrl = `${window.location.origin}${location.pathname}`;
+  const canonicalUrl = `https://visitjo.com${location.pathname}`;
   const descriptionText = (() => {
     const raw = String(hotel?.description || hotel?.summary || '').trim();
     if (raw) return raw.length > 160 ? `${raw.slice(0, 157)}...` : raw;
@@ -287,6 +287,47 @@ function HotelDetails() {
       },
     ],
   };
+
+  // Handle loading and error states
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-light-cool dark:bg-dark-cool flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="animate-spin text-blue-600 mx-auto mb-4" size={48} />
+          <p className="text-slate-600 dark:text-slate-400">Loading hotel details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle error states - return proper 404 for SEO
+  if (error || !hotel) {
+    return (
+      <div className="min-h-screen bg-light-cool dark:bg-dark-cool">
+        <Seo
+          title="Hotel Not Found | VisitJo"
+          description="The hotel you're looking for could not be found. Discover amazing accommodations in Jordan instead."
+          canonicalUrl={`https://visitjo.com${location.pathname}`}
+          noindex={true}
+        />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center max-w-md mx-auto px-4">
+            <div className="text-8xl mb-6">🏨</div>
+            <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-4">Hotel Not Found</h1>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
+              {error || "The hotel you're looking for doesn't exist or has been removed."}
+            </p>
+            <Link
+              to="/hotels"
+              className="btn-primary inline-block"
+            >
+              Browse All Hotels
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-section pb-24 lg:pb-8">
