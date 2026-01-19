@@ -15,17 +15,11 @@ frontend:
     paths:
       - node_modules/**/*
   rewrites:
-    - source: /manifest.json
-      target: /manifest.json
+    - source: /assets/(.*)
+      target: /assets/$1
       status: 200
-    - source: /sw.js
-      target: /sw.js
-      status: 200
-    - source: /registerSW.js
-      target: /registerSW.js
-      status: 200
-    - source: /workbox-66610c77.js
-      target: /workbox-66610c77.js
+    - source: /(.*\.(js|css|png|jpg|jpeg|svg|ico|woff|woff2|ttf|eot|json|xml|txt|map))$
+      target: /$1
       status: 200
 customHeaders:
 customHeaders:
