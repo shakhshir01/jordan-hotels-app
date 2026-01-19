@@ -47,6 +47,9 @@ export default defineConfig(({ mode }) => {
       global: 'globalThis',
       module: { exports: {} },
     },
+    // allow disabling pre-compression (useful on hosting that mishandles .br/.gz headers)
+    const enablePrecompression = mode === 'production' && env.VITE_DISABLE_PRECOMPRESSION !== 'true';
+
     plugins: [
       react(),
       // Temporarily disable PWA to avoid conflicts
@@ -72,8 +75,8 @@ export default defineConfig(({ mode }) => {
       //     ],
       //   },
       // })] : []),
-      // Only enable compression in production
-      ...(mode === 'production' ? [
+      // Only enable compression if not explicitly disabled via env
+      ...(enablePrecompression ? [
         compression({
           algorithm: 'gzip',
           ext: '.gz',
