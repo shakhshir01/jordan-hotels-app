@@ -15,9 +15,6 @@ frontend:
     paths:
       - node_modules/**/*
   rewrites:
-    - source: /registerSW.js
-      target: /registerSW.js
-      status: 200
     - source: /sw.js
       target: /sw.js
       status: 200
