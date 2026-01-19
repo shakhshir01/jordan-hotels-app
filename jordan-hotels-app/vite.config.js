@@ -104,12 +104,19 @@ export default defineConfig(({ mode }) => {
             if (normalizedId.includes('react-toastify')) return 'vendor-toast';
             if (normalizedId.includes('leaflet') || normalizedId.includes('react-leaflet')) return 'vendor-maps';
             if (normalizedId.includes('@stripe') || normalizedId.includes('stripe')) return 'vendor-stripe';
-            if (normalizedId.includes('amazon-cognito-identity-js')) return 'vendor-auth';
             if (normalizedId.includes('i18next') || normalizedId.includes('react-i18next')) return 'vendor-i18n';
             if (normalizedId.includes('lucide-react')) return 'vendor-icons';
             if (normalizedId.includes('react-lazy-load-image-component')) return 'vendor-lazy-images';
             if (normalizedId.includes('@tanstack/react-virtual')) return 'vendor-virtual';
             if (normalizedId.includes('axios')) return 'vendor-http';
+            
+            // Group AWS/Amplify packages together to avoid circular dependencies
+            if (normalizedId.includes('aws-amplify') || 
+                normalizedId.includes('@aws-amplify') || 
+                normalizedId.includes('amazon-cognito-identity-js') ||
+                normalizedId.includes('@aws-sdk')) {
+              return 'vendor-aws';
+            }
 
             return 'vendor-core';
           },

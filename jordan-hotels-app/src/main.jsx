@@ -1,10 +1,10 @@
 // Polyfills for AWS Amplify compatibility
-// import { Buffer } from 'buffer';
+import { Buffer } from 'buffer';
 import process from 'process';
 
 // Make polyfills available globally
 if (typeof globalThis !== 'undefined') {
-  // globalThis.Buffer = Buffer;
+  globalThis.Buffer = Buffer;
   globalThis.process = process;
 }
 
