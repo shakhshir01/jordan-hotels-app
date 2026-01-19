@@ -34,7 +34,7 @@
     "@aws-sdk/lib-dynamodb": "^3.965.0",
     "@google/generative-ai": "^0.11.0",
     "@stripe/react-stripe-js": "^4.0.2",
-    "@stripe/stripe-js": "^1.54.2",
+    "@stripe/stripe-js": "^8.6.1",
     "@tanstack/react-virtual": "^3.13.17",
     "amazon-cognito-identity-js": "^6.3.16",
     "aws-amplify": "^5.3.29",
