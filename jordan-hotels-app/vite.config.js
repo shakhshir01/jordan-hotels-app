@@ -49,29 +49,29 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
-      // Only enable PWA in production builds
-      ...(mode === 'production' ? [VitePWA({
-        registerType: 'autoUpdate',
-        manifest: false, // Disable auto-generated manifest since we have a custom one
-        workbox: {
-          inlineWorkboxRuntime: true, // Inline workbox runtime to avoid import issues
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // Increased to 5 MB
-          globPatterns: ['**/*.{js,css,html,ico,png,svg}'], // Removed heavy assets
-          runtimeCaching: [
-            {
-              urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'images-cache',
-                expiration: {
-                  maxEntries: 50, // Reduced from 100
-                  maxAgeSeconds: 60 * 60 * 24 * 7, // Reduced to 7 days
-                },
-              },
-            },
-          ],
-        },
-      })] : []),
+      // Temporarily disable PWA to avoid conflicts
+      // ...(mode === 'production' ? [VitePWA({
+      //   registerType: 'autoUpdate',
+      //   manifest: false, // Disable auto-generated manifest since we have a custom one
+      //   workbox: {
+      //     inlineWorkboxRuntime: true, // Inline workbox runtime to avoid import issues
+      //     maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // Increased to 5 MB
+      //     globPatterns: ['**/*.{js,css,html,ico,png,svg}'], // Removed heavy assets
+      //     runtimeCaching: [
+      //       {
+      //         urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
+      //         handler: 'CacheFirst',
+      //         options: {
+      //           cacheName: 'images-cache',
+      //           expiration: {
+      //             maxEntries: 50, // Reduced from 100
+      //             maxAgeSeconds: 60 * 60 * 24 * 7, // Reduced to 7 days
+      //           },
+      //         },
+      //       },
+      //     ],
+      //   },
+      // })] : []),
       // Only enable compression in production
       ...(mode === 'production' ? [
         compression({

@@ -15,6 +15,15 @@ frontend:
     paths:
       - node_modules/**/*
   rewrites:
+    - source: /registerSW.js
+      target: /registerSW.js
+      status: 200
+    - source: /sw.js
+      target: /sw.js
+      status: 200
+    - source: /manifest.json
+      target: /manifest.json
+      status: 200
     - source: /assets/(.*)
       target: /assets/$1
       status: 200
@@ -35,6 +44,8 @@ customHeaders:
         value: 'application/manifest+json'
   - pattern: '**/*.js'
     headers:
+      - key: 'Content-Type'
+        value: 'application/javascript'
       - key: 'Cache-Control'
         value: 'public, max-age=31536000, immutable'
   - pattern: '**/*.css'
