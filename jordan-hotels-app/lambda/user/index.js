@@ -310,6 +310,7 @@ async function updateUserProfile(userId, event) {
       mfaChallengeExpires: body.mfaChallengeExpires !== undefined ? body.mfaChallengeExpires : existing.mfaChallengeExpires || null,
       avatarKey: bodyAvatarKey !== undefined ? bodyAvatarKey : existing.avatarKey || null,
       avatarUrl: null, // Will be set after saving
+      tripPlan: body.tripPlan !== undefined ? body.tripPlan : existing.tripPlan || null,
     };
 
     // Remove explicit nulls for cleaner storage (optional)

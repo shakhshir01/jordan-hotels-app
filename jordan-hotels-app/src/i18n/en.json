@@ -12,6 +12,7 @@
     "trends": "Trends",
     "insights": "Insights",
     "experiences": "Experiences",
+    "tripPlanner": "Trip Planner",
     "deals": "Deals",
     "blog": "Blog",
     "reviews": "Reviews",
@@ -374,7 +375,8 @@
       "dayNumber": "Day {{number}}",
       "deleteDay": "Delete day",
       "destinationPlaceholder": "Destination",
-      "notesPlaceholder": "Notes"
+      "autoSaved": "Auto-saved to browser",
+      "autoSavedAccount": "Auto-saved to your account"
     },
     "privacy": {
       "kicker": "PRIVACY",

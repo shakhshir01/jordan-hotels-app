@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
-import { MapPin, Camera, Tag, TrendingUp, BarChart3, MessageSquare, Image, HelpCircle, Settings, Heart } from "lucide-react";
+import { MapPin, Camera, Tag, TrendingUp, BarChart3, MessageSquare, Image, HelpCircle, Heart, Calendar } from "lucide-react";
 
 const Navbar = ({ onAccessibilityClick }) => {
   const { user, userProfile, logout } = useAuth();
@@ -49,12 +49,12 @@ const Navbar = ({ onAccessibilityClick }) => {
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-jordan-sand/20 dark:border-slate-700/50 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto pl-0 pr-4 sm:pl-0 sm:pr-6 lg:pl-0 lg:pr-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
             to="/"
-            className="text-2xl font-bold bg-gradient-to-r from-jordan-blue to-jordan-teal bg-clip-text text-transparent hover:from-jordan-teal hover:to-jordan-blue transition-all duration-300 tracking-wide"
+            className="ml-[-4rem] text-3xl font-bold bg-gradient-to-r from-jordan-blue to-jordan-teal bg-clip-text text-transparent hover:from-jordan-teal hover:to-jordan-blue transition-all duration-300 tracking-wide"
           >
             <span className="capitalize">Visit</span>
             <span className="ml-1">Jo</span>
@@ -75,6 +75,13 @@ const Navbar = ({ onAccessibilityClick }) => {
             >
               <Camera size={16} />
               {t("nav.experiences")}
+            </Link>
+            <Link
+              to="/trip-planner"
+              className="flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:text-jordan-emerald font-medium transition-all duration-300 text-sm hover:scale-105"
+            >
+              <Calendar size={16} />
+              {t("nav.tripPlanner", "Trip Planner")}
             </Link>
             <Link
               to="/deals"
@@ -141,9 +148,9 @@ const Navbar = ({ onAccessibilityClick }) => {
             <button
               onClick={onAccessibilityClick}
               aria-label={t('accessibility.settings', 'Accessibility Settings')}
-              className="p-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue dark:hover:text-jordan-teal transition-colors duration-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="px-3 py-2 text-slate-700 dark:text-slate-200 hover:text-jordan-blue dark:hover:text-jordan-teal transition-colors duration-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium"
             >
-              <Settings size={20} />
+              Accessibility
             </button>
             <ThemeToggle />
             <LanguageSwitcher />
@@ -227,6 +234,10 @@ const Navbar = ({ onAccessibilityClick }) => {
                 <Link to="/experiences" onClick={closeMobile} className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-rose hover:bg-jordan-rose/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95">
                   <Camera size={20} />
                   {t("nav.experiences")}
+                </Link>
+                <Link to="/trip-planner" onClick={closeMobile} className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-emerald hover:bg-jordan-emerald/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95">
+                  <Calendar size={20} />
+                  {t("nav.tripPlanner", "Trip Planner")}
                 </Link>
                 <Link to="/deals" onClick={closeMobile} className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-jordan-gold hover:bg-jordan-gold/5 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 active:scale-95">
                   <Tag size={20} />

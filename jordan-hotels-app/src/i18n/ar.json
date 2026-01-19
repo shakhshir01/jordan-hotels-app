@@ -12,6 +12,7 @@
     "trends": "الأكثر رواجاً",
     "insights": "إحصاءات",
     "experiences": "التجارب",
+    "tripPlanner": "مخطط الرحلات",
     "deals": "العروض",
     "blog": "المدونة",
     "reviews": "المراجعات",
@@ -360,7 +361,8 @@
       "dayNumber": "اليوم {{number}}",
       "deleteDay": "حذف اليوم",
       "destinationPlaceholder": "الوجهة",
-      "notesPlaceholder": "ملاحظات"
+      "autoSaved": "محفوظ تلقائيًا في المتصفح",
+      "autoSavedAccount": "محفوظ تلقائيًا في حسابك"
     },
     "privacy": {
       "kicker": "الخصوصية",

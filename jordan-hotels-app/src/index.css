@@ -12,12 +12,11 @@
   }
 
   html {
-    @apply smooth-scroll;
     height: 100%;
   }
 
   body {
-    @apply bg-white text-black;
+    @apply bg-gray-50 text-black;
     @apply dark:bg-slate-900 dark:text-white;
     background-attachment: fixed;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -124,6 +123,68 @@
   .dark .border-slate-300 {
     @apply border-slate-600;
   }
+
+  /* Additional dark mode fixes for specific components */
+  .dark .bg-red-50 {
+    @apply bg-red-900/20;
+  }
+
+  .dark .bg-green-50 {
+    @apply bg-green-900/20;
+  }
+
+  .dark .bg-blue-50 {
+    @apply bg-blue-900/20;
+  }
+
+  .dark .bg-purple-50 {
+    @apply bg-purple-900/20;
+  }
+
+  .dark .bg-pink-50 {
+    @apply bg-pink-900/20;
+  }
+
+  .dark .bg-indigo-50 {
+    @apply bg-indigo-900/20;
+  }
+
+  .dark .text-red-600 {
+    @apply text-red-400;
+  }
+
+  .dark .text-red-500 {
+    @apply text-red-400;
+  }
+
+  .dark .text-blue-600 {
+    @apply text-blue-400;
+  }
+
+  .dark .text-purple-600 {
+    @apply text-purple-400;
+  }
+
+  .dark .text-green-600 {
+    @apply text-green-400;
+  }
+
+  .dark .text-orange-500 {
+    @apply text-orange-400;
+  }
+
+  .dark .text-pink-500 {
+    @apply text-pink-400;
+  }
+
+  /* Fix for ErrorBoundary and other components using light-only backgrounds */
+  .dark .bg-gray-50 {
+    @apply bg-slate-900;
+  }
+
+  .dark .hover\:bg-gray-50:hover {
+    @apply hover:bg-slate-800;
+  }
 }
 
 /* Mobile Performance Optimizations */
@@ -149,7 +210,7 @@
 
   /* Smooth scrolling for image galleries */
   .gallery-scroll {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -364,7 +425,7 @@
   
   /* Smooth Scroll */
   .smooth-scroll {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
 
   /* Mobile Optimizations */
@@ -460,7 +521,7 @@
   /* Optimize scrolling on mobile */
   .scroll-mobile {
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
 
   /* Mobile accessibility improvements */

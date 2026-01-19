@@ -138,21 +138,14 @@ function HotelDetails() {
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get('book') === 'true' && hotel) {
-      // Scroll to booking form after hotel loads
-      setTimeout(() => {
-        const bookingForm = document.querySelector('form');
-        if (bookingForm) {
-          bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Set default check-in date to tomorrow
-          const tomorrow = new Date();
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          setCheckInDate(tomorrow.toISOString().split('T')[0]);
-          // Set default check-out date to day after tomorrow
-          const dayAfterTomorrow = new Date();
-          dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-          setCheckOutDate(dayAfterTomorrow.toISOString().split('T')[0]);
-        }
-      }, 500);
+      // Set default check-in date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setCheckInDate(tomorrow.toISOString().split('T')[0]);
+      // Set default check-out date to day after tomorrow
+      const dayAfterTomorrow = new Date();
+      dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+      setCheckOutDate(dayAfterTomorrow.toISOString().split('T')[0]);
     }
   }, [hotel, location.search]);
 

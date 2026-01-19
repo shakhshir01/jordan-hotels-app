@@ -325,7 +325,7 @@ const HotelGallery = ({ images = [], hotelName }) => {
         type="button"
         onClick={() => openLightbox(0)}
         aria-label="View all photos"
-        className="hidden md:flex absolute bottom-4 right-4 bg-white text-gray-900 px-4 py-2 rounded-lg shadow-lg items-center gap-2 hover:bg-gray-50 transition-colors font-medium text-sm min-h-[44px] inline-flex items-center justify-center"
+        className="hidden md:flex absolute bottom-4 right-4 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 px-4 py-2 rounded-lg shadow-lg items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors font-medium text-sm min-h-[44px] inline-flex items-center justify-center"
       >
         <Grid className="w-4 h-4" />
         View All Photos

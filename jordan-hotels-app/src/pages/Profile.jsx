@@ -336,14 +336,6 @@ const Profile = () => {
                     <Edit2 size={18} />
                     Edit Profile
                   </button>
-
-                  {/* Small MFA badge only — main enable/disable actions live in the MFA section below */}
-                  {mfaEnabled && (
-                    <div className="flex items-center gap-2 px-3 py-2 glass-card border border-green-200 bg-green-50 text-green-800 rounded-lg shadow-glow">
-                      <Check size={16} />
-                      <span>2FA Enabled{mfaMethod && ` (${mfaMethod === 'EMAIL' ? 'Email' : mfaMethod === 'TOTP' ? 'App' : mfaMethod})`}</span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -391,6 +383,107 @@ const Profile = () => {
                   </div>
                 </div>
 
+                {/* Two-Factor Authentication Section */}
+                <div className="border-t border-slate-200 dark:border-slate-700 pt-6 mt-6">
+                  <h3 className="text-lg font-semibold gradient-text mb-4">Two-Factor Authentication</h3>
+                  
+                  {!mfaEnabled && !showEnableOptions && (
+                    <div className="space-y-4">
+                      <p className="text-slate-600 dark:text-slate-400">
+                        Add an extra layer of security to your account by enabling two-factor authentication.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowEnableOptions(true)}
+                        className="btn-primary px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px]"
+                      >
+                        Enable 2FA
+                      </button>
+                    </div>
+                  )}
+
+                  {!mfaEnabled && showEnableOptions && (
+                    <div className="space-y-4">
+                      <h4 className="text-md font-semibold gradient-text">Choose your 2FA method:</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                          onClick={openEmailSetup}
+                          className="p-4 glass-card border border-slate-300 dark:border-slate-600 rounded-lg hover:shadow-glow hover:scale-105 transition-all duration-300 text-left group"
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <svg className="w-6 h-6 text-blue-600 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <span className="font-semibold text-slate-900 dark:text-slate-100">Email Verification</span>
+                          </div>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                            Receive verification codes via email. No additional app required.
+                          </p>
+                        </button>
+
+                        <button
+                          onClick={async () => {
+                            try {
+                              setShowEnableOptions(false);
+                              await setupTotp();
+                            } catch (err) {
+                              showError(err?.message || 'Failed to start TOTP setup');
+                            }
+                          }}
+                          className="p-4 glass-card border border-slate-300 dark:border-slate-600 rounded-lg hover:shadow-glow hover:scale-105 transition-all duration-300 text-left group"
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <svg className="w-6 h-6 text-green-600 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            <span className="font-semibold text-slate-900 dark:text-slate-100">Authenticator App</span>
+                          </div>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                            Use Google Authenticator, Authy, or similar apps for secure 2FA.
+                          </p>
+                        </button>
+                      </div>
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setShowEnableOptions(false)}
+                          className="btn-secondary px-3 py-1 text-sm hover:scale-105 transition-all duration-300 min-h-[44px]"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {mfaEnabled && (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-slate-900 dark:text-slate-100 font-semibold">2FA is enabled</span>
+                        <span className="text-slate-600 dark:text-slate-400">
+                          ({mfaMethod === 'EMAIL' ? 'Email verification' : mfaMethod === 'TOTP' ? 'Authenticator app' : 'Unknown method'})
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (window.confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
+                            try {
+                              await disableMfa();
+                              showSuccess('2FA disabled');
+                            } catch (_error) {
+                              showError('Failed to disable 2FA');
+                            }
+                          }
+                        }}
+                        className="btn-secondary px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px]"
+                      >
+                        Disable 2FA
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex gap-2 pt-4">
                   <button
                     onClick={handleUpdateProfile}
@@ -427,6 +520,22 @@ const Profile = () => {
                 <div>
                   <p className="text-sm text-slate-600 dark:text-slate-300 font-semibold">Phone</p>
                   <p className="text-lg text-slate-900 dark:text-slate-100">{profile?.phone || 'Not set'}</p>
+                </div>
+                <div className="md:col-span-2">
+                  <p className="text-sm text-slate-600 dark:text-slate-300 font-semibold">Two-Factor Authentication</p>
+                  <div className="flex items-center gap-3 mt-1">
+                    {mfaEnabled ? (
+                      <>
+                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-lg text-slate-900 dark:text-slate-100 font-semibold">Enabled</span>
+                        <span className="text-slate-600 dark:text-slate-400">
+                          ({mfaMethod === 'EMAIL' ? 'Email verification' : mfaMethod === 'TOTP' ? 'Authenticator app' : 'Unknown method'})
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-lg text-slate-900 dark:text-slate-100">Not enabled</span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -702,105 +811,6 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-          )}
-        </div>
-        <div className="glass-card card-modern p-8 mb-8 animate-fade-in">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold gradient-text">Two-Factor Authentication</h2>
-            {!mfaEnabled && !showEnableOptions && (
-              <button
-                type="button"
-                onClick={() => setShowEnableOptions(true)}
-                className="btn-primary px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px]"
-              >
-                Enable 2FA
-              </button>
-            )}
-          </div>
-
-          {!mfaEnabled && showEnableOptions && (
-            <div className="mb-6 p-4 glass-card rounded-lg border border-purple-200/50">
-              <h3 className="text-lg font-semibold gradient-text mb-4">Choose your 2FA method:</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
-                  onClick={openEmailSetup}
-                  className="p-4 glass-card border border-slate-300 dark:border-slate-600 rounded-lg hover:shadow-glow hover:scale-105 transition-all duration-300 text-left group"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <svg className="w-6 h-6 text-blue-600 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">Email Verification</span>
-                  </div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Receive verification codes via email. No additional app required.
-                  </p>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      setShowEnableOptions(false);
-                      await setupTotp();
-                    } catch (err) {
-                      showError(err?.message || 'Failed to start TOTP setup');
-                    }
-                  }}
-                  className="p-4 glass-card border border-slate-300 dark:border-slate-600 rounded-lg hover:shadow-glow hover:scale-105 transition-all duration-300 text-left group"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <svg className="w-6 h-6 text-green-600 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">Authenticator App</span>
-                  </div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Use Google Authenticator, Authy, or similar apps for secure 2FA.
-                  </p>
-                </button>
-              </div>
-              <div className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowEnableOptions(false)}
-                  className="btn-secondary px-3 py-1 text-sm hover:scale-105 transition-all duration-300 min-h-[44px]"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-
-          {mfaEnabled ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-slate-900 dark:text-slate-100 font-semibold">2FA is enabled</span>
-                <span className="text-slate-600 dark:text-slate-400">
-                  ({mfaMethod === 'EMAIL' ? 'Email verification' : mfaMethod === 'TOTP' ? 'Authenticator app' : 'Unknown method'})
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={async () => {
-                  if (window.confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
-                    try {
-                      await disableMfa();
-                      showSuccess('2FA disabled');
-                    } catch (_error) {
-                      showError('Failed to disable 2FA');
-                    }
-                  }
-                }}
-                className="btn-secondary px-4 py-2 hover:scale-105 transition-all duration-300 min-h-[44px]"
-              >
-                Disable 2FA
-              </button>
-            </div>
-          ) : (
-            <p className="text-slate-600 dark:text-slate-400">
-              Add an extra layer of security to your account by enabling two-factor authentication.
-            </p>
           )}
         </div>
 

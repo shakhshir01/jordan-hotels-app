@@ -151,7 +151,7 @@ export default function HotelsMap() {
             type="button"
             onClick={requestUserLocation}
             aria-label="Retry location request"
-            className="mt-3 px-4 py-2 rounded-full border border-amber-200 bg-white text-sm font-semibold text-amber-900 hover:bg-amber-50 min-h-[44px] inline-flex items-center justify-center"
+            className="mt-3 px-4 py-2 rounded-full border border-amber-200 dark:border-amber-700 bg-white dark:bg-slate-800 text-sm font-semibold text-amber-900 dark:text-amber-100 hover:bg-amber-50 dark:hover:bg-amber-900/20 min-h-[44px] inline-flex items-center justify-center"
           >
             Try again
           </button>
@@ -240,7 +240,7 @@ export default function HotelsMap() {
         (() => {
           const selectedName = getHotelDisplayName(selectedHotel, i18n.language);
           return (
-        <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
+        <div className="mt-8 bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative aspect-[3/2] sm:aspect-[4/3] overflow-hidden rounded-lg">
               <OptimizedImage

@@ -146,7 +146,7 @@ const Trends = () => {
                 onClick={() => runSearch(q.q)}
                 className={`px-4 py-2 rounded-full border-2 font-medium transition-all duration-300 hover:scale-105 ${
                   activeQuery === q.q
-                    ? "bg-white text-purple-600 border-white shadow-lg scale-105"
+                    ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 border-white dark:border-slate-600 shadow-lg scale-105"
                     : "border-white/40 text-white/80 hover:bg-white/10 hover:border-white/60"
                 }`}
               >

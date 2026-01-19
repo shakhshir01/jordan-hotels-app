@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MapPin, Plus, Trash2, Clock, Hotel, Camera, Plane, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { hotelAPI } from "../services/api";
 
 const STORAGE_KEY = "visitjo.tripPlan";
 
@@ -34,15 +37,26 @@ const defaultDays = [
 function TripPlanner() {
   const { t, i18n } = useTranslation();
   const isArabic = String(i18n.language || '').toLowerCase().startsWith('ar');
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user, isAuthenticated } = useAuth();
   const [days, setDays] = useState(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length) return parsed;
+    // Check for shared itinerary first
+    const sharedData = searchParams.get('shared');
+    if (sharedData) {
+      try {
+        const decodedData = JSON.parse(atob(sharedData));
+        if (decodedData.days && Array.isArray(decodedData.days)) {
+          return decodedData.days.map((d, index) => ({
+            id: `shared-d${index + 1}`,
+            title: d.title || `Day ${index + 1}`,
+            destination: d.destination || '',
+            notes: d.notes || '',
+          }));
+        }
+      } catch (e) {
+        console.warn('Failed to load shared itinerary:', e);
       }
-    } catch {
-      // ignore (storage unavailable / invalid JSON)
     }
 
     return defaultDays.map((d) => ({
@@ -52,15 +66,108 @@ function TripPlanner() {
       notes: isArabic ? d.notesAr : d.notes,
     }));
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const persist = (next) => {
-    setDays(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      // ignore (storage unavailable)
-    }
-  };
+  // Load trip plan from server or localStorage on mount
+  useEffect(() => {
+    const loadTripPlan = async () => {
+      // Skip if we already have shared data
+      if (searchParams.get('shared')) return;
+
+      setIsLoading(true);
+      try {
+        if (isAuthenticated && user) {
+          // Try to load from server first
+          const profile = await hotelAPI.getUserProfile();
+          if (profile?.tripPlan && Array.isArray(profile.tripPlan) && profile.tripPlan.length > 0) {
+            setDays(profile.tripPlan);
+            // Also save to localStorage as backup
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(profile.tripPlan));
+            } catch {
+              // ignore localStorage errors
+            }
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        // Fall back to localStorage
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length) {
+              setDays(parsed);
+              setIsLoading(false);
+              return;
+            }
+          }
+        } catch {
+          // ignore localStorage errors
+        }
+
+        // Use defaults
+        setDays(defaultDays.map((d) => ({
+          id: d.id,
+          title: isArabic ? d.titleAr : d.title,
+          destination: d.destination,
+          notes: isArabic ? d.notesAr : d.notes,
+        })));
+      } catch (error) {
+        console.warn('Failed to load trip plan:', error);
+        // Fall back to localStorage or defaults
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length) {
+              setDays(parsed);
+            }
+          }
+        } catch {
+          setDays(defaultDays.map((d) => ({
+            id: d.id,
+            title: isArabic ? d.titleAr : d.title,
+            destination: d.destination,
+            notes: isArabic ? d.notesAr : d.notes,
+          })));
+        }
+      }
+      setIsLoading(false);
+    };
+
+    loadTripPlan();
+  }, [isAuthenticated, user, searchParams, isArabic]);
+
+  // Save trip plan whenever days change
+  useEffect(() => {
+    const saveTripPlan = async () => {
+      // Skip saving if we have shared data (temporary state)
+      if (searchParams.get('shared')) return;
+
+      // Always save to localStorage
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(days));
+      } catch {
+        // ignore localStorage errors
+      }
+
+      // Save to server if authenticated
+      if (isAuthenticated && user) {
+        try {
+          await hotelAPI.updateUserProfile({ tripPlan: days });
+        } catch (error) {
+          console.warn('Failed to save trip plan to server:', error);
+          // Continue - localStorage backup exists
+        }
+      }
+    };
+
+    // Debounce saves to avoid too many API calls
+    const timeoutId = setTimeout(saveTripPlan, 500);
+    return () => clearTimeout(timeoutId);
+  }, [days, isAuthenticated, user, searchParams]);
 
   const handleAddDay = () => {
     const next = [
@@ -72,18 +179,66 @@ function TripPlanner() {
         notes: "",
       },
     ];
-    persist(next);
+    setDays(next);
   };
 
   const handleUpdate = (id, patch) => {
     const next = days.map((d) => (d.id === id ? { ...d, ...patch } : d));
-    persist(next);
+    setDays(next);
   };
 
   const handleDelete = (id) => {
     if (days.length === 1) return;
     const next = days.filter((d) => d.id !== id);
-    persist(next);
+    setDays(next);
+  };
+
+  const handleFindHotels = (destination) => {
+    if (destination.trim()) {
+      navigate(`/search?q=${encodeURIComponent(destination)}`);
+    } else {
+      navigate('/');
+    }
+  };
+
+  const handleFindExperiences = (destination) => {
+    if (destination.trim()) {
+      navigate(`/experiences?destination=${encodeURIComponent(destination)}`);
+    } else {
+      navigate('/experiences');
+    }
+  };
+
+  const handleBookTrip = () => {
+    // Navigate to home page and scroll to top
+    navigate('/');
+    // Small delay to ensure navigation completes before scrolling
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleShareItinerary = () => {
+    // Create a shareable URL with itinerary data
+    const itineraryData = {
+      days: days.map(d => ({
+        title: d.title,
+        destination: d.destination,
+        notes: d.notes
+      })),
+      created: new Date().toISOString()
+    };
+    
+    const encodedData = btoa(JSON.stringify(itineraryData));
+    const shareUrl = `${window.location.origin}/trip-planner?shared=${encodedData}`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Itinerary link copied to clipboard! Share it with friends.');
+    }).catch(() => {
+      // Fallback: show the URL in a prompt
+      prompt('Copy this link to share your itinerary:', shareUrl);
+    });
   };
 
   return (
@@ -121,7 +276,7 @@ function TripPlanner() {
               {days.length} {t('pages.tripPlanner.days', 'Days')}
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-400">
-              {t('pages.tripPlanner.autoSaved', 'Auto-saved to browser')}
+              {isAuthenticated ? t('pages.tripPlanner.autoSavedAccount', 'Auto-saved to your account') : t('pages.tripPlanner.autoSaved', 'Auto-saved to browser')}
             </div>
           </div>
           <button
@@ -214,7 +369,7 @@ function TripPlanner() {
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => {/* Add hotel search */}}
+                  onClick={() => handleFindHotels(day.destination)}
                   className="flex-1 bg-gradient-to-r from-jordan-blue to-jordan-teal text-white py-3 px-4 rounded-xl hover:shadow-lg transition-all duration-200 sm:duration-300 flex items-center justify-center gap-2 hover-lift min-h-[48px] sm:min-h-[56px]"
                 >
                   <Hotel size={16} />
@@ -222,7 +377,7 @@ function TripPlanner() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {/* Add experience search */}}
+                  onClick={() => handleFindExperiences(day.destination)}
                   className="flex-1 bg-gradient-to-r from-jordan-emerald to-jordan-teal text-white py-3 px-4 rounded-xl hover:shadow-lg transition-all duration-200 sm:duration-300 flex items-center justify-center gap-2 hover-lift min-h-[48px] sm:min-h-[56px]"
                 >
                   <Camera size={16} />
@@ -265,10 +420,16 @@ function TripPlanner() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="btn-primary px-8 py-4 text-lg font-bold rounded-2xl hover-lift min-h-[48px] sm:min-h-[56px] flex items-center justify-center">
+              <button 
+                onClick={handleBookTrip}
+                className="btn-primary px-8 py-4 text-lg font-bold rounded-2xl hover-lift min-h-[48px] sm:min-h-[56px] flex items-center justify-center"
+              >
                 {t('pages.tripPlanner.summary.bookNow', 'Book Your Trip')}
               </button>
-              <button className="btn-secondary px-8 py-4 text-lg font-bold rounded-2xl hover-lift min-h-[48px] sm:min-h-[56px] flex items-center justify-center">
+              <button 
+                onClick={handleShareItinerary}
+                className="btn-secondary px-8 py-4 text-lg font-bold rounded-2xl hover-lift min-h-[48px] sm:min-h-[56px] flex items-center justify-center"
+              >
                 {t('pages.tripPlanner.summary.share', 'Share Itinerary')}
               </button>
             </div>

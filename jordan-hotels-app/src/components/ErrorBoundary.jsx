@@ -24,10 +24,10 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       // Fallback UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6 text-center">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">Oops! Something went wrong</h1>
-            <p className="text-gray-600 mb-4">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
+          <div className="max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-lg p-6 text-center">
+            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Oops! Something went wrong</h1>
+            <p className="text-gray-600 dark:text-slate-400 mb-4">
               We're sorry, but something unexpected happened. Please try refreshing the page.
             </p>
             <button

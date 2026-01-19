@@ -24,10 +24,10 @@ const Verify = () => {
   if (!email) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-light-premium dark:bg-dark-premium p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
-          <AlertCircle className="mx-auto text-red-600 mb-4" size={48} />
+        <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
+          <AlertCircle className="mx-auto text-red-600 dark:text-red-400 mb-4" size={48} />
           <h2 className="text-2xl font-black mb-4">{t('pages.verify.invalidAccessTitle')}</h2>
-          <p className="text-slate-600 mb-6">{t('pages.verify.invalidAccessBody')}</p>
+          <p className="text-slate-600 dark:text-slate-400 mb-6">{t('pages.verify.invalidAccessBody')}</p>
           <button 
             onClick={() => navigate('/signup')}
             className="w-full bg-blue-900 text-white p-3 rounded-lg font-bold hover:bg-blue-800 transition-all"
