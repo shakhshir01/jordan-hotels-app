@@ -47,6 +47,7 @@ export async function initAmplify() {
       // Mark as configured
       if (typeof window !== 'undefined') {
         window.amplifyConfigured = true;
+        console.log('Amplify configured successfully');
       }
     } else {
       // If no amplifyconfiguration.json was found, attempt to bootstrap
@@ -88,10 +89,51 @@ export async function initAmplify() {
           // Mark as configured
           if (typeof window !== 'undefined') {
             window.amplifyConfigured = true;
+            console.log('Amplify configured with fallback config');
+          }
+        } else if (import.meta.env.VITE_COGNITO_USER_POOL_ID && import.meta.env.VITE_COGNITO_CLIENT_ID) {
+          // Fallback to VITE environment variables directly
+          const fallback = {
+            Auth: {
+              region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+              userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
+              userPoolWebClientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
+            }
+          };
+
+          // If a hosted UI domain is provided, wire up the oauth entries.
+          if (import.meta.env.VITE_COGNITO_DOMAIN) {
+            fallback.Auth.oauth = {
+              domain: import.meta.env.VITE_COGNITO_DOMAIN,
+              scope: ['email','openid','profile'],
+              redirectSignIn: import.meta.env.VITE_REDIRECT_SIGN_IN || `${window.location.origin}/auth/callback`,
+              redirectSignOut: import.meta.env.VITE_REDIRECT_SIGN_OUT || `${window.location.origin}/`,
+              responseType: 'code'
+            };
+          }
+
+          Amplify.configure(fallback);
+          Analytics.configure({
+            AWSPinpoint: {
+              region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+              allowGuestUsers: true
+            }
+          });
+
+          // Mark as configured
+          if (typeof window !== 'undefined') {
+            window.amplifyConfigured = true;
+            console.log('Amplify configured with VITE env vars');
           }
         }
       } catch (_e) {
+        console.log('Failed to bootstrap Amplify config:', _e);
         // ignore bootstrap errors
+      }
+
+      // If no configuration was set, log it
+      if (typeof window !== 'undefined' && !window.amplifyConfigured) {
+        console.log('No Amplify configuration found - running without auth');
       }
     }
   } catch (_error) {
@@ -100,18 +142,20 @@ export async function initAmplify() {
 
   // After configuring Amplify, if there's an existing authenticated session
   // set the API Authorization header immediately so early requests include it.
-  try {
-    const session = await Auth.currentSession();
-    if (session) {
-      try {
-        const idToken = session.getIdToken().getJwtToken();
-        setAuthToken(idToken);
-      } catch (_e) {
-        // ignore token set failures
+  if (typeof window !== 'undefined' && window.amplifyConfigured) {
+    try {
+      const session = await Auth.currentSession();
+      if (session) {
+        try {
+          const idToken = session.getIdToken().getJwtToken();
+          setAuthToken(idToken);
+        } catch (_e) {
+          // ignore token set failures
+        }
       }
+    } catch (_err) {
+      // no session available, that's fine
     }
-  } catch (_err) {
-    // no session available, that's fine
   }
 
   // Optional test event (safe to ignore if Analytics isn't configured yet)

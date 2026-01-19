@@ -136,13 +136,14 @@ export const AuthProvider = ({ children }) => {
   // Check if user is already logged in on mount
   useEffect(() => {
     const checkAuth = async () => {
-      // Wait for Amplify to be configured
-      if (typeof window !== 'undefined' && !window.amplifyConfigured) {
-        setLoading(false);
-        return;
-      }
-
       try {
+        // Wait for Amplify to be configured
+        if (typeof window !== 'undefined' && !window.amplifyConfigured) {
+          console.log('Amplify not configured yet, skipping auth check. Flag value:', window.amplifyConfigured);
+          setLoading(false);
+          return;
+        }
+
         // First check Amplify OAuth authentication
         try {
           const amplifyUser = await Auth.currentAuthenticatedUser();
@@ -156,8 +157,13 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
             return;
           }
-        } catch (_amplifyError) {
-          console.log('No Amplify user found on mount');
+        } catch (authError) {
+          if (authError.message && authError.message.includes('Amplify has not been configured')) {
+            console.log('Amplify not configured, skipping OAuth check');
+            // Continue to Cognito check
+          } else {
+            console.log('No Amplify user found on mount:', authError.message);
+          }
         }
 
         // Then check traditional Cognito authentication
@@ -244,7 +250,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Delay to ensure Amplify is configured
-    const timer = setTimeout(checkAuth, 1500);
+    const timer = setTimeout(checkAuth, 3000);
     return () => clearTimeout(timer);
   }, [setUserAndProfileFromEmail]);
 
