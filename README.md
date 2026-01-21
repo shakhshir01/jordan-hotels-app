@@ -1,4 +1,4 @@
-# VisitJo - Premium Travel Booking Platform for Jordan
+# VISIT-JO - Premium Travel Booking Platform for Jordan
 
 A full-stack, production-ready travel booking application for exploring Jordan's top destinations. Built with React, Tailwind CSS, AWS Lambda, DynamoDB, and Cognito.
 
@@ -48,7 +48,7 @@ A full-stack, production-ready travel booking application for exploring Jordan's
 ## 📁 Project Structure
 
 ```
-VisitJo/
+VISIT-JO/
 ├── jordan-hotels-app/                # Frontend (React + Vite)
 │   ├── src/
 │   │   ├── pages/                   # 20+ page components
@@ -126,8 +126,8 @@ VisitJo/
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/YOUR_USERNAME/visitjo.git
-cd visitjo
+git clone https://github.com/YOUR_USERNAME/VISIT-JO.git
+cd VISIT-JO
 
 # 2. Install dependencies
 cd jordan-hotels-app
@@ -219,7 +219,7 @@ See [GITHUB_DEPLOYMENT.md](./GITHUB_DEPLOYMENT.md) for full setup.
 **Frontend:**
 ```bash
 npm run build
-aws s3 sync dist/ s3://visitjo-frontend/
+aws s3 sync dist/ s3://VISIT-JO-frontend/
 ```
 
 **Backend:**
@@ -334,7 +334,7 @@ This project is licensed under the MIT License - see [LICENSE](./LICENSE) file f
 
 - **Issues**: GitHub Issues
 - **Discussions**: GitHub Discussions
-- **Email**: support@visitjo.com (placeholder)
+- **Email**: support@VISIT-JO.com (placeholder)
 
 ## 🙏 Acknowledgments
 
@@ -359,5 +359,5 @@ This project is licensed under the MIT License - see [LICENSE](./LICENSE) file f
 
 **Status**: ✅ PRODUCTION READY  
 **Last Updated**: January 3, 2026  
-**Maintained By**: VisitJo Team  
+**Maintained By**: VISIT-JO Team  
 **License**: MIT

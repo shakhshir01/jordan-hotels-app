@@ -75,7 +75,7 @@ jobs:
           sam deploy \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
-            --stack-name visitjo-api \
+            --stack-name VISIT-JO-api \
             --s3-bucket ${{ secrets.SAM_DEPLOY_BUCKET }} \
             --capabilities CAPABILITY_IAM
 

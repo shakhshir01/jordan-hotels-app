@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to VisitJo — we appreciate improvements, bug fixes and documentation.
+Thanks for contributing to VISIT-JO — we appreciate improvements, bug fixes and documentation.
 
 Getting started:
 - Fork the repo and create a feature branch off `main`.
