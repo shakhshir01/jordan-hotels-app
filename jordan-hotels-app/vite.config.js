@@ -41,15 +41,32 @@ export default defineConfig(({ mode }) => {
         process: 'process/browser',
         // Resolve `process/browser` to an ESM shim to avoid CommonJS `module` usage
         'process/browser': path.resolve(process.cwd(), 'src', 'shims', 'process-shim.js'),
+        // Resolve `module` to an ESM shim to avoid "module is not defined" errors
+        module: path.resolve(process.cwd(), 'src', 'shims', 'module-shim.js'),
         // Ensure the browser-friendly, ESM-compatible sha256 implementation is used
         '@aws-crypto/sha256-js': '@aws-crypto/sha256-browser',
       },
     },
     define: {
       global: 'globalThis',
+      module: '(globalThis.module = globalThis.module || { exports: {} })',
       // don't inject a fake `module` object — some libs detect it and alter runtime
     },
     plugins: [
+      // Custom plugin to handle CommonJS module.exports in browser
+      {
+        name: 'handle-commonjs-exports',
+        transform(code, id) {
+          // Handle unfetch and similar CommonJS modules that use module.exports
+          if (code.includes('module.exports') && id.includes('node_modules')) {
+            // Inject module object at the top if not already present
+            if (!code.includes('globalThis.module')) {
+              const injection = 'if(!globalThis.module){globalThis.module={exports:{}}}';
+              return { code: injection + code, map: null };
+            }
+          }
+        }
+      },
       react(),
       // Temporarily disable PWA to avoid conflicts
       // ...(mode === 'production' ? [VitePWA({

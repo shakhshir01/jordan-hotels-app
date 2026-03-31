@@ -2,10 +2,19 @@
 import { Buffer } from 'buffer';
 import process from 'process';
 
+// Minimal module shim for CommonJS compatibility in browser
+const module = {
+  exports: {},
+  require: () => {
+    throw new Error('require() is not available in the browser');
+  },
+};
+
 // Make polyfills available globally
 if (typeof globalThis !== 'undefined') {
   globalThis.Buffer = Buffer;
   globalThis.process = process;
+  globalThis.module = module;
 }
 
 import * as React from "react";
