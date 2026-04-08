@@ -90,7 +90,7 @@
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-imagemin": "^0.4.6",
     "vite-plugin-pwa": "^1.2.0",
-    "vitest": "^1.6.1"
+    "vitest": "^4.0.17"
   },
   "overrides": {
     "esbuild": "0.27.2",
